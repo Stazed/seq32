@@ -1,0 +1,53 @@
+v0.4.2 ------------------------------------------------
+2003-5-14
+
+	* Updated main interface
+	* added --priority flag (runs at higher priority)
+	* refactored midi system, took out midi prebuffer
+
+v0.4.1 ------------------------------------------------
+
+	* Fixed gcc 3.2 compile problem
+	* real time value change in data window
+
+v0.4.0 ------------------------------------------------
+
+2002-10-8
+
+	* Added Performace editor.
+
+
+v0.3.0 ------------------------------------------------
+
+2002-9-16
+
+	* Midi clock configure Dialog ( removed #ifndef MIDI_CLOCK stuff )
+	* Updated main interface (progress bars, spin widgets for bpm and screen set )
+	* Midi recording & midi Thru in edit window
+	* Ability to move/select/delete rouge Note On/Off events (just deleted them before )
+	* Added Paino Roll progress indicator, removed one from upper time bar thing.
+	* Removed context menu to switch from Add/Select mode on paino roll.  Now
+	  you just right click and hold down on paino roll and event bar to toggle modes.
+	* Moved Event select button, now on bottom with a display of curent event type.
+	
+v0.2.0 -------------------------------------------------
+
+2002-08-04
+	* Added Control Code Editor
+
+2002-07-16   
+	* seqkeys.C - fixed black key drawing problem
+
+
+v0.1.1 -------------------------------------------------
+
+2002-07-15    Rob Buse    rcbuse@filter24.org
+	* added #define _GNU_SOURCE to makefile.in
+
+v0.1.0 -------------------------------------------------
+
+2002-07-14    Rob Buse    rcbuse@filter24.org 
+	* Initial release of seq24-0.1.0  woohoo!
+
+
+	
