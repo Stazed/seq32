@@ -169,6 +169,8 @@ extern bool global_jack_start_mode;
 extern bool global_manual_alsa_ports;
 
 extern std::string global_filename;
+extern std::string last_used_dir;
+extern bool is_pattern_playing;
 
 extern bool global_print_keys;
 

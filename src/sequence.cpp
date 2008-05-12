@@ -31,6 +31,7 @@ sequence::sequence( )
     m_playing       = false;
     m_was_playing   = false;
     m_recording     = false;
+    m_quanized_rec  = false;
     m_thru          = false;
     m_queued        = false;
 
@@ -38,12 +39,14 @@ sequence::sequence( )
         
     m_time_beats_per_measure = 4;
     m_time_beat_width = 4;
+    m_rec_vol = 0;
 
     //m_tag           = 0;
 
     m_name          = c_dummy;
     m_bus           = 0;
     m_length        = 4 * c_ppqn;
+    m_snap_tick     = c_ppqn / 4;
     m_midi_channel  = 0;
   
     /* no notes are playing */
@@ -167,6 +170,14 @@ sequence::set_bw( long a_beat_width )
     lock();
     m_time_beat_width = a_beat_width;
     set_dirty_mp();
+    unlock();
+}
+
+void 
+sequence::set_rec_vol( long a_rec_vol )
+{
+    lock();
+    m_rec_vol = a_rec_vol;
     unlock();
 }
 
@@ -416,12 +427,13 @@ sequence::verify_and_link()
     list<event>::iterator i;
     list<event>::iterator on;
     list<event>::iterator off;
+    bool end_found = false;
 
     lock();
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
 	(*i).clear_link();
-    (*i).unmark();
+        (*i).unmark();
     }
 
     on = m_list_event.begin();
@@ -435,7 +447,8 @@ sequence::verify_and_link()
 
 	    /* get next possible off node */
 	    off = on; off++;
-
+	    end_found = false;
+	    
 	    while ( off != m_list_event.end() ){
 		
 		/* is a off event, == notes, and isnt
@@ -449,10 +462,31 @@ sequence::verify_and_link()
 		    (*off).link( &(*on) );
 		    (*on).mark(  );
 		    (*off).mark( );
+		    end_found = true;
 
 		    break;
 		}
 		off++;
+	    }
+	    if (!end_found) {
+		off = m_list_event.begin();
+		while ( off != on){
+		    if ( (*off).is_note_off()                  &&
+		         (*off).get_note() == (*on).get_note() && 
+		         ! (*off).is_marked()                  ){
+
+		        /* link + mark */
+		        (*on).link( &(*off) );
+		        (*off).link( &(*on) );
+		        (*on).mark(  );
+		        (*off).mark( );
+		        end_found = true;
+
+		        break;
+		    }
+  		    off++;
+		     
+		}
 	    }
 	}    
 	on++;
@@ -491,6 +525,7 @@ sequence::link_new( )
 {
     list<event>::iterator on;
     list<event>::iterator off;
+    bool end_found = false;
 
     lock();
 
@@ -506,7 +541,7 @@ sequence::link_new( )
 	    
 	    /* get next element */
 	    off = on; off++;
-	    
+	    end_found = false;
 	    while ( off != m_list_event.end()){
 
 		/* is a off event, == notes, and isnt
@@ -518,10 +553,32 @@ sequence::link_new( )
 		    /* link */
 		    (*on).link( &(*off) );
 		    (*off).link( &(*on) );
+		    end_found = true;
 		    
 		    break;
 		}
 		off++;
+	    }
+
+	    if (!end_found) {
+                off = m_list_event.begin();
+	        while ( off != on){
+
+		    /* is a off event, == notes, and isnt
+   		       selected  */
+		    if ( (*off).is_note_off()                    &&
+		         (*off).get_note() == (*on).get_note() && 
+		         ! (*off).is_linked()                    ){
+		    
+		        /* link */
+		        (*on).link( &(*off) );
+		        (*off).link( &(*on) );
+			end_found = true;
+		    
+		        break;
+		}
+		off++;
+	    }
 	    }
 	}    
 	on++;
@@ -632,8 +689,8 @@ sequence::get_selected_box( long *a_tick_s, int *a_note_h,
 	    
 	    time = (*i).get_timestamp();
 	    
-	    if ( time < *a_tick_s ) *a_tick_s = time;
-	    if ( time > *a_tick_f ) *a_tick_f = time;
+	    if ((*i).is_note_on() && ( time < *a_tick_s )) *a_tick_s = time;
+	    if ((*i).is_note_off() && (time > *a_tick_f )) *a_tick_f = time;
 	    
 	    note = (*i).get_note();
 
@@ -747,24 +804,40 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
         long a_tick_f, int a_note_l, select_action_e a_action)
 {
     int ret=0;
+
+    long tick_s;
+    long tick_f;
+
     list<event>::iterator i;
 
     lock();
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
 
-        if( (*i).is_note_off()                &&
-                (*i).get_timestamp() >= a_tick_s &&
-                (*i).get_note()      <= a_note_h &&
-                (*i).get_note()      >= a_note_l ){
-
-
-            if ( (*i).is_linked() ){
-
+        if( (*i).get_note()      <= a_note_h &&
+            (*i).get_note()      >= a_note_l ) {
+	    
+	    if ( (*i).is_linked() ) {
                 event *ev = (*i).get_linked();
+		
+	        if ( (*i).is_note_off() ) {
+		    tick_s = ev->get_timestamp();
+		    tick_f = (*i).get_timestamp();
+		}
+		
+	        if ( (*i).is_note_on() ) {
+		    tick_f = ev->get_timestamp();
+		    tick_s = (*i).get_timestamp();
+	        }
 
-                if ( ev->get_timestamp() <= a_tick_f ){
-
+		if (
+		   (    (tick_s <= tick_f) && 
+		        ((tick_s <= a_tick_f) && (tick_f >= a_tick_s)) ) ||
+		   (    (tick_s > tick_f) && 
+			((tick_s <= a_tick_f) || (tick_f >= a_tick_s)) ) )
+		
+		{
+			
                     if ( a_action == e_select ||
                          a_action == e_select_one )
                     {
@@ -787,39 +860,32 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
                         ret = 1;
                         break;
                     }
-                }
-            }
-        }
+		    
+		}
 
-        if ( ! (*i).is_linked() &&
-                ( (*i).is_note_on() ||
-                  (*i).is_note_off() ) &&
-                (*i).get_timestamp()  >= a_tick_s - 16 &&
-                (*i).get_timestamp()  <= a_tick_f && 
-                (*i).get_note()       <= a_note_h &&
-                (*i).get_note()       >= a_note_l ) {
+			
+  	    } else {
+		tick_s = tick_f = (*i).get_timestamp();    
+                if ( tick_s  >= a_tick_s - 16 && tick_f <= a_tick_f) {
 
-            if ( a_action == e_select ||
-                 a_action == e_select_one )
-            {
-                (*i).select( );
-                ret++;
-                if ( a_action == e_select_one )
-                    break;
-            }
-            if ( a_action == e_is_selected )
-            {
-                if ( (*i).is_selected())
-                {
-                    ret = 1;
-                    break;
+                    if ( a_action == e_select || a_action == e_select_one ) {
+                        (*i).select( );
+                        ret++;
+                        if ( a_action == e_select_one )
+                            break;
+                    }
+                    if ( a_action == e_is_selected ) {
+                        if ( (*i).is_selected()) {
+                            ret = 1;
+                            break;
+                        }
+                    }
+                    if ( a_action == e_would_select ) {
+                        ret = 1;
+                        break;
+                    }
                 }
-            }
-            if ( a_action == e_would_select )
-            {
-                ret = 1;
-                break;
-            }
+	    }
         }
     }
 
@@ -918,11 +984,11 @@ void
 sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
 {
     event e;
-
+    bool noteon=false;
+    long timestamp=0;
+    
     lock();
-
     mark_selected();
-
     list<event>::iterator i;
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
@@ -934,11 +1000,29 @@ sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
             e  = (*i);
             e.unmark();
 
-            if ( (e.get_timestamp() + a_delta_tick) >= 0   &&
-                 (e.get_note() + a_delta_note)      >= 0   &&
+            if ( (e.get_note() + a_delta_note)      >= 0   &&
                  (e.get_note() + a_delta_note)      <  c_num_keys ){
 
-                e.set_timestamp( e.get_timestamp() + a_delta_tick );
+		noteon = e.is_note_on();
+                timestamp = e.get_timestamp() + a_delta_tick;
+
+		if (timestamp > m_length) {
+			timestamp = timestamp - m_length;
+		}
+
+		if (timestamp < 0) {
+			timestamp = m_length + timestamp;
+		}
+
+		if ((timestamp==0) && !noteon) {
+			timestamp = m_length-2;
+		}
+
+		if ((timestamp==m_length) && noteon) {
+			timestamp = 0;
+		}
+
+                e.set_timestamp( timestamp );
                 e.set_note( e.get_note() + a_delta_note );
                 e.select();
 
@@ -1101,19 +1185,29 @@ sequence::grow_selected( long a_delta_tick )
             off = (*i).get_linked();
 
             long length = 
-                off->get_timestamp() - 
-                on->get_timestamp() +
+                off->get_timestamp() + 
                 a_delta_tick;
-            on->unmark();
 
-            if ( length < 1 )
-                length = 1;
+	    //If timestamp + delta is greater that m_length we do round robbin magic
+	    if (length > m_length) {
+	    	length = length - m_length;
+	    }
+
+	    if (length < 0) {
+	    	length = m_length + length;
+	    }
+
+	    if (length==0) {
+	    	length = m_length-2;
+	    }
+
+            on->unmark();
 
             /* copy event */
             e  = *off;
             e.unmark();
 
-            e.set_timestamp( on->get_timestamp() + length );
+            e.set_timestamp( length );
             add_event( &e );
         }
     }
@@ -1500,6 +1594,15 @@ sequence::stream_event(  event *a_ev  )
     }
 
     link_new();
+
+    if ( m_quanized_rec ){
+	if (a_ev->is_note_off()) {
+	    select_note_events( a_ev->get_timestamp(), a_ev->get_note(), 
+			        a_ev->get_timestamp(), a_ev->get_note(), e_select);
+            quanize_events( EVENT_NOTE_ON, 0, m_snap_tick, 1 , true );
+	    
+	}
+    }
     /* update view */
 
     unlock();
@@ -2791,6 +2894,28 @@ sequence::get_recording( )
     return m_recording;
 }
 
+void 
+sequence::set_snap_tick( int a_st )
+{
+    lock();
+    m_snap_tick = a_st;
+    unlock();
+}
+
+void 
+sequence::set_quanized_rec( bool a_qr )
+{
+    lock();
+    m_quanized_rec = a_qr;
+    unlock();
+}
+
+
+bool 
+sequence::get_quanidez_rec( )
+{
+    return m_quanized_rec;
+}
 
 
 void 
@@ -3101,7 +3226,10 @@ sequence::quanize_events( unsigned char a_status, unsigned char a_cc,
             else {
                 timestamp_delta = (a_snap_tick - timestamp_remander) / a_divide;
             }
-            
+	    if ((timestamp_delta + timestamp) >= m_length) {
+		timestamp_delta = - e.get_timestamp() ;
+	    }
+	    
             e.set_timestamp( e.get_timestamp() + timestamp_delta );
             quantized_events.push_front(e);
             

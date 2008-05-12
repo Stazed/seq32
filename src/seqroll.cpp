@@ -471,128 +471,145 @@ seqroll::draw_progress_on_window()
 
 
 
-void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
-{
-   
-    
-    long tick_s;
-    long tick_f;
-    int note;
-    
-    int note_x;
-    int note_width;
-    int note_y;
-    int note_height;
+void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw ) {
 
-    bool selected;
+	long tick_s;
+	long tick_f;
+	int note;
 
-    int velocity;
+	int note_x;
+	int note_width;
+	int note_y;
+	int note_height;
 
-    draw_type dt;
+	bool selected;
 
-    
+	int velocity;
 
-    int start_tick = m_scroll_offset_ticks ;
-    int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
-    
-    sequence *seq = NULL;
-    for( int method=0; method<2; ++method ){
-        
-        if ( method == 0 && m_drawing_background_seq  ){
-            
-            if ( m_perform->is_active( m_background_sequence )){
-                seq =m_perform->get_sequence( m_background_sequence );
-            }
-            else{
-                method++;
-            }
-        }
-        else if ( method == 0 ){
-            method++;
-        }
-        
-        
-        if ( method==1){
-            seq = m_seq;
-        }
+	draw_type dt;
 
-        /* draw boxes from sequence */
-        m_gc->set_foreground( m_black );
-        seq->reset_draw_marker();
 
-        while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, 
-                                                &selected, &velocity )) != DRAW_FIN ){
-            
-            if ( (tick_s >= start_tick && tick_s <= end_tick) ||
-                 ((dt == DRAW_NORMAL_LINKED) &&
-                  (tick_f >= start_tick && tick_f <= end_tick))){
-                
-                /* turn into screen corrids */
-                note_x = tick_s / m_zoom;
-                note_y = c_rollarea_y -(note * c_key_y) - c_key_y - 1 + 2;
-                note_height = c_key_y - 3;
-                
-                //printf( "drawing note[%d] tick_start[%d] tick_end[%d]\n",
-                //	    note, tick_start, tick_end );
-                
-                int in_shift = 0;
-                int length_add = 0;
-                
-                if ( dt == DRAW_NORMAL_LINKED ){
-                    
-                    note_width = (tick_f - tick_s) / m_zoom;
-                    if ( note_width < 1 ) note_width = 1;
-                    
-                }
-                else {
-                    note_width = 8 / m_zoom;
-                }
-                
-                if ( dt == DRAW_NOTE_ON ){
-                    
-                    in_shift = 0;
-                    length_add = 2;
-                }       
-                
-                if ( dt == DRAW_NOTE_OFF ){
-                    
-                    in_shift = -1;
-                    length_add = 1;
-                }
-                
-                note_x -= m_scroll_offset_x;
-                note_y -= m_scroll_offset_y;
-                
-                m_gc->set_foreground(m_black);
-                /* draw boxes from sequence */
 
-                if ( method == 0 )
-                    m_gc->set_foreground( m_dk_grey );
-                
-                a_draw->draw_rectangle(m_gc,true,
-                                       note_x,
-                                       note_y, 
-                                       note_width, 
-                                       note_height);
-                
-                /* draw inside box if there is room */
-                if ( note_width > 3 ){
-                    
-                    if ( selected )
-                        m_gc->set_foreground(m_red);
-                    else
-                        m_gc->set_foreground(m_white);
+	int start_tick = m_scroll_offset_ticks ;
+	int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
 
-                    if ( method == 1 )
-                        a_draw->draw_rectangle(m_gc,true,
-                                               note_x + 1 + in_shift,
-                                               note_y + 1, 
-                                               note_width - 3 + length_add, 
-                                               note_height - 3);	   
-                }
-            }
-        }
-    }
+	sequence *seq = NULL;
+	for( int method=0; method<2; ++method )	{
+
+		if ( method == 0 && m_drawing_background_seq  ){
+
+			if ( m_perform->is_active( m_background_sequence )){
+				seq =m_perform->get_sequence( m_background_sequence );
+			} else {
+				method++;
+			}
+		} else if ( method == 0 ){
+			method++;
+		}
+
+
+		if ( method==1){
+			seq = m_seq;
+		}
+
+		/* draw boxes from sequence */
+		m_gc->set_foreground( m_black );
+		seq->reset_draw_marker();
+
+		while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN ) {
+
+			if (	(tick_s >= start_tick && tick_s <= end_tick) ||
+				( (dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick))
+			) {
+
+				/* turn into screen corrids */
+				note_x = tick_s / m_zoom;
+				note_y = c_rollarea_y -(note * c_key_y) - c_key_y - 1 + 2;
+				note_height = c_key_y - 3;
+
+//				printf( "DEBUG: drawing note[%d] tick_s[%d] tick_f[%d] start_tick[%d] end_tick[%d]\n",
+//				note, tick_s, tick_f, start_tick, end_tick );
+//				printf( "DEBUG: seq.get_lenght() = %d\n",  m_seq->get_length());
+
+				int in_shift = 0;
+				int length_add = 0;
+
+				if ( dt == DRAW_NORMAL_LINKED ){
+
+					if (tick_f >= tick_s) {
+						note_width = (tick_f - tick_s) / m_zoom;
+						if ( note_width < 1 ) note_width = 1;
+					} else {
+						note_width = (m_seq->get_length() - tick_s) / m_zoom;
+					}
+
+				} else {
+					note_width = 16 / m_zoom;
+				}
+
+				if ( dt == DRAW_NOTE_ON ){
+					in_shift = 0;
+					length_add = 2;
+				}       
+
+				if ( dt == DRAW_NOTE_OFF ){
+					in_shift = -1;
+					length_add = 1;
+				}
+
+				note_x -= m_scroll_offset_x;
+				note_y -= m_scroll_offset_y;
+
+				m_gc->set_foreground(m_black);
+				/* draw boxes from sequence */
+
+				if ( method == 0 )
+					m_gc->set_foreground( m_dk_grey );
+
+				a_draw->draw_rectangle(	m_gc,true,
+							note_x,
+							note_y, 
+							note_width, 
+							note_height);
+				if (tick_f < tick_s) {
+					a_draw->draw_rectangle(	m_gc,true,
+								0,
+								note_y, 
+								tick_f/m_zoom, 
+								note_height);
+				}
+
+				/* draw inside box if there is room */
+				if ( note_width > 3 ){
+
+					if ( selected )
+						m_gc->set_foreground(m_red);
+					else
+						m_gc->set_foreground(m_white);
+
+					if ( method == 1 )
+						if (tick_f >= tick_s) {
+							a_draw->draw_rectangle(	m_gc,true,
+										note_x + 1 + in_shift,
+										note_y + 1, 
+										note_width - 3 + length_add, 
+										note_height - 3);
+						} else {
+							a_draw->draw_rectangle(	m_gc,true,
+										note_x + 1 + in_shift,
+										note_y + 1, 
+										note_width , 
+										note_height - 3);
+							a_draw->draw_rectangle(	m_gc,true,
+										0,
+										note_y + 1, 
+										(tick_f/m_zoom) - 3 + length_add, 
+										note_height - 3);
+						}
+				}
+			}
+		}
+	}
 } 
 
 
@@ -1248,6 +1265,19 @@ bool
 seqroll::on_key_press_event(GdkEventKey* a_p0)
 {
     bool ret = false;
+
+	if ( a_p0->keyval ==  GDK_space ){
+		    if (is_pattern_playing) {
+			    m_perform->stop_jack();
+			    m_perform->stop();
+		    	    is_pattern_playing=false;
+		    } else {
+			    m_perform->position_jack( false );  
+			    m_perform->start( false );
+			    m_perform->start_jack( );
+		    	    is_pattern_playing=true;
+ 		    }
+            }
 
     if ( a_p0->type == GDK_KEY_PRESS ){
 

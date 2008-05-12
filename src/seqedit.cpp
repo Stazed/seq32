@@ -27,6 +27,7 @@
 
 
 #include "play.xpm"
+#include "q_rec.xpm"
 #include "rec.xpm"
 #include "thru.xpm"
 #include "bus.xpm"
@@ -39,6 +40,7 @@
 #include "down.xpm"
 #include "note_length.xpm"
 #include "undo.xpm"
+#include "quanize.xpm"
 #include "menu_empty.xpm"
 #include "menu_full.xpm"
 #include "sequences.xpm"
@@ -149,6 +151,7 @@ seqedit::seqedit( sequence *a_seq,
     m_menu_length = manage( new Menu());
     m_menu_bpm = manage( new Menu() );
     m_menu_bw = manage( new Menu() );
+    m_menu_rec_vol = manage( new Menu() );
 
     m_menu_midich = NULL;
     m_menu_midibus = NULL;
@@ -226,6 +229,16 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_record->signal_clicked().connect( mem_fun( *this, &seqedit::record_change_callback));
     m_tooltips->set_tip( *m_toggle_record, "Records incoming midi data." );
 
+    m_toggle_q_rec = manage( new ToggleButton(  ));
+    m_toggle_q_rec->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( q_rec_xpm ))));
+    m_toggle_q_rec->signal_clicked().connect( mem_fun( *this, &seqedit::q_rec_change_callback));
+    m_tooltips->set_tip( *m_toggle_q_rec, "Quantized Record." );
+
+    m_button_rec_vol = manage( new Button());
+    m_button_rec_vol->add( *manage( new Label("Vol")));
+    m_button_rec_vol->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_rec_vol  ));
+    m_tooltips->set_tip( *m_button_rec_vol, "Rec. Volume" );
+
     m_toggle_thru = manage( new ToggleButton(  ));
     m_toggle_thru->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( thru_xpm ))));
     m_toggle_thru->signal_clicked().connect( mem_fun( *this, &seqedit::thru_change_callback));
@@ -235,6 +248,8 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_record->set_active( m_seq->get_recording());
     m_toggle_thru->set_active( m_seq->get_thru());
  
+    dhbox->pack_end( *m_button_rec_vol, false, false, 4);
+    dhbox->pack_end( *m_toggle_q_rec, false, false, 4);
     dhbox->pack_end( *m_toggle_record, false, false, 4);
     dhbox->pack_end( *m_toggle_thru, false, false, 4);
     dhbox->pack_end( *m_toggle_play, false, false, 4);
@@ -347,6 +362,16 @@ seqedit::create_menus( void )
     m_menu_bw->items().push_back(MenuElem("8", SigC::bind(mem_fun(*this,&seqedit::set_bw), 8  )));
     m_menu_bw->items().push_back(MenuElem("16", SigC::bind(mem_fun(*this,&seqedit::set_bw), 16 )));
     
+    /* record volume */
+    m_menu_rec_vol->items().push_back(MenuElem("Free", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 0  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 8", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 127  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 7", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 111  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 6", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 95  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 5", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 79  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 4", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 63  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 3", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 47  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 2", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 31  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 1", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 15  )));
     
     /* music scale */
     m_menu_scale->items().push_back(MenuElem(c_scales_text[0], SigC::bind(mem_fun(*this,&seqedit::set_scale), c_scale_off )));
@@ -647,6 +672,15 @@ seqedit::fill_top_bar( void )
     m_tooltips->set_tip( *m_button_undo, "Undo." );
  
     m_hbox2->pack_start( *m_button_undo , false, false );
+    
+    /* quantize shortcut */
+    m_button_quanize = manage( new Button());
+    m_button_quanize->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( quanize_xpm  ))));
+    m_button_quanize->signal_clicked().connect( SigC::bind(mem_fun(*this,&seqedit::do_action), quantize_notes,0 ));
+    m_tooltips->set_tip( *m_button_quanize, "Quantize Selection." );
+ 
+    m_hbox2->pack_start( *m_button_quanize , false, false );
+
     m_hbox2->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
     /* tools button */
@@ -1068,7 +1102,9 @@ seqedit::set_snap( int a_snap  )
     m_initial_snap = a_snap;
     m_seqroll_wid->set_snap( m_snap );
     m_seqevent_wid->set_snap( m_snap );
+    m_seq->set_snap_tick(a_snap);
 }
+
 
 
 
@@ -1188,6 +1224,11 @@ seqedit::set_bw( int a_beat_width  )
 }
 
 
+void
+seqedit::set_rec_vol( int a_rec_vol  )
+{
+    m_seq->set_rec_vol( a_rec_vol );
+}
 
 
 void 
@@ -1213,6 +1254,11 @@ seqedit::record_change_callback( void )
     m_seq->set_recording( m_toggle_record->get_active() );
 }
 
+void 
+seqedit::q_rec_change_callback( void )
+{
+    m_seq->set_quanized_rec( m_toggle_q_rec->get_active() );
+}
 
 void 
 seqedit::undo_callback( void )

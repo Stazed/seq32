@@ -26,7 +26,9 @@
 #include "stop.xpm"
 #include "perfedit.xpm"
 #include "seq24.xpm"
- 
+
+bool is_pattern_playing = false;
+
 mainwnd::mainwnd(perform *a_p)
 {
 
@@ -279,6 +281,7 @@ mainwnd::file_saveas_dialog( void )
 {
 
     FileSelection dialog( "Save As..." );
+    dialog.set_filename(last_used_dir.c_str());
     int result = dialog.run();
     
     //Handle the response:
@@ -303,6 +306,8 @@ mainwnd::file_saveas_dialog( void )
             }
             
             global_filename = std::string( dialog.get_filename());
+	    last_used_dir.assign(dialog.get_filename());
+	    last_used_dir = last_used_dir.substr(0,last_used_dir.rfind("/")+1).c_str() ;
             set_window_title_filename( global_filename );
             
             break;
@@ -324,6 +329,7 @@ void
 mainwnd::file_open_dialog( void )
 {
     FileSelection dialog( "Open..." );
+    dialog.set_filename(last_used_dir.c_str());
     int result = dialog.run();
     
     //Handle the response:
@@ -349,6 +355,8 @@ mainwnd::file_open_dialog( void )
             }
 
             global_filename = std::string(dialog.get_filename());
+	    last_used_dir.assign(dialog.get_filename());
+	    last_used_dir = last_used_dir.substr(0,last_used_dir.rfind("/")+1).c_str() ;
             set_window_title_filename( global_filename );
             
             m_main_wid->reset();
@@ -623,12 +631,13 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             
             if ( a_ev->keyval == m_mainperf->m_key_start )
             {
-                start_playing();            
-            }
-
-            if ( a_ev->keyval == m_mainperf->m_key_stop )
-            {
-                stop_playing();            
+		    if (is_pattern_playing) {
+		            stop_playing();
+		    	    is_pattern_playing=false;
+		    } else {
+			    start_playing();
+		    	    is_pattern_playing=true;
+ 		    }
             }
 
 

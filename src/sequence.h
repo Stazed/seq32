@@ -111,6 +111,7 @@ class sequence
     bool m_was_playing;
     bool m_playing;
     bool m_recording;
+    bool m_quanized_rec;
     bool m_thru;
     bool m_queued;
 
@@ -139,12 +140,14 @@ class sequence
     /* length of sequence in pulses 
        should be powers of two in bars */
     long m_length;
+    long m_snap_tick;
 
     /* these are just for the editor to mark things
        in correct time */
     //long m_length_measures;
     long m_time_beats_per_measure;
     long m_time_beat_width;
+    long m_rec_vol;
 
     /* locking */
     mutex m_mutex;
@@ -199,6 +202,7 @@ class sequence
 
     void set_bw (long a_beat_width);
     long get_bw (void);
+    void set_rec_vol (long a_rec_vol);
 
     void set_song_mute (bool a_mute);
     bool get_song_mute (void);
@@ -246,6 +250,9 @@ class sequence
 
     void set_recording (bool);
     bool get_recording ();
+    void set_snap_tick( int a_st );
+    void set_quanized_rec( bool a_qr );
+    bool get_quanidez_rec( );
 
     void set_thru (bool);
     bool get_thru ();

@@ -20,7 +20,7 @@
 
 #include "optionsfile.h"
 #include <iostream>
-
+std::string last_used_dir;
 optionsfile::optionsfile( string a_name ) :
     configfile( a_name )
 {
@@ -176,6 +176,11 @@ optionsfile::parse( perform *a_perf )
     line_after( &file, "[manual-alsa-ports]" );
     sscanf( m_line, "%ld", &flag );
     global_manual_alsa_ports = (bool) flag;
+
+    /* last used dir  */
+    char *dir = "                                                                            ";
+    line_after( &file, "[last-used-dir]" );
+    last_used_dir.assign(m_line);
 
     file.close();
 
@@ -343,6 +348,10 @@ optionsfile::write( perform *a_perf  )
          << global_jack_start_mode << "\n\n";
 
     
+    file << "\n\n\n[last-used-dir]\n\n"
+         << "# Last used directory.\n" 
+         << last_used_dir << "\n\n";
+
     file.close();
     return true;
 

@@ -92,6 +92,7 @@ class seqedit : public Gtk::Window
     /* time signature, beats per measure, beat width */
     Menu       *m_menu_bpm;
     Menu       *m_menu_bw;
+    Menu       *m_menu_rec_vol;
 
 
     sequence   *m_seq;
@@ -120,6 +121,7 @@ class seqedit : public Gtk::Window
     HScrollbar *m_hscroll_new;
     
     Button      *m_button_undo;
+    Button      *m_button_quanize;
     
     Button      *m_button_tools;
 
@@ -160,9 +162,12 @@ class seqedit : public Gtk::Window
 
     Button      *m_button_bw;
     Entry       *m_entry_bw;
+    
+    Button	*m_button_rec_vol;
 
     ToggleButton *m_toggle_play;
     ToggleButton *m_toggle_record;
+    ToggleButton *m_toggle_q_rec;
     ToggleButton *m_toggle_thru;
 
     RadioButton *m_radio_select;
@@ -205,6 +210,7 @@ class seqedit : public Gtk::Window
 
     void set_bpm( int a_beats_per_measure );
     void set_bw( int a_beat_width );
+    void set_rec_vol( int a_rec_vol );
     void set_measures( int a_length_measures  );
     void apply_length( int a_bpm, int a_bw, int a_measures );
     long get_measures( void );
@@ -220,6 +226,7 @@ class seqedit : public Gtk::Window
     void name_change_callback( void );
     void play_change_callback( void );
     void record_change_callback( void );
+    void q_rec_change_callback( void );
     void thru_change_callback( void );
     void undo_callback( void );
 
