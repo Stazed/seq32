@@ -570,7 +570,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     }
 
 
-    if ((file_size - m_pos) > (int) sizeof (unsigned long))
+    if ((file_size - m_pos) > (int) sizeof (unsigned int))
     {
 
         /* Get ID + Length */
