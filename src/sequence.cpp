@@ -81,7 +81,7 @@ sequence::pop_undo( void )
     lock();
 
     if (m_list_undo.size() > 0 ){
-
+		m_list_redo.push( m_list_event );
         m_list_event = m_list_undo.top();
         m_list_undo.pop();
         verify_and_link();
@@ -91,6 +91,21 @@ sequence::pop_undo( void )
     unlock();
 }
 
+void 
+sequence::pop_redo( void )
+{
+    lock();
+
+    if (m_list_redo.size() > 0 ){
+		m_list_undo.push( m_list_event );
+        m_list_event = m_list_redo.top();
+        m_list_redo.pop();
+        verify_and_link();
+        unselect();
+    }
+
+    unlock();
+}
 
 void 
 sequence::push_trigger_undo( void )
@@ -117,6 +132,7 @@ sequence::pop_trigger_undo( void )
 
     if (m_list_trigger_undo.size() > 0 ){
 
+		m_list_trigger_redo.push( m_list_trigger );
         m_list_trigger = m_list_trigger_undo.top();
         m_list_trigger_undo.pop();
     }
@@ -2194,7 +2210,6 @@ sequence::get_selected_trigger_start_tick( void )
     while(  i != m_list_trigger.end() ){
         
 	if ( i->m_selected ){
-
             ret = i->m_tick_start;
         }
 

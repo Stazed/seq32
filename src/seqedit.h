@@ -121,6 +121,7 @@ class seqedit : public Gtk::Window
     HScrollbar *m_hscroll_new;
     
     Button      *m_button_undo;
+    Button      *m_button_redo;
     Button      *m_button_quanize;
     
     Button      *m_button_tools;
@@ -229,6 +230,7 @@ class seqedit : public Gtk::Window
     void q_rec_change_callback( void );
     void thru_change_callback( void );
     void undo_callback( void );
+    void redo_callback( void );
 
     void set_data_type( unsigned char a_status, 
 			unsigned char a_control = 0 );

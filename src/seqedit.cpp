@@ -40,6 +40,7 @@
 #include "down.xpm"
 #include "note_length.xpm"
 #include "undo.xpm"
+#include "redo.xpm"
 #include "quanize.xpm"
 #include "menu_empty.xpm"
 #include "menu_full.xpm"
@@ -673,6 +674,14 @@ seqedit::fill_top_bar( void )
  
     m_hbox2->pack_start( *m_button_undo , false, false );
     
+    /* redo */
+    m_button_redo = manage( new Button());
+    m_button_redo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( redo_xpm  ))));
+    m_button_redo->signal_clicked().connect(  mem_fun( *this, &seqedit::redo_callback));
+    m_tooltips->set_tip( *m_button_redo, "Redo." );
+ 
+    m_hbox2->pack_start( *m_button_redo , false, false );
+    
     /* quantize shortcut */
     m_button_quanize = manage( new Button());
     m_button_quanize->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( quanize_xpm  ))));
@@ -1264,6 +1273,18 @@ void
 seqedit::undo_callback( void )
 {
 	m_seq->pop_undo( );
+ 	
+	m_seqroll_wid->redraw();
+	m_seqtime_wid->redraw();
+	m_seqdata_wid->redraw();  
+	m_seqevent_wid->redraw();
+}
+
+
+void 
+seqedit::redo_callback( void )
+{
+	m_seq->pop_redo( );
  	
 	m_seqroll_wid->redraw();
 	m_seqtime_wid->redraw();

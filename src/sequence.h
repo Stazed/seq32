@@ -83,7 +83,9 @@ class sequence
     trigger m_trigger_clipboard;
 
     stack < list < event > >m_list_undo;
+    stack < list < event > >m_list_redo;
     stack < list < trigger > >m_list_trigger_undo;
+    stack < list < trigger > >m_list_trigger_redo;
 
     /* markers */
     list < event >::iterator m_iterator_play;
@@ -182,6 +184,7 @@ class sequence
 
     void push_undo (void);
     void pop_undo (void);
+    void pop_redo (void);
 
     void push_trigger_undo (void);
     void pop_trigger_undo (void);
