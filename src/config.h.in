@@ -9,6 +9,9 @@
 /* Define to 1 if you have the `rt' library (-lrt). */
 #undef HAVE_LIBRT
 
+/* Define to 1 if you have the `sigc-2.0' library (-lsigc-2.0). */
+#undef HAVE_LIBSIGC_2_0
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
