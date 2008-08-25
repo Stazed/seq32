@@ -26,12 +26,14 @@
 #include "stop.xpm"
 #include "perfedit.xpm"
 #include "seq24.xpm"
+#include "seq24_32.xpm"
 
 bool is_pattern_playing = false;
 
 mainwnd::mainwnd(perform *a_p)
 {
 
+    set_icon(Gdk::Pixbuf::create_from_xpm_data(seq24_32_xpm));
 
     /* set the performance */
     m_mainperf = a_p;
