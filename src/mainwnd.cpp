@@ -220,7 +220,7 @@ mainwnd::file_new_dialog( void )
 
 
     Gtk::MessageDialog dialog(*this,
-                              "Clear Sequences ?",
+                              "Clear Sequences?",
                               false,
                               Gtk::MESSAGE_QUESTION,
                               (Gtk::ButtonsType)(BUTTONS_OK_CANCEL),
@@ -449,7 +449,7 @@ void
 mainwnd::file_exit_dialog( void )
 {
     Gtk::MessageDialog dialog(*this,
-                              "Quit seq24 ?", false,
+                              "Quit seq24?", false,
                               Gtk::MESSAGE_QUESTION,
                               (Gtk::ButtonsType)(Gtk::BUTTONS_OK_CANCEL),
                               true);
