@@ -109,7 +109,7 @@ class mainwnd : public Gtk::Window
 
     Entry       *m_entry_notes;
 
-    SigC::Connection   m_timeout_connect;
+    sigc::connection   m_timeout_connect;
 
     void file_new_dialog( void );
     void file_save_dialog( void );

@@ -86,9 +86,9 @@ options::options (Gtk::Window & parent, perform * a_p):
         rb_on->set_group (group);
         rb_mod->set_group (group);
 
-        rb_off->signal_toggled().connect (SigC::bind(mem_fun (*this, &options::clock_callback_off), i, rb_off ));
-        rb_on->signal_toggled ().connect (SigC::bind(mem_fun (*this, &options::clock_callback_on),  i, rb_on  ));
-        rb_mod->signal_toggled().connect (SigC::bind(mem_fun (*this, &options::clock_callback_mod), i, rb_mod ));
+        rb_off->signal_toggled().connect (sigc::bind(mem_fun (*this, &options::clock_callback_off), i, rb_off ));
+        rb_on->signal_toggled ().connect (sigc::bind(mem_fun (*this, &options::clock_callback_on),  i, rb_on  ));
+        rb_mod->signal_toggled().connect (sigc::bind(mem_fun (*this, &options::clock_callback_mod), i, rb_mod ));
         
         hbox2->pack_end (*rb_mod, false, false ); 
         hbox2->pack_end (*rb_on, false, false);
@@ -117,7 +117,7 @@ options::options (Gtk::Window & parent, perform * a_p):
 
     vbox->pack_start( *hbox2, false, false );
     
-    clock_mod_adj->signal_value_changed().connect( SigC::bind(mem_fun(*this,&options::clock_mod_callback),clock_mod_adj));
+    clock_mod_adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::clock_mod_callback),clock_mod_adj));
 
 
     // Input Buses

@@ -64,7 +64,6 @@
 #include "perftime.h"
 
 using namespace Gtk;
-using namespace SigC;
 
 /* has a seqroll and paino roll */
 class perfedit:public Gtk::Window

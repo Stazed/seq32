@@ -31,7 +31,7 @@
 #include "undo.xpm"
 #include "down.xpm"
 
-using namespace SigC;
+using namespace sigc;
 
 perfedit::perfedit( perform *a_perf ) 
 {
@@ -99,12 +99,12 @@ perfedit::perfedit( perform *a_perf )
     m_table->attach( *m_button_grow, 2, 3, 3, 4, Gtk::SHRINK, Gtk::SHRINK  );
 
     m_menu_snap =   manage( new Menu());
-    m_menu_snap->items().push_back(MenuElem("1/1",     SigC::bind(mem_fun(*this,&perfedit::set_snap), 1  )));
-    m_menu_snap->items().push_back(MenuElem("1/2",   SigC::bind(mem_fun(*this,&perfedit::set_snap), 2  )));
-    m_menu_snap->items().push_back(MenuElem("1/4",   SigC::bind(mem_fun(*this,&perfedit::set_snap), 4  )));
-    m_menu_snap->items().push_back(MenuElem("1/8",   SigC::bind(mem_fun(*this,&perfedit::set_snap), 8  )));
-    m_menu_snap->items().push_back(MenuElem("1/16",   SigC::bind(mem_fun(*this,&perfedit::set_snap), 16  )));
-    m_menu_snap->items().push_back(MenuElem("1/32",   SigC::bind(mem_fun(*this,&perfedit::set_snap), 32  )));
+    m_menu_snap->items().push_back(MenuElem("1/1",     sigc::bind(mem_fun(*this,&perfedit::set_snap), 1  )));
+    m_menu_snap->items().push_back(MenuElem("1/2",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 2  )));
+    m_menu_snap->items().push_back(MenuElem("1/4",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 4  )));
+    m_menu_snap->items().push_back(MenuElem("1/8",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 8  )));
+    m_menu_snap->items().push_back(MenuElem("1/16",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 16  )));
+    m_menu_snap->items().push_back(MenuElem("1/32",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 32  )));
  
     
     /* snap */
@@ -121,11 +121,11 @@ perfedit::perfedit( perform *a_perf )
     m_menu_bw = manage( new Menu() );
 
     /* bw */
-    m_menu_bw->items().push_back(MenuElem("1", SigC::bind(mem_fun(*this,&perfedit::set_bw), 1  )));
-    m_menu_bw->items().push_back(MenuElem("2", SigC::bind(mem_fun(*this,&perfedit::set_bw), 2  )));
-    m_menu_bw->items().push_back(MenuElem("4", SigC::bind(mem_fun(*this,&perfedit::set_bw), 4  )));
-    m_menu_bw->items().push_back(MenuElem("8", SigC::bind(mem_fun(*this,&perfedit::set_bw), 8  )));
-    m_menu_bw->items().push_back(MenuElem("16", SigC::bind(mem_fun(*this,&perfedit::set_bw), 16 )));
+    m_menu_bw->items().push_back(MenuElem("1", sigc::bind(mem_fun(*this,&perfedit::set_bw), 1  )));
+    m_menu_bw->items().push_back(MenuElem("2", sigc::bind(mem_fun(*this,&perfedit::set_bw), 2  )));
+    m_menu_bw->items().push_back(MenuElem("4", sigc::bind(mem_fun(*this,&perfedit::set_bw), 4  )));
+    m_menu_bw->items().push_back(MenuElem("8", sigc::bind(mem_fun(*this,&perfedit::set_bw), 8  )));
+    m_menu_bw->items().push_back(MenuElem("16", sigc::bind(mem_fun(*this,&perfedit::set_bw), 16 )));
     
     char b[20];
     
@@ -135,7 +135,7 @@ perfedit::perfedit( perform *a_perf )
         
         /* length */
         m_menu_bpm->items().push_back(MenuElem(b, 
-                                               SigC::bind(mem_fun(*this,&perfedit::set_bpm),   
+                                               sigc::bind(mem_fun(*this,&perfedit::set_bpm),   
                                                     i+1 )));
     }
 

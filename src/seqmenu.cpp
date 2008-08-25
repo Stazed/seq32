@@ -104,7 +104,7 @@ seqmenu::popup_menu( void )
                 }
 
                 menu_channels->items().push_back(MenuElem(name, 
-                            SigC::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel), 
+                            sigc::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel), 
                                 i, j )));
             }
         }        
