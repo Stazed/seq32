@@ -60,7 +60,7 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("Exit", mem_fun(*this,&mainwnd::file_exit_dialog)));
 
-    m_menu_help->items().push_back(MenuElem("About", mem_fun(*this,&mainwnd::about_dialog)));
+    m_menu_help->items().push_back(MenuElem("About...", mem_fun(*this,&mainwnd::about_dialog)));
  
     m_menubar->items().push_front(MenuElem("File", *m_menu_file));
     m_menubar->items().push_back(MenuElem("Help", *m_menu_help));
