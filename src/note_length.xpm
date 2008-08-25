@@ -1,5 +1,5 @@
 /* XPM */
-static char * note_length_xpm[] = {
+static const char * note_length_xpm[] = {
 "29 12 2 1",
 " 	c None",
 ".	c #000000",

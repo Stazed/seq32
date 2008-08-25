@@ -1,5 +1,5 @@
 /* XPM */
-static char * snap_xpm[] = {
+static const char * snap_xpm[] = {
 "29 12 5 1",
 " 	c None",
 ".	c #000000",
