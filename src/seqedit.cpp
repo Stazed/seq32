@@ -237,7 +237,7 @@ seqedit::seqedit( sequence *a_seq,
 
     m_button_rec_vol = manage( new Button());
     m_button_rec_vol->add( *manage( new Label("Vol")));
-    m_button_rec_vol->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_rec_vol  ));
+    m_button_rec_vol->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_rec_vol  ));
     m_tooltips->set_tip( *m_button_rec_vol, "Rec. Volume" );
 
     m_toggle_thru = manage( new ToggleButton(  ));
@@ -299,85 +299,85 @@ seqedit::create_menus( void )
     char b[20];
     
     /* zoom */
-    m_menu_zoom->items().push_back(MenuElem("1:1",  SigC::bind(mem_fun(*this,&seqedit::set_zoom), 1 )));
-    m_menu_zoom->items().push_back(MenuElem("1:2",  SigC::bind(mem_fun(*this,&seqedit::set_zoom), 2 )));
-    m_menu_zoom->items().push_back(MenuElem("1:4",  SigC::bind(mem_fun(*this,&seqedit::set_zoom), 4 )));
-    m_menu_zoom->items().push_back(MenuElem("1:8",  SigC::bind(mem_fun(*this,&seqedit::set_zoom), 8 )));
-    m_menu_zoom->items().push_back(MenuElem("1:16", SigC::bind(mem_fun(*this,&seqedit::set_zoom), 16 )));
-    m_menu_zoom->items().push_back(MenuElem("1:32", SigC::bind(mem_fun(*this,&seqedit::set_zoom), 32 )));
+    m_menu_zoom->items().push_back(MenuElem("1:1",  sigc::bind(mem_fun(*this,&seqedit::set_zoom), 1 )));
+    m_menu_zoom->items().push_back(MenuElem("1:2",  sigc::bind(mem_fun(*this,&seqedit::set_zoom), 2 )));
+    m_menu_zoom->items().push_back(MenuElem("1:4",  sigc::bind(mem_fun(*this,&seqedit::set_zoom), 4 )));
+    m_menu_zoom->items().push_back(MenuElem("1:8",  sigc::bind(mem_fun(*this,&seqedit::set_zoom), 8 )));
+    m_menu_zoom->items().push_back(MenuElem("1:16", sigc::bind(mem_fun(*this,&seqedit::set_zoom), 16 )));
+    m_menu_zoom->items().push_back(MenuElem("1:32", sigc::bind(mem_fun(*this,&seqedit::set_zoom), 32 )));
       
     /* note snap */
-    m_menu_snap->items().push_back(MenuElem("1",     SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 4  )));
-    m_menu_snap->items().push_back(MenuElem("1/2",   SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 2  )));
-    m_menu_snap->items().push_back(MenuElem("1/4",   SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 1  )));
-    m_menu_snap->items().push_back(MenuElem("1/8",   SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 2  )));
-    m_menu_snap->items().push_back(MenuElem("1/16",  SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 4  )));
-    m_menu_snap->items().push_back(MenuElem("1/32",  SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 8  )));
-    m_menu_snap->items().push_back(MenuElem("1/64",  SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 16 )));
-    m_menu_snap->items().push_back(MenuElem("1/128", SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 32 )));
+    m_menu_snap->items().push_back(MenuElem("1",     sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 4  )));
+    m_menu_snap->items().push_back(MenuElem("1/2",   sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 2  )));
+    m_menu_snap->items().push_back(MenuElem("1/4",   sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 1  )));
+    m_menu_snap->items().push_back(MenuElem("1/8",   sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 2  )));
+    m_menu_snap->items().push_back(MenuElem("1/16",  sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 4  )));
+    m_menu_snap->items().push_back(MenuElem("1/32",  sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 8  )));
+    m_menu_snap->items().push_back(MenuElem("1/64",  sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 16 )));
+    m_menu_snap->items().push_back(MenuElem("1/128", sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 32 )));
     m_menu_snap->items().push_back(SeparatorElem());
-    m_menu_snap->items().push_back(MenuElem("1/3",   SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 4  / 3 )));
-    m_menu_snap->items().push_back(MenuElem("1/6",   SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 2  / 3 )));
-    m_menu_snap->items().push_back(MenuElem("1/12",  SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 1  / 3 )));
-    m_menu_snap->items().push_back(MenuElem("1/24",  SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 2  / 3 )));
-    m_menu_snap->items().push_back(MenuElem("1/48",  SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 4  / 3 )));
-    m_menu_snap->items().push_back(MenuElem("1/96",  SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 8  / 3 )));
-    m_menu_snap->items().push_back(MenuElem("1/192", SigC::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 16 / 3 )));
+    m_menu_snap->items().push_back(MenuElem("1/3",   sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 4  / 3 )));
+    m_menu_snap->items().push_back(MenuElem("1/6",   sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 2  / 3 )));
+    m_menu_snap->items().push_back(MenuElem("1/12",  sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 1  / 3 )));
+    m_menu_snap->items().push_back(MenuElem("1/24",  sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 2  / 3 )));
+    m_menu_snap->items().push_back(MenuElem("1/48",  sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 4  / 3 )));
+    m_menu_snap->items().push_back(MenuElem("1/96",  sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 8  / 3 )));
+    m_menu_snap->items().push_back(MenuElem("1/192", sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn / 16 / 3 )));
     
     /* note note_length */
-    m_menu_note_length->items().push_back(MenuElem("1",     SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 4  )));
-    m_menu_note_length->items().push_back(MenuElem("1/2",   SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 2  )));
-    m_menu_note_length->items().push_back(MenuElem("1/4",   SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 1  )));
-    m_menu_note_length->items().push_back(MenuElem("1/8",   SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 2  )));
-    m_menu_note_length->items().push_back(MenuElem("1/16",  SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 4  )));
-    m_menu_note_length->items().push_back(MenuElem("1/32",  SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 8  )));
-    m_menu_note_length->items().push_back(MenuElem("1/64",  SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 16 )));
-    m_menu_note_length->items().push_back(MenuElem("1/128", SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 32 )));
+    m_menu_note_length->items().push_back(MenuElem("1",     sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 4  )));
+    m_menu_note_length->items().push_back(MenuElem("1/2",   sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 2  )));
+    m_menu_note_length->items().push_back(MenuElem("1/4",   sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 1  )));
+    m_menu_note_length->items().push_back(MenuElem("1/8",   sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 2  )));
+    m_menu_note_length->items().push_back(MenuElem("1/16",  sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 4  )));
+    m_menu_note_length->items().push_back(MenuElem("1/32",  sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 8  )));
+    m_menu_note_length->items().push_back(MenuElem("1/64",  sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 16 )));
+    m_menu_note_length->items().push_back(MenuElem("1/128", sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 32 )));
     m_menu_note_length->items().push_back(SeparatorElem());
-    m_menu_note_length->items().push_back(MenuElem("1/3",   SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 4  / 3 )));
-    m_menu_note_length->items().push_back(MenuElem("1/6",   SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 2  / 3 )));
-    m_menu_note_length->items().push_back(MenuElem("1/12",  SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 1  / 3 )));
-    m_menu_note_length->items().push_back(MenuElem("1/24",  SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 2  / 3 )));
-    m_menu_note_length->items().push_back(MenuElem("1/48",  SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 4  / 3 )));
-    m_menu_note_length->items().push_back(MenuElem("1/96",  SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 8  / 3 )));
-    m_menu_note_length->items().push_back(MenuElem("1/192", SigC::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 16 / 3 )));
+    m_menu_note_length->items().push_back(MenuElem("1/3",   sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 4  / 3 )));
+    m_menu_note_length->items().push_back(MenuElem("1/6",   sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 2  / 3 )));
+    m_menu_note_length->items().push_back(MenuElem("1/12",  sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn * 1  / 3 )));
+    m_menu_note_length->items().push_back(MenuElem("1/24",  sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 2  / 3 )));
+    m_menu_note_length->items().push_back(MenuElem("1/48",  sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 4  / 3 )));
+    m_menu_note_length->items().push_back(MenuElem("1/96",  sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 8  / 3 )));
+    m_menu_note_length->items().push_back(MenuElem("1/192", sigc::bind(mem_fun(*this,&seqedit::set_note_length), c_ppqn / 16 / 3 )));
     
     /* Key */
-    m_menu_key->items().push_back(MenuElem( c_key_text[0],  SigC::bind(mem_fun(*this,&seqedit::set_key), 0 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[1],  SigC::bind(mem_fun(*this,&seqedit::set_key), 1 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[2],  SigC::bind(mem_fun(*this,&seqedit::set_key), 2 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[3],  SigC::bind(mem_fun(*this,&seqedit::set_key), 3 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[4],  SigC::bind(mem_fun(*this,&seqedit::set_key), 4 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[5],  SigC::bind(mem_fun(*this,&seqedit::set_key), 5 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[6],  SigC::bind(mem_fun(*this,&seqedit::set_key), 6 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[7],  SigC::bind(mem_fun(*this,&seqedit::set_key), 7 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[8],  SigC::bind(mem_fun(*this,&seqedit::set_key), 8 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[9],  SigC::bind(mem_fun(*this,&seqedit::set_key), 9 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[10], SigC::bind(mem_fun(*this,&seqedit::set_key), 10 )));
-    m_menu_key->items().push_back(MenuElem( c_key_text[11], SigC::bind(mem_fun(*this,&seqedit::set_key), 11 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[0],  sigc::bind(mem_fun(*this,&seqedit::set_key), 0 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[1],  sigc::bind(mem_fun(*this,&seqedit::set_key), 1 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[2],  sigc::bind(mem_fun(*this,&seqedit::set_key), 2 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[3],  sigc::bind(mem_fun(*this,&seqedit::set_key), 3 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[4],  sigc::bind(mem_fun(*this,&seqedit::set_key), 4 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[5],  sigc::bind(mem_fun(*this,&seqedit::set_key), 5 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[6],  sigc::bind(mem_fun(*this,&seqedit::set_key), 6 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[7],  sigc::bind(mem_fun(*this,&seqedit::set_key), 7 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[8],  sigc::bind(mem_fun(*this,&seqedit::set_key), 8 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[9],  sigc::bind(mem_fun(*this,&seqedit::set_key), 9 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[10], sigc::bind(mem_fun(*this,&seqedit::set_key), 10 )));
+    m_menu_key->items().push_back(MenuElem( c_key_text[11], sigc::bind(mem_fun(*this,&seqedit::set_key), 11 )));
     
     /* bw */
-    m_menu_bw->items().push_back(MenuElem("1", SigC::bind(mem_fun(*this,&seqedit::set_bw), 1  )));
-    m_menu_bw->items().push_back(MenuElem("2", SigC::bind(mem_fun(*this,&seqedit::set_bw), 2  )));
-    m_menu_bw->items().push_back(MenuElem("4", SigC::bind(mem_fun(*this,&seqedit::set_bw), 4  )));
-    m_menu_bw->items().push_back(MenuElem("8", SigC::bind(mem_fun(*this,&seqedit::set_bw), 8  )));
-    m_menu_bw->items().push_back(MenuElem("16", SigC::bind(mem_fun(*this,&seqedit::set_bw), 16 )));
+    m_menu_bw->items().push_back(MenuElem("1", sigc::bind(mem_fun(*this,&seqedit::set_bw), 1  )));
+    m_menu_bw->items().push_back(MenuElem("2", sigc::bind(mem_fun(*this,&seqedit::set_bw), 2  )));
+    m_menu_bw->items().push_back(MenuElem("4", sigc::bind(mem_fun(*this,&seqedit::set_bw), 4  )));
+    m_menu_bw->items().push_back(MenuElem("8", sigc::bind(mem_fun(*this,&seqedit::set_bw), 8  )));
+    m_menu_bw->items().push_back(MenuElem("16", sigc::bind(mem_fun(*this,&seqedit::set_bw), 16 )));
     
     /* record volume */
-    m_menu_rec_vol->items().push_back(MenuElem("Free", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 0  )));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 8", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 127  )));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 7", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 111  )));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 6", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 95  )));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 5", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 79  )));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 4", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 63  )));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 3", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 47  )));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 2", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 31  )));
-    m_menu_rec_vol->items().push_back(MenuElem("Fixed 1", SigC::bind(mem_fun(*this,&seqedit::set_rec_vol), 15  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Free", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 0  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 8", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 127  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 7", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 111  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 6", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 95  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 5", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 79  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 4", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 63  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 3", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 47  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 2", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 31  )));
+    m_menu_rec_vol->items().push_back(MenuElem("Fixed 1", sigc::bind(mem_fun(*this,&seqedit::set_rec_vol), 15  )));
     
     /* music scale */
-    m_menu_scale->items().push_back(MenuElem(c_scales_text[0], SigC::bind(mem_fun(*this,&seqedit::set_scale), c_scale_off )));
-    m_menu_scale->items().push_back(MenuElem(c_scales_text[1], SigC::bind(mem_fun(*this,&seqedit::set_scale), c_scale_major )));
-    m_menu_scale->items().push_back(MenuElem(c_scales_text[2], SigC::bind(mem_fun(*this,&seqedit::set_scale), c_scale_minor )));
+    m_menu_scale->items().push_back(MenuElem(c_scales_text[0], sigc::bind(mem_fun(*this,&seqedit::set_scale), c_scale_off )));
+    m_menu_scale->items().push_back(MenuElem(c_scales_text[1], sigc::bind(mem_fun(*this,&seqedit::set_scale), c_scale_major )));
+    m_menu_scale->items().push_back(MenuElem(c_scales_text[2], sigc::bind(mem_fun(*this,&seqedit::set_scale), c_scale_minor )));
     
     /* midi channel menu */
     for( int i=0; i<16; i++ ){
@@ -386,16 +386,16 @@ seqedit::create_menus( void )
         
         /* length */
         m_menu_length->items().push_back(MenuElem(b, 
-                                                  SigC::bind(mem_fun(*this,&seqedit::set_measures),   
+                                                  sigc::bind(mem_fun(*this,&seqedit::set_measures),   
                                                        i+1 )));
         /* length */
         m_menu_bpm->items().push_back(MenuElem(b, 
-                                               SigC::bind(mem_fun(*this,&seqedit::set_bpm),   
+                                               sigc::bind(mem_fun(*this,&seqedit::set_bpm),   
                                                     i+1 )));
     }
 
-    m_menu_length->items().push_back(MenuElem("32", SigC::bind(mem_fun(*this,&seqedit::set_measures), 32 )));
-    m_menu_length->items().push_back(MenuElem("64", SigC::bind(mem_fun(*this,&seqedit::set_measures), 64 )));
+    m_menu_length->items().push_back(MenuElem("32", sigc::bind(mem_fun(*this,&seqedit::set_measures), 32 )));
+    m_menu_length->items().push_back(MenuElem("64", sigc::bind(mem_fun(*this,&seqedit::set_measures), 64 )));
 
 
 
@@ -420,29 +420,29 @@ seqedit::popup_tool_menu( void )
     Menu *holder2;
     
     holder = manage( new Menu());
-    holder->items().push_back( MenuElem( "All Notes",       SigC::bind(mem_fun(*this,&seqedit::do_action), select_all_notes,0 )));
-    holder->items().push_back( MenuElem( "Inverse Notes",   SigC::bind(mem_fun(*this,&seqedit::do_action), select_inverse_notes,0 )));
+    holder->items().push_back( MenuElem( "All Notes",       sigc::bind(mem_fun(*this,&seqedit::do_action), select_all_notes,0 )));
+    holder->items().push_back( MenuElem( "Inverse Notes",   sigc::bind(mem_fun(*this,&seqedit::do_action), select_inverse_notes,0 )));
    
     if ( m_editing_status !=  EVENT_NOTE_ON &&
          m_editing_status !=  EVENT_NOTE_OFF ){
 
         holder->items().push_back( SeparatorElem( )); 
-        holder->items().push_back( MenuElem( "All Events",      SigC::bind(mem_fun(*this,&seqedit::do_action), select_all_events,0 )));
-        holder->items().push_back( MenuElem( "Inverse Events",  SigC::bind(mem_fun(*this,&seqedit::do_action), select_inverse_events,0 )));
+        holder->items().push_back( MenuElem( "All Events",      sigc::bind(mem_fun(*this,&seqedit::do_action), select_all_events,0 )));
+        holder->items().push_back( MenuElem( "Inverse Events",  sigc::bind(mem_fun(*this,&seqedit::do_action), select_inverse_events,0 )));
     }
     
     m_menu_tools->items().push_back( MenuElem( "Select", *holder ));
     
     holder = manage( new Menu());
-    holder->items().push_back( MenuElem( "Quantize Selected Notes",       SigC::bind(mem_fun(*this,&seqedit::do_action), quantize_notes,0 )));
-    holder->items().push_back( MenuElem( "Tighten Selected Notes",       SigC::bind(mem_fun(*this,&seqedit::do_action), tighten_notes,0 )));
+    holder->items().push_back( MenuElem( "Quantize Selected Notes",       sigc::bind(mem_fun(*this,&seqedit::do_action), quantize_notes,0 )));
+    holder->items().push_back( MenuElem( "Tighten Selected Notes",       sigc::bind(mem_fun(*this,&seqedit::do_action), tighten_notes,0 )));
 
     if ( m_editing_status !=  EVENT_NOTE_ON &&
          m_editing_status !=  EVENT_NOTE_OFF ){
         
         holder->items().push_back( SeparatorElem( )); 
-        holder->items().push_back( MenuElem( "Quantize Selected Events",      SigC::bind(mem_fun(*this,&seqedit::do_action), quantize_events,0 )));
-        holder->items().push_back( MenuElem( "Tighten Selected Events",      SigC::bind(mem_fun(*this,&seqedit::do_action), tighten_events,0 )));
+        holder->items().push_back( MenuElem( "Quantize Selected Events",      sigc::bind(mem_fun(*this,&seqedit::do_action), quantize_events,0 )));
+        holder->items().push_back( MenuElem( "Tighten Selected Events",      sigc::bind(mem_fun(*this,&seqedit::do_action), tighten_events,0 )));
         
     }
     m_menu_tools->items().push_back( MenuElem( "Modify Time", *holder ));
@@ -458,7 +458,7 @@ seqedit::popup_tool_menu( void )
 
         if ( i!=0 ){
             sprintf( num, "%+d [%s]", i, c_interval_text[ abs(i) ]  );
-            holder2->items().push_front( MenuElem( num, SigC::bind(mem_fun(*this,&seqedit::do_action), transpose, i )));
+            holder2->items().push_front( MenuElem( num, sigc::bind(mem_fun(*this,&seqedit::do_action), transpose, i )));
         }
     }
     
@@ -471,7 +471,7 @@ seqedit::popup_tool_menu( void )
 
         if ( i!=0 ){
             sprintf( num, "%+d [%s]",  (i<0) ? i-1 : i+1, c_chord_text[ abs(i) ]  );
-            holder2->items().push_front( MenuElem( num, SigC::bind(mem_fun(*this,&seqedit::do_action), transpose_h, i )));
+            holder2->items().push_front( MenuElem( num, sigc::bind(mem_fun(*this,&seqedit::do_action), transpose_h, i )));
         }
     }
 
@@ -600,7 +600,7 @@ seqedit::fill_top_bar( void )
     /* beats per measure */ 
     m_button_bpm = manage( new Button());
     m_button_bpm->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
-    m_button_bpm->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_bpm  ));
+    m_button_bpm->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_bpm  ));
     m_tooltips->set_tip( *m_button_bpm, "Time Signature. Beats per Measure" );
     m_entry_bpm = manage( new Entry());
     m_entry_bpm->set_width_chars(2);
@@ -614,7 +614,7 @@ seqedit::fill_top_bar( void )
     /* beat width */
     m_button_bw = manage( new Button());
     m_button_bw->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
-    m_button_bw->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_bw  ));
+    m_button_bw->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_bw  ));
     m_tooltips->set_tip( *m_button_bw, "Time Signature.  Length of Beat" );
     m_entry_bw = manage( new Entry());
     m_entry_bw->set_width_chars(2);
@@ -627,7 +627,7 @@ seqedit::fill_top_bar( void )
     /* length */
     m_button_length = manage( new Button());
     m_button_length->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( length_xpm  ))));
-    m_button_length->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_length  ));
+    m_button_length->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_length  ));
     m_tooltips->set_tip( *m_button_length, "Sequence length in Bars." );
     m_entry_length = manage( new Entry());
     m_entry_length->set_width_chars(2);
@@ -685,7 +685,7 @@ seqedit::fill_top_bar( void )
     /* quantize shortcut */
     m_button_quanize = manage( new Button());
     m_button_quanize->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( quanize_xpm  ))));
-    m_button_quanize->signal_clicked().connect( SigC::bind(mem_fun(*this,&seqedit::do_action), quantize_notes,0 ));
+    m_button_quanize->signal_clicked().connect( sigc::bind(mem_fun(*this,&seqedit::do_action), quantize_notes,0 ));
     m_tooltips->set_tip( *m_button_quanize, "Quantize Selection." );
  
     m_hbox2->pack_start( *m_button_quanize , false, false );
@@ -707,7 +707,7 @@ seqedit::fill_top_bar( void )
     /* snap */
     m_button_snap = manage( new Button());
     m_button_snap->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( snap_xpm  ))));
-    m_button_snap->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_snap  ));
+    m_button_snap->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_snap  ));
     m_tooltips->set_tip( *m_button_snap, "Grid snap." );
     m_entry_snap = manage( new Entry());
     m_entry_snap->set_width_chars(5);
@@ -720,7 +720,7 @@ seqedit::fill_top_bar( void )
     /* note_length */
     m_button_note_length = manage( new Button());
     m_button_note_length->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( note_length_xpm  ))));
-    m_button_note_length->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_note_length  ));
+    m_button_note_length->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_note_length  ));
     m_tooltips->set_tip( *m_button_note_length, "Note Length." );
     m_entry_note_length = manage( new Entry());
     m_entry_note_length->set_width_chars(5);
@@ -733,7 +733,7 @@ seqedit::fill_top_bar( void )
     /* zoom */
     m_button_zoom = manage( new Button());
     m_button_zoom->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( zoom_xpm  ))));
-    m_button_zoom->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_zoom  ));
+    m_button_zoom->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_zoom  ));
     m_tooltips->set_tip( *m_button_zoom, "Zoom. Pixels to Ticks" );
     m_entry_zoom = manage( new Entry());
     m_entry_zoom->set_width_chars(4);
@@ -748,7 +748,7 @@ seqedit::fill_top_bar( void )
     /* key */
     m_button_key = manage( new Button());
     m_button_key->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( key_xpm  ))));
-    m_button_key->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_key  ));
+    m_button_key->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_key  ));
     m_tooltips->set_tip( *m_button_key, "Key of Sequence" );
     m_entry_key = manage( new Entry());
     m_entry_key->set_width_chars(5);
@@ -760,7 +760,7 @@ seqedit::fill_top_bar( void )
     /* music scale */
     m_button_scale = manage( new Button());
     m_button_scale->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( scale_xpm  ))));
-    m_button_scale->signal_clicked().connect(  SigC::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_scale  ));
+    m_button_scale->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_scale  ));
     m_tooltips->set_tip( *m_button_scale, "Musical Scale" );
     m_entry_scale = manage( new Entry());
     m_entry_scale->set_width_chars(5);
@@ -788,17 +788,17 @@ seqedit::fill_top_bar( void )
 #if 0
     /* Select */
     m_radio_select = manage( new RadioButton( "Sel", true ));
-    m_radio_select->signal_clicked().connect( SigC::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_select ));
+    m_radio_select->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_select ));
     m_hbox3->pack_start( *m_radio_select, false, false );
     
     /* Draw */
     m_radio_draw = manage( new RadioButton( "Draw" ));
-    m_radio_draw->signal_clicked().connect( SigC::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_draw ));
+    m_radio_draw->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_draw ));
     m_hbox3->pack_start( *m_radio_draw, false, false );
      
     /* Grow */
     m_radio_grow = manage( new RadioButton( "Grow" ));
-    m_radio_grow->signal_clicked().connect( SigC::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_grow ));
+    m_radio_grow->signal_clicked().connect( sigc::bind(mem_fun( *this, &seqedit::mouse_action ), e_action_grow ));
     m_hbox3->pack_start( *m_radio_grow, false, false );
      
     /* Stretch */
@@ -843,7 +843,7 @@ seqedit::popup_midibus_menu( void )
     mastermidibus *masterbus = m_mainperf->get_master_midi_bus();
     for ( int i=0; i< masterbus->get_num_out_buses(); i++ ){
         m_menu_midibus->items().push_back(MenuElem(masterbus->get_midi_out_bus_name(i),
-                                                   SigC::bind(mem_fun(*this,&seqedit::set_midi_bus), i)));
+                                                   sigc::bind(mem_fun(*this,&seqedit::set_midi_bus), i)));
     }
 
     m_menu_midibus->popup(0,0);
@@ -875,7 +875,7 @@ seqedit::popup_midich_menu( void )
                            string(")") );
         }
         m_menu_midich->items().push_back(MenuElem(name, 
-                                                  SigC::bind(mem_fun(*this,&seqedit::set_midi_channel), 
+                                                  sigc::bind(mem_fun(*this,&seqedit::set_midi_channel), 
                                                        i )));
     }
 
@@ -896,7 +896,7 @@ seqedit::popup_sequence_menu( void )
     m_menu_sequences = manage( new Menu());
 
     m_menu_sequences->items().push_back(MenuElem("Off",
-                                                 SigC::bind(mem_fun(*this, &seqedit::set_background_sequence), -1)));
+                                                 sigc::bind(mem_fun(*this, &seqedit::set_background_sequence), -1)));
     m_menu_sequences->items().push_back( SeparatorElem( ));
 
     for ( int ss=0; ss<c_max_sets; ++ss ){
@@ -924,7 +924,7 @@ seqedit::popup_sequence_menu( void )
                 sprintf( name, "[%d] %.13s", i, seq->get_name() );
 
                 menu_ss->items().push_back(MenuElem(name,
-                                                    SigC::bind(mem_fun(*this,&seqedit::set_background_sequence), i)));
+                                                    sigc::bind(mem_fun(*this,&seqedit::set_background_sequence), i)));
                 
             }
         }
@@ -1007,29 +1007,29 @@ seqedit::popup_event_menu( void )
 
     m_menu_data->items().push_back( ImageMenuElem( "Note On Velocity",
                                                    *create_menu_image( note_on ),
-                                                   SigC::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_NOTE_ON, 0 )));
+                                                   sigc::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_NOTE_ON, 0 )));
 
     m_menu_data->items().push_back( SeparatorElem( )); 
 
     m_menu_data->items().push_back( ImageMenuElem( "Note Off Velocity",
                                                    *create_menu_image( note_off ),
-                                                   SigC::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_NOTE_OFF, 0 )));
+                                                   sigc::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_NOTE_OFF, 0 )));
 
     m_menu_data->items().push_back( ImageMenuElem( "AfterTouch",
                                                    *create_menu_image( aftertouch ),
-                                                   SigC::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_AFTERTOUCH, 0 )));
+                                                   sigc::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_AFTERTOUCH, 0 )));
 
     m_menu_data->items().push_back( ImageMenuElem( "Program Change",
                                                    *create_menu_image( program_change ),
-                                                   SigC::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_PROGRAM_CHANGE, 0 )));
+                                                   sigc::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_PROGRAM_CHANGE, 0 )));
 
     m_menu_data->items().push_back( ImageMenuElem( "Channel Pressure",
                                                    *create_menu_image( channel_pressure ),
-                                                   SigC::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_CHANNEL_PRESSURE, 0 )));
+                                                   sigc::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_CHANNEL_PRESSURE, 0 )));
 
     m_menu_data->items().push_back( ImageMenuElem( "Pitch Wheel",
                                                    *create_menu_image( pitch_wheel ),
-                                                   SigC::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_PITCH_WHEEL , 0 )));
+                                                   sigc::bind(mem_fun(*this,&seqedit::set_data_type), (unsigned char) EVENT_PITCH_WHEEL , 0 )));
 
     m_menu_data->items().push_back( SeparatorElem( )); 
 
@@ -1050,7 +1050,7 @@ seqedit::popup_event_menu( void )
 
             menu_cc->items().push_back( ImageMenuElem( controller_name,
                                                        *create_menu_image( ccs[i*16+j]),
-                                                       SigC::bind(mem_fun(*this,&seqedit::set_data_type), 
+                                                       sigc::bind(mem_fun(*this,&seqedit::set_data_type), 
                                                        (unsigned char) EVENT_CONTROL_CHANGE, i*16+j)));
         }
         m_menu_data->items().push_back( MenuElem( string(b), *menu_cc ));

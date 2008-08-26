@@ -26,12 +26,14 @@
 #include "stop.xpm"
 #include "perfedit.xpm"
 #include "seq24.xpm"
+#include "seq24_32.xpm"
 
 bool is_pattern_playing = false;
 
 mainwnd::mainwnd(perform *a_p)
 {
 
+    set_icon(Gdk::Pixbuf::create_from_xpm_data(seq24_32_xpm));
 
     /* set the performance */
     m_mainperf = a_p;
@@ -60,7 +62,7 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("Exit", mem_fun(*this,&mainwnd::file_exit_dialog)));
 
-    m_menu_help->items().push_back(MenuElem("About", mem_fun(*this,&mainwnd::about_dialog)));
+    m_menu_help->items().push_back(MenuElem("About...", mem_fun(*this,&mainwnd::about_dialog)));
  
     m_menubar->items().push_front(MenuElem("File", *m_menu_file));
     m_menubar->items().push_back(MenuElem("Help", *m_menu_help));
@@ -220,7 +222,7 @@ mainwnd::file_new_dialog( void )
 
 
     Gtk::MessageDialog dialog(*this,
-                              "Clear Sequences ?",
+                              "Clear Sequences?",
                               false,
                               Gtk::MESSAGE_QUESTION,
                               (Gtk::ButtonsType)(BUTTONS_OK_CANCEL),
@@ -449,7 +451,7 @@ void
 mainwnd::file_exit_dialog( void )
 {
     Gtk::MessageDialog dialog(*this,
-                              "Quit seq24 ?", false,
+                              "Quit seq24?", false,
                               Gtk::MESSAGE_QUESTION,
                               (Gtk::ButtonsType)(Gtk::BUTTONS_OK_CANCEL),
                               true);

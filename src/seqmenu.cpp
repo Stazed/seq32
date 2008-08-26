@@ -47,9 +47,11 @@ seqmenu::popup_menu( void )
     m_menu = manage( new Menu());
 
     if ( m_mainperf->is_active( m_current_seq )) {
-        m_menu->items().push_back(MenuElem("Edit", mem_fun(*this,&seqmenu::seq_edit)));
+        m_menu->items().push_back(MenuElem("Edit...",
+                    mem_fun(*this, &seqmenu::seq_edit)));
     } else {
-        m_menu->items().push_back(MenuElem("New", mem_fun(*this,&seqmenu::seq_edit)));
+        m_menu->items().push_back(MenuElem("New",
+                    mem_fun(*this, &seqmenu::seq_edit)));
     }
 
 
@@ -104,7 +106,7 @@ seqmenu::popup_menu( void )
                 }
 
                 menu_channels->items().push_back(MenuElem(name, 
-                            SigC::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel), 
+                            sigc::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel), 
                                 i, j )));
             }
         }        
