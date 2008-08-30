@@ -1,4 +1,4 @@
-208-08-27 Guido Scholz  <guido.scholz@bayernline.de>
+208-08-27 Guido Scholz <guido.scholz@bayernline.de>
 	* src/*.xpm: Fixed missing "const" to avoid compiler warnings.
 	* configure.in: Enabled bzip2 tarball for make target "dist".
 	Checks for gtkmm-2.4 , sigc-2.0 and asound libraries added.
@@ -10,7 +10,7 @@
 	Switched to sigc++-2.0 API, to make program compatible to latest
 	sigc++ version (2.2).
 
-2008-07-03  Ivan Hernandez <ihernandez@kiusys.com>
+2008-07-03 Ivan Hernandez <ihernandez@kiusys.com>
 	* redo.xpm, seqedit.*,  sequence.*: Added Redo function on
 	sequence editor.
 
