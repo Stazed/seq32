@@ -1,3 +1,7 @@
+208-08-30 Guido Scholz <guido.scholz@bayernline.de>
+	* man/seq24.1: Man page from Ubuntu added; written by Dana
+	Olson.
+
 208-08-27 Guido Scholz <guido.scholz@bayernline.de>
 	* src/*.xpm: Fixed missing "const" to avoid compiler warnings.
 	* configure.in: Enabled bzip2 tarball for make target "dist".
