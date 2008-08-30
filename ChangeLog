@@ -1,3 +1,33 @@
+208-08-27 Guido Scholz  <guido.scholz@bayernline.de>
+	* src/*.xpm: Fixed missing "const" to avoid compiler warnings.
+	* configure.in: Enabled bzip2 tarball for make target "dist".
+	Checks for gtkmm-2.4 , sigc-2.0 and asound libraries added.
+	* main.cpp, src/seq24_32.xpm: Application icon added. Typos
+	fixed.
+	* event.cpp, font.cpp: Missing include for header files added;
+	was complained by gcc 4.3.
+	* mainwnd.h, options.cpp, perfedit.*, seqedit.cpp, seqmenu.cpp:
+	Switched to sigc++-2.0 API, to make program compatible to latest
+	sigc++ version (2.2).
+
+2008-07-03  Ivan Hernandez <ihernandez@kiusys.com>
+	* redo.xpm, seqedit.*,  sequence.*: Added Redo function on
+	sequence editor.
+
+2008-05-19 Ivan Hernandez <ihernandez@kiusys.com>
+	* midifile.cpp: Fixes the BPM saving on 64bit platforms, patch
+	provided by Pete Leigh.
+
+2008-05-12 Ivan Hernandez <ihernandez@kiusys.com>
+	* globals.h, mainwnd.cpp, optionsfile.cpp, seqedit.*,
+	seqroll.cpp, sequence.*, q_rec.xpm, quanize.xpm: Round robbin
+	logic on sequence edit. Start stop shortcut on sequence editor.
+	Remembers last used directory on configuration so you go where
+	you worked. Live Quantize, so notes get to the right time when
+	you play. Fixed volume. Makes midi input have a fixed volume
+	when you record.
+
+
 v0.4.2 ------------------------------------------------
 2003-5-14
 
