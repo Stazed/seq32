@@ -46,7 +46,7 @@ font::render_string_on_drawable(
         Glib::RefPtr<Gdk::GC> a_gc,
         int x, int y,
         Glib::RefPtr<Gdk::Drawable> a_draw,
-        char *str, 
+        const char *str, 
         font::Color col )
 {
     int length = 0;

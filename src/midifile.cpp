@@ -542,15 +542,13 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         if (ID == c_notes)
         {
 
-            long
-                screen_sets = read_short ();
+            unsigned int screen_sets = read_short ();
 
             for (unsigned int x = 0; x < screen_sets; x++)
             {
 
                 /* get the length of the string */
-                unsigned int
-                    len = read_short ();
+                unsigned int len = read_short ();
 
                 char *
                     notes = new char[len + 1];
@@ -578,8 +576,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         if (ID == c_bpmtag)
         {
 
-            long
-                bpm = read_long ();
+            long bpm = read_long ();
             a_perf->set_bpm (bpm);
         }
     }

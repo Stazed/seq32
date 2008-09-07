@@ -49,7 +49,7 @@ class midibus
     
  private:
 
-    char m_id;
+    int m_id;
 
     clock_e m_clock_type;
     bool m_inputing;
@@ -95,12 +95,12 @@ class midibus
 	     snd_seq_t  *a_seq, 
 	     const char *a_client_name, 
 	     const char *a_port_name,
-	     char a_id,
+	     int a_id,
          int a_queue );
 
     midibus( int a_localclient,
 	     snd_seq_t  *a_seq, 
-	     char a_id,
+	     int a_id,
          int a_queue );
     
     ~midibus();

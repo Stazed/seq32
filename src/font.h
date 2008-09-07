@@ -56,7 +56,7 @@ public:
         int x,
         int y,
         Glib::RefPtr<Gdk::Drawable> a_draw,
-        char *str, 
+        const char *str, 
         font::Color col );
     
 };

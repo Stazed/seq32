@@ -145,19 +145,19 @@ class perform
 
  public:
 
-    long m_key_bpm_up;
-    long m_key_bpm_dn;
+    unsigned int m_key_bpm_up;
+    unsigned int m_key_bpm_dn;
 
-    long m_key_replace;
-    long m_key_queue;
-    long m_key_snapshot_1;
-    long m_key_snapshot_2;
+    unsigned int m_key_replace;
+    unsigned int m_key_queue;
+    unsigned int m_key_snapshot_1;
+    unsigned int m_key_snapshot_2;
 
-    long m_key_screenset_up;
-    long m_key_screenset_dn;
+    unsigned int m_key_screenset_up;
+    unsigned int m_key_screenset_dn;
 
-    long m_key_start; 
-    long m_key_stop;
+    unsigned int m_key_start; 
+    unsigned int m_key_stop;
 
 
     perform();

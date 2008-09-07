@@ -28,7 +28,7 @@ midibus::midibus( int a_localclient,
 		  snd_seq_t *a_seq, 
 		  const char *a_client_name, 
 		  const char *a_port_name,
-		  char a_id, int a_queue )
+		  int a_id, int a_queue )
 {
     /* set members */
     m_local_addr_client = a_localclient;
@@ -65,7 +65,7 @@ midibus::midibus( int a_localclient,
 
 midibus::midibus( int a_localclient,
 		  snd_seq_t *a_seq, 
-		  char a_id, int a_queue )
+		  int a_id, int a_queue )
 {
     /* set members */
     m_local_addr_client = a_localclient;

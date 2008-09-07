@@ -53,11 +53,11 @@ optionsfile::parse( perform *a_perf )
 
     line_after( &file, "[midi-control]" );
 
-    int sequences = 0;
-    sscanf( m_line, "%d", &sequences );
+    unsigned int sequences = 0;
+    sscanf( m_line, "%u", &sequences );
     next_data_line( &file );
 
-    for ( int i=0; i<sequences; ++i ){
+    for ( unsigned int i=0; i<sequences; ++i ){
 
         int sequence = 0;
         
@@ -119,15 +119,15 @@ optionsfile::parse( perform *a_perf )
         next_data_line( &file );
     }
 
-    sscanf( m_line, "%ld %ld", &a_perf->m_key_bpm_up,
+    sscanf( m_line, "%u %u", &a_perf->m_key_bpm_up,
                              &a_perf->m_key_bpm_dn );
     next_data_line( &file );
 
-    sscanf( m_line, "%ld %ld", &a_perf->m_key_screenset_up,
+    sscanf( m_line, "%u %u", &a_perf->m_key_screenset_up,
                              &a_perf->m_key_screenset_dn );
     next_data_line( &file );
 
-    sscanf( m_line, "%ld %ld %ld %ld",
+    sscanf( m_line, "%u %u %u %u",
             &a_perf->m_key_replace,
             &a_perf->m_key_queue,
             &a_perf->m_key_snapshot_1,
@@ -178,7 +178,6 @@ optionsfile::parse( perform *a_perf )
     global_manual_alsa_ports = (bool) flag;
 
     /* last used dir  */
-    char *dir = "                                                                            ";
     line_after( &file, "[last-used-dir]" );
     last_used_dir.assign(m_line);
 

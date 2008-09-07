@@ -821,8 +821,8 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
 {
     int ret=0;
 
-    long tick_s;
-    long tick_f;
+    long tick_s = 0;
+    long tick_f = 0;
 
     list<event>::iterator i;
 
@@ -1415,7 +1415,7 @@ sequence::change_event_data_range( long a_tick_s, long a_tick_f,
 
         if ( set ){
 
-            float weight;
+            //float weight;
 
             /* no divide by 0 */
             if( a_tick_f == a_tick_s )
