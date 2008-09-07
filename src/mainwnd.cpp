@@ -32,14 +32,14 @@ bool is_pattern_playing = false;
 
 mainwnd::mainwnd(perform *a_p)
 {
-
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq24_32_xpm));
 
     /* set the performance */
     m_mainperf = a_p;
 
     /* main window */
-    set_window_title_filename( global_filename );
+    global_filename = "";
+    update_window_title();
 
     m_main_wid = manage( new mainwid(  m_mainperf ));
     m_main_time = manage( new maintime( ));
@@ -143,7 +143,6 @@ mainwnd::mainwnd(perform *a_p)
 
     m_perf_edit = new perfedit( m_mainperf );
     m_options = NULL;
-  
 }
 
  
@@ -178,7 +177,6 @@ mainwnd::timer_callback(  )
     }
 
     return true;
-
 }
 
 
@@ -199,6 +197,7 @@ mainwnd::options_dialog( void )
     m_options->show_all(); 
 }
 
+
 void 
 mainwnd::start_playing( void )
 {
@@ -206,6 +205,7 @@ mainwnd::start_playing( void )
     m_mainperf->start( false );
     m_mainperf->start_jack( );
 }
+
 
 void 
 mainwnd::stop_playing( void )
@@ -219,8 +219,6 @@ mainwnd::stop_playing( void )
 void
 mainwnd::file_new_dialog( void )
 {
-
-
     Gtk::MessageDialog dialog(*this,
                               "Clear Sequences?",
                               false,
@@ -238,10 +236,11 @@ mainwnd::file_new_dialog( void )
             m_mainperf->clear_all();
             
             m_main_wid->reset();
-            m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad( m_mainperf->get_screenset() ));
+            m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
+                        m_mainperf->get_screenset() ));
             
-            global_filename = "untitled";
-            set_window_title_filename( global_filename );
+            global_filename = "";
+            update_window_title();
             
             break;
         }
@@ -261,6 +260,11 @@ void
 mainwnd::file_save_dialog( void )
 {
     bool result = false;
+
+    if (global_filename == "") {
+        file_saveas_dialog();
+        return;
+    }
     
     midifile f( global_filename.c_str() );
     result = f.write( m_mainperf );
@@ -275,14 +279,14 @@ mainwnd::file_save_dialog( void )
                                      true);
         errdialog.run();
     }
-    
 }
+
 
 void 
 mainwnd::file_saveas_dialog( void )
 {
 
-    FileSelection dialog( "Save As..." );
+    FileSelection dialog( "Save file as" );
     dialog.set_filename(last_used_dir.c_str());
     int result = dialog.run();
     
@@ -310,7 +314,7 @@ mainwnd::file_saveas_dialog( void )
             global_filename = std::string( dialog.get_filename());
 	    last_used_dir.assign(dialog.get_filename());
 	    last_used_dir = last_used_dir.substr(0,last_used_dir.rfind("/")+1).c_str() ;
-            set_window_title_filename( global_filename );
+            update_window_title();
             
             break;
         }
@@ -323,14 +327,13 @@ mainwnd::file_saveas_dialog( void )
             break;
         }
     }
-
-
 }
+
 
 void 
 mainwnd::file_open_dialog( void )
 {
-    FileSelection dialog( "Open..." );
+    FileSelection dialog( "Open file" );
     dialog.set_filename(last_used_dir.c_str());
     int result = dialog.run();
     
@@ -359,7 +362,7 @@ mainwnd::file_open_dialog( void )
             global_filename = std::string(dialog.get_filename());
 	    last_used_dir.assign(dialog.get_filename());
 	    last_used_dir = last_used_dir.substr(0,last_used_dir.rfind("/")+1).c_str() ;
-            set_window_title_filename( global_filename );
+            update_window_title();
             
             m_main_wid->reset();
             m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad( m_mainperf->get_screenset() )); 
@@ -377,14 +380,14 @@ mainwnd::file_open_dialog( void )
             break;
         }
     }
-  
 }
+
 
 void 
 mainwnd::file_import_dialog( void )
 {
 
-   FileSelection dialog( "Import..." );
+   FileSelection dialog( "Import file" );
 
 
    HBox *abox = dialog.get_action_area(); 
@@ -426,7 +429,7 @@ mainwnd::file_import_dialog( void )
            }
 
            global_filename = std::string(dialog.get_filename());
-           set_window_title_filename( global_filename );
+           update_window_title();
            
            m_main_wid->reset();
            m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad( m_mainperf->get_screenset() )); 
@@ -443,7 +446,6 @@ mainwnd::file_import_dialog( void )
            break;
        }
    }
-
 }
 
 
@@ -477,8 +479,8 @@ mainwnd::file_exit_dialog( void )
             break;
         }
     }
-    
 }
+
 
 bool
 mainwnd::on_delete_event(GdkEventAny *a_e)
@@ -496,7 +498,6 @@ mainwnd::on_delete_event(GdkEventAny *a_e)
         return false;
     }
 }
-
 
 
 void 
@@ -520,9 +521,6 @@ mainwnd::about_dialog( void )
     dialog.show_all_children();
     dialog.run(); 
 }
-
-
-
 
 
 void 
@@ -563,6 +561,7 @@ mainwnd::on_key_release_event(GdkEventKey* a_ev)
     return false;
 }
 
+
 void
 mainwnd::edit_callback_notepad( )
 {
@@ -570,7 +569,6 @@ mainwnd::edit_callback_notepad( )
     m_mainperf->set_screen_set_notepad( m_mainperf->get_screenset(), 
 				        &text ); 
 }
-
 
 
 bool
@@ -666,20 +664,21 @@ mainwnd::sequence_key( int a_seq )
 
 
 void
-mainwnd::set_window_title_filename( std::string a_file )
+mainwnd::update_window_title()
 {
-    std::string title =
-        ( PACKAGE )
-        + string( "-" )
-        + string( VERSION )
-        + string( "  " )
-        + a_file;
+    std::string title;
+
+    if (global_filename == "")
+        title = ( PACKAGE ) + string( " - [unnamed]" );
+    else
+        title =
+            ( PACKAGE )
+            + string( " - [" )
+            + global_filename
+            + string( "]" );
     
     set_title ( title.c_str());
 }
-
-
-
 
 
 void 

@@ -137,7 +137,7 @@ class mainwnd : public Gtk::Window
 
     void sequence_key( int a_seq );
 
-    void set_window_title_filename( std::string a_file );
+    void update_window_title();
 
  public:
 
