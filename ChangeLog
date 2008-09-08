@@ -1,3 +1,7 @@
+2008-09-08 Jaakko Sipari <jaakko.sipari@gmail.com>
+	* perfroll.cpp, seqevent.cpp, seqroll.cpp: Added backspace as
+	an optional delete key to the pattern editor.
+
 2008-09-08 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwnd.cpp: Keyboard shortcuts for menu items added.
 	Menu rearranged to use less separators.

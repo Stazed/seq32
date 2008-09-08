@@ -1281,7 +1281,7 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
 
     if ( a_p0->type == GDK_KEY_PRESS ){
 
-        if ( a_p0->keyval ==  GDK_Delete ){
+        if ( a_p0->keyval ==  GDK_Delete || a_p0->keyval == GDK_BackSpace ){
 
             m_seq->push_undo();
             m_seq->mark_selected();
