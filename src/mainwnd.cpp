@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
+
 #include "mainwnd.h"
 #include "perform.h"
 #include "midifile.h"
@@ -50,22 +51,32 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_help    = manage( new Menu());
     
     /* fill with items */
-    m_menu_file->items().push_back(MenuElem("New", mem_fun(*this,&mainwnd::file_new_dialog)));
+    m_menu_file->items().push_back(MenuElem("_New",
+                Gtk::AccelKey("<control>N"),
+                mem_fun(*this, &mainwnd::file_new_dialog)));
+    m_menu_file->items().push_back(MenuElem("_Open...",
+                Gtk::AccelKey("<control>O"),
+                mem_fun(*this, &mainwnd::file_open_dialog)));
+    m_menu_file->items().push_back(MenuElem("_Save",
+                Gtk::AccelKey("<control>S"),
+                mem_fun(*this, &mainwnd::file_save_dialog)));
+    m_menu_file->items().push_back(MenuElem("Save _as...",
+                mem_fun(*this, &mainwnd::file_saveas_dialog)));
     m_menu_file->items().push_back(SeparatorElem());
-    m_menu_file->items().push_back(MenuElem("Open...",   mem_fun(*this,&mainwnd::file_open_dialog)));
-    m_menu_file->items().push_back(MenuElem("Import...", mem_fun(*this,&mainwnd::file_import_dialog)));
+    m_menu_file->items().push_back(MenuElem("_Import...",
+                mem_fun(*this, &mainwnd::file_import_dialog)));
+    m_menu_file->items().push_back(MenuElem("_Options...",
+                mem_fun(*this,&mainwnd::options_dialog)));
     m_menu_file->items().push_back(SeparatorElem());
-    m_menu_file->items().push_back(MenuElem("Save", mem_fun(*this,&mainwnd::file_save_dialog)));
-    m_menu_file->items().push_back(MenuElem("Save As...", mem_fun(*this,&mainwnd::file_saveas_dialog)));
-    m_menu_file->items().push_back(SeparatorElem());
-    m_menu_file->items().push_back(MenuElem("Options...", mem_fun(*this,&mainwnd::options_dialog)));
-    m_menu_file->items().push_back(SeparatorElem());
-    m_menu_file->items().push_back(MenuElem("Exit", mem_fun(*this,&mainwnd::file_exit_dialog)));
+    m_menu_file->items().push_back(MenuElem("E_xit",
+                Gtk::AccelKey("<control>Q"),
+                mem_fun(*this, &mainwnd::file_exit_dialog)));
 
-    m_menu_help->items().push_back(MenuElem("About...", mem_fun(*this,&mainwnd::about_dialog)));
+    m_menu_help->items().push_back(MenuElem("_About...",
+                mem_fun(*this, &mainwnd::about_dialog)));
  
-    m_menubar->items().push_front(MenuElem("File", *m_menu_file));
-    m_menubar->items().push_back(MenuElem("Help", *m_menu_help));
+    m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
+    m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
 
     HBox *hbox = manage( new HBox( false, 2 ) );
 
@@ -335,6 +346,7 @@ mainwnd::file_open_dialog( void )
 {
     FileSelection dialog( "Open file" );
     dialog.set_filename(last_used_dir.c_str());
+
     int result = dialog.run();
     
     //Handle the response:
@@ -574,8 +586,11 @@ mainwnd::edit_callback_notepad( )
 bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
+    // trap control and modifier key combinations to get menu items working
+    if (a_ev->state & GDK_CONTROL_MASK || a_ev->state & GDK_MOD1_MASK) 
+        return Gtk::Window::on_key_press_event(a_ev);
 
-    if( m_entry_notes->has_focus()){
+    else if ( m_entry_notes->has_focus()) {
         m_entry_notes->event( (GdkEvent*) a_ev );
         return false;
     }

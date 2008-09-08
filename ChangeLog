@@ -1,4 +1,8 @@
-2008-09-17 Guido Scholz <guido.scholz@bayernline.de>
+2008-09-08 Guido Scholz <guido.scholz@bayernline.de>
+	* src/mainwnd.cpp: Keyboard shortcuts for menu items added.
+	Menu rearranged to use less separators.
+
+2008-09-07 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwnd.*: Title page naming changed.
 	* src/seqedit.cpp: Fixed GTK warning about invalid input string,
 	caused by buffer overflow.
