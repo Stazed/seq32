@@ -67,7 +67,7 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("_Import...",
                 mem_fun(*this, &mainwnd::file_import_dialog)));
-    m_menu_file->items().push_back(MenuElem("_Options...",
+    m_menu_file->items().push_back(MenuElem("O_ptions...",
                 mem_fun(*this,&mainwnd::options_dialog)));
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("E_xit",
