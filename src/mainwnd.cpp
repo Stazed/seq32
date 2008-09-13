@@ -449,7 +449,7 @@ mainwnd::file_import_dialog( void )
 {
 
    FileSelection dialog( "Import file" );
-
+   dialog.set_filename(last_used_dir.c_str());
 
    HBox *abox = dialog.get_action_area(); 
    HBox hbox( false, 2 );
