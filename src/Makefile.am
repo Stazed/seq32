@@ -1,24 +1,40 @@
- 
-
-
+# Makefile.am for seq24
 
 AM_CXXFLAGS = $(DEPS_CFLAGS) $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) -Wall
-LDADD = $(DEPS_LIBS)  $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS)
+seq24_LDADD = $(DEPS_LIBS) $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS)
 
-bin_PROGRAMS = seq24 dump
-
-dump_SOURCES = dump.cpp
+bin_PROGRAMS = seq24
 
 seq24_SOURCES = \
-event.cpp    mainwid.h  midibus.h  seqdata.cpp  seqevent.cpp  seqroll.cpp  sequence.cpp   \
-event.h    mainwnd.cpp  perform.cpp  seqdata.h  seqevent.h  seqroll.h  sequence.h \
-globals.h  mainwnd.h  perform.h  seqedit.cpp  seqkeys.cpp   seqtime.cpp \
-mainwid.cpp  midibus.cpp  seq24.cpp    seqedit.h  seqkeys.h   seqtime.h \
-controllers.h mutex.h mutex.cpp midifile.cpp midifile.h options.h \
-options.cpp perfedit.cpp perfedit.h perfnames.cpp perfnames.h \
-perfroll.cpp perfroll.h perftime.cpp perftime.h maintime.h maintime.cpp \
-font.cpp font.h optionsfile.cpp optionsfile.h seqmenu.h seqmenu.cpp \
-lash.h lash.cpp configfile.cpp configfile.h userfile.h userfile.cpp
+	configfile.cpp configfile.h \
+	controllers.h \
+	event.cpp event.h \
+	font.cpp font.h \
+	globals.h \
+	lash.cpp lash.h \
+	maintime.cpp maintime.h \
+	mainwid.cpp mainwid.h \
+	mainwnd.cpp mainwnd.h \
+	midibus.cpp midibus.h \
+	midifile.cpp midifile.h \
+	mutex.cpp mutex.h \
+	options.cpp options.h \
+	optionsfile.cpp optionsfile.h \
+	perfedit.cpp perfedit.h \
+	perfnames.cpp perfnames.h \
+	perform.cpp perform.h \
+	perfroll.cpp perfroll.h \
+	perftime.cpp perftime.h \
+	seq24.cpp \
+	seqdata.cpp seqdata.h \
+	seqedit.cpp seqedit.h \
+	seqevent.cpp seqevent.h \
+	seqkeys.cpp seqkeys.h \
+	seqmenu.cpp seqmenu.h \
+	seqroll.cpp seqroll.h \
+	seqtime.cpp seqtime.h \
+	sequence.cpp sequence.h \
+	userfile.cpp userfile.h
 
 EXTRA_DIST = *.xpm 
 
