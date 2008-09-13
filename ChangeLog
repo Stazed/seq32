@@ -3,6 +3,9 @@
 	files in Makefile.am reordered.
 	* configure.in, src/Makefile.am: Cleanup compiler and linker
 	variables handling for gtkmm library.
+	* src/mainwnd.*: Use newer file dialog, MIDI files are
+	preselectable. ".midi" suffix is added if user does not append a
+	valid MIDI file extension.
 
 2008-09-08 Jaakko Sipari <jaakko.sipari@gmail.com>
 	* perfroll.cpp, seqevent.cpp, seqroll.cpp: Added backspace as

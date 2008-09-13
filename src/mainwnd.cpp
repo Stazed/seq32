@@ -18,6 +18,8 @@
 //
 //-----------------------------------------------------------------------------
 
+#include <cctype>
+
 #include "mainwnd.h"
 #include "perform.h"
 #include "midifile.h"
@@ -146,9 +148,11 @@ mainwnd::mainwnd(perform *a_p)
 
     add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );
 
-    m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(  m_mainperf->get_screenset() )); 
+    m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                m_mainperf->get_screenset())); 
 
-    m_timeout_connect = Glib::signal_timeout().connect(mem_fun(*this,&mainwnd::timer_callback), 25);
+    m_timeout_connect = Glib::signal_timeout().connect(
+            mem_fun(*this, &mainwnd::timer_callback), 25);
     
     m_quit = false;
 
@@ -167,7 +171,7 @@ mainwnd::~mainwnd()
 
 
 // This is the GTK timer callback, used to draw our current time and bpm
-// on the main window
+// ondd_events( the main window
 bool
 mainwnd::timer_callback(  )
 {
@@ -231,11 +235,8 @@ void
 mainwnd::file_new_dialog( void )
 {
     Gtk::MessageDialog dialog(*this,
-                              "Clear Sequences?",
-                              false,
-                              Gtk::MESSAGE_QUESTION,
-                              (Gtk::ButtonsType)(BUTTONS_OK_CANCEL),
-                              true );
+            "Clear Sequences?", false,
+            Gtk::MESSAGE_QUESTION, BUTTONS_OK_CANCEL, true);
     
     int result = dialog.run();
 
@@ -283,12 +284,19 @@ mainwnd::file_save_dialog( void )
     if ( !result ){
         
         Gtk::MessageDialog errdialog(*this,
-                                     "Error writing file.",
-                                     false,
-                                     Gtk::MESSAGE_ERROR,
-                                     (Gtk::ButtonsType)(Gtk::BUTTONS_OK),
-                                     true);
+                "Error writing file.", false,
+                Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
         errdialog.run();
+    }
+}
+
+
+/* convert string to lower case letters */
+void
+mainwnd::toLower(basic_string<char>& s) {
+    for (basic_string<char>::iterator p = s.begin();
+            p != s.end(); p++) {
+        *p = tolower(*p);
     }
 }
 
@@ -296,8 +304,24 @@ mainwnd::file_save_dialog( void )
 void 
 mainwnd::file_saveas_dialog( void )
 {
+    Gtk::FileChooserDialog dialog("Save file as",
+                      Gtk::FILE_CHOOSER_ACTION_SAVE);
+    dialog.set_transient_for(*this);
 
-    FileSelection dialog( "Save file as" );
+    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+
+    Gtk::FileFilter filter_midi;
+    filter_midi.set_name("MIDI files");
+    filter_midi.add_pattern("*.midi");
+    filter_midi.add_pattern("*.mid");
+    dialog.add_filter(filter_midi);
+
+    Gtk::FileFilter filter_any;
+    filter_any.set_name("Any files");
+    filter_any.add_pattern("*");
+    dialog.add_filter(filter_any);
+
     dialog.set_filename(last_used_dir.c_str());
     int result = dialog.run();
     
@@ -308,23 +332,32 @@ mainwnd::file_saveas_dialog( void )
         {
             bool result = false;
             
-            midifile f( dialog.get_filename() );
+            std::string fname = dialog.get_filename();
+            Gtk::FileFilter* current_filter = dialog.get_filter();
+
+            if ((current_filter != NULL) &&
+                    (current_filter->get_name() == "MIDI files")) {
+
+                // check for MIDI file extension; if missing, add .midi
+                std::string suffix = fname.substr(
+                        fname.find_last_of(".") + 1, std::string::npos);
+                toLower(suffix);
+                if ((suffix != "midi") && (suffix != "mid"))
+                    fname = fname + ".midi";
+            }
+
+            midifile f(fname);
             result = f.write( m_mainperf );
 
-            if ( !result ){
-                
+            if (!result) {
                 Gtk::MessageDialog errdialog(*this,
-                                              false,
-                                             "Error writing file.",
-                                             Gtk::MESSAGE_ERROR,
-                                             (Gtk::ButtonsType)(Gtk::BUTTONS_OK),
-                                             true );
+                        false, "Error writing file.",
+                        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true );
                 errdialog.run();
             }
             
-            global_filename = std::string( dialog.get_filename());
-	    last_used_dir.assign(dialog.get_filename());
-	    last_used_dir = last_used_dir.substr(0,last_used_dir.rfind("/")+1).c_str() ;
+            global_filename = fname;
+	    last_used_dir = fname.substr(0, fname.rfind("/") + 1).c_str();
             update_window_title();
             
             break;
@@ -344,7 +377,24 @@ mainwnd::file_saveas_dialog( void )
 void 
 mainwnd::file_open_dialog( void )
 {
-    FileSelection dialog( "Open file" );
+    Gtk::FileChooserDialog dialog("Open MIDI file",
+                      Gtk::FILE_CHOOSER_ACTION_OPEN);
+    dialog.set_transient_for(*this);
+
+    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+
+    Gtk::FileFilter filter_midi;
+    filter_midi.set_name("MIDI files");
+    filter_midi.add_pattern("*.midi");
+    filter_midi.add_pattern("*.mid");
+    dialog.add_filter(filter_midi);
+
+    Gtk::FileFilter filter_any;
+    filter_any.set_name("Any files");
+    filter_any.add_pattern("*");
+    dialog.add_filter(filter_any);
+
     dialog.set_filename(last_used_dir.c_str());
 
     int result = dialog.run();
@@ -364,16 +414,15 @@ mainwnd::file_open_dialog( void )
             if ( !result ){
                 
                 Gtk::MessageDialog errdialog(*this,
-                                             "Error reading file.", false,
-                                             Gtk::MESSAGE_ERROR,
-                                             (Gtk::ButtonsType)(Gtk::BUTTONS_OK),
-                                             true);
+                        "Error reading file.", false,
+                        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                 errdialog.run();
             }
 
             global_filename = std::string(dialog.get_filename());
 	    last_used_dir.assign(dialog.get_filename());
-	    last_used_dir = last_used_dir.substr(0,last_used_dir.rfind("/")+1).c_str() ;
+	    last_used_dir = last_used_dir.substr(0,
+                    last_used_dir.rfind("/") + 1).c_str();
             update_window_title();
             
             m_main_wid->reset();
@@ -430,14 +479,10 @@ mainwnd::file_import_dialog( void )
 
            }
            catch(...){
-               
                Gtk::MessageDialog errdialog(*this, 
-                                            "Error reading file.", false,
-                                            Gtk::MESSAGE_ERROR,
-                                            (Gtk::ButtonsType)(Gtk::BUTTONS_OK),
-                                            true);
+                       "Error reading file.", false,
+                       Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                 errdialog.run();
-               
            }
 
            global_filename = std::string(dialog.get_filename());
@@ -465,10 +510,8 @@ void
 mainwnd::file_exit_dialog( void )
 {
     Gtk::MessageDialog dialog(*this,
-                              "Quit seq24?", false,
-                              Gtk::MESSAGE_QUESTION,
-                              (Gtk::ButtonsType)(Gtk::BUTTONS_OK_CANCEL),
-                              true);
+            "Quit seq24?", false,
+            Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK_CANCEL, true);
     
     int result = dialog.run();
 
@@ -515,11 +558,11 @@ mainwnd::on_delete_event(GdkEventAny *a_e)
 void 
 mainwnd::about_dialog( void )
 {
-    Dialog dialog( "About", *this, true, true   );
+    Dialog dialog("About seq24", *this, true, true);
 
     dialog.set_size_request( 450, 400 );
 
-    dialog.add_button( " Ok ", Gtk::RESPONSE_OK  );
+    dialog.add_button( "Ok", Gtk::RESPONSE_OK  );
 
     Glib::RefPtr<TextBuffer> buffer = TextBuffer::create();
     buffer->set_text( c_about );
@@ -689,7 +732,7 @@ mainwnd::update_window_title()
         title =
             ( PACKAGE )
             + string( " - [" )
-            + global_filename
+            + Glib::filename_to_utf8(global_filename)
             + string( "]" );
     
     set_title ( title.c_str());

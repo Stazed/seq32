@@ -33,35 +33,11 @@
 #ifndef SEQ24_MAINWINDOW
 #define SEQ24_MAINWINDOW
 
-#include <gtkmm/button.h>
-#include <gtkmm/window.h>
-#include <gtkmm/accelgroup.h>
-#include <gtkmm/box.h>
-#include <gtkmm/main.h>
-#include <gtkmm/menu.h>
-#include <gtkmm/menubar.h>
-#include <gtkmm/eventbox.h>
-#include <gtkmm/window.h>
-#include <gtkmm/table.h>
-#include <gtkmm/drawingarea.h>
-#include <gtkmm/label.h>
-#include <gtkmm/viewport.h> 
-#include <gtkmm/fileselection.h>
-#include <gtkmm/dialog.h>
-#include <gtkmm/messagedialog.h>
-#include <gtkmm/textview.h>
-#include <gtkmm/arrow.h>
-#include <gtkmm/spinbutton.h>
-#include <gtkmm/progressbar.h>
-#include <gtkmm/dialog.h>
-#include <gtkmm/label.h>
-#include <gdkmm/cursor.h>
-#include <gtkmm/image.h>
-
+#include <map>
+#include <gtkmm.h>
 
 #include "globals.h"
 
-#include <map>
 
 
 using namespace Gtk;
@@ -132,12 +108,10 @@ class mainwnd : public Gtk::Window
     void start_playing();
     void stop_playing();
     void test();
-
     void open_performance_edit( );
-
     void sequence_key( int a_seq );
-
     void update_window_title();
+    void toLower(basic_string<char>&);
 
  public:
 
