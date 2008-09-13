@@ -1,6 +1,8 @@
 2008-09-13 Guido Scholz <guido.scholz@bayernline.de>
 	* src/dump.cpp, src/Makefile.am: "dump" program removed, source
 	files in Makefile.am reordered.
+	* configure.in, src/Makefile.am: Cleanup compiler and linker
+	variables handling for gtkmm library.
 
 2008-09-08 Jaakko Sipari <jaakko.sipari@gmail.com>
 	* perfroll.cpp, seqevent.cpp, seqroll.cpp: Added backspace as
