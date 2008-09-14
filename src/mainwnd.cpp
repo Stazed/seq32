@@ -41,7 +41,6 @@ mainwnd::mainwnd(perform *a_p)
     m_mainperf = a_p;
 
     /* main window */
-    global_filename = "";
     update_window_title();
 
     m_main_wid = manage( new mainwid(  m_mainperf ));

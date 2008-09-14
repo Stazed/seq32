@@ -58,7 +58,7 @@ bool global_device_ignore = false;
 int global_device_ignore_num = 0;
 bool global_stats = false;
 bool global_pass_sysex = false;
-std::string global_filename = "untitled.s24";
+std::string global_filename = "";
 std::string config_filename = ".seq24rc";
 std::string user_filename = ".seq24usr";
 bool global_print_keys = false;
@@ -72,10 +72,8 @@ user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 
 font *p_font_renderer;
-
 lash *lash_driver = NULL;
 
-bool load_file = false;
 
 int 
 main (int argc, char *argv[])
@@ -92,8 +90,8 @@ main (int argc, char *argv[])
             global_user_instrument_definitions[i].controllers_active[j] = false;
     }
     
-	/* init the lash driver (strips lash specific cmdline arguments */
-	lash_driver = new lash(&argc, &argv);
+    /* init the lash driver (strips lash specific cmdline arguments */
+    lash_driver = new lash(&argc, &argv);
 
     /* the main performance object */
     perform p; 
@@ -175,26 +173,19 @@ main (int argc, char *argv[])
                 break;
                 
             case 'S':
-                
                 global_stats = true;
                 break;
                 
             case 's':
-                
                 global_showmidi = true;
-                
                 break;
                 
             case 'p':
-                
                 global_priority = true;
-                
                 break;
                 
             case 'P':
-                
                 global_pass_sysex = true;
-                
                 break;
                 
             case 'k':
@@ -214,30 +205,23 @@ main (int argc, char *argv[])
                 break;
 
             case 'M':
-
-                if( atoi( optarg ) > 0 ){
+                if (atoi( optarg ) > 0) {
                     global_jack_start_mode = true;
                 }
-                else
-                {
+                else {
                     global_jack_start_mode = false;
                 }
                 break;
 
             case 'm':
-
                 global_manual_alsa_ports = true;
                 break;
 
             case 'f':
-     
-                load_file = true;
                 global_filename = std::string( optarg );
-                
                break;
                 
             case 'i':
-                
                 /* ignore alsa device */
                 global_device_ignore = true;
                 global_device_ignore_num = atoi( optarg );
@@ -257,8 +241,7 @@ main (int argc, char *argv[])
     p.launch_output_thread();
     p.init_jack();
     
-    if ( load_file )
-    {
+    if (global_filename != "") {
         /* import that midi file */
         f = new midifile( global_filename.c_str());
         f->parse( &p, 0 );
@@ -267,7 +250,7 @@ main (int argc, char *argv[])
 
     mainwnd mainwnd( &p );
 
-	lash_driver->start( &p );
+    lash_driver->start( &p );
     kit.run();
     
     p.deinit_jack();
@@ -289,7 +272,7 @@ main (int argc, char *argv[])
         printf( "Error calling getenv( \"HOME\" )\n" );  
     }
 
-	delete lash_driver;
+    delete lash_driver;
 
     return 0;
 }
