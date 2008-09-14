@@ -321,7 +321,7 @@ mainwnd::file_saveas_dialog( void )
     filter_any.add_pattern("*");
     dialog.add_filter(filter_any);
 
-    dialog.set_filename(last_used_dir.c_str());
+    dialog.set_current_folder(last_used_dir);
     int result = dialog.run();
     
     //Handle the response:
@@ -394,7 +394,7 @@ mainwnd::file_open_dialog( void )
     filter_any.add_pattern("*");
     dialog.add_filter(filter_any);
 
-    dialog.set_filename(last_used_dir.c_str());
+    dialog.set_current_folder(last_used_dir);
 
     int result = dialog.run();
     
