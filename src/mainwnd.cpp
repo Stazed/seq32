@@ -43,15 +43,21 @@ mainwnd::mainwnd(perform *a_p)
     /* main window */
     update_window_title();
 
-    m_main_wid = manage( new mainwid(  m_mainperf ));
+    m_main_wid = manage( new mainwid( m_mainperf ));
     m_main_time = manage( new maintime( ));
 
-    m_menubar   = manage(new MenuBar());
+    m_menubar = manage(new MenuBar());
+
     m_menu_file = manage(new Menu());
-    m_menu_control = manage( new Menu());
-    m_menu_help    = manage( new Menu());
+    m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
     
-    /* fill with items */
+    m_menu_view = manage( new Menu());
+    m_menubar->items().push_back(MenuElem("_View", *m_menu_view));
+
+    m_menu_help = manage( new Menu());
+    m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
+    
+    /* file menu items */
     m_menu_file->items().push_back(MenuElem("_New",
                 Gtk::AccelKey("<control>N"),
                 mem_fun(*this, &mainwnd::file_new_dialog)));
@@ -73,57 +79,82 @@ mainwnd::mainwnd(perform *a_p)
                 Gtk::AccelKey("<control>Q"),
                 mem_fun(*this, &mainwnd::file_exit_dialog)));
 
+    /* view menu items */
+    m_menu_view->items().push_back(MenuElem("_Song Editor...",
+                Gtk::AccelKey("<control>E"),
+                mem_fun(*this, &mainwnd::open_performance_edit)));
+ 
+    /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
                 mem_fun(*this, &mainwnd::about_dialog)));
  
-    m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
-    m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
 
+    /* bottom line items */
     HBox *hbox = manage( new HBox( false, 2 ) );
 
+    /* stop button */
     m_button_stop = manage( new Button( ));
-    m_button_stop->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
-    m_button_stop->signal_clicked().connect( mem_fun(*this,&mainwnd::stop_playing));
+    m_button_stop->add(*manage(new Image(
+                    Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
+    m_button_stop->signal_clicked().connect(
+            mem_fun(*this, &mainwnd::stop_playing));
+    m_button_stop->set_tooltip_text("Stop playing MIDI sequence");
     hbox->pack_start(*m_button_stop, false, false);
 
-    m_button_play = manage( new Button() );
-    m_button_play->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( play2_xpm  ))));
-    m_button_play->signal_clicked().connect(  mem_fun( *this, &mainwnd::start_playing));
+    /* play button */
+    m_button_play = manage(new Button() );
+    m_button_play->add(*manage(new Image(
+                    Gdk::Pixbuf::create_from_xpm_data( play2_xpm ))));
+    m_button_play->signal_clicked().connect(
+            mem_fun( *this, &mainwnd::start_playing));
+    m_button_play->set_tooltip_text("Play MIDI sequence");
     hbox->pack_start(*m_button_play, false, false);
 
-    //m_button_test = manage( new Button("test") );
-    //m_button_test->signal_clicked().connect(  mem_fun( *this, &mainwnd::test));
-    //hbox->pack_start(*m_button_test, false, false);
-
-    m_button_perfedit = manage( new Button(  ));
-    m_button_perfedit->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
-    m_button_perfedit->signal_clicked().connect( mem_fun( *this, &mainwnd::open_performance_edit ));
+    /* song edit button */
+    m_button_perfedit = manage( new Button( ));
+    m_button_perfedit->add( *manage( new Image(
+                    Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
+    m_button_perfedit->signal_clicked().connect(
+            mem_fun( *this, &mainwnd::open_performance_edit ));
+    m_button_perfedit->set_tooltip_text("Show or hide song editor window");
     hbox->pack_end(*m_button_perfedit, false, false, 4);
 
-    m_adjust_bpm = manage( new Adjustment(  m_mainperf->get_bpm(), 20, 500, 1 ));
+    /* bpm spin button */
+    m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 20, 500, 1));
     m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
     m_spinbutton_bpm->set_editable( false );
+    m_adjust_bpm->signal_value_changed().connect(
+            mem_fun(*this, &mainwnd::adj_callback_bpm ));
+    m_spinbutton_bpm->set_tooltip_text("Adjust beats per minute (BPM) value");
     hbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
     hbox->pack_start(*m_spinbutton_bpm, false, false );
   
+    /* sequence set spin button */
     m_adjust_ss = manage( new Adjustment( 0, 0, c_max_sets - 1, 1 ));
     m_spinbutton_ss = manage( new SpinButton( *m_adjust_ss ));
     m_spinbutton_ss->set_editable( false );
     m_spinbutton_ss->set_wrap( true );
+    m_adjust_ss->signal_value_changed().connect(
+            mem_fun(*this, &mainwnd::adj_callback_ss ));
+    m_spinbutton_ss->set_tooltip_text("Select sreen set");
     hbox->pack_end(*m_spinbutton_ss, false, false );
     hbox->pack_end(*(manage( new Label( "  set " ))), false, false, 4);
-
-    m_adjust_bpm->signal_value_changed().connect( mem_fun(*this,&mainwnd::adj_callback_bpm ));
-    m_adjust_ss->signal_value_changed().connect( mem_fun(*this,&mainwnd::adj_callback_ss ));
  
+    /* screen set name edit line */
     m_entry_notes = manage( new Entry());
-    m_entry_notes->signal_changed().connect( mem_fun(*this,&mainwnd::edit_callback_notepad ));
-
+    m_entry_notes->signal_changed().connect(
+            mem_fun(*this, &mainwnd::edit_callback_notepad));
+    m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                m_mainperf->get_screenset())); 
+    m_entry_notes->set_tooltip_text("Enter screen set name");
     hbox->pack_start( *m_entry_notes, true, true );
 
-    /* 2nd hbox */
+
+    /* top line items */
     HBox *hbox2 = manage( new HBox( false, 0 ) );
-    hbox2->pack_start( *manage(  new Image(Gdk::Pixbuf::create_from_xpm_data( seq24_xpm ))), false, false );
+    hbox2->pack_start(*manage(new Image(
+                    Gdk::Pixbuf::create_from_xpm_data(seq24_xpm))),
+            false, false);
     hbox2->pack_end( *m_main_time, false, false );
 
     /* set up a vbox, put the menu in it, and add it */
@@ -146,9 +177,6 @@ mainwnd::mainwnd(perform *a_p)
     show_all();
 
     add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );
-
-    m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
-                m_mainperf->get_screenset())); 
 
     m_timeout_connect = Glib::signal_timeout().connect(
             mem_fun(*this, &mainwnd::timer_callback), 25);
@@ -197,8 +225,12 @@ mainwnd::timer_callback(  )
 void 
 mainwnd::open_performance_edit( void )
 {
-    m_perf_edit->init_before_show();
-    m_perf_edit->show_all();
+    if (m_perf_edit->is_visible())
+        m_perf_edit->hide();
+    else {
+        m_perf_edit->init_before_show();
+        m_perf_edit->show_all();
+    }
 }
 
 
@@ -628,16 +660,16 @@ mainwnd::edit_callback_notepad( )
 bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
-    // trap control and modifier key combinations to get menu items working
-    if (a_ev->state & GDK_CONTROL_MASK || a_ev->state & GDK_MOD1_MASK) 
-        return Gtk::Window::on_key_press_event(a_ev);
+    // control and modifier key combinations matching
+    // menu items have first priority
+    if (Gtk::Window::on_key_press_event(a_ev))
+        return true;
 
     else if ( m_entry_notes->has_focus()) {
         m_entry_notes->event( (GdkEvent*) a_ev );
         return false;
     }
-    else
-    {
+    else {
         if ( a_ev->type == GDK_KEY_PRESS ){
 
             if ( global_print_keys ){

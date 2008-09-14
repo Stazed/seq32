@@ -6,6 +6,8 @@
 	* src/mainwnd.*: Use newer file dialog, MIDI files are
 	preselectable. ".midi" suffix is added if user does not append a
 	valid MIDI file extension.
+	New menu item to show and hide song edit window. Tooltips for
+	bottom line elements added.
 
 2008-09-08 Jaakko Sipari <jaakko.sipari@gmail.com>
 	* perfroll.cpp, seqevent.cpp, seqroll.cpp: Added backspace as

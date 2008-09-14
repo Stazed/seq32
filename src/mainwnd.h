@@ -55,7 +55,7 @@ class mainwnd : public Gtk::Window
     
     MenuBar  *m_menubar;
     Menu     *m_menu_file;
-    Menu     *m_menu_control;
+    Menu     *m_menu_view;
     Menu     *m_menu_help;
 
     perform  *m_mainperf;
