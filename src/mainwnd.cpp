@@ -60,15 +60,15 @@ mainwnd::mainwnd(perform *a_p)
     /* file menu items */
     m_menu_file->items().push_back(MenuElem("_New",
                 Gtk::AccelKey("<control>N"),
-                mem_fun(*this, &mainwnd::file_new_dialog)));
+                mem_fun(*this, &mainwnd::file_new)));
     m_menu_file->items().push_back(MenuElem("_Open...",
                 Gtk::AccelKey("<control>O"),
-                mem_fun(*this, &mainwnd::file_open_dialog)));
+                mem_fun(*this, &mainwnd::file_open)));
     m_menu_file->items().push_back(MenuElem("_Save",
                 Gtk::AccelKey("<control>S"),
-                mem_fun(*this, &mainwnd::file_save_dialog)));
+                mem_fun(*this, &mainwnd::file_save)));
     m_menu_file->items().push_back(MenuElem("Save _as...",
-                mem_fun(*this, &mainwnd::file_saveas_dialog)));
+                mem_fun(*this, &mainwnd::file_save_as)));
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("_Import...",
                 mem_fun(*this, &mainwnd::file_import_dialog)));
@@ -77,7 +77,7 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("E_xit",
                 Gtk::AccelKey("<control>Q"),
-                mem_fun(*this, &mainwnd::file_exit_dialog)));
+                mem_fun(*this, &mainwnd::file_exit)));
 
     /* view menu items */
     m_menu_view->items().push_back(MenuElem("_Song Editor...",
@@ -181,7 +181,7 @@ mainwnd::mainwnd(perform *a_p)
     m_timeout_connect = Glib::signal_timeout().connect(
             mem_fun(*this, &mainwnd::timer_callback), 25);
     
-    m_quit = false;
+    m_modified = false;
 
     m_perf_edit = new perfedit( m_mainperf );
     m_options = NULL;
@@ -213,9 +213,10 @@ mainwnd::timer_callback(  )
 
     if ( m_adjust_ss->get_value() !=  m_mainperf->get_screenset() )
     {
-        m_main_wid->set_screenset(  m_mainperf->get_screenset() );  
-        m_adjust_ss->set_value( m_mainperf->get_screenset()  );	
-        m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()  )); 
+        m_main_wid->set_screenset(m_mainperf->get_screenset());  
+        m_adjust_ss->set_value( m_mainperf->get_screenset());	
+        m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                    m_mainperf->get_screenset())); 
     }
 
     return true;
@@ -230,6 +231,7 @@ mainwnd::open_performance_edit( void )
     else {
         m_perf_edit->init_before_show();
         m_perf_edit->show_all();
+        m_modified = true;
     }
 }
 
@@ -250,6 +252,7 @@ mainwnd::start_playing( void )
     m_mainperf->position_jack( false );  
     m_mainperf->start( false );
     m_mainperf->start_jack( );
+    is_pattern_playing = true;
 }
 
 
@@ -259,81 +262,41 @@ mainwnd::stop_playing( void )
     m_mainperf->stop_jack();
     m_mainperf->stop();
     m_main_wid->update_sequences_on_window();
+    is_pattern_playing = false;
 }
 
 
-void
-mainwnd::file_new_dialog( void )
+/* callback function */
+void mainwnd::file_new()
 {
-    Gtk::MessageDialog dialog(*this,
-            "Clear Sequences?", false,
-            Gtk::MESSAGE_QUESTION, BUTTONS_OK_CANCEL, true);
-    
-    int result = dialog.run();
-
-    //Handle the response:
-    switch(result)
-    {
-        case(Gtk::RESPONSE_OK):
-        {
-            m_mainperf->clear_all();
-            
-            m_main_wid->reset();
-            m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
-                        m_mainperf->get_screenset() ));
-            
-            global_filename = "";
-            update_window_title();
-            
-            break;
-        }
-        case(Gtk::RESPONSE_CANCEL):
-        {   
-            break;
-        }
-        default:
-        { 
-            break;
-        }
-    }
+    if (is_save())
+        new_file();
 }
 
 
-void 
-mainwnd::file_save_dialog( void )
+void mainwnd::new_file()
 {
-    bool result = false;
+    m_mainperf->clear_all();
 
-    if (global_filename == "") {
-        file_saveas_dialog();
-        return;
-    }
-    
-    midifile f( global_filename.c_str() );
-    result = f.write( m_mainperf );
+    m_main_wid->reset();
+    m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
+                m_mainperf->get_screenset() ));
 
-    if ( !result ){
-        
-        Gtk::MessageDialog errdialog(*this,
-                "Error writing file.", false,
-                Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-        errdialog.run();
-    }
+    global_filename = "";
+    update_window_title();
+    m_modified = false;
 }
 
 
-/* convert string to lower case letters */
-void
-mainwnd::toLower(basic_string<char>& s) {
-    for (basic_string<char>::iterator p = s.begin();
-            p != s.end(); p++) {
-        *p = tolower(*p);
-    }
+/* callback function */
+void mainwnd::file_save()
+{
+    save_file();
 }
 
 
-void 
-mainwnd::file_saveas_dialog( void )
+/* callback function */
+void mainwnd::file_save_as()
 {
     Gtk::FileChooserDialog dialog("Save file as",
                       Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -356,10 +319,8 @@ mainwnd::file_saveas_dialog( void )
     dialog.set_current_folder(last_used_dir);
     int result = dialog.run();
     
-    //Handle the response:
-    switch(result)
-    {
-        case(Gtk::RESPONSE_OK):
+    switch (result) {
+        case Gtk::RESPONSE_OK:
         {
             bool result = false;
             
@@ -377,36 +338,66 @@ mainwnd::file_saveas_dialog( void )
                     fname = fname + ".midi";
             }
 
-            midifile f(fname);
-            result = f.write( m_mainperf );
+            if (Glib::file_test(fname, Glib::FILE_TEST_EXISTS)) {
+                Gtk::MessageDialog warning(*this, false,
+                        "File already exists!\n"
+                        "Do you want to overwrite it?",
+                        Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
+                result = warning.run();
 
-            if (!result) {
-                Gtk::MessageDialog errdialog(*this,
-                        false, "Error writing file.",
-                        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true );
-                errdialog.run();
+                if (result == Gtk::RESPONSE_NO)
+                    return;
             }
-            
             global_filename = fname;
-	    last_used_dir = fname.substr(0, fname.rfind("/") + 1).c_str();
             update_window_title();
-            
+            save_file();
             break;
         }
-        case(Gtk::RESPONSE_CANCEL):
-        {
-            break;
-        }
+
         default:
-        {
             break;
-        }
     }
 }
 
 
-void 
-mainwnd::file_open_dialog( void )
+void mainwnd::open_file(const std::string& fn)
+{
+    bool result;
+
+    m_mainperf->clear_all();
+
+    midifile f(fn);
+    result = f.parse(m_mainperf, 0);
+    m_modified = !result;
+
+    if (!result) {
+        Gtk::MessageDialog errdialog(*this,
+                "Error reading file: " + fn, false,
+                Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        errdialog.run();
+        return;
+    }
+
+    last_used_dir = fn.substr(0, fn.rfind("/") + 1);
+    global_filename = fn;
+    update_window_title();
+
+    m_main_wid->reset();
+    m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                m_mainperf->get_screenset())); 
+    m_adjust_bpm->set_value( m_mainperf->get_bpm());
+}
+
+
+/*callback function*/
+void mainwnd::file_open()
+{
+    if (is_save())
+        choose_file();
+}
+
+
+void mainwnd::choose_file()
 {
     Gtk::FileChooserDialog dialog("Open MIDI file",
                       Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -430,47 +421,89 @@ mainwnd::file_open_dialog( void )
 
     int result = dialog.run();
     
-    //Handle the response:
-    switch(result)
-    {
+    switch(result) {
         case(Gtk::RESPONSE_OK):
-        {
-            bool result = false;
-            
-            m_mainperf->clear_all();
-            
-            midifile f( dialog.get_filename() );
-            result = f.parse( m_mainperf, 0 );
+            open_file(dialog.get_filename());
 
-            if ( !result ){
-                
-                Gtk::MessageDialog errdialog(*this,
-                        "Error reading file.", false,
-                        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-                errdialog.run();
-            }
-
-            global_filename = std::string(dialog.get_filename());
-	    last_used_dir.assign(dialog.get_filename());
-	    last_used_dir = last_used_dir.substr(0,
-                    last_used_dir.rfind("/") + 1).c_str();
-            update_window_title();
-            
-            m_main_wid->reset();
-            m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad( m_mainperf->get_screenset() )); 
-            m_adjust_bpm->set_value( m_mainperf->get_bpm() );
-
-            
-            break;
-        }
-        case(Gtk::RESPONSE_CANCEL):
-        {
-            break;
-        }
         default:
-        {
             break;
+    }
+}
+
+
+bool mainwnd::save_file()
+{
+    bool result = false;
+
+    if (global_filename == "") {
+        file_save_as();
+        return true;
+    }
+
+    midifile f(global_filename);
+    result = f.write(m_mainperf);
+
+    if (!result) {
+        Gtk::MessageDialog errdialog(*this,
+                "Error writing file.", false,
+                Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        errdialog.run();
+    }
+    m_modified = !result;
+    return result;
+}
+
+
+int mainwnd::query_save_changes()
+{
+    Glib::ustring query_str;
+
+    if (global_filename == "")
+        query_str = "Unnamed file was changed.\nSave changes?";
+    else
+        query_str = "File '" + global_filename + "' was changed.\n"
+                "Save changes?";
+
+    Gtk::MessageDialog dialog(*this, query_str, false,
+            Gtk::MESSAGE_QUESTION,
+            Gtk::BUTTONS_YES_NO, true); 
+    
+    return dialog.run();
+}
+
+
+bool mainwnd::is_save()
+{
+    bool result = false;
+
+    if (is_modified()) {
+        int choice = query_save_changes();
+        switch (choice) {
+            case Gtk::RESPONSE_YES:
+                if (save_file())
+                    result = true;
+                break;
+            case Gtk::RESPONSE_NO:
+                result = true;
+                break;
+            case Gtk::RESPONSE_CANCEL:
+            default:
+                break;
         }
+    }
+    else
+        result = true;
+
+    return result;
+}
+
+
+/* convert string to lower case letters */
+void
+mainwnd::toLower(basic_string<char>& s) {
+    for (basic_string<char>::iterator p = s.begin();
+            p != s.end(); p++) {
+        *p = tolower(*p);
     }
 }
 
@@ -478,14 +511,14 @@ mainwnd::file_open_dialog( void )
 void 
 mainwnd::file_import_dialog( void )
 {
-
    FileSelection dialog( "Import file" );
    dialog.set_filename(last_used_dir.c_str());
 
    HBox *abox = dialog.get_action_area(); 
    HBox hbox( false, 2 );
    
-   m_adjust_load_offset = manage( new Adjustment( 0, -(c_max_sets - 1) , c_max_sets - 1, 1 ));
+   m_adjust_load_offset = manage( new Adjustment( 0, -(c_max_sets - 1),
+               c_max_sets - 1, 1 ));
    m_spinbutton_load_offset = manage( new SpinButton( *m_adjust_load_offset ));
    m_spinbutton_load_offset->set_editable( false );
    m_spinbutton_load_offset->set_wrap( true );
@@ -507,7 +540,6 @@ mainwnd::file_import_dialog( void )
            try{
                midifile f( dialog.get_filename() );
                f.parse( m_mainperf, (int) m_adjust_load_offset->get_value() );
-
            }
            catch(...){
                Gtk::MessageDialog errdialog(*this, 
@@ -518,9 +550,11 @@ mainwnd::file_import_dialog( void )
 
            global_filename = std::string(dialog.get_filename());
            update_window_title();
+           m_modified = true;
            
            m_main_wid->reset();
-           m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad( m_mainperf->get_screenset() )); 
+           m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                       m_mainperf->get_screenset() )); 
            m_adjust_bpm->set_value( m_mainperf->get_bpm() );
 
            break;
@@ -536,34 +570,13 @@ mainwnd::file_import_dialog( void )
    }
 }
 
-
-void
-mainwnd::file_exit_dialog( void )
+/*callback function*/
+void mainwnd::file_exit()
 {
-    Gtk::MessageDialog dialog(*this,
-            "Quit seq24?", false,
-            Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK_CANCEL, true);
-    
-    int result = dialog.run();
-
-    //Handle the response:
-    switch(result)
-    {
-        case(Gtk::RESPONSE_OK):
-        {
-            m_quit = true;
-            Gtk::Main::quit();
-            
-            break;
-        }
-        case(Gtk::RESPONSE_CANCEL):
-        {   
-            break;
-        }
-        default:
-        { 
-            break;
-        }
+    if (is_save()) {
+        if (is_pattern_playing)
+            stop_playing();
+        hide();
     }
 }
 
@@ -571,18 +584,11 @@ mainwnd::file_exit_dialog( void )
 bool
 mainwnd::on_delete_event(GdkEventAny *a_e)
 {
-    if ( ! m_quit ){
-        file_exit_dialog();
-        return true;
-    }
-    else {
-        
-        midifile f( "autosave.mid" );
-        f.write( m_mainperf );
+    bool result = is_save();
+    if (result && is_pattern_playing)
+            stop_playing();
 
-        stop_playing();
-        return false;
-    }
+    return !result;
 }
 
 
@@ -614,7 +620,9 @@ mainwnd::adj_callback_ss( )
 {
     m_mainperf->set_screenset( (int) m_adjust_ss->get_value()); 
     m_main_wid->set_screenset( m_mainperf->get_screenset());
-    m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()));
+    m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                m_mainperf->get_screenset()));
+    m_modified = true;
 }
 
 
@@ -622,28 +630,23 @@ void
 mainwnd::adj_callback_bpm( )
 {
     m_mainperf->set_bpm( (int) m_adjust_bpm->get_value()); 
+    m_modified = true;
 }
 
 
 bool
 mainwnd::on_key_release_event(GdkEventKey* a_ev)
 {
-	if ( a_ev->keyval == m_mainperf->m_key_replace )
-		{
-			m_mainperf->unset_sequence_control_status( c_status_replace );
-		}
-	
-	if (a_ev->keyval == m_mainperf->m_key_queue )
-		{
-			m_mainperf->unset_sequence_control_status( c_status_queue );
-		}
-	
-	if ( a_ev->keyval == m_mainperf->m_key_snapshot_1 ||
-		 a_ev->keyval == m_mainperf->m_key_snapshot_2 )
-		{
-			m_mainperf->unset_sequence_control_status( c_status_snapshot );
-		}
-	
+    if ( a_ev->keyval == m_mainperf->m_key_replace )
+        m_mainperf->unset_sequence_control_status( c_status_replace );
+
+    if (a_ev->keyval == m_mainperf->m_key_queue )
+        m_mainperf->unset_sequence_control_status( c_status_queue );
+
+    if ( a_ev->keyval == m_mainperf->m_key_snapshot_1 ||
+            a_ev->keyval == m_mainperf->m_key_snapshot_2 )
+        m_mainperf->unset_sequence_control_status( c_status_snapshot );
+
     return false;
 }
 
@@ -654,6 +657,7 @@ mainwnd::edit_callback_notepad( )
     string text = m_entry_notes->get_text();
     m_mainperf->set_screen_set_notepad( m_mainperf->get_screenset(), 
 				        &text ); 
+    m_modified = true;
 }
 
 
@@ -720,13 +724,10 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             
             if ( a_ev->keyval == m_mainperf->m_key_start )
             {
-		    if (is_pattern_playing) {
-		            stop_playing();
-		    	    is_pattern_playing=false;
-		    } else {
-			    start_playing();
-		    	    is_pattern_playing=true;
- 		    }
+                if (is_pattern_playing)
+                    stop_playing();
+                else
+                    start_playing();
             }
 
 
@@ -770,8 +771,7 @@ mainwnd::update_window_title()
 }
 
 
-void 
-mainwnd::test( )
+bool mainwnd::is_modified()
 {
-    m_mainperf->get_master_midi_bus( )->flush(); 
+    return m_modified;
 }

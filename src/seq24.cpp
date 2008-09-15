@@ -248,10 +248,10 @@ main (int argc, char *argv[])
         delete f;
     }
 
-    mainwnd mainwnd( &p );
+    mainwnd seq24_window( &p );
 
     lash_driver->start( &p );
-    kit.run();
+    kit.run(seq24_window);
     
     p.deinit_jack();
     

@@ -35,6 +35,7 @@
 
 #include <map>
 #include <gtkmm.h>
+#include <string>
 
 #include "globals.h"
 
@@ -51,7 +52,7 @@ class mainwnd : public Gtk::Window
    
  private:
 
-    bool      m_quit;
+    bool      m_modified;
     
     MenuBar  *m_menubar;
     Menu     *m_menu_file;
@@ -70,8 +71,6 @@ class mainwnd : public Gtk::Window
     
     Button      *m_button_stop;
     Button      *m_button_play;
-    Button      *m_button_test;
-
     Button      *m_button_perfedit;
 
     SpinButton  *m_spinbutton_bpm;
@@ -87,31 +86,33 @@ class mainwnd : public Gtk::Window
 
     sigc::connection   m_timeout_connect;
 
-    void file_new_dialog( void );
-    void file_save_dialog( void );
-    void file_saveas_dialog( void );
-    void file_open_dialog( void );
     void file_import_dialog( void );
-    void file_exit_dialog( void );
-
     void options_dialog( void );
     void about_dialog( void );
 
-
     void adj_callback_ss( );
     void adj_callback_bpm( );
-
     void edit_callback_notepad( );
-
     bool timer_callback( );
 
     void start_playing();
     void stop_playing();
-    void test();
     void open_performance_edit( );
     void sequence_key( int a_seq );
     void update_window_title();
     void toLower(basic_string<char>&);
+    bool is_modified();
+    void file_new();
+    void file_open();
+    void file_save();
+    void file_save_as();
+    void file_exit();
+    void new_file();
+    void open_file(const std::string&);
+    bool save_file();
+    void choose_file();
+    int query_save_changes();
+    bool is_save();
 
  public:
 
