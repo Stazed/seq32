@@ -35,7 +35,6 @@ using namespace sigc;
 
 perfedit::perfedit( perform *a_perf ) 
 {
-
     using namespace Menu_Helpers;
 
     /* set the performance */
@@ -199,10 +198,7 @@ perfedit::perfedit( perform *a_perf )
     m_button_play = manage( new Button() );
     m_button_play->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( play2_xpm ))));
     m_button_play->signal_clicked().connect(  mem_fun( *this, &perfedit::start_playing));
-    m_tooltips->set_tip( *m_button_play, "Being playing at L marker." );
-
-
-
+    m_tooltips->set_tip( *m_button_play, "Begin playing at L marker." );
 
 
     m_hlbox->pack_end( *m_button_copy , false, false ); 
@@ -376,8 +372,6 @@ void perfedit::set_bw( int a_beat_width )
 }
 
 
-
-
 void 
 perfedit::on_realize()
 {
@@ -385,9 +379,6 @@ perfedit::on_realize()
     Gtk::Window::on_realize();
 
     Glib::signal_timeout().connect(mem_fun(*this,&perfedit::timeout ), c_redraw_ms);
-  
-  
- 
 }
 
 
@@ -420,9 +411,6 @@ perfedit::~perfedit()
 {
 
 }
-
-
-
 
 
 bool 

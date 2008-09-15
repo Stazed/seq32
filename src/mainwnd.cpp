@@ -511,32 +511,48 @@ mainwnd::toLower(basic_string<char>& s) {
 void 
 mainwnd::file_import_dialog( void )
 {
-   FileSelection dialog( "Import file" );
-   dialog.set_filename(last_used_dir.c_str());
+    Gtk::FileChooserDialog dialog("Import MIDI file",
+            Gtk::FILE_CHOOSER_ACTION_OPEN);
+    dialog.set_transient_for(*this);
 
-   HBox *abox = dialog.get_action_area(); 
-   HBox hbox( false, 2 );
-   
-   m_adjust_load_offset = manage( new Adjustment( 0, -(c_max_sets - 1),
-               c_max_sets - 1, 1 ));
-   m_spinbutton_load_offset = manage( new SpinButton( *m_adjust_load_offset ));
-   m_spinbutton_load_offset->set_editable( false );
-   m_spinbutton_load_offset->set_wrap( true );
-   hbox.pack_end(*m_spinbutton_load_offset, false, false );
-   hbox.pack_end(*(manage( new Label( "Screen Set Offset" ))), false, false, 4);
-   
-   abox->pack_end(hbox, false, false );  
-   
-   dialog.show_all_children();
-   
-   int result = dialog.run();
-   
-   //Handle the response:
-   switch(result)
-   {
+    Gtk::FileFilter filter_midi;
+    filter_midi.set_name("MIDI files");
+    filter_midi.add_pattern("*.midi");
+    filter_midi.add_pattern("*.mid");
+    dialog.add_filter(filter_midi);
+
+    Gtk::FileFilter filter_any;
+    filter_any.set_name("Any files");
+    filter_any.add_pattern("*");
+    dialog.add_filter(filter_any);
+
+    dialog.set_current_folder(last_used_dir);
+
+    HButtonBox *btnbox = dialog.get_action_area(); 
+    HBox hbox( false, 2 );
+
+    m_adjust_load_offset = manage( new Adjustment( 0, -(c_max_sets - 1),
+                c_max_sets - 1, 1 ));
+    m_spinbutton_load_offset = manage( new SpinButton( *m_adjust_load_offset ));
+    m_spinbutton_load_offset->set_editable( false );
+    m_spinbutton_load_offset->set_wrap( true );
+    hbox.pack_end(*m_spinbutton_load_offset, false, false );
+    hbox.pack_end(*(manage( new Label("_Screen Set Offset"))), false, false, 4);
+
+    btnbox->pack_start(hbox, false, false );  
+
+    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+
+    dialog.show_all_children();
+
+    int result = dialog.run();
+
+    //Handle the response:
+    switch(result)
+    {
        case(Gtk::RESPONSE_OK):
        {
-
            try{
                midifile f( dialog.get_filename() );
                f.parse( m_mainperf, (int) m_adjust_load_offset->get_value() );
@@ -559,14 +575,13 @@ mainwnd::file_import_dialog( void )
 
            break;
        }
+
        case(Gtk::RESPONSE_CANCEL):
-       {
            break;
-       }
+
        default:
-       {
            break;
-       }
+
    }
 }
 
