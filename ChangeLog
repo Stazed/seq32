@@ -1,3 +1,10 @@
+2008-09-16 Daniel Ellis <mail@danellis.co.uk>
+	* src/seqdata.cpp, src/seqedit.*, src/seqroll.cpp: Zooming and
+	panning in the editor window using the scroll wheel (when CTRL 
+	or SHIFT are used) implemented. Horizontal scroll step interval
+	increased to 1/16 note per zoom level and page interval to 1
+	bar.
+
 2008-09-16 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwnd.*: About dialog changed to use new layout. Project
 	contributors added accordingly.

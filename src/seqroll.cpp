@@ -176,8 +176,16 @@ seqroll::update_sizes()
     m_hadjust->set_lower( 0 );
     m_hadjust->set_upper( m_seq->get_length() );
     m_hadjust->set_page_size( m_window_x * m_zoom );
-    m_hadjust->set_step_increment( c_ppqn / 4 );
-    m_hadjust->set_page_increment( c_ppqn / 4 );
+    
+    /* The step increment is 1 semiquaver (1/16) note per zoom level */
+    m_hadjust->set_step_increment( (c_ppqn / 4) * m_zoom);
+    
+    /* The page increment is always one bar */
+    int page_increment = c_ppqn *
+                        m_seq->get_bpm() *
+                        (4.0 / m_seq->get_bw());
+    m_hadjust->set_page_increment(page_increment);
+    
 
     int h_max_value = ( m_seq->get_length() - (m_window_x * m_zoom));
     
@@ -1360,6 +1368,16 @@ seqroll::on_size_allocate(Gtk::Allocation& a_r )
 bool
 seqroll::on_scroll_event( GdkEventScroll* a_ev )
 {
+    //printf("seqroll::on_scroll_event(state=%d)\n", a_ev->state);
+
+    guint modifiers;    // Used to filter out caps/num lock etc.
+    modifiers = gtk_accelerator_get_default_mod_mask ();
+    
+    /* This scroll event only handles basic scrolling without any
+     * modifier keys such as GDK_CONTROL_MASK or GDK_SHIFT_MASK */
+    if ((a_ev->state & modifiers) != 0)
+        return false;
+
 	double val = m_vadjust->get_value();
 
 	if ( a_ev->direction == GDK_SCROLL_UP ){

@@ -299,6 +299,14 @@ seqdata::convert_x( int a_x, long *a_tick )
 bool
 seqdata::on_scroll_event( GdkEventScroll* a_ev )
 {
+    guint modifiers;    // Used to filter out caps/num lock etc.
+    modifiers = gtk_accelerator_get_default_mod_mask ();
+
+    /* This scroll event only handles basic scrolling without any
+     * modifier keys such as GDK_CONTROL_MASK or GDK_SHIFT_MASK */
+    if ((a_ev->state & modifiers) != 0)
+        return false;
+
     if (  a_ev->direction == GDK_SCROLL_UP ){
         m_seq->increment_selected( m_status, m_cc );
     }

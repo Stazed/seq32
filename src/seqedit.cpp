@@ -286,6 +286,7 @@ seqedit::seqedit( sequence *a_seq,
     set_key( m_key );
     set_key( m_key );
 
+    add_events(Gdk::SCROLL_MASK);
 }
 
 
@@ -299,12 +300,12 @@ seqedit::create_menus( void )
     char b[20];
     
     /* zoom */
-    m_menu_zoom->items().push_back(MenuElem("1:1",  sigc::bind(mem_fun(*this,&seqedit::set_zoom), 1 )));
-    m_menu_zoom->items().push_back(MenuElem("1:2",  sigc::bind(mem_fun(*this,&seqedit::set_zoom), 2 )));
-    m_menu_zoom->items().push_back(MenuElem("1:4",  sigc::bind(mem_fun(*this,&seqedit::set_zoom), 4 )));
-    m_menu_zoom->items().push_back(MenuElem("1:8",  sigc::bind(mem_fun(*this,&seqedit::set_zoom), 8 )));
-    m_menu_zoom->items().push_back(MenuElem("1:16", sigc::bind(mem_fun(*this,&seqedit::set_zoom), 16 )));
-    m_menu_zoom->items().push_back(MenuElem("1:32", sigc::bind(mem_fun(*this,&seqedit::set_zoom), 32 )));
+    for(int i = c_min_zoom; i <= c_max_zoom; i*=2)
+    {
+        char b[10];
+        sprintf( b, "1:%d", i );
+        m_menu_zoom->items().push_back(MenuElem(b,  sigc::bind(mem_fun(*this,&seqedit::set_zoom), i )));
+    }
       
     /* note snap */
     m_menu_snap->items().push_back(MenuElem("1",     sigc::bind(mem_fun(*this,&seqedit::set_snap), c_ppqn * 4  )));
@@ -1404,3 +1405,49 @@ seqedit::on_delete_event(GdkEventAny *a_event)
     
     return false;
 }
+
+bool
+seqedit::on_scroll_event( GdkEventScroll* a_ev )
+{
+    //printf("seqedit::on_scroll_event(x=%f,y=%f,state=%d)\n", a_ev->x, a_ev->y, a_ev->state);
+
+    guint modifiers;    // Used to filter out caps/num lock etc.
+    modifiers = gtk_accelerator_get_default_mod_mask ();
+
+    if ((a_ev->state & modifiers) == GDK_CONTROL_MASK)
+    {
+        if (a_ev->direction == GDK_SCROLL_DOWN)
+        {
+            if (m_zoom*2 <= c_max_zoom)
+                set_zoom(m_zoom*2);
+        }
+        else if (a_ev->direction == GDK_SCROLL_UP)
+        {
+            if (m_zoom/2 >= c_min_zoom)
+                set_zoom(m_zoom/2);
+        }
+        return true;
+    }
+    else if ((a_ev->state & modifiers) == GDK_SHIFT_MASK)
+    {
+        double val = m_hadjust->get_value();
+        double step = m_hadjust->get_step_increment();
+        double upper = m_hadjust->get_upper();
+
+        if (a_ev->direction == GDK_SCROLL_DOWN)
+        {
+            if (val + step < upper)
+                m_hadjust->set_value(val + step);
+            else
+                m_hadjust->set_value(upper);
+        }
+        else if (a_ev->direction == GDK_SCROLL_UP)
+        {
+            m_hadjust->set_value(val - step);
+        }
+        return true;
+    }
+
+    return false;  // Not handled
+}
+

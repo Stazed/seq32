@@ -631,6 +631,7 @@ mainwnd::about_dialog( void )
     list_authors.push_back("Jaakko Sipari <jaakko.sipari@gmail.com>");
     list_authors.push_back("Peter Leigh <pete.leigh@gmail.com>");
     list_authors.push_back("Anthony Green <green@redhat.com>");
+    list_authors.push_back("Daniel Ellis <mail@danellis.co.uk>");
     dialog.set_authors(list_authors);
 
     std::list<Glib::ustring> list_documenters;

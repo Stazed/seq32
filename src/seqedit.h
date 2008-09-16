@@ -73,6 +73,9 @@ class seqedit : public Gtk::Window
 
  private:
  
+    static const int c_min_zoom = 1;
+    static const int c_max_zoom = 32;
+ 	
     MenuBar    *m_menubar;
 
     Menu       *m_menu_tools;
@@ -271,7 +274,7 @@ class seqedit : public Gtk::Window
  
 
     bool on_delete_event(GdkEventAny *a_event);
-    
+    bool on_scroll_event(GdkEventScroll* a_ev);
 };
 
 
