@@ -610,20 +610,32 @@ mainwnd::on_delete_event(GdkEventAny *a_e)
 void 
 mainwnd::about_dialog( void )
 {
-    Dialog dialog("About seq24", *this, true, true);
+    Gtk::AboutDialog dialog;
+    dialog.set_transient_for(*this);
+    dialog.set_name(PACKAGE_NAME);
+    dialog.set_version(PACKAGE_VERSION);
+    dialog.set_comments("Interactive MIDI Sequencer");
 
-    dialog.set_size_request( 450, 400 );
-
-    dialog.add_button( "Ok", Gtk::RESPONSE_OK  );
-
-    Glib::RefPtr<TextBuffer> buffer = TextBuffer::create();
-    buffer->set_text( c_about );
+    dialog.set_copyright(
+            "(C) 2002 - 2006 Rob C. Buse\n"
+            "(C) 2006 Dave Robillard\n"
+            "(C) 2008 Ivan Hernandez, Guido Scholz, Jaakko Sipari");
     
-    TextView text( buffer ); 
-    text.set_editable( false );
+    dialog.set_website(
+            "http://www.filter24.org/seq24\n"
+            "http://edge.launchpad.net/seq24");
 
-    dialog.get_vbox()->set_border_width( 10 );
-    dialog.get_vbox()->pack_start( text, true, true, 0);
+    std::list<Glib::ustring> list_authors;
+    list_authors.push_back("Rob C. Buse <rcb@filter24.org>");
+    list_authors.push_back("Dave Robillard");
+    list_authors.push_back("Ivan Hernandez <ihernandez@kiusys.com>");
+    list_authors.push_back("Guido Scholz <guido.scholz@bayernline.de>");
+    list_authors.push_back("Jaakko Sipari <jaakko.sipari@gmail.com>");
+    dialog.set_authors(list_authors);
+
+    std::list<Glib::ustring> list_documenters;
+    list_documenters.push_back("Dana Olson <seq24@ubuntustudio.com>");
+    dialog.set_documenters(list_documenters);
 
     dialog.show_all_children();
     dialog.run(); 

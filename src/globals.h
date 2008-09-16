@@ -117,29 +117,9 @@ const unsigned long c_triggers_new =   0x24240008;
 const unsigned long c_midictrl =   0x24240010;
 
 
-/* about box */
-const string 
-c_about( 
-
-	string ( PACKAGE ) + string( " " ) + string( VERSION ) + string( " " ) +
-	string ( "Interactive Midi Sequencer\n" )+
-	string ( "\n" )+
-	string ( "Author: Rob C. Buse (seq24@filter24.org)\n" )+
-	string ( "\n" )+
-	string ( "For information about seq24, read the SEQ24\n" )+
-	string ( "file included with the source.\n" )+
-	string ( "\n" )+
-	string ( "Visit http://www.filter24.org/seq24 for updates.\n" )+
-	string ( "\n" )+
-	string ( "Copyright (c) 2005  Rob C. Buse\n" )+
-	string ( "Released under the GNU Public License, see\n" )+
-	string ( "COPYING for details.\n" )
-);
-
 const char c_font_6_12[] = "-*-fixed-medium-r-*--12-*-*-*-*-*-*";
 const char c_font_8_13[] = "-*-fixed-medium-r-*--13-*-*-*-*-*-*";
 const char c_font_5_7[]  = "-*-fixed-medium-r-*--7-*-*-*-*-*-*";
-
 
 
 
