@@ -1,6 +1,8 @@
 2008-09-16 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwnd.*: About dialog changed to use new layout. Project
 	contributors added accordingly.
+	* src/seqdata.cpp: Buffer overflow fixed; provided by Anthony
+	Green.
 
 2008-09-15 Guido Scholz <guido.scholz@bayernline.de>
 	* src/main.cpp, src/mainwnd.*: File new/open/save/close logic

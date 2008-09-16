@@ -618,7 +618,6 @@ mainwnd::about_dialog( void )
 
     dialog.set_copyright(
             "(C) 2002 - 2006 Rob C. Buse\n"
-            "(C) 2006 Dave Robillard\n"
             "(C) 2008 Ivan Hernandez, Guido Scholz, Jaakko Sipari");
     
     dialog.set_website(
@@ -627,10 +626,11 @@ mainwnd::about_dialog( void )
 
     std::list<Glib::ustring> list_authors;
     list_authors.push_back("Rob C. Buse <rcb@filter24.org>");
-    list_authors.push_back("Dave Robillard");
     list_authors.push_back("Ivan Hernandez <ihernandez@kiusys.com>");
     list_authors.push_back("Guido Scholz <guido.scholz@bayernline.de>");
     list_authors.push_back("Jaakko Sipari <jaakko.sipari@gmail.com>");
+    list_authors.push_back("Peter Leigh <pete.leigh@gmail.com>");
+    list_authors.push_back("Anthony Green <green@redhat.com>");
     dialog.set_authors(list_authors);
 
     std::list<Glib::ustring> list_documenters;
