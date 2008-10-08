@@ -537,7 +537,7 @@ mainwnd::file_import_dialog( void )
     m_spinbutton_load_offset->set_editable( false );
     m_spinbutton_load_offset->set_wrap( true );
     hbox.pack_end(*m_spinbutton_load_offset, false, false );
-    hbox.pack_end(*(manage( new Label("_Screen Set Offset"))), false, false, 4);
+    hbox.pack_end(*(manage( new Label("Screen Set Offset"))), false, false, 4);
 
     btnbox->pack_start(hbox, false, false );  
 
