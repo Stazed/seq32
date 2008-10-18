@@ -113,14 +113,12 @@ const unsigned long c_notes =      0x24240005;
 const unsigned long c_timesig =    0x24240006;
 const unsigned long c_bpmtag =     0x24240007;
 const unsigned long c_triggers_new =   0x24240008;
-
 const unsigned long c_midictrl =   0x24240010;
 
 
 const char c_font_6_12[] = "-*-fixed-medium-r-*--12-*-*-*-*-*-*";
 const char c_font_8_13[] = "-*-fixed-medium-r-*--13-*-*-*-*-*-*";
 const char c_font_5_7[]  = "-*-fixed-medium-r-*--7-*-*-*-*-*-*";
-
 
 
 /* used in menu to tell setState what to do */
@@ -130,7 +128,6 @@ const int c_paste  = 2;
 
 /* redraw when recording ms */
 const int c_redraw_ms = 40;
-
 
 
 /* consts for perform editor */
@@ -174,7 +171,6 @@ extern user_instrument_definition global_user_instrument_definitions[c_max_instr
 
 /* scales */
 enum c_music_scales {
-
   c_scale_off,
   c_scale_major,
   c_scale_minor,
@@ -184,7 +180,6 @@ enum c_music_scales {
 
 
 const bool c_scales_policy[c_scale_size][12] =
-
   {
     /* off = chromatic */
     { true,true,true,true,true,true,true,true,true,true,true,true},
@@ -198,7 +193,6 @@ const bool c_scales_policy[c_scale_size][12] =
   };
 
 const int c_scales_transpose_up[c_scale_size][12] =
-
   {
     /* off = chromatic */
     { 1,1,1,1,1,1,1,1,1,1,1,1},
@@ -213,7 +207,6 @@ const int c_scales_transpose_up[c_scale_size][12] =
 
 
 const int c_scales_transpose_dn[c_scale_size][12] =
-
   {
     /* off = chromatic */
     { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
@@ -225,7 +218,6 @@ const int c_scales_transpose_dn[c_scale_size][12] =
   };
 
 const int c_scales_symbol[c_scale_size][12] =
-
   {
     /* off = chromatic */
     { 32,32,32,32,32,32,32,32,32,32,32,32},
@@ -242,15 +234,15 @@ const int c_scales_symbol[c_scale_size][12] =
 // down 129
 
 
-const char c_scales_text[c_scale_size][20] =
-  { 
+const char c_scales_text[c_scale_size][6] =
+{ 
     "Off", 
     "Major", 
     "Minor" 
-  };
+};
 
-const char c_key_text[][20] =
-  {
+const char c_key_text[][3] =
+{
     "C", 
     "C#", 
     "D", 
@@ -263,9 +255,9 @@ const char c_key_text[][20] =
     "A",
     "A#",
     "B"
-  };
+};
 
-const char c_interval_text[][15] =
+const char c_interval_text[][3] =
 {
     "P1",
     "m2",
@@ -283,12 +275,9 @@ const char c_interval_text[][15] =
     "m9",
     "M9",
     ""
-
 };
  	  	  	
-
-
-const char c_chord_text[][8] =
+const char c_chord_text[][5] =
 {
     "I",
     "II",
