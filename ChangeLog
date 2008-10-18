@@ -1,3 +1,8 @@
+2008-10-18 Guido Scholz <guido.scholz@bayernline.de>
+	* src/midifile.cpp: Fixed memory leak if MIDI file format error
+	occurs. Error messages added to give user better feedback about
+	reason behind file read error.
+
 2008-09-28 Daniel Ellis <mail@danellis.co.uk>
 	* src/perfroll.cpp: Panning in the song editor using the scroll
 	wheel (when SHIFT is used).

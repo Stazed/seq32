@@ -29,11 +29,10 @@ midifile::midifile (string a_name)
 
 midifile::~midifile ()
 {
-
 }
 
 
-    unsigned long
+unsigned long
 midifile::read_long ()
 {
     unsigned long ret = 0;
@@ -46,7 +45,7 @@ midifile::read_long ()
     return ret;
 }
 
-    unsigned short
+unsigned short
 midifile::read_short ()
 {
     unsigned short ret = 0;
@@ -55,11 +54,10 @@ midifile::read_short ()
     ret += (m_d[m_pos++]);
 
     //printf( "read_short 0x%4x\n", ret );
-
     return ret;
 }
 
-    unsigned long
+unsigned long
 midifile::read_var ()
 {
     unsigned long ret = 0;
@@ -68,7 +66,6 @@ midifile::read_var ()
     /* while bit #7 is set */
     while (((c = m_d[m_pos++]) & 0x80) != 0x00)
     {
-
         /* shift ret 7 bits */
         ret <<= 7;
         /* add bits 0-6 */
@@ -85,72 +82,55 @@ midifile::read_var ()
 
 bool midifile::parse (perform * a_perf, int a_screen_set)
 {
-
-    /* file size */
-    int
-        file_size;
-
     /* open binary file */
-    ifstream
-        file (m_name.c_str (), ios::in | ios::binary | ios::ate);
+    ifstream file(m_name.c_str(), ios::in | ios::binary | ios::ate);
 
-    if (!file.is_open ())
+    if (!file.is_open ()) {
+        fprintf(stderr, "Error opening MIDI file\n");
         return false;
+    }
 
-    file_size = file.tellg ();
+    int file_size = file.tellg ();
 
     /* run to start */
     file.seekg (0, ios::beg);
 
     /* alloc data */
     m_d = (unsigned char *) new char[file_size];
+    if (m_d == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return false;
+    }
     file.read ((char *) m_d, file_size);
     file.close ();
 
     /* set position to 0 */
     m_pos = 0;
 
-
     /* chunk info */
-    unsigned long
-        ID;
-    unsigned long
-        TrackLength;
+    unsigned long ID;
+    unsigned long TrackLength;
 
     /* time */
-    unsigned long
-        Delta;
-    unsigned long
-        RunningTime;
-    unsigned long
-        CurrentTime;
+    unsigned long Delta;
+    unsigned long RunningTime;
+    unsigned long CurrentTime;
 
-    unsigned short
-        Format;			/* 0,1,2 */
-    unsigned short
-        NumTracks;
-    unsigned short
-        ppqn;
-
-    unsigned short
-        perf;
-
-    int
-        c;
+    unsigned short Format;			/* 0,1,2 */
+    unsigned short NumTracks;
+    unsigned short ppqn;
+    unsigned short perf;
+    int c;
 
     /* track name from file */
-    char
-        TrackName[256];
+    char TrackName[256];
 
     /* used in small loops */
-    int
-        i;
+    int i;
 
     /* sequence pointer */
-    sequence *
-        seq;
-    event
-        e;
+    sequence * seq;
+    event e;
 
     /* read in header */
     ID = read_long ();
@@ -163,30 +143,31 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     //      ID, TrackLength, Format, NumTracks, ppqn );
 
     /* magic number 'MThd' */
-    if (ID != 0x4D546864)
+    if (ID != 0x4D546864) {
+        fprintf(stderr, "Invalid MIDI header detected: %8lX\n", ID);
+        delete[]m_d;
         return false;
+    }
 
     /* we are only supporting format 1 for now */
-    if (Format != 1)
+    if (Format != 1) {
+        fprintf(stderr, "Unsupported MIDI format detected: %d\n", Format);
+        delete[]m_d;
         return false;
+    }
 
     /* We should be good to load now   */
     /* for each Track in the midi file */
     for (int curTrack = 0; curTrack < NumTracks; curTrack++)
     {
-
         /* done for each track */
-        bool
-            done = false;
+        bool done = false;
         perf = 0;
 
         /* events */
-        unsigned char
-            status = 0, type, data[2], laststatus;
-        long
-            len;
-        unsigned long
-            proprietary = 0;
+        unsigned char status = 0, type, data[2], laststatus;
+        long len;
+        unsigned long proprietary = 0;
 
         /* Get ID + Length */
         ID = read_long ();
@@ -197,13 +178,15 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         /* magic number 'MTrk' */
         if (ID == 0x4D54726B)
         {
-
             /* we know we have a good track, so we can create
                a new sequence to dump it to */
             seq = new sequence ();
-
+            if (seq == NULL) {
+                fprintf(stderr, "Memory allocation failed\n");
+                delete[]m_d;
+                return false;
+            }
             seq->set_master_midi_bus (&a_perf->m_master_bus);
-
 
             /* reset time */
             RunningTime = 0;
@@ -211,7 +194,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             /* this gets each event in the Trk */
             while (!done)
             {
-
                 /* get time delta */
                 Delta = read_var ();
 
@@ -222,7 +204,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                 /* is it a status bit ? */
                 if ((status & 0x80) == 0x00)
                 {
-
                     /* no, its a running status */
                     status = laststatus;
                 }
@@ -241,13 +222,12 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                    PPQN / ppqn gives us the ratio */
                 CurrentTime = (RunningTime * c_ppqn) / ppqn;
 
-                //printf( "D[%6ld] [%6ld] %02X\n        ", Delta, CurrentTime, status);
+                //printf( "D[%6ld] [%6ld] %02X\n", Delta, CurrentTime, status);
                 e.set_timestamp (CurrentTime);
 
                 /* switch on the channelless status */
                 switch (status & 0xF0)
                 {
-
                     /* case for those with 2 data bytes */
                     case EVENT_NOTE_OFF:
                     case EVENT_NOTE_ON:
@@ -294,7 +274,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                         if (status == 0xFF)
                         {
-
                             /* get meta type */
                             type = m_d[m_pos++];
                             len = read_var ();
@@ -303,12 +282,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                             switch (type)
                             {
-
                                 /* proprietary */
                                 case 0x7f:
 
                                     /* FF 7F len data  */
-
                                     if (len > 4)
                                     {
                                         proprietary = read_long ();
@@ -321,48 +298,39 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         len--;
                                     }
 
-                                    if (proprietary == c_midich)
+                                    else if (proprietary == c_midich)
                                     {
                                         seq->set_midi_channel (m_d[m_pos++]);
                                         len--;
                                     }
 
-                                    if (proprietary == c_timesig)
+                                    else if (proprietary == c_timesig)
                                     {
                                         seq->set_bpm (m_d[m_pos++]);
                                         seq->set_bw (m_d[m_pos++]);
                                         len -= 2;
                                     }
 
-                                    if (proprietary == c_triggers)
+                                    else if (proprietary == c_triggers)
                                     {
-
-                                        int
-                                            num_triggers = len / 4;
+                                        int num_triggers = len / 4;
 
                                         for (int i = 0; i < num_triggers; i += 2)
                                         {
-
-                                            unsigned long
-                                                on = read_long ();
-                                            unsigned long
-                                                length = (read_long () - on);
+                                            unsigned long on = read_long ();
+                                            unsigned long length = (read_long () - on);
                                             len -= 8;
-
                                             seq->add_trigger(on, length, 0, false);
                                         }
                                     }
 
-                                    if (proprietary == c_triggers_new)
+                                    else if (proprietary == c_triggers_new)
                                     {
-
                                         int num_triggers = len / 12;
 
                                         //printf( "num_triggers[%d]\n", num_triggers );
-
                                         for (int i = 0; i < num_triggers; i++)
                                         {
-
                                             unsigned long on = read_long ();
                                             unsigned long off = read_long ();
                                             unsigned long length = off - on + 1;
@@ -371,16 +339,13 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                             //printf( "< start[%d] end[%d] offset[%d]\n",
                                             //        on, off, offset );
 
-
                                             len -= 12;
-
                                             seq->add_trigger (on, length, offset, false);
                                         }
                                     }
 
                                     /* eat the rest */
                                     m_pos += len;
-
                                     break;
 
                                     /* Trk Done */
@@ -397,12 +362,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     seq->set_length (CurrentTime, false);
                                     seq->zero_markers ();
                                     done = true;
-
                                     break;
 
                                     /* Track name */
                                 case 0x03:
-
                                     for (i = 0; i < len; i++)
                                     {
                                         TrackName[i] = m_d[m_pos++];
@@ -412,24 +375,19 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                                     //printf("[%s]\n", TrackName );
                                     seq->set_name (TrackName);
-
                                     break;
 
                                     /* sequence number */
                                 case 0x00:
-
-                                    /* sequence number */
                                     if (len == 0x00)
                                         perf = 0;
                                     else
                                         perf = read_short ();
 
                                     //printf ( "perf %d\n", perf );
-
                                     break;
 
                                 default:
-
                                     for (i = 0; i < len; i++)
                                     {
                                         c = m_d[m_pos++];
@@ -441,17 +399,19 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                         }
                         else
                         {
-
                             /* sysex */
-                            //printf( "no SYSEX code in perform.C yet\n");
+                            fprintf(stderr,
+                                    "No support for SYSEX messages: %hhu\n",
+                                    status);
+                            delete[]m_d;
                             return false;
                         }
 
                         break;
 
                     default:
-
-                        //printf( "switch(status) error\n");
+                        fprintf(stderr, "Unsupported MIDI event: %hhu\n", status);
+                        delete[]m_d;
                         return false;
                         break;
                 }
@@ -466,9 +426,9 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         /* dont know what kind of chunk */
         else
         {
-
             /* its not a MTrk, we dont know how to deal with it, 
                so we just eat it */
+            fprintf(stderr, "Unsupported MIDI header detected: %8lX\n", ID);
             m_pos += TrackLength;
             done = true;
         }
@@ -479,13 +439,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
     if ((file_size - m_pos) > (int) sizeof (unsigned long))
     {
-
         ID = read_long ();
         if (ID == c_midictrl)
         {
-
-            unsigned long
-                seqs = read_long ();
+            unsigned long seqs = read_long ();
 
             for (unsigned int i = 0; i < seqs; i++)
             {
@@ -516,19 +473,15 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             }
         }
 
-
         /* Get ID + Length */
         ID = read_long ();
         if (ID == c_midiclocks)
         {
-
             TrackLength = read_long ();
             /* TrackLength is nyumber of buses */
             for (unsigned int x = 0; x < TrackLength; x++)
             {
-
-                int
-                    bus_on = m_d[m_pos++];
+                int bus_on = m_d[m_pos++];
                 a_perf->get_master_midi_bus ()->set_clock (x, (clock_e) bus_on);
             }
         }
@@ -536,56 +489,41 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
     if ((file_size - m_pos) > (int) sizeof (unsigned long))
     {
-
         /* Get ID + Length */
         ID = read_long ();
         if (ID == c_notes)
         {
-
             unsigned int screen_sets = read_short ();
 
             for (unsigned int x = 0; x < screen_sets; x++)
             {
-
                 /* get the length of the string */
                 unsigned int len = read_short ();
-
-                char *
-                    notes = new char[len + 1];
+                char * notes = new char[len + 1];
 
                 for (unsigned int i = 0; i < len; i++)
                     notes[i] = m_d[m_pos++];
-                notes[len] = 0;
 
-                string
-                    notess (notes);
-
+                notes[len] = '\0';
+                string notess (notes);
                 a_perf->set_screen_set_notepad (x, &notess);
-
                 delete[]notes;
             }
         }
     }
 
-
     if ((file_size - m_pos) > (int) sizeof (unsigned int))
     {
-
         /* Get ID + Length */
         ID = read_long ();
         if (ID == c_bpmtag)
         {
-
             long bpm = read_long ();
             a_perf->set_bpm (bpm);
         }
     }
 
-
-
-
     // *** ADD NEW TAGS AT END **************/
-
 
     delete[]m_d;
     return true;
@@ -593,8 +531,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 }
 
 
-
-    void
+void
 midifile::write_long (unsigned long a_x)
 {
     m_l.push_front ((a_x & 0xFF000000) >> 24);
@@ -604,7 +541,7 @@ midifile::write_long (unsigned long a_x)
 }
 
 
-    void
+void
 midifile::write_short (unsigned short a_x)
 {
     m_l.push_front ((a_x & 0xFF00) >> 8);
@@ -614,27 +551,20 @@ midifile::write_short (unsigned short a_x)
 bool midifile::write (perform * a_perf)
 {
     /* open binary file */
-
-    ofstream
-        file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
+    ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
 
     if (!file.is_open ())
         return false;
 
     /* used in small loops */
-    int
-        i;
+    int i;
 
     /* sequence pointer */
-    sequence *
-        seq;
-    event
-        e;
-    list < char >
-        l;
+    sequence * seq;
+    event e;
+    list<char> l;
 
-    int
-        numtracks = 0;
+    int numtracks = 0;
 
     /* get number of tracks */
     for (i = 0; i < c_max_sequence; i++)
@@ -676,7 +606,6 @@ bool midifile::write (perform * a_perf)
 
             while (l.size () > 0)
             {
-
                 m_l.push_front (l.back ());
                 l.pop_back ();
             }
@@ -700,9 +629,7 @@ bool midifile::write (perform * a_perf)
 
     for (i = 0; i < c_max_sets; i++)
     {
-
-        string *
-            note = a_perf->get_screen_set_notepad (i);
+        string * note = a_perf->get_screen_set_notepad (i);
         write_short (note->length ());
 
         for (unsigned int j = 0; j < note->length (); j++)
@@ -714,19 +641,15 @@ bool midifile::write (perform * a_perf)
     write_long (c_bpmtag);
     write_long (a_perf->get_bpm ());
 
-    int
-        data_size = m_l.size ();
+    int data_size = m_l.size ();
     m_d = (unsigned char *) new char[data_size];
 
     m_pos = 0;
 
-
     for (list < unsigned char >::reverse_iterator ri = m_l.rbegin ();
             ri != m_l.rend (); ri++)
     {
-
         m_d[m_pos++] = *ri;
-
     }
 
     m_l.clear ();
@@ -743,6 +666,4 @@ bool midifile::write (perform * a_perf)
     delete[]m_d;
 
     return true;
-
-
 }
