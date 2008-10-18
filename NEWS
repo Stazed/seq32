@@ -26,3 +26,5 @@ seq24-0.9.0 (2008-??-??)
 * Zooming and panning in the editor window using the scroll wheel (when
   CTRL or SHIFT are used) implemented. Horizontal scroll step interval
   increased to 1/16 note per zoom level and page interval to 1 bar.
+* Panning in the song editor using the scroll wheel (when SHIFT is used)
+  implemented.

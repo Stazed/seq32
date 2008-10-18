@@ -765,7 +765,7 @@ perfroll::on_button_release_event(GdkEventButton* a_ev)
         }
     }
 
-    if ( a_ev->button == 3 ){
+    else if ( a_ev->button == 3 ){
 	m_adding_pressed = false;
  	set_adding( false );
     }
@@ -787,16 +787,35 @@ perfroll::on_button_release_event(GdkEventButton* a_ev)
 bool
 perfroll::on_scroll_event( GdkEventScroll* a_ev )
 {
-	double val = m_vadjust->get_value();
-
-    if (  a_ev->direction == GDK_SCROLL_UP ){
-		val -= m_vadjust->get_step_increment();
+    guint modifiers;    // Used to filter out caps/num lock etc.
+    modifiers = gtk_accelerator_get_default_mod_mask ();
+    
+    if ((a_ev->state & modifiers) == GDK_SHIFT_MASK)
+    {
+        double val = m_hadjust->get_value();
+        
+        if ( a_ev->direction == GDK_SCROLL_UP ){
+            val -= m_hadjust->get_step_increment();
+        }
+        else if ( a_ev->direction == GDK_SCROLL_DOWN ){
+            val += m_hadjust->get_step_increment();
+        }
+        
+        m_hadjust->clamp_page(val, val + m_hadjust->get_page_size());
     }
-    if (  a_ev->direction == GDK_SCROLL_DOWN ){
-		val += m_vadjust->get_step_increment();
+    else
+    {
+        double val = m_vadjust->get_value();
+        
+        if ( a_ev->direction == GDK_SCROLL_UP ){
+            val -= m_vadjust->get_step_increment();
+        }
+        else if ( a_ev->direction == GDK_SCROLL_DOWN ){
+            val += m_vadjust->get_step_increment();
+        }
+        
+        m_vadjust->clamp_page(val, val + m_vadjust->get_page_size());
     }
-
-	m_vadjust->clamp_page( val, val + m_vadjust->get_page_size());
     return true;
 }
 
