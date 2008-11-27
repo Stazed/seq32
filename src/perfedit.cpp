@@ -30,6 +30,7 @@
 #include "copy.xpm"
 #include "undo.xpm"
 #include "down.xpm"
+#include "perfedit.xpm"
 
 using namespace sigc;
 
@@ -37,13 +38,15 @@ perfedit::perfedit( perform *a_perf )
 {
     using namespace Menu_Helpers;
 
+    set_icon(Gdk::Pixbuf::create_from_xpm_data(perfedit_xpm));
+
     /* set the performance */
     m_snap = c_ppqn / 4;
 
     m_mainperf = a_perf;
 
     /* main window */
-    set_title ( "Song Editor" );
+    set_title( "seq24 - Song Editor");
     set_size_request(700, 400);
 
     /* tooltips */

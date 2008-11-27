@@ -46,6 +46,7 @@
 #include "menu_full.xpm"
 #include "sequences.xpm"
 #include "tools.xpm"
+#include "seq-editor.xpm"
 
 int seqedit::m_initial_zoom = 2;
 int seqedit::m_initial_snap = c_ppqn / 4;
@@ -84,6 +85,7 @@ seqedit::seqedit( sequence *a_seq,
 		  // mainwid *a_mainwid, 
 		  int a_pos  )
 {
+    set_icon(Gdk::Pixbuf::create_from_xpm_data(seq_editor_xpm));
 
     /* set the performance */
     m_seq = a_seq;
@@ -100,7 +102,9 @@ seqedit::seqedit( sequence *a_seq,
     m_pos = a_pos;
 
     /* main window */
-    set_title ( m_seq->get_name());
+    std::string title = "seq24 - ";
+    title.append(m_seq->get_name());
+    set_title(title);
     set_size_request(700, 500);
 
     m_seq->set_editing( true );

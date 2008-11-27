@@ -1,3 +1,7 @@
+2008-11-27 Guido Scholz <guido.scholz@bayernline.de>
+	* src/perfedit.cpp, src/seqedit.cpp: Window icons for song
+	editor and sequence editor added.
+
 2008-10-18 Guido Scholz <guido.scholz@bayernline.de>
 	* src/midifile.cpp: Fixed memory leak if MIDI file format error
 	occurs. Error messages added to give user better feedback about

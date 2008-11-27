@@ -618,7 +618,7 @@ mainwnd::about_dialog( void )
 
     dialog.set_copyright(
             "(C) 2002 - 2006 Rob C. Buse\n"
-            "(C) 2008 Ivan Hernandez, Guido Scholz, Jaakko Sipari");
+            "(C) 2008 Seq24team");
     
     dialog.set_website(
             "http://www.filter24.org/seq24\n"
