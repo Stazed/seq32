@@ -1,16 +1,21 @@
 seq24-0.9.0 (2008-11-27)
 
+Fixed Bugs
+* Fixed BPM saving on 64 bit platforms.
+* Several string buffer overruns fixed.
+* Several compiler warnings fixed.
+* Fixed memory leak if file loading fails due to format errors.
+
+New Features
 * Round robbin logic on sequence edit added.
 * Start stop shortcut on sequence editor added.
 * Remember last used directory on configuration so you go where
   you worked.
 * Live Quantize, so notes get to the right time when you play.
 * Fixed volume. Makes midi input have a fixed volume when you record.
-* Fixed BPM saving on 64 bit platforms.
 * Added Redo function on sequence editor.
 * Switched to sigc++-2.0 API, to make program compatible to latest
   sigc++ version (2.2).
-* Several compiler warnings fixed.
 * Man page from Ubuntu added.
 * Keyboard shortcuts for menu items added.
 * Added backspace as an optional delete key to the pattern editor.
@@ -21,7 +26,6 @@ seq24-0.9.0 (2008-11-27)
 * File new/open/save/close logic rewritten to monitor user applied file
   changes.
 * "dump" program removed.
-* Nem menu item to show song editor window added.
 * About dialog changed to use new layout.
 * Zooming and panning in the editor window using the scroll wheel (when
   CTRL or SHIFT are used) implemented. Horizontal scroll step interval
