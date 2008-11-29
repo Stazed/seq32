@@ -98,7 +98,7 @@ const int c_timearea_y = 18;
 
 /* sequences */
 const int c_midi_notes = 256;
-const string c_dummy( "Untitled" );
+const std::string c_dummy( "Untitled" );
 
 /* maximum size of sequence, default size */
 const int c_maxbeats     = 0xFFFF;   /* max number of beats in a sequence */
@@ -145,8 +145,8 @@ extern bool global_with_jack_master_cond;
 extern bool global_jack_start_mode;
 extern bool global_manual_alsa_ports;
 
-extern std::string global_filename;
-extern std::string last_used_dir;
+extern Glib::ustring global_filename;
+extern Glib::ustring last_used_dir;
 extern bool is_pattern_playing;
 
 extern bool global_print_keys;

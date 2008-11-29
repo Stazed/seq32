@@ -108,7 +108,7 @@ class mainwnd : public Gtk::Window
     void file_save_as();
     void file_exit();
     void new_file();
-    void open_file(const std::string&);
+    void open_file(const Glib::ustring&);
     bool save_file();
     void choose_file();
     int query_save_changes();

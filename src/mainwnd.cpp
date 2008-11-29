@@ -360,7 +360,7 @@ void mainwnd::file_save_as()
 }
 
 
-void mainwnd::open_file(const std::string& fn)
+void mainwnd::open_file(const Glib::ustring& fn)
 {
     bool result;
 

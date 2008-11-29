@@ -21,7 +21,7 @@
 #include "midifile.h"
 #include <iostream>
 
-midifile::midifile (string a_name)
+midifile::midifile(const Glib::ustring& a_name)
 {
     m_name = a_name;
     m_pos = 0;

@@ -21,14 +21,15 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "config.h"
-#include "perform.h"
+#include "font.h"
+#include "lash.h"
 #include "mainwnd.h"
 #include "midifile.h"
 #include "optionsfile.h"
+#include "perform.h"
 #include "userfile.h"
-#include "font.h"
-#include "lash.h"
 
 /* struct for command parsing */
 static struct 
@@ -58,7 +59,7 @@ bool global_device_ignore = false;
 int global_device_ignore_num = 0;
 bool global_stats = false;
 bool global_pass_sysex = false;
-std::string global_filename = "";
+Glib::ustring global_filename = "";
 std::string config_filename = ".seq24rc";
 std::string user_filename = ".seq24usr";
 bool global_print_keys = false;
@@ -105,8 +106,8 @@ main (int argc, char *argv[])
 
     if ( getenv( "HOME" ) != NULL ){
         
-        string home( getenv( "HOME" ));
-        std::string total_file = home + "/" + config_filename;
+        Glib::ustring home( getenv( "HOME" ));
+        Glib::ustring total_file = home + "/" + config_filename;
         printf( "Reading [%s]\n", total_file.c_str());
 
         optionsfile options( total_file );
@@ -218,7 +219,7 @@ main (int argc, char *argv[])
                 break;
 
             case 'f':
-                global_filename = std::string( optarg );
+                global_filename = Glib::ustring(optarg);
                break;
                 
             case 'i':
@@ -243,7 +244,7 @@ main (int argc, char *argv[])
     
     if (global_filename != "") {
         /* import that midi file */
-        f = new midifile( global_filename.c_str());
+        f = new midifile(global_filename);
         f->parse( &p, 0 );
         delete f;
     }
@@ -258,7 +259,7 @@ main (int argc, char *argv[])
     if ( getenv( "HOME" ) != NULL ){
         
         string home( getenv( "HOME" ));
-        std::string total_file = home + "/" + config_filename;
+        Glib::ustring total_file = home + "/" + config_filename;
         printf( "Writing [%s]\n", total_file.c_str());
 
         optionsfile options( total_file );

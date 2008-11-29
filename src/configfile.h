@@ -32,7 +32,7 @@ class configfile
  protected:
     
     int m_pos;
-    string m_name;
+    Glib::ustring m_name;
 
     /* holds our data */
     unsigned char *m_d;
@@ -48,8 +48,8 @@ class configfile
 
  public:
 
-    configfile( string a_name );
-    virtual ~configfile(  );
+    configfile(const Glib::ustring& a_name);
+    virtual ~configfile();
 
     virtual bool parse( perform *a_perf ) = 0;
     virtual bool write( perform *a_perf ) = 0;

@@ -34,7 +34,6 @@ class sequence;
 
 enum draw_type
 {
-
     DRAW_FIN = 0,
     DRAW_NORMAL_LINKED,
     DRAW_NOTE_ON,

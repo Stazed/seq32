@@ -32,7 +32,7 @@ class midifile
  private:
     
     int m_pos;
-    string m_name;
+    Glib::ustring m_name;
 
     /* holds our data */
     unsigned char *m_d;
@@ -48,9 +48,9 @@ class midifile
 
  public:
 
-    midifile( string a_name );
+    midifile(const Glib::ustring&);
  
-    ~midifile(  );
+    ~midifile();
 
     bool parse( perform *a_perf, int a_screen_set );
     bool write( perform *a_perf );

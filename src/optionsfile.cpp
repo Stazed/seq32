@@ -18,10 +18,13 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "optionsfile.h"
 #include <iostream>
-std::string last_used_dir;
-optionsfile::optionsfile( string a_name ) :
+
+#include "optionsfile.h"
+
+Glib::ustring last_used_dir;
+
+optionsfile::optionsfile(const Glib::ustring& a_name) :
     configfile( a_name )
 {
 }
@@ -184,7 +187,6 @@ optionsfile::parse( perform *a_perf )
     file.close();
 
     return true;
-    
 }
 
 
@@ -353,5 +355,4 @@ optionsfile::write( perform *a_perf  )
 
     file.close();
     return true;
-
 }
