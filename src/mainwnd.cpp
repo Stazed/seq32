@@ -19,6 +19,7 @@
 //-----------------------------------------------------------------------------
 
 #include <cctype>
+#include <gtk/gtkversion.h>
 
 #include "mainwnd.h"
 #include "perform.h"
@@ -98,7 +99,9 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
     m_button_stop->signal_clicked().connect(
             mem_fun(*this, &mainwnd::stop_playing));
+#if GTK_MINOR_VERSION >= 12
     m_button_stop->set_tooltip_text("Stop playing MIDI sequence");
+#endif
     hbox->pack_start(*m_button_stop, false, false);
 
     /* play button */
@@ -107,7 +110,9 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( play2_xpm ))));
     m_button_play->signal_clicked().connect(
             mem_fun( *this, &mainwnd::start_playing));
+#if GTK_MINOR_VERSION >= 12
     m_button_play->set_tooltip_text("Play MIDI sequence");
+#endif
     hbox->pack_start(*m_button_play, false, false);
 
     /* song edit button */
@@ -116,7 +121,9 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
     m_button_perfedit->signal_clicked().connect(
             mem_fun( *this, &mainwnd::open_performance_edit ));
+#if GTK_MINOR_VERSION >= 12
     m_button_perfedit->set_tooltip_text("Show or hide song editor window");
+#endif
     hbox->pack_end(*m_button_perfedit, false, false, 4);
 
     /* bpm spin button */
@@ -125,7 +132,9 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_bpm->set_editable( false );
     m_adjust_bpm->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_bpm ));
+#if GTK_MINOR_VERSION >= 12
     m_spinbutton_bpm->set_tooltip_text("Adjust beats per minute (BPM) value");
+#endif
     hbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
     hbox->pack_start(*m_spinbutton_bpm, false, false );
   
@@ -136,7 +145,9 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_ss->set_wrap( true );
     m_adjust_ss->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_ss ));
+#if GTK_MINOR_VERSION >= 12
     m_spinbutton_ss->set_tooltip_text("Select sreen set");
+#endif
     hbox->pack_end(*m_spinbutton_ss, false, false );
     hbox->pack_end(*(manage( new Label( "  set " ))), false, false, 4);
  
@@ -146,7 +157,9 @@ mainwnd::mainwnd(perform *a_p)
             mem_fun(*this, &mainwnd::edit_callback_notepad));
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset())); 
+#if GTK_MINOR_VERSION >= 12
     m_entry_notes->set_tooltip_text("Enter screen set name");
+#endif
     hbox->pack_start( *m_entry_notes, true, true );
 
 
