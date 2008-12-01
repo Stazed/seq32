@@ -53,8 +53,9 @@ options::options (Gtk::Window & parent, perform * a_p):
     //Notebook *clock_notebook = manage( new Notebook());
     //clock_notebook->set_scrollable(true);
 
-    vbox = manage (new VBox ());
-    m_notebook->pages().push_back(Notebook_Helpers::TabElem (*vbox, "MIDI Clock"));
+    vbox = manage(new VBox());
+    m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox,
+                "MIDI Clock"));
 
     CheckButton *check;
     Label *label;
@@ -144,8 +145,8 @@ options::options (Gtk::Window & parent, perform * a_p):
     // Jack
     VBox *vbox2 = manage (new VBox ());
     vbox2->set_border_width (4);
-    m_notebook->pages ().
-        push_back (Notebook_Helpers::TabElem (*vbox2, "Jack Sync"));
+    m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox2,
+                "Jack Sync"));
 
 
     check = manage (new CheckButton ("Jack Transport"));
@@ -209,18 +210,14 @@ options::options (Gtk::Window & parent, perform * a_p):
 
     Gtk::Button * button = manage (new Button ("Connect"));
     tooltips->set_tip (*button, "Connect to Jack.");
-    button->signal_clicked ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback), e_jack_connect,
-                 button));
+    button->signal_clicked().connect(bind(mem_fun(*this,
+                    &options::transport_callback), e_jack_connect, button));
     vbox2->pack_start (*button, false, false);
 
     button = manage (new Button ("Disconnect"));
     tooltips->set_tip (*button, "Disconnect Jack.");
-    button->signal_clicked ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback), e_jack_disconnect,
-                 button));
+    button->signal_clicked().connect(bind(mem_fun(*this,
+                    &options::transport_callback), e_jack_disconnect, button));
     vbox2->pack_start (*button, false, false);
 
 

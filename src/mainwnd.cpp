@@ -479,8 +479,12 @@ int mainwnd::query_save_changes()
 
     Gtk::MessageDialog dialog(*this, query_str, false,
             Gtk::MESSAGE_QUESTION,
-            Gtk::BUTTONS_YES_NO, true); 
-    
+            Gtk::BUTTONS_NONE, true);
+
+    dialog.add_button(Gtk::Stock::YES, Gtk::RESPONSE_YES);
+    dialog.add_button(Gtk::Stock::NO, Gtk::RESPONSE_NO);
+    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+
     return dialog.run();
 }
 

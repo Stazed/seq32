@@ -1,6 +1,8 @@
 2008-12-01 Guido Scholz <guido.scholz@bayernline.de>
 	* src/seq.cpp, src/optionsfile.cpp: Fixed error if path for
 	last used directory is not properly set.
+	* src/mainwnd.cpp: "Cancel" option added to "Save file?"
+	question.
 
 2008-11-30 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwnd.cpp: Check for GTK minor version added to avoid
