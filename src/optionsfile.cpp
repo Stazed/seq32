@@ -20,9 +20,10 @@
 
 #include <iostream>
 
+//#include "globals.h"
 #include "optionsfile.h"
 
-Glib::ustring last_used_dir;
+extern Glib::ustring last_used_dir;
 
 optionsfile::optionsfile(const Glib::ustring& a_name) :
     configfile( a_name )
@@ -168,7 +169,7 @@ optionsfile::parse( perform *a_perf )
         next_data_line( &file );
     }
     
-    /* midi clock mod  */
+    /* midi clock mod */
     long ticks = 64;
     line_after( &file, "[midi-clock-mod-ticks]" );
     sscanf( m_line, "%ld", &ticks );
@@ -180,9 +181,12 @@ optionsfile::parse( perform *a_perf )
     sscanf( m_line, "%ld", &flag );
     global_manual_alsa_ports = (bool) flag;
 
-    /* last used dir  */
+    /* last used dir */
     line_after( &file, "[last-used-dir]" );
-    last_used_dir.assign(m_line);
+    //FIXME: check for a valid path is missing
+    if (m_line[0] == '/')
+        last_used_dir.assign(m_line);
+
 
     file.close();
 

@@ -60,6 +60,7 @@ int global_device_ignore_num = 0;
 bool global_stats = false;
 bool global_pass_sysex = false;
 Glib::ustring global_filename = "";
+Glib::ustring last_used_dir ="/";
 std::string config_filename = ".seq24rc";
 std::string user_filename = ".seq24usr";
 bool global_print_keys = false;
@@ -107,6 +108,7 @@ main (int argc, char *argv[])
     if ( getenv( "HOME" ) != NULL ){
         
         Glib::ustring home( getenv( "HOME" ));
+        last_used_dir = home;
         Glib::ustring total_file = home + "/" + config_filename;
         printf( "Reading [%s]\n", total_file.c_str());
 
@@ -135,7 +137,6 @@ main (int argc, char *argv[])
     /* parse parameters */
     int c;
     
-    midifile *f;
 
     while (1){
 	
@@ -244,7 +245,7 @@ main (int argc, char *argv[])
     
     if (global_filename != "") {
         /* import that midi file */
-        f = new midifile(global_filename);
+        midifile *f = new midifile(global_filename);
         f->parse( &p, 0 );
         delete f;
     }
