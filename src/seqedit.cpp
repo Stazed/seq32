@@ -565,7 +565,7 @@ seqedit::popup_tool_menu( void )
 
     holder = manage( new Menu());
 
-    char num[9];
+    char num[11];
 
     holder2 = manage( new Menu());
     for ( int i=-12; i<=12; ++i) {
