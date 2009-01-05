@@ -264,17 +264,17 @@ class seqedit : public Gtk::Window
 
  public:
 
-    seqedit( sequence *a_seq, 
-	     perform *a_perf, 
-	     // mainwid *a_mainwid, 
-	     int a_pos  );
+    seqedit(sequence *a_seq, 
+	    perform *a_perf, 
+	    // mainwid *a_mainwid, 
+	    int a_pos);
 
-    ~seqedit(  );
+    ~seqedit();
 
  
-
     bool on_delete_event(GdkEventAny *a_event);
     bool on_scroll_event(GdkEventScroll* a_ev);
+    bool on_key_press_event(GdkEventKey* a_ev);
 };
 
 
