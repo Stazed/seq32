@@ -126,6 +126,7 @@ perform::init( void )
     m_master_bus.init( );
 }
 
+
 void
 perform::init_jack( void )
 {
@@ -145,21 +146,15 @@ perform::init_jack( void )
             sprintf( client_name, "seq24 (%d)", getpid());
             
             /* become a new client of the JACK server */
-            if (( m_jack_client = jack_client_new(client_name)) == 0) {
+            if (( m_jack_client = jack_client_open(client_name, JackNullOption, NULL)) == 0) {
                 printf( "JACK server is not running.\n[JACK sync disabled]\n");
                 m_jack_running = false;
                 break;
             }
-            if (jack_activate(m_jack_client)) {
-                printf("Cannot register as JACK client\n");
-                m_jack_running = false;
-                break;
-            }
-            
+                     
             jack_on_shutdown( m_jack_client, jack_shutdown,(void *) this );
             jack_set_sync_callback(m_jack_client, jack_sync_callback, (void *) this );
-
-            
+     
             
             bool cond = global_with_jack_master_cond; /* true if we want to fail if there is already a master */
             if ( global_with_jack_master && 
@@ -174,6 +169,13 @@ perform::init_jack( void )
              
             }
             
+            if (jack_activate(m_jack_client)) {
+                printf("Cannot register as JACK client\n");
+                m_jack_running = false;
+                break;
+            }
+
+            
         } while (0);
         
     } 
@@ -182,13 +184,6 @@ perform::init_jack( void )
     
 #endif
 }
-
-
-
-
-
-
-
 
 void
 perform::deinit_jack( void )

@@ -1,3 +1,6 @@
+2009-03-14 Stéphane Letz <>
+	* src/iperform.cpp: Adaptations for jack2 applied.
+
 2008-12-01 Guido Scholz <guido.scholz@bayernline.de>
 	* src/seq.cpp, src/optionsfile.cpp: Fixed error if path for
 	last used directory is not properly set.
