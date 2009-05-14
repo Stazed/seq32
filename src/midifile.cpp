@@ -397,11 +397,21 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     break;
                             }
                         }
-                        else
+                        else if (status == 0xF0)
                         {
                             /* sysex */
+                            len = read_var ();
+
+                            /* skip it */
+                            m_pos += len;
                             fprintf(stderr,
-                                    "No support for SYSEX messages: %hhu\n",
+                                    "Warning: skipping SYSEX message\n");
+                        }
+                        else
+                        {
+                            /* sys realtime */
+                            fprintf(stderr,
+                                    "Unexpected MIDI system message: %hhu\n",
                                     status);
                             delete[]m_d;
                             return false;
