@@ -352,9 +352,10 @@ void mainwnd::file_save_as()
             }
 
             if (Glib::file_test(fname, Glib::FILE_TEST_EXISTS)) {
-                Gtk::MessageDialog warning(*this, false,
+                Gtk::MessageDialog warning(*this, 
                         "File already exists!\n"
                         "Do you want to overwrite it?",
+                        false,
                         Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
                 result = warning.run();
 
