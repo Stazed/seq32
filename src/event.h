@@ -34,7 +34,11 @@ const unsigned char  EVENT_PROGRAM_CHANGE   = 0xC0;
 const unsigned char  EVENT_CHANNEL_PRESSURE = 0xD0;
 const unsigned char  EVENT_PITCH_WHEEL      = 0xE0;
 const unsigned char  EVENT_CLEAR_CHAN_MASK  = 0xF0;
+const unsigned char  EVENT_MIDI_SONG_POS    = 0xF2;
 const unsigned char  EVENT_MIDI_CLOCK       = 0xF8;
+const unsigned char  EVENT_MIDI_START       = 0xFA;
+const unsigned char  EVENT_MIDI_STOP        = 0xFC;
+const unsigned char  EVENT_MIDI_CONTINUE    = 0xFB;
 const unsigned char  EVENT_SYSEX            = 0xF0;
 const unsigned char  EVENT_SYSEX_END        = 0xF7;
 
