@@ -1,3 +1,6 @@
+2009-05-22 Sebastien Alaiw <ace17@free.fr>
+	* src/mainwnd.cpp: Fixed file save as crash.
+
 2009-05-22 Guido Scholz <guido.scholz@bayernline.de>
 	* src/seq24.cpp, src/midibus.*, midibus_portmidi.*, perform.cpp,
 	options.cpp, lash.*, seauence.h, globals.h, configwin32.h:
