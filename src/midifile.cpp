@@ -397,12 +397,19 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                     break;
                             }
                         }
-                        else
+                        else if(status == 0xF0)
                         {
                             /* sysex */
-                            fprintf(stderr,
-                                    "No support for SYSEX messages: %hhu\n",
-                                    status);
+                            len = read_var ();
+
+                            /* skip it */
+                            m_pos += len;
+
+                            fprintf(stderr, "Warning, no support for SYSEX messages, discarding.\n");
+                        }
+                        else
+                        {
+                            fprintf(stderr, "Unexpected system event : 0x%.2X", status);
                             delete[]m_d;
                             return false;
                         }
