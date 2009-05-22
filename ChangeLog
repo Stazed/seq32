@@ -1,3 +1,15 @@
+2009-05-22 Sebastien Alaiw <ace17@free.fr>
+	* src/mainwnd.cpp: Fixed file save as crash.
+	* src/midifile.cpp: Fixed MIDI sysex event reading.
+
+2009-05-22 Guido Scholz <guido.scholz@bayernline.de>
+	* src/seq24.cpp, src/midibus.*, midibus_portmidi.*, perform.cpp,
+	options.cpp, lash.*, seauence.h, globals.h, configwin32.h:
+	Support for (lost) Win32 platform support added (reworked
+	patch from Kevin Meinert, Rob Buse).
+	* src/seqedit.cpp, src/seqroll.*: Optimized redraw for sequencer
+	roll background (from Win32 version, Rob Buse).
+
 2009-03-14 Stéphane Letz <>
 	* src/iperform.cpp: Adaptations for jack2 applied.
 

@@ -16,6 +16,7 @@ seq24_SOURCES = \
 	mainwid.cpp mainwid.h \
 	mainwnd.cpp mainwnd.h \
 	midibus.cpp midibus.h \
+	midibus_portmidi.cpp midibus_portmidi.h \
 	midifile.cpp midifile.h \
 	mutex.cpp mutex.h \
 	options.cpp options.h \
@@ -36,7 +37,7 @@ seq24_SOURCES = \
 	sequence.cpp sequence.h \
 	userfile.cpp userfile.h
 
-EXTRA_DIST = *.xpm 
+EXTRA_DIST = configwin32.h *.xpm 
 
 MOSTLYCLEANFILES = *~
 

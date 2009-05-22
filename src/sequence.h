@@ -18,19 +18,20 @@
 //
 //-----------------------------------------------------------------------------
 
-class sequence;
 
 #ifndef SEQ24_SEQUENCE
 #define SEQ24_SEQUENCE
+
+class sequence;
+
+#include <string>
+#include <list>
+#include <stack>
 
 #include "event.h"
 #include "midibus.h"
 #include "globals.h"
 #include "mutex.h"
-
-#include <string>
-#include <list>
-#include <stack>
 
 enum draw_type
 {

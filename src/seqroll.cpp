@@ -99,6 +99,8 @@ seqroll::seqroll(perform *a_perf,
     m_drawing_background_seq = false;
 
     set_double_buffered( false );
+
+    m_ignore_redraw = false;
 }
 
 
@@ -108,6 +110,10 @@ seqroll::set_background_sequence( bool a_state, int a_seq )
     m_drawing_background_seq = a_state;
     m_background_sequence = a_seq;
 
+    if ( m_ignore_redraw )
+      return;
+
+    update_background();
     update_pixmap();
     queue_draw();
 }
@@ -116,7 +122,7 @@ seqroll::set_background_sequence( bool a_state, int a_seq )
 
 seqroll::~seqroll( )
 {
-	delete m_clipboard;
+    delete m_clipboard;
 }
 
 /* popup menu calls this */
@@ -149,8 +155,10 @@ seqroll::on_realize()
     m_gc = Gdk::GC::create( m_window );
     m_window->clear();
 
-    m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqroll::change_horz ));
-    m_vadjust->signal_value_changed().connect( mem_fun( *this, &seqroll::change_vert ));
+    m_hadjust->signal_value_changed().connect( mem_fun( *this,
+                &seqroll::change_horz ));
+    m_vadjust->signal_value_changed().connect( mem_fun( *this,
+                &seqroll::change_vert ));
 
     update_sizes();
 }
@@ -169,8 +177,6 @@ void
 seqroll::update_sizes()
 {
     /* set default size */
-
-
     m_hadjust->set_lower( 0 );
     m_hadjust->set_upper( m_seq->get_length() );
     m_hadjust->set_page_size( m_window_x * m_zoom );
@@ -179,9 +185,9 @@ seqroll::update_sizes()
     m_hadjust->set_step_increment( (c_ppqn / 4) * m_zoom);
     
     /* The page increment is always one bar */
-    int page_increment = c_ppqn *
-                        m_seq->get_bpm() *
-                        (4.0 / m_seq->get_bw());
+    int page_increment = int( double(c_ppqn) *
+                        double(m_seq->get_bpm()) *
+                        (4.0 / double(m_seq->get_bw())) );
     m_hadjust->set_page_increment(page_increment);
     
 
@@ -190,7 +196,6 @@ seqroll::update_sizes()
     if ( m_hadjust->get_value() > h_max_value ){
         m_hadjust->set_value( h_max_value );
     }
-
 
     
     m_vadjust->set_lower( 0 );
@@ -212,6 +217,11 @@ seqroll::update_sizes()
                                         m_window_x,
                                         m_window_y,
                                         -1);
+        m_background = Gdk::Pixmap::create( m_window,
+                                            m_window_x,
+                                            m_window_y,
+                                            -1);
+
         change_vert();
     }
 }
@@ -223,6 +233,11 @@ seqroll::change_horz( )
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
 
+
+    if ( m_ignore_redraw )
+        return;
+
+    update_background();
     update_pixmap();
     force_draw();    
 }
@@ -233,6 +248,10 @@ seqroll::change_vert( )
     m_scroll_offset_key = (int) m_vadjust->get_value();
     m_scroll_offset_y = m_scroll_offset_key * c_key_y;
 
+    if ( m_ignore_redraw )
+        return;
+
+    update_background();
     update_pixmap();
     force_draw();
     
@@ -245,7 +264,11 @@ seqroll::reset()
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
     
+    if ( m_ignore_redraw )
+        return;
+
     update_sizes();
+    update_background();
     update_pixmap();
     queue_draw();
 }
@@ -253,24 +276,57 @@ seqroll::reset()
 void
 seqroll::redraw()
 {
+    if ( m_ignore_redraw )
+        return;
+
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
-    
+
+    update_background(); 
     update_pixmap();
-    queue_draw();
+    force_draw();
+
 }
 
 
+void 
+seqroll::redraw_events()
+{
+    if ( m_ignore_redraw )
+        return;
+
+    update_pixmap();
+    force_draw();
+}
+
+
+void
+seqroll::set_ignore_redraw(bool a_ignore)
+{
+    m_ignore_redraw = a_ignore;
+}
+
+
+void
+seqroll::draw_background_on_pixmap()
+{
+      m_pixmap->draw_drawable(m_gc, 
+                              m_background, 
+                            0,
+                            0,
+                            0,
+                            0,
+                            m_window_x,
+                            m_window_y );                                 
+}
+    
 /* updates background */
 void 
-seqroll::draw_background()
+seqroll::update_background()
 {
-    
-    //printf ("draw_background()\n" );
-    
     /* clear background */
     m_gc->set_foreground(m_white);
-    m_pixmap->draw_rectangle(m_gc,true,
+    m_background->draw_rectangle(m_gc,true,
                              0,
                              0, 
                              m_window_x, 
@@ -287,19 +343,19 @@ seqroll::draw_background()
     
     for ( int i=0; i< (m_window_y / c_key_y) + 1; i++ )
     {
-        m_pixmap->draw_line(m_gc,
+        m_background->draw_line(m_gc,
                             0,
                             i * c_key_y,
                             m_window_x,
                             i * c_key_y );
         
-        if ( m_scale != c_scale_off ){
+        if ( m_scale != c_scale_off ) {
             
             if ( !c_scales_policy[m_scale][ ((c_num_keys - i)
                                              - m_scroll_offset_key
                                              - 1 + ( 12 - m_key )) % 12] )
                 
-                m_pixmap->draw_rectangle(m_gc,true,
+                m_background->draw_rectangle(m_gc,true,
                                          0,
                                          i * c_key_y + 1,
                                          m_window_x,
@@ -318,16 +374,14 @@ seqroll::draw_background()
     //if ( measures_per_line <= 0
     int measures_per_line = 1;
     
-    //printf( "measures_per_line[%d]\n", measures_per_line );
-
     int ticks_per_measure =  m_seq->get_bpm() * (4 * c_ppqn) / m_seq->get_bw();
     int ticks_per_beat =  (4 * c_ppqn) / m_seq->get_bw();
     int ticks_per_step = 6 * m_zoom;
     int ticks_per_m_line =  ticks_per_measure * measures_per_line;
-    int start_tick = m_scroll_offset_ticks - (m_scroll_offset_ticks % ticks_per_step );
+    int start_tick = m_scroll_offset_ticks -
+        (m_scroll_offset_ticks % ticks_per_step );
     int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
     
-
     //printf ( "ticks_per_step[%d] start_tick[%d] end_tick[%d]\n",
     //         ticks_per_step, start_tick, end_tick );
 
@@ -356,7 +410,6 @@ seqroll::draw_background()
 
         }
         
-      
         else {
 
             m_gc->set_line_attributes( 1,
@@ -376,7 +429,7 @@ seqroll::draw_background()
             m_gc->set_dashes( 0, &dash, 1 );
         }
         
-        m_pixmap->draw_line(m_gc,
+        m_background->draw_line(m_gc,
                             base_line - m_scroll_offset_x,
                             0,
                             base_line - m_scroll_offset_x,
@@ -413,8 +466,9 @@ seqroll::set_snap( int a_snap )
 void 
 seqroll::set_note_length( int a_note_length )
 {
-	m_note_length = a_note_length;
+    m_note_length = a_note_length;
 }
+
 
 /* sets the music scale */
 void 
@@ -443,7 +497,8 @@ seqroll::set_key( int a_key )
 void 
 seqroll::update_pixmap()
 {
-    draw_background();
+    //printf( "update_pixmap()\n" );
+    draw_background_on_pixmap();
     draw_events_on_pixmap();
 }
 
@@ -544,7 +599,7 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw ) {
 						if ( note_width < 1 ) note_width = 1;
 					} else {
 						note_width = (m_seq->get_length() - tick_s) / m_zoom;
-					}
+                                        }
 
 				} else {
 					note_width = 16 / m_zoom;
@@ -628,6 +683,8 @@ seqroll::draw_events_on_pixmap()
 int 
 seqroll::idle_redraw()
 {
+    //printf( "idle_redraw()\n" );
+                      
     draw_events_on( m_window );
     draw_events_on( m_pixmap );
   
@@ -740,7 +797,6 @@ seqroll::draw_selection_on_window()
 bool
 seqroll::on_expose_event(GdkEventExpose* e)
 {
-  
     m_window->draw_drawable(m_gc, 
                             m_pixmap, 
                             e->area.x,
@@ -1038,11 +1094,12 @@ seqroll::on_button_press_event(GdkEventButton* a_ev)
 
     /* if they clicked, something changed */
     if ( needs_update ){
-        redraw();
+    
+        ////printf( "needs update\n" );
         m_seq->set_dirty();
+        //redraw_events();
     }
     return true;
-
 }
 
 
@@ -1148,8 +1205,9 @@ seqroll::on_button_release_event(GdkEventButton* a_ev)
     /* if they clicked, something changed */
     if (  needs_update ){
 
-        redraw();
+        ////printf( "needs_update2\n" );
         m_seq->set_dirty();
+        //redraw_events();
     }
     return true;
 }
@@ -1192,6 +1250,7 @@ seqroll::on_motion_notify_event(GdkEventMotion* a_ev)
         convert_xy( m_current_x, m_current_y, &tick, &note );
 
         m_seq->add_note( tick, m_note_length - 2, note, true );
+        return true;
     }
     
     return false;
@@ -1224,16 +1283,16 @@ seqroll::snap_x( int *a_x )
 bool
 seqroll::on_enter_notify_event(GdkEventCrossing* a_p0)
 {
-  m_seqkeys_wid->set_hint_state( true );
-  return false;
+    m_seqkeys_wid->set_hint_state( true );
+    return false;
 }
 
 
 bool
 seqroll::on_leave_notify_event(GdkEventCrossing* a_p0)
 {
-  m_seqkeys_wid->set_hint_state( false );
-  return false;
+    m_seqkeys_wid->set_hint_state( false );
+    return false;
 }
 
 
@@ -1320,8 +1379,8 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
     }
 
     if ( ret == true ){
-        redraw();
         m_seq->set_dirty();
+        //redraw_events();
         return true;
     }
 
@@ -1353,8 +1412,6 @@ seqroll::on_size_allocate(Gtk::Allocation& a_r )
 bool
 seqroll::on_scroll_event( GdkEventScroll* a_ev )
 {
-    //printf("seqroll::on_scroll_event(state=%d)\n", a_ev->state);
-
     guint modifiers;    // Used to filter out caps/num lock etc.
     modifiers = gtk_accelerator_get_default_mod_mask ();
     
@@ -1363,18 +1420,17 @@ seqroll::on_scroll_event( GdkEventScroll* a_ev )
     if ((a_ev->state & modifiers) != 0)
         return false;
 
-	double val = m_vadjust->get_value();
+    double val = m_vadjust->get_value();
 
-	if ( a_ev->direction == GDK_SCROLL_UP ){
-		val -= m_vadjust->get_step_increment()/6;
-	} else if (  a_ev->direction == GDK_SCROLL_DOWN ){
-		val += m_vadjust->get_step_increment()/6;
-	} else {
-		return true;
-	}
+    if (a_ev->direction == GDK_SCROLL_UP){
+        val -= m_vadjust->get_step_increment()/6;
+    } else if (a_ev->direction == GDK_SCROLL_DOWN){
+        val += m_vadjust->get_step_increment()/6;
+    } else {
+        return true;
+    }
 
-	m_vadjust->clamp_page( val, val + m_vadjust->get_page_size() );
+    m_vadjust->clamp_page( val, val + m_vadjust->get_page_size() );
     return true;
-
 }
 

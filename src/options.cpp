@@ -143,11 +143,11 @@ options::options (Gtk::Window & parent, perform * a_p):
     }
 
     // Jack
+#ifdef JACK_SUPPORT
     VBox *vbox2 = manage (new VBox ());
     vbox2->set_border_width (4);
     m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox2,
                 "Jack Sync"));
-
 
     check = manage (new CheckButton ("Jack Transport"));
     check->set_active (global_with_jack_transport);
@@ -207,7 +207,6 @@ options::options (Gtk::Window & parent, perform * a_p):
     vbox2->pack_start (*rb_live, false, false);
     vbox2->pack_start (*rb_perform, false, false);
 
-
     Gtk::Button * button = manage (new Button ("Connect"));
     tooltips->set_tip (*button, "Connect to Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
@@ -219,7 +218,7 @@ options::options (Gtk::Window & parent, perform * a_p):
     button->signal_clicked().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_disconnect, button));
     vbox2->pack_start (*button, false, false);
-
+#endif
 
     /* show everything */
     show_all_children ();

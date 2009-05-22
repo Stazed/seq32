@@ -51,13 +51,13 @@ mainwnd::mainwnd(perform *a_p)
 
     m_menu_file = manage(new Menu());
     m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
-    
+
     m_menu_view = manage( new Menu());
     m_menubar->items().push_back(MenuElem("_View", *m_menu_view));
 
     m_menu_help = manage( new Menu());
     m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
-    
+
     /* file menu items */
     m_menu_file->items().push_back(MenuElem("_New",
                 Gtk::AccelKey("<control>N"),
@@ -84,11 +84,11 @@ mainwnd::mainwnd(perform *a_p)
     m_menu_view->items().push_back(MenuElem("_Song Editor...",
                 Gtk::AccelKey("<control>E"),
                 mem_fun(*this, &mainwnd::open_performance_edit)));
- 
+
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
                 mem_fun(*this, &mainwnd::about_dialog)));
- 
+
 
     /* bottom line items */
     HBox *hbox = manage( new HBox( false, 2 ) );
@@ -137,7 +137,7 @@ mainwnd::mainwnd(perform *a_p)
 #endif
     hbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
     hbox->pack_start(*m_spinbutton_bpm, false, false );
-  
+
     /* sequence set spin button */
     m_adjust_ss = manage( new Adjustment( 0, 0, c_max_sets - 1, 1 ));
     m_spinbutton_ss = manage( new SpinButton( *m_adjust_ss ));
@@ -150,13 +150,13 @@ mainwnd::mainwnd(perform *a_p)
 #endif
     hbox->pack_end(*m_spinbutton_ss, false, false );
     hbox->pack_end(*(manage( new Label( "  set " ))), false, false, 4);
- 
+
     /* screen set name edit line */
     m_entry_notes = manage( new Entry());
     m_entry_notes->signal_changed().connect(
             mem_fun(*this, &mainwnd::edit_callback_notepad));
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
-                m_mainperf->get_screenset())); 
+                m_mainperf->get_screenset()));
 #if GTK_MINOR_VERSION >= 12
     m_entry_notes->set_tooltip_text("Enter screen set name");
 #endif
@@ -175,17 +175,17 @@ mainwnd::mainwnd(perform *a_p)
     vbox->set_border_width( 10 );
     vbox->pack_start(*hbox2, false, false );
     vbox->pack_start(*m_main_wid, true, true, 10 );
-    vbox->pack_start(*hbox, false, false ); 
- 
+    vbox->pack_start(*hbox, false, false );
+
 
     VBox *ovbox = new VBox();
- 
+
     ovbox->pack_start(*m_menubar, false, false );
     ovbox->pack_start( *vbox );
 
     /* add box */
     this->add (*ovbox);
-  
+
     /* show everything */
     show_all();
 
@@ -193,14 +193,14 @@ mainwnd::mainwnd(perform *a_p)
 
     m_timeout_connect = Glib::signal_timeout().connect(
             mem_fun(*this, &mainwnd::timer_callback), 25);
-    
+
     m_modified = false;
 
     m_perf_edit = new perfedit( m_mainperf );
     m_options = NULL;
 }
 
- 
+
 mainwnd::~mainwnd()
 {
     if ( m_perf_edit != NULL )
@@ -216,7 +216,7 @@ bool
 mainwnd::timer_callback(  )
 {
     long ticks = m_mainperf->get_tick();
-	
+
     m_main_time->idle_progress( ticks );
     m_main_wid->update_markers( ticks );
 
@@ -226,17 +226,17 @@ mainwnd::timer_callback(  )
 
     if ( m_adjust_ss->get_value() !=  m_mainperf->get_screenset() )
     {
-        m_main_wid->set_screenset(m_mainperf->get_screenset());  
-        m_adjust_ss->set_value( m_mainperf->get_screenset());	
+        m_main_wid->set_screenset(m_mainperf->get_screenset());
+        m_adjust_ss->set_value( m_mainperf->get_screenset());
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
-                    m_mainperf->get_screenset())); 
+                    m_mainperf->get_screenset()));
     }
 
     return true;
 }
 
 
-void 
+void
 mainwnd::open_performance_edit( void )
 {
     if (m_perf_edit->is_visible())
@@ -249,27 +249,27 @@ mainwnd::open_performance_edit( void )
 }
 
 
-void 
+void
 mainwnd::options_dialog( void )
 {
     if ( m_options != NULL )
         delete m_options;
-    m_options = new options( *this,  m_mainperf ); 
-    m_options->show_all(); 
+    m_options = new options( *this,  m_mainperf );
+    m_options->show_all();
 }
 
 
-void 
+void
 mainwnd::start_playing( void )
 {
-    m_mainperf->position_jack( false );  
+    m_mainperf->position_jack( false );
     m_mainperf->start( false );
     m_mainperf->start_jack( );
     is_pattern_playing = true;
 }
 
 
-void 
+void
 mainwnd::stop_playing( void )
 {
     m_mainperf->stop_jack();
@@ -331,12 +331,12 @@ void mainwnd::file_save_as()
 
     dialog.set_current_folder(last_used_dir);
     int result = dialog.run();
-    
+
     switch (result) {
         case Gtk::RESPONSE_OK:
         {
             bool result = false;
-            
+
             std::string fname = dialog.get_filename();
             Gtk::FileFilter* current_filter = dialog.get_filter();
 
@@ -352,7 +352,7 @@ void mainwnd::file_save_as()
             }
 
             if (Glib::file_test(fname, Glib::FILE_TEST_EXISTS)) {
-                Gtk::MessageDialog warning(*this, 
+                Gtk::MessageDialog warning(*this,
                         "File already exists!\n"
                         "Do you want to overwrite it?",
                         false,
@@ -398,7 +398,7 @@ void mainwnd::open_file(const Glib::ustring& fn)
 
     m_main_wid->reset();
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
-                m_mainperf->get_screenset())); 
+                m_mainperf->get_screenset()));
     m_adjust_bpm->set_value( m_mainperf->get_bpm());
 }
 
@@ -434,7 +434,7 @@ void mainwnd::choose_file()
     dialog.set_current_folder(last_used_dir);
 
     int result = dialog.run();
-    
+
     switch(result) {
         case(Gtk::RESPONSE_OK):
             open_file(dialog.get_filename());
@@ -526,7 +526,7 @@ mainwnd::toLower(basic_string<char>& s) {
 }
 
 
-void 
+void
 mainwnd::file_import_dialog( void )
 {
     Gtk::FileChooserDialog dialog("Import MIDI file",
@@ -546,7 +546,7 @@ mainwnd::file_import_dialog( void )
 
     dialog.set_current_folder(last_used_dir);
 
-    HButtonBox *btnbox = dialog.get_action_area(); 
+    HButtonBox *btnbox = dialog.get_action_area();
     HBox hbox( false, 2 );
 
     m_adjust_load_offset = manage( new Adjustment( 0, -(c_max_sets - 1),
@@ -557,7 +557,7 @@ mainwnd::file_import_dialog( void )
     hbox.pack_end(*m_spinbutton_load_offset, false, false );
     hbox.pack_end(*(manage( new Label("Screen Set Offset"))), false, false, 4);
 
-    btnbox->pack_start(hbox, false, false );  
+    btnbox->pack_start(hbox, false, false );
 
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
@@ -576,7 +576,7 @@ mainwnd::file_import_dialog( void )
                f.parse( m_mainperf, (int) m_adjust_load_offset->get_value() );
            }
            catch(...){
-               Gtk::MessageDialog errdialog(*this, 
+               Gtk::MessageDialog errdialog(*this,
                        "Error reading file.", false,
                        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                 errdialog.run();
@@ -585,10 +585,10 @@ mainwnd::file_import_dialog( void )
            global_filename = std::string(dialog.get_filename());
            update_window_title();
            m_modified = true;
-           
+
            m_main_wid->reset();
            m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
-                       m_mainperf->get_screenset() )); 
+                       m_mainperf->get_screenset() ));
            m_adjust_bpm->set_value( m_mainperf->get_bpm() );
 
            break;
@@ -625,7 +625,7 @@ mainwnd::on_delete_event(GdkEventAny *a_e)
 }
 
 
-void 
+void
 mainwnd::about_dialog( void )
 {
     Gtk::AboutDialog dialog;
@@ -637,7 +637,7 @@ mainwnd::about_dialog( void )
     dialog.set_copyright(
             "(C) 2002 - 2006 Rob C. Buse\n"
             "(C) 2008 Seq24team");
-    
+
     dialog.set_website(
             "http://www.filter24.org/seq24\n"
             "http://edge.launchpad.net/seq24");
@@ -657,14 +657,14 @@ mainwnd::about_dialog( void )
     dialog.set_documenters(list_documenters);
 
     dialog.show_all_children();
-    dialog.run(); 
+    dialog.run();
 }
 
 
-void 
+void
 mainwnd::adj_callback_ss( )
 {
-    m_mainperf->set_screenset( (int) m_adjust_ss->get_value()); 
+    m_mainperf->set_screenset( (int) m_adjust_ss->get_value());
     m_main_wid->set_screenset( m_mainperf->get_screenset());
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
@@ -672,10 +672,10 @@ mainwnd::adj_callback_ss( )
 }
 
 
-void 
+void
 mainwnd::adj_callback_bpm( )
 {
-    m_mainperf->set_bpm( (int) m_adjust_bpm->get_value()); 
+    m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
     m_modified = true;
 }
 
@@ -701,8 +701,8 @@ void
 mainwnd::edit_callback_notepad( )
 {
     string text = m_entry_notes->get_text();
-    m_mainperf->set_screen_set_notepad( m_mainperf->get_screenset(), 
-				        &text ); 
+    m_mainperf->set_screen_set_notepad( m_mainperf->get_screenset(),
+				        &text );
     m_modified = true;
 }
 
@@ -723,51 +723,51 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         if ( a_ev->type == GDK_KEY_PRESS ){
 
             if ( global_print_keys ){
-                printf( "key_press[%d]\n", a_ev->keyval ); 
+                printf( "key_press[%d]\n", a_ev->keyval );
             }
-            
+
             if ( a_ev->keyval == m_mainperf->m_key_bpm_dn ){
-                m_mainperf->set_bpm( m_mainperf->get_bpm() - 1 );  
+                m_mainperf->set_bpm( m_mainperf->get_bpm() - 1 );
                 m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
             }
-            
+
             if ( a_ev->keyval ==  m_mainperf->m_key_bpm_up ){
-                m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );   
+                m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
                 m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
             }
-            
+
             if ( a_ev->keyval == m_mainperf->m_key_replace )
             {
                 m_mainperf->set_sequence_control_status( c_status_replace );
             }
-            
+
             if (a_ev->keyval ==  m_mainperf->m_key_queue )
             {
                 m_mainperf->set_sequence_control_status( c_status_queue );
             }
-            
+
             if ( a_ev->keyval == m_mainperf->m_key_snapshot_1 ||
                  a_ev->keyval == m_mainperf->m_key_snapshot_2 )
             {
                 m_mainperf->set_sequence_control_status( c_status_snapshot );
             }
-            
+
             if ( a_ev->keyval == m_mainperf->m_key_screenset_dn ){
 
-                m_mainperf->set_screenset(  m_mainperf->get_screenset() - 1 );  
-                m_main_wid->set_screenset(  m_mainperf->get_screenset() );  
-                m_adjust_ss->set_value( m_mainperf->get_screenset()  );	
-                m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()  )); 
+                m_mainperf->set_screenset(  m_mainperf->get_screenset() - 1 );
+                m_main_wid->set_screenset(  m_mainperf->get_screenset() );
+                m_adjust_ss->set_value( m_mainperf->get_screenset()  );
+                m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()  ));
             }
-            
+
             if ( a_ev->keyval == m_mainperf->m_key_screenset_up ){
 
-                m_mainperf->set_screenset(  m_mainperf->get_screenset() + 1 );  
-                m_main_wid->set_screenset(  m_mainperf->get_screenset() );  
-                m_adjust_ss->set_value( m_mainperf->get_screenset()  );	
-                m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()  )); 
+                m_mainperf->set_screenset(  m_mainperf->get_screenset() + 1 );
+                m_main_wid->set_screenset(  m_mainperf->get_screenset() );
+                m_adjust_ss->set_value( m_mainperf->get_screenset()  );
+                m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()  ));
             }
-            
+
             if ( a_ev->keyval == m_mainperf->m_key_start )
             {
                 if (is_pattern_playing)
@@ -778,21 +778,21 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 
 
             if( m_mainperf->get_key_events()->count( a_ev->keyval) != 0 ){
-                
+
                 sequence_key(  (*m_mainperf->get_key_events())[a_ev->keyval] );
             }
         }
     }
-    
+
     return false;
 }
 
 
-void 
+void
 mainwnd::sequence_key( int a_seq )
 {
     int offset = m_mainperf->get_screenset() * c_mainwnd_rows * c_mainwnd_cols;
-	
+
     if ( m_mainperf->is_active( a_seq + offset ) ){
 		m_mainperf->sequence_playing_toggle( a_seq + offset );
     }
@@ -812,7 +812,7 @@ mainwnd::update_window_title()
             + string( " - [" )
             + Glib::filename_to_utf8(global_filename)
             + string( "]" );
-    
+
     set_title ( title.c_str());
 }
 
