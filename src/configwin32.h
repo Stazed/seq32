@@ -12,19 +12,19 @@
 #define PACKAGE_NAME "seq24"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "seq24 0.9.0"
+#define PACKAGE_STRING "seq24 0.9.1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "seq24"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.9.0"
+#define PACKAGE_VERSION "0.9.1"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.9.0"
+#define VERSION "0.9.1"
 
 /* gnu source */
 #define _GNU_SOURCE 1
