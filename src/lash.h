@@ -21,7 +21,12 @@
 #ifndef SEQ24_LASH
 #define SEQ24_LASH
 
+#ifdef __WIN32__
+#include "configwin32.h"
+#else
 #include "config.h"
+#endif
+
 #include "perform.h"
 
 #ifdef LASH_SUPPORT

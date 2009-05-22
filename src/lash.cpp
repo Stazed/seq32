@@ -21,7 +21,7 @@
 #include <string>
 #include <sigc++/slot.h>
 #include <gtkmm.h>
-#include "config.h"
+
 #include "lash.h"
 #include "midifile.h"
 

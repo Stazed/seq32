@@ -21,7 +21,9 @@
 #include "midibus.h"
 #include "event.h"
 #include <stdio.h>
-#include <time.h>
+#ifndef __WIN32__
+#  include <time.h>
+#endif
 #include <sched.h>
 
 //For keys
@@ -1002,15 +1004,24 @@ output_thread_func(void *a_pef )
 		
 		memset(schp, 0, sizeof(sched_param));
 		schp->sched_priority = 1;
-		
+
+#ifndef __WIN32__
+// Not in MinGW RCB
 		if (sched_setscheduler(0, SCHED_FIFO, schp) != 0) 	{
 			
 			printf("output_thread_func: couldnt sched_setscheduler(FIFO), you need to be root.\n");
 			pthread_exit(0);
 		}
+#endif 
     }
-	
+
+#ifdef __WIN32__
+    timeBeginPeriod(1);
+#endif
 	p->output_func();
+#ifdef __WIN32__
+    timeEndPeriod(1);
+#endif
 
 	return 0;
 }
@@ -1110,6 +1121,7 @@ perform::output_func(void)
 
 
 
+#ifndef __WIN32__
         /* begning time */
         struct timespec last;
         /* current time */
@@ -1121,6 +1133,19 @@ perform::output_func(void)
 
         /* difference between last and current */
         struct timespec delta;
+#else
+        /* begning time */
+        long last;
+        /* current time */
+        long current;
+
+        long stats_loop_start;
+        long stats_loop_finish;
+
+
+        /* difference between last and current */
+        long delta;
+#endif
 
         /* tick and tick fraction */
         double current_tick   = 0.0;
@@ -1164,13 +1189,20 @@ perform::output_func(void)
         }
 
 
-        int ppqn = m_master_bus.get_ppqn();
+        int ppqn = m_master_bus.get_ppqn();        
+#ifndef __WIN32__
         /* get start time position */
         clock_gettime(CLOCK_REALTIME, &last);
 
         if ( global_stats )
             stats_last_clock_us= (last.tv_sec * 1000000) + (last.tv_nsec / 1000);
+#else
+        /* get start time position */
+        last = timeGetTime();
 
+        if ( global_stats )
+            stats_last_clock_us= last * 1000;
+#endif
 
 
 
@@ -1187,15 +1219,27 @@ perform::output_func(void)
              **************************************/
 
             if ( global_stats ){
+#ifndef __WIN32__
                 clock_gettime(CLOCK_REALTIME, &stats_loop_start);
+#else
+                stats_loop_start = timeGetTime();
+#endif
             }
 
 
             /* delta time */
+#ifndef __WIN32__
             clock_gettime(CLOCK_REALTIME, &current);
             delta.tv_sec  =  (current.tv_sec  - last.tv_sec  );
             delta.tv_nsec =  (current.tv_nsec - last.tv_nsec );
             long delta_us = (delta.tv_sec * 1000000) + (delta.tv_nsec / 1000);
+#else
+            current = timeGetTime();
+            //printf( "current [0x%x]\n", current );
+            delta = current - last;
+            long delta_us = delta * 1000;
+            //printf( "  delta [0x%x]\n", delta );
+#endif
 
 
             /* delta time to ticks */
@@ -1206,6 +1250,7 @@ perform::output_func(void)
             double delta_tick   =  (double) (bpm * ppqn * (delta_us/60000000.0f) ); 
 
             //printf ( "delta_tick[%ld.%03ld]\n", delta_tick, delta_tick_f  );
+            //printf ( "    delta_tick[%lf]\n", delta_tick  );
 #ifdef JACK_SUPPORT
 
             // no init until we get a good lock
@@ -1223,7 +1268,7 @@ perform::output_func(void)
                     m_jack_frame_last = m_jack_frame_current;
 
 
-                    printf ("[Start Playback]\n" );
+                    //printf ("[Start Playback]\n" );
                     dumping = true;
                     m_jack_tick =
                         m_jack_pos.frame *
@@ -1401,7 +1446,11 @@ perform::output_func(void)
                         /* was there a tick ? */
                         if ( stats_total_tick % (c_ppqn / 24) == 0 ){
 
+#ifndef __WIN32__
                             long current_us = (current.tv_sec * 1000000) + (current.tv_nsec / 1000);
+#else
+                            long current_us = current * 1000;
+#endif
                             stats_clock_width_us = current_us - stats_last_clock_us;
                             stats_last_clock_us = current_us;
 
@@ -1425,11 +1474,18 @@ perform::output_func(void)
             /* set last */
             last = current;
 
+#ifndef __WIN32__
             clock_gettime(CLOCK_REALTIME, &current);
             delta.tv_sec  =  (current.tv_sec  - last.tv_sec  );
             delta.tv_nsec =  (current.tv_nsec - last.tv_nsec );
             long elapsed_us = (delta.tv_sec * 1000000) + (delta.tv_nsec / 1000);
             //printf( "elapsed_us[%ld]\n", elapsed_us );
+#else
+            current = timeGetTime();
+            delta = current - last;
+            long elapsed_us = delta * 1000;
+            //printf( "        elapsed_us[%ld]\n", elapsed_us );
+#endif
 
             /* now, we want to trigger every c_thread_trigger_width_ms,
                and it took us delta_us to play() */ 
@@ -1450,7 +1506,7 @@ perform::output_func(void)
                 delta_us = (long)next_clock_delta_us;
             } 
 
-
+#ifndef __WIN32__
             if ( delta_us > 0.0 ){
 
                 delta.tv_sec =  (delta_us / 1000000);
@@ -1459,7 +1515,17 @@ perform::output_func(void)
                 //printf("sleeping() ");
                 nanosleep( &delta, NULL );
 
+            }
+#else
+            if ( delta_us > 0 ){
+
+                delta =  (delta_us / 1000);
+
+                //printf("           sleeping() [0x%x]\n", delta);
+                Sleep(delta);
+
             } 
+#endif
 
             else {
 
@@ -1467,15 +1533,24 @@ perform::output_func(void)
                     printf ("underrun\n" );
             }
 
-            if ( global_stats ){	  
+            if ( global_stats ){
+#ifndef __WIN32__	  
                 clock_gettime(CLOCK_REALTIME, &stats_loop_finish);
+#else
+                stats_loop_finish = timeGetTime();
+#endif
             }
 
             if ( global_stats ){
 
+#ifndef __WIN32__
                 delta.tv_sec  =  (stats_loop_finish.tv_sec  - stats_loop_start.tv_sec  );
                 delta.tv_nsec =  (stats_loop_finish.tv_nsec - stats_loop_start.tv_nsec );
                 long delta_us = (delta.tv_sec * 1000000) + (delta.tv_nsec / 1000);
+#else
+                delta = stats_loop_finish - stats_loop_start;
+                long delta_us = delta * 1000;
+#endif
 
                 int index = delta_us / 100;
                 if ( index >= 100  ) index = 99;
@@ -1560,16 +1635,25 @@ input_thread_func(void *a_pef )
         
         memset(schp, 0, sizeof(sched_param));
         schp->sched_priority = 1;
-        
+
+#ifndef __WIN32__
+// MinGW RCB        
         if (sched_setscheduler(0, SCHED_FIFO, schp) != 0) 	{
             
             printf("input_thread_func: couldnt sched_setscheduler(FIFO), you need to be root.\n");
             pthread_exit(0);
         }
+#endif
     }
-    
-    
+#ifdef __WIN32__
+    timeBeginPeriod(1);
+#endif
+
     p->input_func();
+
+#ifdef __WIN32__
+    timeEndPeriod(1);
+#endif
     
     return 0;
 }

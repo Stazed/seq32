@@ -22,9 +22,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "config.h"
+#ifdef __WIN32__
+#    include "configwin32.h"
+#else
+#    include "config.h"
+#endif
+
 #include "font.h"
-#include "lash.h"
+#ifdef LASH_SUPPORT
+#    include "lash.h"
+#endif
 #include "mainwnd.h"
 #include "midifile.h"
 #include "optionsfile.h"
@@ -74,7 +81,18 @@ user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 
 font *p_font_renderer;
+
+#ifdef LASH_SUPPORT
 lash *lash_driver = NULL;
+#endif
+
+#ifdef __WIN32__
+#   define HOME "HOMEPATH"
+#   define SLASH "\\"
+#else
+#   define HOME "HOME"
+#   define SLASH "/"
+#endif
 
 
 int 
@@ -92,8 +110,10 @@ main (int argc, char *argv[])
             global_user_instrument_definitions[i].controllers_active[j] = false;
     }
     
-    /* init the lash driver (strips lash specific cmdline arguments */
-    lash_driver = new lash(&argc, &argv);
+	/* init the lash driver (strips lash specific cmdline arguments */
+#ifdef LASH_SUPPORT
+	lash_driver = new lash(&argc, &argv);
+#endif
 
     /* the main performance object */
     perform p; 
@@ -105,11 +125,11 @@ main (int argc, char *argv[])
     p_font_renderer = new font();
 
 
-    if ( getenv( "HOME" ) != NULL ){
+    if ( getenv( HOME ) != NULL ){
         
-        Glib::ustring home( getenv( "HOME" ));
+        Glib::ustring home( getenv( HOME ));
         last_used_dir = home;
-        Glib::ustring total_file = home + "/" + config_filename;
+        Glib::ustring total_file = home + SLASH + config_filename;
         printf( "Reading [%s]\n", total_file.c_str());
 
         optionsfile options( total_file );
@@ -118,7 +138,7 @@ main (int argc, char *argv[])
             printf( "Error Reading [%s]\n", total_file.c_str());  
         }
 
-        total_file = home + "/" + user_filename;
+        total_file = home + SLASH + user_filename;
         printf( "Reading [%s]\n", total_file.c_str());
 
         userfile user( total_file );
@@ -129,14 +149,14 @@ main (int argc, char *argv[])
     
     } else {
         
-        printf( "Error calling getenv( \"HOME\" )\n" );  
+        printf( "Error calling getenv( \"%s\" )\n", HOME );  
     }
 
     
 
     /* parse parameters */
     int c;
-    
+
 
     while (1){
 	
@@ -252,15 +272,17 @@ main (int argc, char *argv[])
 
     mainwnd seq24_window( &p );
 
-    lash_driver->start( &p );
+#ifdef LASH_SUPPORT
+	lash_driver->start( &p );
+#endif
     kit.run(seq24_window);
     
     p.deinit_jack();
     
-    if ( getenv( "HOME" ) != NULL ){
+    if ( getenv( HOME ) != NULL ){
         
-        string home( getenv( "HOME" ));
-        Glib::ustring total_file = home + "/" + config_filename;
+        string home( getenv( HOME ));
+        Glib::ustring total_file = home + SLASH + config_filename;
         printf( "Writing [%s]\n", total_file.c_str());
 
         optionsfile options( total_file );
@@ -271,10 +293,12 @@ main (int argc, char *argv[])
             
     } else {
         
-        printf( "Error calling getenv( \"HOME\" )\n" );  
+        printf( "Error calling getenv( \"%s\" )\n", HOME );  
     }
 
-    delete lash_driver;
+#ifdef LASH_SUPPORT
+	delete lash_driver;
+#endif
 
     return 0;
 }

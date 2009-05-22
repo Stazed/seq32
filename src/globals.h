@@ -17,15 +17,20 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
-#include "config.h"
-
 
 #ifndef SEQ24_GLOBALS
 #define SEQ24_GLOBALS
 
+#ifdef __WIN32__
+#    include "configwin32.h"
+#else
+#    include "config.h"
+#endif
+
 #include <string>
 #include <gtkmm/main.h>
 #include <gtkmm/drawingarea.h>
+
 
 using namespace std;
 

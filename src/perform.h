@@ -28,7 +28,9 @@ class perform;
 #include "midibus.h"
 #include "midifile.h"
 #include "sequence.h"
-#include <unistd.h>
+#ifndef __WIN32__
+#   include <unistd.h>
+#endif
 #include <pthread.h>
 
 

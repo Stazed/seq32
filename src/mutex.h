@@ -17,12 +17,13 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
-#include "globals.h"
-#include "config.h"
-#include <pthread.h>
 
 #ifndef SEQ24_MUTEX
 #define SEQ24_MUTEX
+
+#include "globals.h"
+
+#include <pthread.h>
 
 class mutex {
     

@@ -18,26 +18,17 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_MIDIBUS
-#define SEQ24_MIDIBUS
+#ifndef SEQ24_MIDIBUS_PORTMIDI
+#define SEQ24_MIDIBUS_PORTMIDI
 
-/* forward declarations*/
-class mastermidibus;
 class midibus;
+class mastermidibus;
 
 #ifdef __WIN32__
-#   include "configwin32.h"
-#   include "midibus_portmidi.h"
-#else
-#include "config.h"
-
-#if HAVE_LIBASOUND
-#    include <alsa/asoundlib.h>
-#    include <alsa/seq_midi_event.h>
-#endif
 
 #include <string>
 
+#include "portmidi.h"
 #include "event.h"
 #include "sequence.h"
 #include "mutex.h"
@@ -55,33 +46,18 @@ enum clock_e
 
 };
 
-
 class midibus
 {
     
  private:
 
-    int m_id;
+    char m_id;
+    char m_pm_num;
 
     clock_e m_clock_type;
     bool m_inputing;
 
     static int m_clock_mod;
-
-    /* sequencer client handle */
-#if HAVE_LIBASOUND
-    snd_seq_t *m_seq;
-
-    /* address of client */
-    int m_dest_addr_client;
-    int m_dest_addr_port;
-
-    int m_local_addr_client;
-    int m_local_addr_port;
-#endif
-
-    /* id of queue */
-    int m_queue;
 
     /* name of bus */
     string m_name;
@@ -89,47 +65,26 @@ class midibus
     /* last tick */
     long m_lasttick;
 
-
     /* locking */
     mutex m_mutex;
 
     /* mutex */
     void lock();
     void unlock();
-
+    
+    PortMidiStream* m_pms;
    
 
  public:
+    midibus( char a_id,
+             char a_pm_num,
+    	     const char *a_client_name );
 
-#if HAVE_LIBASOUND	     
-    /* constructor, client#, port#, sequencer, 
-       name of client, name of port */
-    midibus( int a_localclient,
-	     int a_destclient, 
-	     int a_destport, 
-	     snd_seq_t  *a_seq, 
-	     const char *a_client_name, 
-	     const char *a_port_name,
-	     int a_id,
-         int a_queue );
-
-    midibus( int a_localclient,
-	     snd_seq_t  *a_seq, 
-	     int a_id,
-         int a_queue );
-#endif 
-
-#ifdef __WIN32__
-    midibus( char a_id, int a_queue );
-#endif
 
     ~midibus();
 
     bool init_out(  );
     bool init_in(  );
-    bool deinit_in(  );
-    bool init_out_sub(  );
-    bool init_in_sub(  );
  
     void print();
 
@@ -140,7 +95,8 @@ class midibus
     void play( event *a_e24, unsigned char a_channel );
     void sysex( event *a_e24 );
 
-
+    int poll_for_midi( );
+    
     /* clock */
     void start();
     void stop();
@@ -225,10 +181,6 @@ class mastermidibus
 
     void init();
 
-#if HAVE_LIBASOUND	         
-    snd_seq_t* get_alsa_seq( ) { return m_alsa_seq; };
-#endif 
-
     int get_num_out_buses();
     int get_num_in_buses();
 
@@ -259,8 +211,6 @@ class mastermidibus
     sequence* get_sequence( ) { return m_seq; }
     void sysex( event *a_event );
     
-    void port_start( int a_client, int a_port );
-    void port_exit( int a_client, int a_port );
     
     void play( unsigned char a_bus, event *a_e24, unsigned char a_channel );
     
