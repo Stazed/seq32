@@ -274,6 +274,7 @@ seqedit::seqedit( sequence *a_seq,
     /* sets scroll bar to the middle */
     //gfloat middle = m_vscroll->get_adjustment()->get_upper() / 3;
     //m_vscroll->get_adjustment()->set_value(middle);
+    m_seqroll_wid->set_ignore_redraw(true);
 
     set_zoom( m_zoom );
     set_snap( m_snap );
@@ -291,8 +292,8 @@ seqedit::seqedit( sequence *a_seq,
 
     set_scale( m_scale );
     set_key( m_key );
-    set_key( m_key );
 
+    m_seqroll_wid->set_ignore_redraw(false);
     add_events(Gdk::SCROLL_MASK);
 }
 
@@ -1079,7 +1080,8 @@ seqedit::popup_event_menu( void )
     bool program_change = false;
     bool channel_pressure = false;
     bool pitch_wheel = false;
-    bool ccs[128]; memset( ccs, false, sizeof(bool) * 128 );
+    bool ccs[128];
+    memset( ccs, false, sizeof(bool) * 128 );
 
     int midi_bus = m_seq->get_midi_bus();
     int midi_ch = m_seq->get_midi_channel();
@@ -1486,7 +1488,7 @@ seqedit::timeout( void )
     
     if (m_seq->is_dirty_edit() ){
 
-	    m_seqroll_wid->redraw();
+	    m_seqroll_wid->redraw_events();
 	    m_seqevent_wid->redraw();
 	    m_seqdata_wid->redraw();
     }
@@ -1573,6 +1575,4 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
     else
         return Gtk::Window::on_key_press_event(a_ev);
 }
-
-
 

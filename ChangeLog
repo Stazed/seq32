@@ -7,6 +7,8 @@
 	options.cpp, lash.*, seauence.h, globals.h, configwin32.h:
 	Support for (lost) Win32 platform support added (reworked
 	patch from Kevin Meinert, Rob Buse).
+	* src/seqedit.cpp, src/seqroll.*: Optimized redraw for sequencer
+	roll background (from Win32 version, Rob Buse).
 
 2009-03-14 Stéphane Letz <>
 	* src/iperform.cpp: Adaptations for jack2 applied.

@@ -65,6 +65,7 @@ class seqroll : public Gtk::DrawingArea
     Gdk::Color    m_black, m_white, m_grey, m_dk_grey, m_red;
 
     Glib::RefPtr<Gdk::Pixmap> m_pixmap;
+    Glib::RefPtr<Gdk::Pixmap> m_background;
  
     rect         m_old;
     rect         m_selected;
@@ -125,6 +126,7 @@ class seqroll : public Gtk::DrawingArea
     int m_background_sequence;
     bool m_drawing_background_seq;
 
+    bool m_ignore_redraw;
     
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);
@@ -169,20 +171,22 @@ class seqroll : public Gtk::DrawingArea
     void force_draw( void );
 
 
-
  public:
 
     void reset();
     void redraw();
+    void redraw_events();
     void set_zoom( int a_zoom );
     void set_snap( int a_snap );
 	void set_note_length( int a_note_length );
+    void set_ignore_redraw(bool a_ignore);
     
     void set_scale( int a_scale );
     void set_key( int a_key );
     
     void update_sizes();
-    void draw_background();
+    void update_background();
+    void draw_background_on_pixmap();
     void draw_events_on_pixmap();
     void draw_selection_on_window();
     void update_pixmap();
@@ -204,7 +208,7 @@ class seqroll : public Gtk::DrawingArea
              Adjustment *a_hadjust,
              Adjustment *a_vadjust );
 
-	void set_data_type( unsigned char a_status, unsigned char a_control  );
+    void set_data_type( unsigned char a_status, unsigned char a_control  );
  
     ~seqroll( );
 };
