@@ -107,9 +107,13 @@ class perform
     long m_starting_tick;
     
     long m_tick;
+    bool m_usemidiclock;
+    bool m_midiclockrunning; // stopped or started
+    int  m_midiclocktick;
+    int  m_midiclockpos;
+
    
     void set_running( bool a_running );
-    bool is_running();
 
     void set_playback_mode( bool a_playback_mode );
 
@@ -146,6 +150,7 @@ class perform
     void inner_stop();
 
  public:
+    bool is_running();
 
     unsigned int m_key_bpm_up;
     unsigned int m_key_bpm_dn;
@@ -220,6 +225,7 @@ class perform
     void position_jack( bool a_state );
 
     void off_sequences( void );
+    void all_notes_off( void );
 
     void set_active(int a_sequence, bool a_active);
     void set_was_active( int a_sequence );

@@ -1,3 +1,6 @@
+2009-05-27 Kevin Meinert <kevin@subatomicglue.com>
+	* src/perform.*: Support for MIDI clock synchronization added.
+
 2009-05-22 Sebastien Alaiw <ace17@free.fr>
 	* src/mainwnd.cpp: Fixed file save as crash.
 	* src/midifile.cpp: Fixed MIDI sysex event reading.

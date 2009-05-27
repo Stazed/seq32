@@ -46,6 +46,10 @@ perform::perform()
     m_inputing = true;
     m_outputing = true;
     m_tick = 0;
+    m_midiclockrunning = false;
+    m_usemidiclock = false;
+    m_midiclocktick = 0;
+    m_midiclockpos = -1;
 
     thread_trigger_width_ms = c_thread_trigger_width_ms;
 
@@ -893,6 +897,8 @@ perform::inner_stop( )
     set_running( false );
     //off_sequences();
     reset_sequences(  );
+    
+    m_usemidiclock = false;
 }
 
 
@@ -912,6 +918,20 @@ perform::off_sequences( void )
 
 
 
+void 
+perform::all_notes_off( void )
+{
+    for (int i=0; i< c_max_sequence; i++ ){
+		
+		if ( is_active(i) == true ){
+			assert( m_seqs[i] );
+
+			m_seqs[i]->off_playing_notes( );
+		} 
+    }
+    /* flush the bus */
+    m_master_bus.flush();
+}
 
 void 
 perform::reset_sequences( void )
@@ -1249,7 +1269,21 @@ perform::output_func(void)
             /* get delta ticks, delta_ticks_f is in 1000th of a tick */
             double delta_tick   =  (double) (bpm * ppqn * (delta_us/60000000.0f) ); 
 
-            //printf ( "delta_tick[%ld.%03ld]\n", delta_tick, delta_tick_f  );
+            if ( m_usemidiclock)
+            {
+               delta_tick = m_midiclocktick;
+               m_midiclocktick = 0;
+            }
+            if ( 0 <= m_midiclockpos)
+            {
+                delta_tick = 0;
+                clock_tick     = m_midiclockpos;
+                current_tick   = m_midiclockpos;
+                total_tick     = m_midiclockpos;
+                m_midiclockpos = -1;
+                //init_clock = true;
+            }
+
             //printf ( "    delta_tick[%lf]\n", delta_tick  );
 #ifdef JACK_SUPPORT
 
@@ -1737,6 +1771,45 @@ perform::input_func( void ){
             do {
                 
                 if ( m_master_bus.get_midi_event( &ev ) ){
+                    
+                    // Obey MidiTimeClock:
+                    if (ev.get_status() == EVENT_MIDI_START)
+                    {
+                         stop();
+                         start( false );
+                         m_midiclockrunning = true;
+                         m_usemidiclock = true;
+                         m_midiclocktick = 0;
+                         m_midiclockpos = 0;
+                    }
+                    // not tested (todo: test it!)
+                    else if (ev.get_status() == EVENT_MIDI_CONTINUE)
+                    {
+                         m_midiclockrunning = true;
+                         start( false );
+                         //m_usemidiclock = true;
+                    }
+                    else if (ev.get_status() == EVENT_MIDI_STOP)
+                    {
+                         // do nothing, just let the system pause
+                         // since we're not getting ticks after the stop, the song wont advance
+                         // when start is recieved, we'll reset the position, or
+                         // when continue is recieved, we wont
+                         m_midiclockrunning = false;
+                         all_notes_off();
+                    }
+                    else if (ev.get_status() == EVENT_MIDI_CLOCK)
+                    {
+                         if (m_midiclockrunning)
+                            m_midiclocktick += 8;
+                    }
+                    // not tested (todo: test it!)
+                    else if (ev.get_status() == EVENT_MIDI_SONG_POS)
+                    {
+                         unsigned char a, b;
+                         ev.get_data( &a, &b );
+                         m_midiclockpos = ((int)a << 7) && (int)b;
+                    }
                     
                     /* filter system wide messages */
                     if ( ev.get_status() <= EVENT_SYSEX ){  
