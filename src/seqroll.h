@@ -53,12 +53,43 @@ class rect
     int x, y, height, width;
 };
 
+class seqroll;
+struct FruitySeqRollInput
+{
+    FruitySeqRollInput() : m_adding( false ), m_canadd( true ), m_erase_painting( false )
+    {}
+    bool on_button_press_event(GdkEventButton* a_ev, seqroll& ths);
+    bool on_button_release_event(GdkEventButton* a_ev, seqroll& ths);
+    bool on_motion_notify_event(GdkEventMotion* a_ev, seqroll& ths);
+    void updateMousePtr(seqroll& ths);
+    bool m_adding;
+    bool m_canadd;
+    bool m_erase_painting;
+    long m_drag_paste_start_pos[2];
+};
+struct Seq24SeqRollInput
+{
+    Seq24SeqRollInput() : m_adding( false )
+    {}
+    bool on_button_press_event(GdkEventButton* a_ev, seqroll& ths);
+    bool on_button_release_event(GdkEventButton* a_ev, seqroll& ths);
+    bool on_motion_notify_event(GdkEventMotion* a_ev, seqroll& ths);
+    void set_adding( bool a_adding, seqroll& ths );
+    bool m_adding;
+};
+
 
 /* piano roll */
 class seqroll : public Gtk::DrawingArea
 {
 
  private: 
+    friend struct FruitySeqRollInput;
+    FruitySeqRollInput m_fruity_interaction;
+
+    friend struct Seq24SeqRollInput;
+    Seq24SeqRollInput m_seq24_interaction;
+
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;
@@ -98,9 +129,11 @@ class seqroll : public Gtk::DrawingArea
     bool m_moving;
     bool m_moving_init;
     bool m_growing;
-    bool m_adding;
     bool m_painting;
     bool m_paste;
+    bool m_is_drag_pasting;
+    bool m_is_drag_pasting_start;
+    bool m_justselected_one;
 
     /* where the dragging started */
     int m_drop_x; 
@@ -193,7 +226,6 @@ class seqroll : public Gtk::DrawingArea
     int idle_redraw();
 
     void draw_progress_on_window();
-    void set_adding( bool a_adding );
 
     void start_paste( );
     

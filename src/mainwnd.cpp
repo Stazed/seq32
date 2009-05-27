@@ -712,10 +712,10 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
     // control and modifier key combinations matching
     // menu items have first priority
-    if (Gtk::Window::on_key_press_event(a_ev))
-        return true;
+    /*if (*/Gtk::Window::on_key_press_event(a_ev);
+        //return true;  // on win32, it'd always return true here (i.e. for SPACE bar)... ?
 
-    else if ( m_entry_notes->has_focus()) {
+    /*else */if ( m_entry_notes->has_focus()) {
         m_entry_notes->event( (GdkEvent*) a_ev );
         return false;
     }

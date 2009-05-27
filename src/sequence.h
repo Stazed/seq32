@@ -54,7 +54,6 @@ public:
     long m_offset;
     
     trigger (){
-        
         m_tick_start = 0;
         m_tick_end = 0;
         m_offset = 0;
@@ -175,6 +174,9 @@ class sequence
     void split_trigger( trigger &trig, long a_split_tick);
     void adjust_trigger_offsets_to_legnth( long a_new_len );
     long adjust_offset( long a_offset );
+    void remove( list<event>::iterator i );
+    void remove( event* e );
+
 
   public:
 
@@ -299,6 +301,11 @@ class sequence
     bool select_trigger(long a_tick);
     bool unselect_triggers (void);
 
+    bool intersectTriggers( long position, long& start, long& end );
+    bool intersectNotes( long position, long position_note, long& start, long& end, long& note );
+    bool intersectEvents( long posstart, long posend, long status, long& start );
+
+
     void del_selected_trigger( void );
     void cut_selected_trigger( void );
     void copy_selected_trigger( void );
@@ -328,7 +335,10 @@ class sequence
         e_select,
         e_select_one,
         e_is_selected,
-        e_would_select
+        e_would_select,
+        e_deselect, // deselect under cursor
+        e_toggle_selection, // sel/deselect under cursor
+        e_remove_one // remove one note under cursor
     };
     
     /* select note events in range, returns number

@@ -40,7 +40,7 @@ options::options (Gtk::Window & parent, perform * a_p):
     get_action_area ()->set_border_width (2);
     hbox->set_border_width (6);
 
-    m_button_ok = manage (new Button (" Ok "));
+    m_button_ok = manage (new Button ("Ok"));
     get_action_area ()->pack_end (*m_button_ok, false, false);
     m_button_ok->signal_clicked ().connect (mem_fun (*this, &options::hide));
 
@@ -113,13 +113,37 @@ options::options (Gtk::Window & parent, perform * a_p):
     HBox *hbox2 = manage (new HBox ());
     
     //m_spinbutton_bpm->set_editable( false );
-    hbox2->pack_start(*(manage( new Label( " Clock Start Modulo (1/16 Notes) " ))), false, false, 4);
+    hbox2->pack_start(*(manage( new Label( "Clock Start Modulo (1/16 Notes)"))), false, false, 4);
     hbox2->pack_start(*clock_mod_spin, false, false );
 
     vbox->pack_start( *hbox2, false, false );
     
     clock_mod_adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::clock_mod_callback),clock_mod_adj));
 
+    // add controls for input method
+    {
+        Adjustment *adj = new Adjustment( global_interactionmethod, 0, e_number_of_interactions-1, 1 );
+        SpinButton *spin = new SpinButton( *adj );
+
+        HBox *hbox2 = manage (new HBox ());
+        HBox *hbox3 = manage (new HBox ());
+
+        //m_spinbutton_bpm->set_editable( false );
+        interaction_method_label = new Label("Input Method");
+        hbox2->pack_start(*(manage( interaction_method_label )), false, false, 4);
+        hbox2->pack_start(*spin, false, false );
+
+        vbox->pack_start( *hbox2, false, false );
+
+        interaction_method_desc_label = new Label(" ----- ");
+        hbox3->pack_start(*(manage( interaction_method_desc_label )), false, false, 4);
+        vbox->pack_start(*hbox3, false, false );
+
+        adj->signal_value_changed().connect( SigC::bind(mem_fun(*this,&options::interaction_method_callback),adj));
+
+        // force it to refresh.
+        interaction_method_callback( adj );
+    }
 
     // Input Buses
     buses = m_perf->get_master_midi_bus ()->get_num_in_buses ();
@@ -253,6 +277,21 @@ options::clock_mod_callback( Adjustment *adj )
     midibus::set_clock_mod((int)adj->get_value());
 }
  
+void
+options::interaction_method_callback( Adjustment *adj )
+{
+    global_interactionmethod = (interaction_method_e)(int)adj->get_value();
+    std::string text = "Interaction Method (";
+    text += c_interaction_method_names[(int)adj->get_value()];
+    text += "): ";
+    interaction_method_label->set_text( text.c_str() );
+    
+    text = "     (";
+    text += c_interaction_method_descs[(int)adj->get_value()];
+    text += ")";
+    interaction_method_desc_label->set_text( text.c_str() );
+}
+
 
     void
 options::input_callback (int a_bus, Button * i_button)

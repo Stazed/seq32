@@ -132,8 +132,11 @@ const int c_normal = 1;
 const int c_paste  = 2;
 
 /* redraw when recording ms */
+#ifdef __WIN32__
+const int c_redraw_ms = 20;
+#else
 const int c_redraw_ms = 40;
-
+#endif
 
 /* consts for perform editor */
 const int c_names_x = 6 * 24;
@@ -185,7 +188,7 @@ enum c_music_scales {
 
 
 const bool c_scales_policy[c_scale_size][12] =
-  {
+{
     /* off = chromatic */
     { true,true,true,true,true,true,true,true,true,true,true,true},
 
@@ -195,10 +198,10 @@ const bool c_scales_policy[c_scale_size][12] =
     /* minor */
     { true,false,true,true,false,true,false,true,true,false,true,false},
 
-  };
+};
 
 const int c_scales_transpose_up[c_scale_size][12] =
-  {
+{
     /* off = chromatic */
     { 1,1,1,1,1,1,1,1,1,1,1,1},
     /* major */
@@ -206,13 +209,13 @@ const int c_scales_transpose_up[c_scale_size][12] =
     /* minor */
     { 2,0,1,2,0,2,0,1,2,0,2,0},
 
-  };
+};
 
 
 
 
 const int c_scales_transpose_dn[c_scale_size][12] =
-  {
+{
     /* off = chromatic */
     { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
     /* major */
@@ -220,21 +223,21 @@ const int c_scales_transpose_dn[c_scale_size][12] =
     /* minor */
     { -2,0,-2,-1,0,-2,0,-2,-1,0,-2,0},
 
-  };
+};
 
 const int c_scales_symbol[c_scale_size][12] =
-  {
+{
     /* off = chromatic */
     { 32,32,32,32,32,32,32,32,32,32,32,32},
 
     /* major */
     { 32,32,32,32,32,32,32,32,32,32,32,32},
-               
+
     /* minor */
     { 32,32,32,32,32,32,32,32,129,128,129,128},
-                 
-  };             
-                 
+
+};             
+
 // up 128        
 // down 129
 
@@ -301,5 +304,27 @@ enum mouse_action_e
     e_action_grow
 };
 
+enum interaction_method_e
+{
+    e_seq24_interaction,
+    e_fruity_interaction,
+    e_number_of_interactions // keep this one last...
+};
+
+const char* const c_interaction_method_names[] =
+{
+    "seq24",
+    "fruity",
+    NULL
+};
+
+const char* const c_interaction_method_descs[] =
+{
+    "original seq24 method",
+    "similar to a certain fruity sequencer we like",
+    NULL
+};
+
+extern interaction_method_e global_interactionmethod;
 
 #endif

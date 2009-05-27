@@ -48,6 +48,7 @@ option long_options[] = {
     {"stats",     0, 0, 'S' },
     {"priority", 0, 0, 'p' },
     {"ignore",required_argument, 0, 'i'},
+    {"interaction_method",required_argument, 0, 'x'},
     {"jack_transport",0, 0, 'j'},
     {"jack_master",0, 0, 'J'},
     {"jack_master_cond",0,0,'C'},
@@ -71,6 +72,7 @@ Glib::ustring last_used_dir ="/";
 std::string config_filename = ".seq24rc";
 std::string user_filename = ".seq24usr";
 bool global_print_keys = false;
+interaction_method_e global_interactionmethod = e_seq24_interaction;
 
 bool global_with_jack_transport = false;
 bool global_with_jack_master = false;
@@ -183,6 +185,7 @@ main (int argc, char *argv[])
                 printf( "    --priority : runs higher priority with FIFO scheduler (must be root)\n" );
                 printf( "    --pass_sysex : passes any incoming sysex messages to all outputs \n" );
                 printf( "    --show_keys : prints pressed key value\n" );
+                printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
                 printf( "    --jack_transport : seq24 will sync to jack transport\n" );
                 printf( "    --jack_master : seq24 will try to be jack master\n" );
                 printf( "    --jack_master_cond : jack master will fail if there is already a master\n" );
@@ -249,6 +252,10 @@ main (int argc, char *argv[])
                 global_device_ignore_num = atoi( optarg );
                 break;
                 
+            case 'x':
+                global_interactionmethod = (interaction_method_e)atoi( optarg );
+                break;
+
                 
             default:
                 break;

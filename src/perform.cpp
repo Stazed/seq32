@@ -1782,7 +1782,7 @@ perform::input_func( void ){
                          m_midiclocktick = 0;
                          m_midiclockpos = 0;
                     }
-                    // not tested (todo: test it!)
+                    // midi continue: start from current pos.
                     else if (ev.get_status() == EVENT_MIDI_CONTINUE)
                     {
                          m_midiclockrunning = true;

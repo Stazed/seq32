@@ -157,7 +157,8 @@ bool midibus::init_out( )
 			      m_dest_addr_client, 
 			      m_dest_addr_port );
     if ( ret < 0 ){
-        printf( "snd_seq_connect_to(%d:%d) error\n", m_dest_addr_client, m_dest_addr_port);
+        printf( "snd_seq_connect_to(%d:%d) error\n",
+                m_dest_addr_client, m_dest_addr_port);
         return false;
     }
 #endif
@@ -232,7 +233,8 @@ bool midibus::init_in( )
     ret = snd_seq_subscribe_port(m_seq, subs);
 
     if ( ret < 0 ){
-        printf( "snd_seq_connect_from(%d:%d) error\n", m_dest_addr_client, m_dest_addr_port);
+        printf( "snd_seq_connect_from(%d:%d) error\n",
+                m_dest_addr_client, m_dest_addr_port);
         return false;
     }
 #endif

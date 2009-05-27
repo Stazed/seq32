@@ -45,12 +45,41 @@
 
 using namespace Gtk;
 
+class perfroll;
+struct FruityPerfInput
+{
+    FruityPerfInput() : m_adding_pressed( false ), m_current_x( 0 ),
+                         m_current_y( 0 )
+    {}
+    bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths);
+    bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths);
+    bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths);
+    void updateMousePtr(perfroll& ths);
+    bool m_adding_pressed;
+    long m_current_x, m_current_y;
+};
+struct Seq24PerfInput
+{
+    Seq24PerfInput() : m_adding( false ), m_adding_pressed( false ) {}
+    bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths);
+    bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths);
+    bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths);
+    void set_adding( bool a_adding, perfroll& ths );
+    bool m_adding;
+    bool m_adding_pressed;
+};
 
 /* performance roll */
 class perfroll : public Gtk::DrawingArea
 {
 
  private: 
+    friend struct FruityPerfInput;
+    FruityPerfInput m_fruity_interaction;
+
+    friend struct Seq24PerfInput;
+    Seq24PerfInput m_seq24_interaction;
+
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
@@ -86,9 +115,6 @@ class perfroll : public Gtk::DrawingArea
     Adjustment   *m_vadjust;
     Adjustment   *m_hadjust;
 
-    bool m_adding;
-    bool m_adding_pressed;
-    bool m_adding_pressed_state;
     bool m_moving;
     bool m_growing;
     bool m_grow_direction;
@@ -113,6 +139,10 @@ class perfroll : public Gtk::DrawingArea
     void snap_x( int *a_x );
 
    
+    void start_playing( void );
+    void stop_playing( void );
+
+   
 
     void draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_sequence );
     void draw_background_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_sequence );
@@ -135,8 +165,6 @@ class perfroll : public Gtk::DrawingArea
     void increment_size();
 
     void draw_progress();
-
-    void set_adding( bool a_adding );
 
     void redraw_dirty_sequences( void );
 

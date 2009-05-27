@@ -20,7 +20,6 @@
 
 #include <iostream>
 
-//#include "globals.h"
 #include "optionsfile.h"
 
 extern Glib::ustring last_used_dir;
@@ -30,9 +29,8 @@ optionsfile::optionsfile(const Glib::ustring& a_name) :
 {
 }
 
-optionsfile::~optionsfile( )
+optionsfile::~optionsfile()
 {
-
 }
 
 
@@ -187,7 +185,12 @@ optionsfile::parse( perform *a_perf )
     if (m_line[0] == '/')
         last_used_dir.assign(m_line);
 
-
+    /* interaction method  */
+    long method = 0;
+    line_after( &file, "[interaction-method]" );
+    sscanf( m_line, "%ld", &method );
+    global_interactionmethod = (interaction_method_e)method;
+    
     file.close();
 
     return true;
@@ -305,6 +308,17 @@ optionsfile::write( perform *a_perf  )
     file << "# not connect to other clients\n";
     file << global_manual_alsa_ports << "\n";
     
+    /* interaction-method */
+    int x = 0;
+    file << "\n\n\n[interaction-method]\n";
+    while (c_interaction_method_names[x] && c_interaction_method_descs[x])
+    {
+        file << "# " << x << " - '" << c_interaction_method_names[x]
+                     << "' (" << c_interaction_method_descs[x] << ")\n";
+        ++x;
+    }
+    file << global_interactionmethod << "\n";
+
  
 
     file << "\n\n\n[keyboard-control]\n";

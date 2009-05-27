@@ -63,6 +63,8 @@ class options : public Gtk::Dialog
     perform *m_perf;
 
     Button  *m_button_ok;
+    Label* interaction_method_label;
+    Label* interaction_method_desc_label;
 
 
     Table   *m_table;
@@ -85,6 +87,7 @@ class options : public Gtk::Dialog
     void clock_callback_mod( int a_bus, RadioButton *a_button );
 
     void clock_mod_callback( Adjustment *adj );
+    void interaction_method_callback( Adjustment *adj );
     
     void input_callback( int a_bus, Button *a_button );
     void transport_callback( button a_type, Button *a_button );
