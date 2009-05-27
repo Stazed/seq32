@@ -636,7 +636,7 @@ mainwnd::about_dialog( void )
 
     dialog.set_copyright(
             "(C) 2002 - 2006 Rob C. Buse\n"
-            "(C) 2008 Seq24team");
+            "(C) 2008 - 2009 Seq24team");
     
     dialog.set_website(
             "http://www.filter24.org/seq24\n"
@@ -650,6 +650,7 @@ mainwnd::about_dialog( void )
     list_authors.push_back("Peter Leigh <pete.leigh@gmail.com>");
     list_authors.push_back("Anthony Green <green@redhat.com>");
     list_authors.push_back("Daniel Ellis <mail@danellis.co.uk>");
+    list_authors.push_back("Kevin Meinert <kevin@subatomicglue.com>");
     dialog.set_authors(list_authors);
 
     std::list<Glib::ustring> list_documenters;
