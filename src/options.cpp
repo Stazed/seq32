@@ -202,7 +202,7 @@ options::options (Gtk::Window & parent, perform * a_p):
         hbox3->pack_start(*(manage( interaction_method_desc_label )), false, false, 4);
         vbox->pack_start(*hbox3, false, false );
 
-        adj->signal_value_changed().connect( SigC::bind(mem_fun(*this,&options::interaction_method_callback),adj));
+        adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::interaction_method_callback),adj));
 
         // force it to refresh.
         interaction_method_callback( adj );
