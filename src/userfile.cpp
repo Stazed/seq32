@@ -109,11 +109,11 @@ userfile::parse( perform *a_perf )
 #if 0
     line_after( &file, "[midi-control]" );
 
-    int sequences = 0;
-    sscanf( m_line, "%d", &sequences );
+    unsigned int sequences = 0;
+    sscanf( m_line, "%u", &sequences );
     next_data_line( &file );
 
-    for ( int i=0; i<sequences; ++i ){
+    for ( unsigned int i=0; i<sequences; ++i ){
 
         int sequence = 0;
         
@@ -144,6 +144,35 @@ userfile::parse( perform *a_perf )
          
         next_data_line( &file );
     }
+    /* group midi control */
+    line_after( &file, "[mute-group]");
+
+    int gtrack = 0;
+    sscanf( m_line, "%d", &gtrack );
+    next_data_line( &file );
+   
+    int mtx[c_seqs_in_set], j=0;
+    for (int i=0; i< c_seqs_in_set; i++) {
+        a_perf->select_group_mute(j);
+        sscanf (m_line, "%d [%d %d %d %d %d %d %d %d] [%d %d %d %d %d %d %d %d] [%d %d %d %d %d %d %d %d] [%d %d %d %d %d %d %d %d]",
+            &j,
+            &mtx[0], &mtx[1], &mtx[2], &mtx[3],
+            &mtx[4], &mtx[5], &mtx[6], &mtx[7],
+           
+            &mtx[8], &mtx[9], &mtx[10], &mtx[11],
+            &mtx[12], &mtx[13], &mtx[14], &mtx[15],
+             
+            &mtx[16], &mtx[17], &mtx[18], &mtx[19],
+            &mtx[20], &mtx[21], &mtx[22], &mtx[23],
+             
+            &mtx[24], &mtx[25], &mtx[26], &mtx[27],
+            &mtx[28], &mtx[29], &mtx[30], &mtx[31]);
+        for (int k=0; k< c_seqs_in_set; k++) {
+            a_perf->set_group_mute_state(k, mtx[k]);
+        }
+        j++;
+        next_data_line( &file );
+    }
 
     line_after( &file, "[midi-clock]" );
     long buses = 0;
@@ -171,23 +200,54 @@ userfile::parse( perform *a_perf )
         
         long key = 0, seq = 0;
         sscanf( m_line, "%ld %ld", &key, &seq );
-        a_perf->key_events[key] = seq;
+        a_perf->set_key_event( key, seq );
+        next_data_line( &file );
+    }
+    line_after( &file, "[keyboard-group]" );
+    long groups = 0;
+    sscanf( m_line, "%ld", &groups );
+    next_data_line( &file );
+
+    a_perf->key_groups.clear();
+   
+   
+    for ( int i=0; i<groups; ++i ){
+       
+        long key = 0, group = 0;
+        sscanf( m_line, "%ld %ld", &key, &group );
+        a_perf->set_key_group( key, group );
         next_data_line( &file );
     }
 
-    sscanf( m_line, "%ld %ld", &a_perf->m_key_bpm_up,
+
+
+    sscanf( m_line, "%u %u", &a_perf->m_key_bpm_up,
                              &a_perf->m_key_bpm_dn );
     next_data_line( &file );
-
-    sscanf( m_line, "%ld %ld", &a_perf->m_key_screenset_up,
-                             &a_perf->m_key_screenset_dn );
+    sscanf( m_line, "%u %u %u", &a_perf->m_key_screenset_up,
+                             &a_perf->m_key_screenset_dn,
+                             &a_perf->m_key_set_playing_screenset);
     next_data_line( &file );
 
-    sscanf( m_line, "%ld %ld %ld %ld",
+    sscanf( m_line, "%u %u %u", &a_perf->m_key_group_on,
+                              &a_perf->m_key_group_off,
+                             &a_perf->m_key_group_learn);
+   
+    next_data_line( &file );
+
+    sscanf( m_line, "%u %u %u %u %u",
             &a_perf->m_key_replace,
             &a_perf->m_key_queue,
             &a_perf->m_key_snapshot_1,
-            &a_perf->m_key_snapshot_2 );
+            &a_perf->m_key_snapshot_2,
+            &a_perf->m_key_keep_queue);
+
+    next_data_line( &file );
+    sscanf( m_line, "%ld", &a_perf->m_show_ui_sequence_key );
+    next_data_line( &file );
+    sscanf( m_line, "%ld", &a_perf->m_key_start );
+    next_data_line( &file );
+    sscanf( m_line, "%ld", &a_perf->m_key_stop );
 
     line_after( &file, "[jack-transport]" );
     long flag = 0;
@@ -233,12 +293,22 @@ userfile::parse( perform *a_perf )
     sscanf( m_line, "%ld", &flag );
     global_manual_alsa_ports = (bool) flag;
 
+    /* last used dir */
+    line_after( &file, "[last-used-dir]" );
+    //FIXME: check for a valid path is missing
+    if (m_line[0] == '/')
+        last_used_dir.assign(m_line);
+
+    /* interaction method  */
+    long method = 0;
+    line_after( &file, "[interaction-method]" );
+    sscanf( m_line, "%ld", &method );
+    global_interactionmethod = (interaction_method_e)method;
+
 #endif
-    
     file.close();
 
     return true;
-    
 }
 
 

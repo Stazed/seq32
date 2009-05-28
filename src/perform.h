@@ -59,18 +59,39 @@ const int c_status_replace  = 0x01;
 const int c_status_snapshot = 0x02;
 const int c_status_queue    = 0x04;
 
-const int c_midi_control_bpm_up       = c_seqs_in_set ;
-const int c_midi_control_bpm_dn       = c_seqs_in_set + 1;
-const int c_midi_control_ss_up        = c_seqs_in_set + 2;
-const int c_midi_control_ss_dn        = c_seqs_in_set + 3;
-const int c_midi_control_mod_replace  = c_seqs_in_set + 4;
-const int c_midi_control_mod_snapshot = c_seqs_in_set + 5;
-const int c_midi_control_mod_queue    = c_seqs_in_set + 6;
-const int c_midi_controls             = c_seqs_in_set + 7;
+	 const int c_midi_track_ctrl = c_seqs_in_set * 2;
+	 const int c_midi_control_bpm_up       = c_midi_track_ctrl ;
+	 const int c_midi_control_bpm_dn       = c_midi_track_ctrl + 1;
+	 const int c_midi_control_ss_up        = c_midi_track_ctrl + 2;
+	 const int c_midi_control_ss_dn        = c_midi_track_ctrl + 3;
+	 const int c_midi_control_mod_replace  = c_midi_track_ctrl + 4;
+	 const int c_midi_control_mod_snapshot = c_midi_track_ctrl + 5;
+	 const int c_midi_control_mod_queue    = c_midi_track_ctrl + 6;
+	 //andy midi_control_mod_mute_group
+	 const int c_midi_control_mod_gmute    = c_midi_track_ctrl + 7;
+	 //andy learn_mute_toggle_mode
+	 const int c_midi_control_mod_glearn   = c_midi_track_ctrl + 8;
+	 //andy play only this screen set
+	 const int c_midi_control_play_ss      = c_midi_track_ctrl + 9;
+	 const int c_midi_controls             = c_midi_track_ctrl + 10;//7
+
+struct performcallback
+{
+    virtual void on_grouplearnchange(bool state) {}
+};
 
 class perform
 {
  private:
+    //andy mute group
+    bool m_mute_group[c_gmute_tracks];
+    bool m_tracks_mute_state[c_seqs_in_set];
+    bool m_mode_group;
+    bool m_mode_group_learn;
+    int m_mute_group_selected;
+    //andy playing screen
+    int m_playing_screen;
+   
 
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
@@ -111,6 +132,8 @@ class perform
     bool m_midiclockrunning; // stopped or started
     int  m_midiclocktick;
     int  m_midiclockpos;
+    
+    bool m_show_ui_sequence_key;
 
    
     void set_running( bool a_running );
@@ -129,7 +152,12 @@ class perform
 
     condition_var m_condition_var;
 
-    std::map<long,long> key_events;
+    // do not access these directly, use set/lookup below
+    std::map<unsigned int,long> key_events;
+    std::map<unsigned int,long> key_groups;
+    std::map<long,unsigned int> key_events_rev; // reverse lookup, keep this in sync!!
+    std::map<long,unsigned int> key_groups_rev; // reverse lookup, keep this in sync!!
+
 
 #ifdef JACK_SUPPORT
     
@@ -151,21 +179,33 @@ class perform
 
  public:
     bool is_running();
+    bool is_learn_mode() const { return m_mode_group_learn; }
+
+    // can register here for events...
+    std::vector<performcallback*> m_notify;
 
     unsigned int m_key_bpm_up;
     unsigned int m_key_bpm_dn;
 
     unsigned int m_key_replace;
     unsigned int m_key_queue;
+    unsigned int m_key_keep_queue;
     unsigned int m_key_snapshot_1;
     unsigned int m_key_snapshot_2;
 
     unsigned int m_key_screenset_up;
     unsigned int m_key_screenset_dn;
+    unsigned int m_key_set_playing_screenset;
+   
+    unsigned int m_key_group_on;
+    unsigned int m_key_group_off;
+    unsigned int m_key_group_learn;
+   
 
-    unsigned int m_key_start; 
+    unsigned int m_key_start;
     unsigned int m_key_stop;
 
+    bool show_ui_sequence_key() const { return m_show_ui_sequence_key; }
 
     perform();
     ~perform();
@@ -216,7 +256,17 @@ class perform
 
     void set_screenset( int a_ss );
     int get_screenset( void );
-    
+    void set_playing_screenset( void );
+    int get_playing_screenset( void );
+    void mute_group_tracks (void);
+    void select_and_mute_group (int a_g_group);
+    void set_mode_group_mute ();
+    void select_group_mute (int a_g_mute);
+    void set_mode_group_learn (void);
+    void unset_mode_group_learn (void);
+    bool is_group_learning( void ) { return m_mode_group_learn; }
+    void select_mute_group ( int a_group );
+    void unset_mode_group_mute ();    
     void start( bool a_state );
     void stop();
 
@@ -256,6 +306,8 @@ class perform
     void sequence_playing_toggle( int a_sequence );
     void sequence_playing_on( int a_sequence );
     void sequence_playing_off( int a_sequence );
+    void set_group_mute_state (int a_g_track, bool a_mute_state);
+    bool get_group_mute_state (int a_g_track);
     
     void mute_all_tracks( void );
 
@@ -272,11 +324,24 @@ class perform
     void restore_playing_state( void );
     
     
-    std::map<long,long> *get_key_events( void ){ return &key_events; };
+    const std::map<unsigned int,long> *get_key_events( void ) const { return &key_events; };
+    const std::map<unsigned int,long> *get_key_groups( void ) const { return &key_groups; };
+    
+    void set_key_event( unsigned int keycode, long sequence_slot );
+    void set_key_group( unsigned int keycode, long group_slot );
+
+    // getters of keyboard mapping for sequence and groups,
+    // if not found, returns something "safe" (so use get_key()->count() to see if it's there first)
+    unsigned int lookup_keyevent_key( long seqnum ) { if (key_events_rev.count( seqnum )) return key_events_rev[seqnum]; else return '?';}
+    long lookup_keyevent_seq( unsigned int keycode ) { if (key_events.count( keycode )) return key_events[keycode]; else return 0; }
+    unsigned int lookup_keygroup_key( long groupnum ) { if (key_groups_rev.count( groupnum )) return key_groups_rev[groupnum]; else return '?'; }
+    long lookup_keygroup_group( unsigned int keycode ) { if (key_groups.count( keycode )) return key_groups[keycode]; else return 0; }
+
 
 
     friend class midifile;
     friend class optionsfile;
+    friend class options;
 
 #ifdef JACK_SUPPORT
 
@@ -286,7 +351,6 @@ class perform
     friend void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes, 
                                        jack_position_t *pos, int new_pos, void *arg);
 #endif
-
 };
 
 /* located in perform.C */

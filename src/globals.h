@@ -30,6 +30,9 @@
 #include <string>
 #include <gtkmm/main.h>
 #include <gtkmm/drawingarea.h>
+//For keys
+#include <gtkmm/accelkey.h>
+
 
 
 using namespace std;
@@ -38,6 +41,7 @@ using namespace std;
 const int c_mainwnd_rows = 4;
 const int c_mainwnd_cols = 8;
 const int c_seqs_in_set = c_mainwnd_rows * c_mainwnd_cols;
+const int c_gmute_tracks = c_seqs_in_set * c_seqs_in_set;
 const int c_max_sets = 32;
 const int c_total_seqs = c_seqs_in_set * c_max_sets;
 
@@ -327,4 +331,7 @@ const char* const c_interaction_method_descs[] =
 
 extern interaction_method_e global_interactionmethod;
 
+// makes printable text from the given key
+// see seq24.cpp for implementation
+char* key2text( unsigned long int val );
 #endif

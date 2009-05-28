@@ -48,6 +48,13 @@
 #include "tools.xpm"
 #include "seq-editor.xpm"
 
+// tooltip helper, for old vs new gtk...
+#if GTK_MINOR_VERSION >= 12
+#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
+#else
+#   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
+#endif
+
 int seqedit::m_initial_zoom = 2;
 int seqedit::m_initial_snap = c_ppqn / 4;
 int seqedit::m_initial_note_length = c_ppqn / 4;
@@ -225,31 +232,31 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_play->add(  *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( play_xpm ))));
     m_toggle_play->signal_clicked().connect(
             mem_fun( *this, &seqedit::play_change_callback));
-    m_tooltips->set_tip( *m_toggle_play, "Sequence dumps data to midi bus." );
+    add_tooltip( m_toggle_play, "Sequence dumps data to midi bus." );
     
     m_toggle_record = manage( new ToggleButton(  ));
     m_toggle_record->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( rec_xpm ))));
     m_toggle_record->signal_clicked().connect(
             mem_fun( *this, &seqedit::record_change_callback));
-    m_tooltips->set_tip( *m_toggle_record, "Records incoming midi data." );
+    add_tooltip( m_toggle_record, "Records incoming midi data." );
 
     m_toggle_q_rec = manage( new ToggleButton(  ));
     m_toggle_q_rec->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( q_rec_xpm ))));
     m_toggle_q_rec->signal_clicked().connect(
             mem_fun( *this, &seqedit::q_rec_change_callback));
-    m_tooltips->set_tip( *m_toggle_q_rec, "Quantized Record." );
+    add_tooltip( m_toggle_q_rec, "Quantized Record." );
 
     m_button_rec_vol = manage( new Button());
     m_button_rec_vol->add( *manage( new Label("Vol")));
     m_button_rec_vol->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_rec_vol  ));
-    m_tooltips->set_tip( *m_button_rec_vol, "Select recording volume" );
+    add_tooltip( m_button_rec_vol, "Select recording volume" );
 
     m_toggle_thru = manage( new ToggleButton(  ));
     m_toggle_thru->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( thru_xpm ))));
     m_toggle_thru->signal_clicked().connect(
             mem_fun( *this, &seqedit::thru_change_callback));
-    m_tooltips->set_tip( *m_toggle_thru, "Incoming midi data passes "
+    add_tooltip( m_toggle_thru, "Incoming midi data passes "
             "thru to sequences midi bus and channel." );
 
     m_toggle_play->set_active( m_seq->get_playing());
@@ -689,7 +696,7 @@ seqedit::fill_top_bar( void )
     m_button_bpm->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_bpm  ));
-    m_tooltips->set_tip( *m_button_bpm, "Time Signature. Beats per Measure" );
+    add_tooltip( m_button_bpm, "Time Signature. Beats per Measure" );
     m_entry_bpm = manage( new Entry());
     m_entry_bpm->set_width_chars(2);
     m_entry_bpm->set_editable( false );
@@ -705,7 +712,7 @@ seqedit::fill_top_bar( void )
     m_button_bw->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_bw  ));
-    m_tooltips->set_tip( *m_button_bw, "Time Signature. Length of Beat" );
+    add_tooltip( m_button_bw, "Time Signature. Length of Beat" );
     m_entry_bw = manage( new Entry());
     m_entry_bw->set_width_chars(2);
     m_entry_bw->set_editable( false );
@@ -719,7 +726,7 @@ seqedit::fill_top_bar( void )
     m_button_length->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_length  ));
-    m_tooltips->set_tip( *m_button_length, "Sequence length in Bars." );
+    add_tooltip( m_button_length, "Sequence length in Bars." );
     m_entry_length = manage( new Entry());
     m_entry_length->set_width_chars(2);
     m_entry_length->set_editable( false );
@@ -735,7 +742,7 @@ seqedit::fill_top_bar( void )
     m_button_bus->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( bus_xpm  ))));
     m_button_bus->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_midibus_menu));
-    m_tooltips->set_tip( *m_button_bus, "Select Output Bus." );
+    add_tooltip( m_button_bus, "Select Output Bus." );
 
     m_entry_bus = manage( new Entry());
     m_entry_bus->set_max_length(60);
@@ -750,7 +757,7 @@ seqedit::fill_top_bar( void )
     m_button_channel->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( midi_xpm  ))));
     m_button_channel->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_midich_menu ));
-    m_tooltips->set_tip( *m_button_channel, "Select Midi channel." );
+    add_tooltip( m_button_channel, "Select Midi channel." );
     m_entry_channel = manage( new Entry());
     m_entry_channel->set_width_chars(2);
     m_entry_channel->set_editable( false );
@@ -764,7 +771,7 @@ seqedit::fill_top_bar( void )
     m_button_undo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( undo_xpm  ))));
     m_button_undo->signal_clicked().connect(
             mem_fun( *this, &seqedit::undo_callback));
-    m_tooltips->set_tip( *m_button_undo, "Undo." );
+    add_tooltip( m_button_undo, "Undo." );
  
     m_hbox2->pack_start( *m_button_undo , false, false );
     
@@ -773,7 +780,7 @@ seqedit::fill_top_bar( void )
     m_button_redo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( redo_xpm  ))));
     m_button_redo->signal_clicked().connect(
             mem_fun( *this, &seqedit::redo_callback));
-    m_tooltips->set_tip( *m_button_redo, "Redo." );
+    add_tooltip( m_button_redo, "Redo." );
  
     m_hbox2->pack_start( *m_button_redo , false, false );
     
@@ -782,7 +789,7 @@ seqedit::fill_top_bar( void )
     m_button_quanize->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( quanize_xpm  ))));
     m_button_quanize->signal_clicked().connect(
             sigc::bind(mem_fun(*this, &seqedit::do_action), quantize_notes, 0));
-    m_tooltips->set_tip( *m_button_quanize, "Quantize Selection." );
+    add_tooltip( m_button_quanize, "Quantize Selection." );
  
     m_hbox2->pack_start( *m_button_quanize , false, false );
 
@@ -804,7 +811,7 @@ seqedit::fill_top_bar( void )
     m_button_snap->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_snap  ));
-    m_tooltips->set_tip( *m_button_snap, "Grid snap." );
+    add_tooltip( m_button_snap, "Grid snap." );
     m_entry_snap = manage( new Entry());
     m_entry_snap->set_width_chars(5);
     m_entry_snap->set_editable( false );
@@ -818,7 +825,7 @@ seqedit::fill_top_bar( void )
     m_button_note_length->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_note_length  ));
-    m_tooltips->set_tip( *m_button_note_length, "Note Length." );
+    add_tooltip( m_button_note_length, "Note Length." );
     m_entry_note_length = manage( new Entry());
     m_entry_note_length->set_width_chars(5);
     m_entry_note_length->set_editable( false );
@@ -833,7 +840,7 @@ seqedit::fill_top_bar( void )
     m_button_zoom->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_zoom  ));
-    m_tooltips->set_tip( *m_button_zoom, "Zoom. Pixels to Ticks" );
+    add_tooltip( m_button_zoom, "Zoom. Pixels to Ticks" );
     m_entry_zoom = manage( new Entry());
     m_entry_zoom->set_width_chars(4);
     m_entry_zoom->set_editable( false );
@@ -850,7 +857,7 @@ seqedit::fill_top_bar( void )
     m_button_key->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_key  ));
-    m_tooltips->set_tip( *m_button_key, "Key of Sequence" );
+    add_tooltip( m_button_key, "Key of Sequence" );
     m_entry_key = manage( new Entry());
     m_entry_key->set_width_chars(5);
     m_entry_key->set_editable( false );
@@ -864,7 +871,7 @@ seqedit::fill_top_bar( void )
     m_button_scale->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
                 m_menu_scale  ));
-    m_tooltips->set_tip( *m_button_scale, "Musical Scale" );
+    add_tooltip( m_button_scale, "Musical Scale" );
     m_entry_scale = manage( new Entry());
     m_entry_scale->set_width_chars(5);
     m_entry_scale->set_editable( false );
@@ -879,7 +886,7 @@ seqedit::fill_top_bar( void )
     m_button_sequence->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( sequences_xpm  ))));
     m_button_sequence->signal_clicked().connect(
             mem_fun( *this, &seqedit::popup_sequence_menu));
-    m_tooltips->set_tip( *m_button_sequence, "Background Sequence" );
+    add_tooltip( m_button_sequence, "Background Sequence" );
     m_entry_sequence = manage( new Entry());
     m_entry_sequence->set_width_chars(14);
     m_entry_sequence->set_editable( false );

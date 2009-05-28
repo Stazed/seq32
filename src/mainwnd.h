@@ -47,13 +47,18 @@ using namespace Gtk;
 using namespace Menu_Helpers;
 
 
-class mainwnd : public Gtk::Window
+class mainwnd : public Gtk::Window, public performcallback
 {
-   
+    /* notification handler for learn mode toggle */
+    virtual void on_grouplearnchange(bool state);
+
  private:
 
     bool      m_modified;
     
+#if GTK_MINOR_VERSION < 12
+    Tooltips *m_tooltips;
+#endif
     MenuBar  *m_menubar;
     Menu     *m_menu_file;
     Menu     *m_menu_view;
@@ -69,6 +74,8 @@ class mainwnd : public Gtk::Window
 
     Gdk::Cursor   m_main_cursor;
     
+    Button      *m_button_learn;
+
     Button      *m_button_stop;
     Button      *m_button_play;
     Button      *m_button_perfedit;
@@ -97,6 +104,7 @@ class mainwnd : public Gtk::Window
 
     void start_playing();
     void stop_playing();
+    void learn_toggle();
     void open_performance_edit( );
     void sequence_key( int a_seq );
     void update_window_title();

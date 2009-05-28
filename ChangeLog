@@ -1,3 +1,9 @@
+2009-05-28 Kevin Meinert <kevin@subatomicglue.com>, n.n. <@>
+	* src/globals.h, src/learn.xpm, src/learn2.xpm, src/mainwid.*,
+	src/options.*, src/optionsfile.cpp, src/perfedit.cpp,
+	src/perform.*, src/seq24.cpp, src/seqedit.cpp, src/seqmenu.cpp,
+	src/seqroll.cpp, src/userfile.cpp: Mute group feature added.
+
 2009-05-27 Kevin Meinert <kevin@subatomicglue.com>
 	* src/perform.*: Support for MIDI clock synchronization added.
 	* src/globals.h, src/mainwnd.cpp, src/options.h,

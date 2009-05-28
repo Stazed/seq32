@@ -55,6 +55,7 @@ using namespace Gtk;
 
 
 
+
 class options : public Gtk::Dialog
 {
 
@@ -90,6 +91,7 @@ class options : public Gtk::Dialog
     void interaction_method_callback( Adjustment *adj );
     
     void input_callback( int a_bus, Button *a_button );
+
     void transport_callback( button a_type, Button *a_button );
     
 public:
