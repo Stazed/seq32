@@ -4,6 +4,8 @@
 	* src/midibus.cpp: Improved MIDI buffer size handling.
 	* man/seq24.1: Command line option for mouse interaction method
 	added.
+	* SEQ24: Documentation for mute groups added (provided by Andrea
+	delle Canne and Frank Kober).
 
 2009-05-29 Sebastien Alaiw <ace17@free.fr>
 	* src/midibus.cpp: Fixed handling of error condition for
