@@ -1,3 +1,12 @@
+2009-05-29 Guido Scholz <guido.scholz@bayernline.de>
+	* src/options.cpp: Fixed missing return value for
+	on_key_press_event().
+	* src/midibus.cpp: Improved MIDI buffer size handling.
+
+2009-05-29 Sebastien Alaiw <ace17@free.fr>
+	* src/midibus.cpp: Fixed handling of error condition for
+	snd_midi_event_decode().
+
 2009-05-28 Kevin Meinert <kevin@subatomicglue.com>, Andrea delle Canne
 <andreadellecanne@gmail.com>
 	* src/globals.h, src/learn.xpm, src/learn2.xpm, src/mainwid.*,

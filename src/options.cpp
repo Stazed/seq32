@@ -47,6 +47,7 @@ class KeyBindEntry : public Entry
 {
 public:
     enum type { location, events, groups };
+
     KeyBindEntry(   type t,
                     unsigned int* location_to_write = NULL,
                     perform* p = NULL,
@@ -63,6 +64,7 @@ public:
             case groups: set( m_perf->lookup_keygroup_key( m_slot ) ); break;
         }
     }
+    
     void set( unsigned int val )
     {
         char buf[256] = "";
@@ -75,9 +77,10 @@ public:
         set_text( buf );
         set_width_chars( strlen(buf)-3 );
     }
+
     virtual bool on_key_press_event(GdkEventKey* event)
     {
-        Entry::on_key_press_event( event );
+        bool result = Entry::on_key_press_event( event );
         set( event->keyval );
         switch (m_type)
         {
@@ -85,7 +88,9 @@ public:
             case events: m_perf->set_key_event( event->keyval, m_slot ); break;
             case groups: m_perf->set_key_group( event->keyval, m_slot ); break;
         }
+        return result;
     }
+
     unsigned int* m_key;
     type m_type;
     perform* m_perf;
@@ -299,9 +304,11 @@ options::options (Gtk::Window & parent, perform * a_p):
          hbox = manage (new HBox ());
          std::map<unsigned int, long>::const_iterator it;
          int x = 0;
+
          for (int ss = 0; ss < 32; ++ss)
          {
              int s = (ss%8) * 4 + ss/8; // count this way... 0,4,8,16...
+             // FIXME: keycode is not used
              unsigned int keycode = m_perf->lookup_keyevent_key( s );
              char buf[16];
              sprintf( buf, "%d", s );
@@ -322,8 +329,10 @@ options::options (Gtk::Window & parent, perform * a_p):
          
          hbox = manage (new HBox ());
          x = 0;
+
          for (int s = 0; s < 32; ++s)
          {
+             // FIXME: keycode is not used
              unsigned int keycode = m_perf->lookup_keygroup_key( s );
              char buf[16];
              sprintf( buf, "%d", s );

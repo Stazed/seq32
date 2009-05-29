@@ -54,8 +54,6 @@ using namespace Gtk;
 
 
 
-
-
 class options : public Gtk::Dialog
 {
 
@@ -97,10 +95,6 @@ class options : public Gtk::Dialog
 public:
     
     options( Gtk::Window &parent, perform *a_p );
-
- 
-        
-    
 };
 
 #endif
