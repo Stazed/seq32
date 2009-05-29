@@ -2,6 +2,8 @@
 	* src/options.cpp: Fixed missing return value for
 	on_key_press_event().
 	* src/midibus.cpp: Improved MIDI buffer size handling.
+	* man/seq24.1: Command line option for mouse interaction method
+	added.
 
 2009-05-29 Sebastien Alaiw <ace17@free.fr>
 	* src/midibus.cpp: Fixed handling of error condition for
