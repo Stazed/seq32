@@ -210,12 +210,23 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 		/*char key =  m_seq_to_char[local_seq];*/
 
 	    char str[20];
-	    sprintf( str, 
+
+        if (m_mainperf->show_ui_sequence_key())
+        {
+    	    sprintf( str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
+
+    	    p_font_renderer->render_string_on_drawable(m_gc,
+                                                       base_x + c_seqarea_x - 7,
+                                                       base_y + c_text_y * 4 - 2,
+                                                       m_pixmap, str, col );
+        }
+
+	    sprintf( str,
 		     "%d-%d %ld/%ld",
 		     seq->get_midi_bus(), 
 		     seq->get_midi_channel()+1,
 		     seq->get_bpm(), seq->get_bw() );
-        
+
 	    p_font_renderer->render_string_on_drawable(m_gc,
                                                    base_x + c_text_x, 
                                                    base_y + c_text_y * 4 - 2,

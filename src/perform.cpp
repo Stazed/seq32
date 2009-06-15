@@ -40,12 +40,17 @@ perform::perform()
 		
 		
     }
-
+    m_mute_group_selected = 0;
+    m_mode_group = true;
     m_running = false;
     m_looping = false;
     m_inputing = true;
     m_outputing = true;
     m_tick = 0;
+    m_midiclockrunning = false;
+    m_usemidiclock = false;
+    m_midiclocktick = 0;
+    m_midiclockpos = -1;
 
     thread_trigger_width_ms = c_thread_trigger_width_ms;
 
@@ -62,39 +67,72 @@ perform::perform()
 		m_midi_cc_off[i] = zero;
     }
 
-    key_events[ GDK_1 ] = 0; 
-    key_events[ GDK_q ] = 1; 
-    key_events[ GDK_a ] = 2;
-    key_events[ GDK_z ] = 3; 
-    key_events[ GDK_2 ] = 4; 
-    key_events[ GDK_w ] = 5;
-    key_events[ GDK_s ] = 6; 
-    key_events[ GDK_x ] = 7; 
-    key_events[ GDK_3 ] = 8;
-    key_events[ GDK_e ] = 9; 
-    key_events[ GDK_d ] = 10; 
-    key_events[ GDK_c ] = 11;
-    key_events[ GDK_4 ] = 12; 
-    key_events[ GDK_r ] = 13; 
-    key_events[ GDK_f ] = 14;
-    key_events[ GDK_v ] = 15; 
-    key_events[ GDK_5 ] = 16; 
-    key_events[ GDK_t ] = 17;
-    key_events[ GDK_g ] = 18; 
-    key_events[ GDK_b ] = 19; 
-    key_events[ GDK_6 ] = 20;
-    key_events[ GDK_y ] = 21; 
-    key_events[ GDK_h ] = 22; 
-    key_events[ GDK_n ] = 23;
-    key_events[ GDK_7 ] = 24; 
-    key_events[ GDK_u ] = 25; 
-    key_events[ GDK_j ] = 26;
-    key_events[ GDK_m ] = 27; 
-    key_events[ GDK_8 ] = 28; 
-    key_events[ GDK_i ] = 29;
-    key_events[ GDK_k ] = 30; 
-    key_events[ GDK_comma ] = 31;
-
+    m_show_ui_sequence_key = true;
+    
+    set_key_event( GDK_1, 0 );
+    set_key_event( GDK_q, 1 );
+    set_key_event( GDK_a, 2 );
+    set_key_event( GDK_z, 3 );
+    set_key_event( GDK_2, 4 );
+    set_key_event( GDK_w, 5 );
+    set_key_event( GDK_s, 6 );
+    set_key_event( GDK_x, 7 );
+    set_key_event( GDK_3, 8 );
+    set_key_event( GDK_e, 9 );
+    set_key_event( GDK_d, 10 );
+    set_key_event( GDK_c, 11 );
+    set_key_event( GDK_4, 12 );
+    set_key_event( GDK_r, 13 );
+    set_key_event( GDK_f, 14 );
+    set_key_event( GDK_v, 15 );
+    set_key_event( GDK_5, 16 );
+    set_key_event( GDK_t, 17 );
+    set_key_event( GDK_g, 18 );
+    set_key_event( GDK_b, 19 );
+    set_key_event( GDK_6, 20 );
+    set_key_event( GDK_y, 21 );
+    set_key_event( GDK_h, 22 );
+    set_key_event( GDK_n, 23 );
+    set_key_event( GDK_7, 24 );
+    set_key_event( GDK_u, 25 );
+    set_key_event( GDK_j, 26 );
+    set_key_event( GDK_m, 27 );
+    set_key_event( GDK_8, 28 );
+    set_key_event( GDK_i, 29 );
+    set_key_event( GDK_k, 30 );
+    set_key_event( GDK_comma, 31 );
+    set_key_group( 33, 0 );
+    set_key_group( 34, 1 );
+    set_key_group( 163, 2 );
+    set_key_group( 36, 3 );
+    set_key_group( 37, 4 );
+    set_key_group( 38, 5 );
+    set_key_group( 47, 6 );
+    set_key_group( 40, 7 );
+    set_key_group( 81, 8 );
+    set_key_group( 87, 9 );
+    set_key_group( 69, 10 );
+    set_key_group( 82, 11 );
+    set_key_group( 84, 12 );
+    set_key_group( 89, 13 );
+    set_key_group( 85, 14 );
+    set_key_group( 73, 15 );
+    set_key_group( 65, 16 );
+    set_key_group( 83, 17 );
+    set_key_group( 68, 18 );
+    set_key_group( 70, 19 );
+    set_key_group( 71, 20 );
+    set_key_group( 72, 21 );
+    set_key_group( 74, 22 );
+    set_key_group( 75, 23 );
+    set_key_group( 90, 24 );
+    set_key_group( 88, 25 );
+    set_key_group( 67, 26 );
+    set_key_group( 86, 27 );
+    set_key_group( 66, 28 );
+    set_key_group( 78, 29 );
+    set_key_group( 77, 30 );
+    set_key_group( 59, 31 );
     
     m_key_bpm_up = GDK_apostrophe;
     m_key_bpm_dn = GDK_semicolon;
@@ -103,9 +141,14 @@ perform::perform()
     m_key_queue = GDK_Control_R;
     m_key_snapshot_1 = GDK_Alt_L;
     m_key_snapshot_2 = GDK_Alt_R;
+    m_key_keep_queue = 92;
     
     m_key_screenset_up = GDK_bracketright;
     m_key_screenset_dn = GDK_bracketleft;
+    m_key_set_playing_screenset = 65360;
+    m_key_group_on = 236;
+    m_key_group_off = 39;
+    m_key_group_learn = GDK_Insert;
 
     m_key_start  = GDK_space;
     m_key_stop   = GDK_Escape;
@@ -170,8 +213,7 @@ perform::init_jack( void )
                 m_jack_master = false;
              
             }
-            
-            if (jack_activate(m_jack_client)) {
+             if (jack_activate(m_jack_client)) {
                 printf("Cannot register as JACK client\n");
                 m_jack_running = false;
                 break;
@@ -240,8 +282,123 @@ perform::clear_all( void )
     }
 
 }
+void
+perform::set_mode_group_mute ()
+{
+    m_mode_group = true;
+    return;
+}
 
+void
+perform::unset_mode_group_mute ()
+{
+    m_mode_group = false;
+    return;
+}
 
+void
+perform::set_group_mute_state (int a_g_track, bool a_mute_state)
+{
+    if (a_g_track < 0)
+        a_g_track = 0;
+    if (a_g_track > c_seqs_in_set)
+        a_g_track = c_seqs_in_set -1;
+    m_mute_group[a_g_track + m_mute_group_selected * c_seqs_in_set] = a_mute_state;
+    return;
+}
+
+bool
+perform::get_group_mute_state (int a_g_track)
+{
+    if (a_g_track < 0)
+        a_g_track = 0;
+    if (a_g_track > c_seqs_in_set)
+        a_g_track = c_seqs_in_set -1;
+    return m_mute_group[a_g_track + m_mute_group_selected * c_seqs_in_set];
+}
+
+void
+perform::select_group_mute (int a_g_mute)
+{
+    int j = (a_g_mute * c_seqs_in_set);
+    int k = m_playing_screen * c_seqs_in_set;
+    if (a_g_mute < 0)
+        a_g_mute = 0;
+    if (a_g_mute > c_seqs_in_set)
+        a_g_mute = c_seqs_in_set -1;
+    if (m_mode_group_learn)
+        for (int i = 0; i < c_seqs_in_set; i++) {
+            if (is_active(i + k)) {
+                assert(m_seqs[i + k]);
+                m_mute_group[i + j] = m_seqs[i + k]->get_playing();
+            }
+        }
+    m_mute_group_selected = a_g_mute;
+    return;
+}
+void perform::set_mode_group_learn (void)
+{
+    set_mode_group_mute();
+    m_mode_group_learn = true;
+    for (int x = 0; x < m_notify.size(); ++x)
+        m_notify[x]->on_grouplearnchange( true );
+    return;
+}
+
+void perform::unset_mode_group_learn (void)
+{
+    for (int x = 0; x < m_notify.size(); ++x)
+        m_notify[x]->on_grouplearnchange( false );
+    m_mode_group_learn = false;
+    return;
+}
+
+void
+perform::select_mute_group ( int a_group )
+{
+    int j = (a_group * c_seqs_in_set);
+    int k = m_playing_screen * c_seqs_in_set;
+    if (a_group < 0)
+        a_group = 0;
+    if (a_group > c_seqs_in_set)
+        a_group = c_seqs_in_set -1;
+    m_mute_group_selected = a_group;
+    for (int i = 0; i < c_seqs_in_set; i++) {
+        if ((m_mode_group_learn) && (is_active(i + k))) {
+            assert(m_seqs[i + k]);
+            m_mute_group[i + j] = m_seqs[i + k]->get_playing();
+        }
+        m_tracks_mute_state[i] = m_mute_group[i + m_mute_group_selected * c_seqs_in_set];
+    }
+    return;
+}
+
+void
+perform::mute_group_tracks (void)
+{
+    if (m_mode_group) {
+        for (int i=0; i< c_seqs_in_set; i++) {
+            for (int j=0; j < c_seqs_in_set; j++) {
+                if ( is_active(i * c_seqs_in_set + j) ) {
+                    if ((i == m_playing_screen) && (m_tracks_mute_state[j])) {
+                            sequence_playing_on (i * c_seqs_in_set + j);
+                    } else {
+                        sequence_playing_off (i * c_seqs_in_set + j);
+                    }
+                }
+            }
+               
+        }
+    }
+}
+
+void
+perform::select_and_mute_group (int a_g_group)
+{
+    select_mute_group(a_g_group);
+    mute_group_tracks();
+    return;
+}
 
 void
 perform::mute_all_tracks( void )
@@ -624,6 +781,26 @@ perform::get_screenset( void )
 {
     return m_screen_set;
 }
+ void
+ perform::set_playing_screenset (void)
+ {
+    for (int j, i = 0; i < c_seqs_in_set; i++) {
+        j = i + m_playing_screen * c_seqs_in_set;
+        if ( is_active(j) ){
+            assert( m_seqs[j] );
+            m_tracks_mute_state[i] = m_seqs[j]->get_playing();
+        }
+    }
+    m_playing_screen = m_screen_set;
+    mute_group_tracks();
+ }
+
+ int
+ perform::get_playing_screenset (void)
+ {
+    return m_playing_screen;
+ }
+
 
 void 
 perform::set_offset( int a_offset ) 
@@ -893,6 +1070,8 @@ perform::inner_stop( )
     set_running( false );
     //off_sequences();
     reset_sequences(  );
+    
+    m_usemidiclock = false;
 }
 
 
@@ -912,6 +1091,20 @@ perform::off_sequences( void )
 
 
 
+void 
+perform::all_notes_off( void )
+{
+    for (int i=0; i< c_max_sequence; i++ ){
+		
+		if ( is_active(i) == true ){
+			assert( m_seqs[i] );
+
+			m_seqs[i]->off_playing_notes( );
+		} 
+    }
+    /* flush the bus */
+    m_master_bus.flush();
+}
 
 void 
 perform::reset_sequences( void )
@@ -921,7 +1114,7 @@ perform::reset_sequences( void )
 		if ( is_active(i) == true ){
 			assert( m_seqs[i] );
 
-                        bool state = m_seqs[i]->get_playing();
+			bool state = m_seqs[i]->get_playing();
                         
 			m_seqs[i]->off_playing_notes( );
 			m_seqs[i]->set_playing( false );
@@ -1249,7 +1442,21 @@ perform::output_func(void)
             /* get delta ticks, delta_ticks_f is in 1000th of a tick */
             double delta_tick   =  (double) (bpm * ppqn * (delta_us/60000000.0f) ); 
 
-            //printf ( "delta_tick[%ld.%03ld]\n", delta_tick, delta_tick_f  );
+            if ( m_usemidiclock)
+            {
+               delta_tick = m_midiclocktick;
+               m_midiclocktick = 0;
+            }
+            if ( 0 <= m_midiclockpos)
+            {
+                delta_tick = 0;
+                clock_tick     = m_midiclockpos;
+                current_tick   = m_midiclockpos;
+                total_tick     = m_midiclockpos;
+                m_midiclockpos = -1;
+                //init_clock = true;
+            }
+
             //printf ( "    delta_tick[%lf]\n", delta_tick  );
 #ifdef JACK_SUPPORT
 
@@ -1716,9 +1923,40 @@ perform::handle_midi_control( int a_control, bool a_state )
                 set_sequence_control_status( c_status_queue );
             else
                 unset_sequence_control_status( c_status_queue );
+        //andy cases
+        case c_midi_control_mod_gmute:
+
+            printf ( "gmute\n" );
+           
+            if (a_state)
+                set_mode_group_mute();
+            else
+                unset_mode_group_mute();
             break;
-            
-        default:
+           
+        case c_midi_control_mod_glearn:
+
+            //printf ( "glearn\n" );
+
+            if (a_state)
+                set_mode_group_learn();
+            else
+                unset_mode_group_learn();
+            break;
+           
+        case c_midi_control_play_ss:
+
+            //printf ( "play_ss\n" );
+
+            set_playing_screenset();
+            break;
+           
+         default:
+            if ((a_control >= c_seqs_in_set) && (a_control < c_midi_track_ctrl)) {
+                //printf ( "group mute\n" );
+           
+                select_and_mute_group(a_control - c_seqs_in_set);
+            }
             break;
             
     }
@@ -1737,6 +1975,45 @@ perform::input_func( void ){
             do {
                 
                 if ( m_master_bus.get_midi_event( &ev ) ){
+                    
+                    // Obey MidiTimeClock:
+                    if (ev.get_status() == EVENT_MIDI_START)
+                    {
+                         stop();
+                         start( false );
+                         m_midiclockrunning = true;
+                         m_usemidiclock = true;
+                         m_midiclocktick = 0;
+                         m_midiclockpos = 0;
+                    }
+                    // midi continue: start from current pos.
+                    else if (ev.get_status() == EVENT_MIDI_CONTINUE)
+                    {
+                         m_midiclockrunning = true;
+                         start( false );
+                         //m_usemidiclock = true;
+                    }
+                    else if (ev.get_status() == EVENT_MIDI_STOP)
+                    {
+                         // do nothing, just let the system pause
+                         // since we're not getting ticks after the stop, the song wont advance
+                         // when start is recieved, we'll reset the position, or
+                         // when continue is recieved, we wont
+                         m_midiclockrunning = false;
+                         all_notes_off();
+                    }
+                    else if (ev.get_status() == EVENT_MIDI_CLOCK)
+                    {
+                         if (m_midiclockrunning)
+                            m_midiclocktick += 8;
+                    }
+                    // not tested (todo: test it!)
+                    else if (ev.get_status() == EVENT_MIDI_SONG_POS)
+                    {
+                         unsigned char a, b;
+                         ev.get_data( &a, &b );
+                         m_midiclockpos = ((int)a << 7) && (int)b;
+                    }
                     
                     /* filter system wide messages */
                     if ( ev.get_status() <= EVENT_SYSEX ){  
@@ -1923,8 +2200,21 @@ void
 perform::sequence_playing_on( int a_sequence )
 {
     if ( is_active(a_sequence) == true ){
+        if (m_mode_group && (m_playing_screen == m_screen_set)
+          && (a_sequence >= (m_playing_screen * c_seqs_in_set))
+          && (a_sequence < ((m_playing_screen + 1) * c_seqs_in_set)))
+            m_tracks_mute_state[a_sequence - m_playing_screen * c_seqs_in_set] = true;
 		assert( m_seqs[a_sequence] );
-		m_seqs[a_sequence]->set_playing(true);
+        if (!(m_seqs[a_sequence]->get_playing())) {
+            if (m_control_status & c_status_queue ) {
+                if (!(m_seqs[a_sequence]->get_queued()))
+                    m_seqs[a_sequence]->toggle_queued();
+            } else
+                m_seqs[a_sequence]->set_playing(true);
+        } else {
+            if ((m_seqs[a_sequence]->get_queued()) && (m_control_status & c_status_queue ))
+                m_seqs[a_sequence]->toggle_queued();
+        }
     } 
 }
 
@@ -1933,10 +2223,75 @@ void
 perform::sequence_playing_off( int a_sequence )
 {
     if ( is_active(a_sequence) == true ){
-		assert( m_seqs[a_sequence] );
-		m_seqs[a_sequence]->set_playing(false);
+        if (m_mode_group && (m_playing_screen == m_screen_set)
+          && (a_sequence >= (m_playing_screen * c_seqs_in_set))
+          && (a_sequence < ((m_playing_screen + 1) * c_seqs_in_set)))
+            m_tracks_mute_state[a_sequence - m_playing_screen * c_seqs_in_set] = false;
+        assert( m_seqs[a_sequence] );
+        if (m_seqs[a_sequence]->get_playing()) {
+            if (m_control_status & c_status_queue ) {
+                if (!(m_seqs[a_sequence]->get_queued()))
+                    m_seqs[a_sequence]->toggle_queued();
+            } else
+                m_seqs[a_sequence]->set_playing(false);
+        } else {
+            if ((m_seqs[a_sequence]->get_queued()) && (m_control_status & c_status_queue ))
+                m_seqs[a_sequence]->toggle_queued();
+        }
     } 
 }
+
+void
+perform::set_key_event( unsigned int keycode, long sequence_slot )
+{
+     // unhook previous binding...
+     std::map<unsigned int,long>::iterator it1 = key_events.find( keycode );
+     if (it1 != key_events.end())
+     {
+         std::map<long,unsigned int>::iterator i = key_events_rev.find( it1->second );
+         if (i != key_events_rev.end())
+             key_events_rev.erase( i );
+         key_events.erase( it1 );
+     }
+     std::map<long,unsigned int>::iterator it2 = key_events_rev.find( sequence_slot );
+     if (it2 != key_events_rev.end())
+     {
+         std::map<unsigned int,long>::iterator i = key_events.find( it2->second );
+         if (i != key_events.end())
+             key_events.erase( i );
+         key_events_rev.erase( it2 );
+     }
+     // set
+     key_events[keycode] = sequence_slot;
+     key_events_rev[sequence_slot] = keycode;
+}
+
+void
+perform::set_key_group( unsigned int keycode, long group_slot )
+{
+     // unhook previous binding...
+     std::map<unsigned int,long>::iterator it1 = key_groups.find( keycode );
+     if (it1 != key_groups.end())
+     {
+         std::map<long,unsigned int>::iterator i = key_groups_rev.find( it1->second );
+         if (i != key_groups_rev.end())
+             key_groups_rev.erase( i );
+         key_groups.erase( it1 );
+     }
+     std::map<long,unsigned int>::iterator it2 = key_groups_rev.find( group_slot );
+     if (it2 != key_groups_rev.end())
+     {
+         std::map<unsigned int,long>::iterator i = key_groups.find( it2->second );
+         if (i != key_groups.end())
+             key_groups.erase( i );
+         key_groups_rev.erase( it2 );
+     }
+     // set
+     key_groups[keycode] = group_slot;
+     key_groups_rev[group_slot] = keycode;
+}
+
+
 
 #ifdef JACK_SUPPORT
 void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes, 

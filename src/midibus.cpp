@@ -157,7 +157,8 @@ bool midibus::init_out( )
 			      m_dest_addr_client,
 			      m_dest_addr_port );
     if ( ret < 0 ){
-        printf( "snd_seq_connect_to(%d:%d) error\n", m_dest_addr_client, m_dest_addr_port);
+        printf( "snd_seq_connect_to(%d:%d) error\n",
+                m_dest_addr_client, m_dest_addr_port);
         return false;
     }
 #endif
@@ -232,7 +233,8 @@ bool midibus::init_in( )
     ret = snd_seq_subscribe_port(m_seq, subs);
 
     if ( ret < 0 ){
-        printf( "snd_seq_connect_from(%d:%d) error\n", m_dest_addr_client, m_dest_addr_port);
+        printf( "snd_seq_connect_from(%d:%d) error\n",
+                m_dest_addr_client, m_dest_addr_port);
         return false;
     }
 #endif
@@ -247,12 +249,11 @@ bool midibus::init_in_sub( )
     int ret;
 
     /* create ports */
-    ret = snd_seq_create_simple_port(m_seq,
-				     "seq24 in",
-				     SND_SEQ_PORT_CAP_WRITE |
-                     SND_SEQ_PORT_CAP_SUBS_WRITE,
-				     SND_SEQ_PORT_TYPE_MIDI_GENERIC |
-				     SND_SEQ_PORT_TYPE_APPLICATION );
+    ret = snd_seq_create_simple_port(m_seq, "seq24 in",
+            SND_SEQ_PORT_CAP_WRITE |
+            SND_SEQ_PORT_CAP_SUBS_WRITE,
+            SND_SEQ_PORT_TYPE_MIDI_GENERIC |
+            SND_SEQ_PORT_TYPE_APPLICATION );
     m_local_addr_port = ret;
 
     if ( ret < 0 ){
@@ -292,7 +293,8 @@ bool midibus::deinit_in( )
     ret = snd_seq_unsubscribe_port(m_seq, subs);
 
     if ( ret < 0 ){
-        printf( "snd_seq_unsubscribe_port(%d:%d) error\n", m_dest_addr_client, m_dest_addr_port);
+        printf( "snd_seq_unsubscribe_port(%d:%d) error\n",
+                m_dest_addr_client, m_dest_addr_port);
         return false;
     }
 #endif
@@ -345,18 +347,12 @@ midibus::play( event *a_e24, unsigned char a_channel )
 		/* fill buffer and set midi channel */
 		buffer[0] = a_e24->get_status();
 		buffer[0] += (a_channel & 0x0F);
-
 		a_e24->get_data( &buffer[1], &buffer[2] );
-
 		snd_midi_event_new( 10, &midi_ev );
 
 		/* clear event */
 		snd_seq_ev_clear( &ev );
-		snd_midi_event_encode( midi_ev,
-							   buffer,
-							   3,
-							   &ev );
-
+		snd_midi_event_encode( midi_ev, buffer, 3, &ev );
 		snd_midi_event_free( midi_ev );
 
 		/* set source */
@@ -371,20 +367,16 @@ midibus::play( event *a_e24, unsigned char a_channel )
 
 		/* pump it into the queue */
 		snd_seq_event_output(m_seq, &ev);
-
 #endif
-
     unlock();
 }
 
 
 inline long
 min ( long a, long b ){
-
-  if ( a < b )
-    return a;
-  return b;
-
+    if ( a < b )
+        return a;
+    return b;
 }
 
 /* takes an native event, encodes to alsa event,
@@ -407,26 +399,22 @@ midibus::sysex( event *a_e24 )
     // its immediate
     snd_seq_ev_set_direct( &ev );
 
-
     unsigned char *data = a_e24->get_sysex();
     long data_size =  a_e24->get_size();
-    for( long offset = 0;
-	 offset < data_size;
-	 offset += c_midibus_sysex_chunk ){
 
-      long data_left = data_size - offset;
+    for (long offset = 0; offset < data_size;
+            offset += c_midibus_sysex_chunk) {
 
-      snd_seq_ev_set_sysex( &ev,
-			       min( data_left, c_midibus_sysex_chunk),
-			       &data[offset] );
+        long data_left = data_size - offset;
 
-      /* pump it into the queue */
-      snd_seq_event_output_direct(m_seq, &ev);
+        snd_seq_ev_set_sysex( &ev,
+                min( data_left, c_midibus_sysex_chunk),
+                &data[offset] );
 
-      usleep(80000);
-
-      flush();
-
+        /* pump it into the queue */
+        snd_seq_event_output_direct(m_seq, &ev);
+        usleep(80000);
+        flush();
     }
 #endif
     unlock();
@@ -482,13 +470,11 @@ midibus::continue_from( long a_tick )
 #ifdef HAVE_LIBASOUND
     /* tell the device that we are going to start at a certain position */
     long pp16th = (c_ppqn / 4);
-
     long leftover = ( a_tick % pp16th );
     long beats = ( a_tick / pp16th );
-
     long starting_tick = a_tick - leftover;
 
-    /* was there anything left?, then wait for next beat (16th note) to start clocking */
+    /* was there anything left? Then wait for next beat (16th note) to start clocking */
     if ( leftover > 0)
     {
         starting_tick += pp16th;
@@ -542,10 +528,8 @@ midibus::start()
     if ( m_clock_type != e_clock_off ){
 
 	snd_seq_event_t ev;
-
 	ev.type = SND_SEQ_EVENT_START;
 	snd_seq_ev_set_fixed( &ev );
-
 	snd_seq_ev_set_priority( &ev, 1 );
 
 	/* set source */
@@ -611,10 +595,8 @@ midibus::stop()
     if ( m_clock_type != e_clock_off ){
 
 	snd_seq_event_t ev;
-
 	ev.type = SND_SEQ_EVENT_STOP;
 	snd_seq_ev_set_fixed( &ev );
-
 	snd_seq_ev_set_priority( &ev, 1 );
 
 	/* set source */
@@ -626,7 +608,6 @@ midibus::stop()
 
 	/* pump it into the queue */
 	snd_seq_event_output(m_seq, &ev);
-
     }
 #endif
 }
@@ -636,13 +617,11 @@ midibus::stop()
 void
 midibus::clock( long a_tick )
 {
-
     lock();
 #ifdef HAVE_LIBASOUND
     if ( m_clock_type != e_clock_off ){
 
 	bool done = false;
-
 	long uptotick = a_tick;
 
 	if ( m_lasttick >= uptotick )
@@ -659,7 +638,6 @@ midibus::clock( long a_tick )
 	    if ( m_lasttick % ( c_ppqn / 24 ) == 0 ){
 
 		snd_seq_event_t ev;
-
 		ev.type = SND_SEQ_EVENT_CLOCK;
 
 		/* set tag to 127 so the sequences
@@ -667,7 +645,6 @@ midibus::clock( long a_tick )
 		ev.tag = 127;
 
 		snd_seq_ev_set_fixed( &ev );
-
 		snd_seq_ev_set_priority( &ev, 1 );
 
 		/* set source */
@@ -731,7 +708,7 @@ mastermidibus::unlock( )
 
 
 
-/* gets it a runnin */
+/* gets it running */
 void
 mastermidibus::start()
 {
@@ -902,8 +879,8 @@ mastermidibus::mastermidibus()
 	/* notify lash of our client ID so it can restore connections */
 	lash_driver->set_alsa_client_id(snd_seq_client_id(m_alsa_seq));
 #endif
-
 }
+
 
 void
 mastermidibus::init( )
@@ -1054,7 +1031,7 @@ mastermidibus::init( )
                 SND_SEQ_CLIENT_SYSTEM,
                 SND_SEQ_PORT_SYSTEM_ANNOUNCE,
                 m_alsa_seq,
-                "system","annouce",
+                "system", "annouce",
                 0, m_queue);
 
     m_bus_announce->set_input(true);
@@ -1480,19 +1457,16 @@ mastermidibus::get_midi_event( event *a_in )
     snd_seq_event_t *ev;
 
     bool sysex = false;
+    bool ret = false;
 
     /* temp for midi data */
     unsigned char buffer[0x1000];
 
     snd_seq_event_input(m_alsa_seq, &ev);
 
-
-
-    bool ret = false;
-
     if (! global_manual_alsa_ports )
     {
-        switch( ev->type ){
+        switch(ev->type) {
 
             case SND_SEQ_EVENT_PORT_START:
                 {
@@ -1521,32 +1495,27 @@ mastermidibus::get_midi_event( event *a_in )
                     break;
                 }
 
-            default: break;
+            default:
+                break;
 
         }
     }
 
-    if( ret ){
+    if (ret) {
         unlock();
         return false;
     }
 
     /* alsa midi parser */
     snd_midi_event_t *midi_ev;
-    snd_midi_event_new( 0x1000, &midi_ev );
+    snd_midi_event_new(sizeof(buffer), &midi_ev);
 
-    long bytes =
-        snd_midi_event_decode( midi_ev,
-                               buffer,
-                               0x1000,
-                               ev );
-    if( bytes < 0 ){
-        snd_seq_free_event( ev );
-        snd_midi_event_free( midi_ev );
+    long bytes = snd_midi_event_decode(midi_ev, buffer, sizeof(buffer), ev);
+
+    if (bytes <= 0) {
         unlock();
         return false;
     }
-
     a_in->set_timestamp( ev->time.tick );
     a_in->set_status( buffer[0] );
     a_in->set_size( bytes );
@@ -1554,14 +1523,14 @@ mastermidibus::get_midi_event( event *a_in )
     /* we will only get EVENT_SYSEX on the first
        packet of midi data, the rest we have
        to poll for */
-    if ( buffer[0] == EVENT_SYSEX ){
+    //if ( buffer[0] == EVENT_SYSEX ){
+    if (0) {
 
         /* set up for sysex if needed */
         a_in->start_sysex( );
         sysex = a_in->append_sysex( buffer, bytes );
     }
     else {
-
         a_in->set_data( buffer[1], buffer[2] );
 
         // some keyboards send on's with vel 0 for off
@@ -1574,35 +1543,23 @@ mastermidibus::get_midi_event( event *a_in )
     }
 
     /* sysex messages might be more than one message */
-    while ( sysex ){
+    while (sysex) {
 
-        snd_seq_free_event( ev );
         snd_seq_event_input(m_alsa_seq, &ev);
 
-        bytes =
-            snd_midi_event_decode( midi_ev,
-                                   buffer,
-                                   0x1000,
-                                   ev );
-        if( bytes < 0 ){
-          snd_seq_free_event( ev );
-          snd_midi_event_free( midi_ev );
-          unlock();
-          return false;
-        }
+        bytes = snd_midi_event_decode(midi_ev, buffer, sizeof(buffer), ev);
 
-
-        sysex = a_in->append_sysex( buffer, bytes );
-
+        if (bytes > 0)
+            sysex = a_in->append_sysex( buffer, bytes );
+        else
+            sysex = false;
     }
 
-    snd_seq_free_event( ev );
     snd_midi_event_free( midi_ev );
 
 #endif
 
     unlock();
-
     return true;
 }
 

@@ -20,6 +20,14 @@
 #include "event.h"
 #include "seqroll.h"
 
+const long c_handlesize = 16;
+
+inline static long
+clamp( long val, long low, long hi )
+{
+     return val < low ? low : hi < val ? hi : val;
+}
+
 
 seqroll::seqroll(perform *a_perf,
                  sequence *a_seq, 
@@ -74,9 +82,11 @@ seqroll::seqroll(perform *a_perf,
     m_moving    = false;
 	m_moving_init = false;
     m_growing   = false;
-    m_adding    = false;
     m_painting  = false;
     m_paste     = false;
+    m_is_drag_pasting = false;
+    m_is_drag_pasting_start = false;
+    m_justselected_one = false;
 
     m_old_progress_x = 0;
 
@@ -123,22 +133,6 @@ seqroll::set_background_sequence( bool a_state, int a_seq )
 seqroll::~seqroll( )
 {
     delete m_clipboard;
-}
-
-/* popup menu calls this */
-void 
-seqroll::set_adding( bool a_adding )
-{
-    if ( a_adding ){
-
-	get_window()->set_cursor(  Gdk::Cursor( Gdk::PENCIL ));
-	m_adding = true;
-    
-    } else {
-
-	get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
-	m_adding = false;
-    }
 }
 
 
@@ -343,6 +337,28 @@ seqroll::update_background()
     
     for ( int i=0; i< (m_window_y / c_key_y) + 1; i++ )
     {
+         if (global_interactionmethod == e_fruity_interaction)
+         {
+             if (0 == (((c_num_keys - i) - m_scroll_offset_key + ( 12 - m_key )) % 12))
+             {
+                 /* draw horz black lines at C */
+                 m_gc->set_foreground(m_dk_grey);
+                 m_gc->set_line_attributes( 1,
+                                            Gdk::LINE_SOLID,
+                                            Gdk::CAP_NOT_LAST,
+                                            Gdk::JOIN_MITER );
+             }
+             else if (11 == (((c_num_keys - i) - m_scroll_offset_key + ( 12 - m_key )) % 12))
+             {
+                 /* draw horz grey lines for the other notes */
+                 m_gc->set_foreground(m_grey);
+                 m_gc->set_line_attributes( 1,
+                                            Gdk::LINE_ON_OFF_DASH,
+                                            Gdk::CAP_NOT_LAST,
+                                            Gdk::JOIN_MITER );
+             }
+         }
+         
         m_background->draw_line(m_gc,
                             0,
                             i * c_key_y,
@@ -507,168 +523,168 @@ void
 seqroll::draw_progress_on_window()
 {	
     m_window->draw_drawable(m_gc, 
-                            m_pixmap, 
-                            m_old_progress_x,
-                            0,
-                            m_old_progress_x,
-                            0,
-                            1,
-                            m_window_y );
-	
-	m_old_progress_x = (m_seq->get_last_tick() / m_zoom) - m_scroll_offset_x;
+            m_pixmap, 
+            m_old_progress_x,
+            0,
+            m_old_progress_x,
+            0,
+            1,
+            m_window_y );
 
-	if ( m_old_progress_x != 0 ){	
-	    
-	    m_gc->set_foreground(m_black);
-	    m_window->draw_line(m_gc,
-			       m_old_progress_x,
-			       0,
-			       m_old_progress_x, 
-			       m_window_y);
-	}
+    m_old_progress_x = (m_seq->get_last_tick() / m_zoom) - m_scroll_offset_x;
+
+    if ( m_old_progress_x != 0 ){	
+
+        m_gc->set_foreground(m_black);
+        m_window->draw_line(m_gc,
+                m_old_progress_x,
+                0,
+                m_old_progress_x, 
+                m_window_y);
+    }
 }
 
 
 void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw ) {
 
-	long tick_s;
-	long tick_f;
-	int note;
+    long tick_s;
+    long tick_f;
+    int note;
 
-	int note_x;
-	int note_width;
-	int note_y;
-	int note_height;
+    int note_x;
+    int note_width;
+    int note_y;
+    int note_height;
 
-	bool selected;
+    bool selected;
 
-	int velocity;
+    int velocity;
 
-	draw_type dt;
-
-
-
-	int start_tick = m_scroll_offset_ticks ;
-	int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
-
-	sequence *seq = NULL;
-	for( int method=0; method<2; ++method )	{
-
-		if ( method == 0 && m_drawing_background_seq  ){
-
-			if ( m_perform->is_active( m_background_sequence )){
-				seq =m_perform->get_sequence( m_background_sequence );
-			} else {
-				method++;
-			}
-		} else if ( method == 0 ){
-			method++;
-		}
+    draw_type dt;
 
 
-		if ( method==1){
-			seq = m_seq;
-		}
 
-		/* draw boxes from sequence */
-		m_gc->set_foreground( m_black );
-		seq->reset_draw_marker();
+    int start_tick = m_scroll_offset_ticks ;
+    int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
 
-		while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN ) {
+    sequence *seq = NULL;
+    for( int method=0; method<2; ++method )	{
 
-			if ((tick_s >= start_tick && tick_s <= end_tick) ||
-				( (dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick))
-			) {
+        if ( method == 0 && m_drawing_background_seq  ){
 
-				/* turn into screen corrids */
-				note_x = tick_s / m_zoom;
-				note_y = c_rollarea_y -(note * c_key_y) - c_key_y - 1 + 2;
-				note_height = c_key_y - 3;
+            if ( m_perform->is_active( m_background_sequence )){
+                seq =m_perform->get_sequence( m_background_sequence );
+            } else {
+                method++;
+            }
+        } else if ( method == 0 ){
+            method++;
+        }
 
-//				printf( "DEBUG: drawing note[%d] tick_s[%d] tick_f[%d] start_tick[%d] end_tick[%d]\n",
-//				note, tick_s, tick_f, start_tick, end_tick );
-//				printf( "DEBUG: seq.get_lenght() = %d\n",  m_seq->get_length());
 
-				int in_shift = 0;
-				int length_add = 0;
+        if ( method==1){
+            seq = m_seq;
+        }
 
-				if ( dt == DRAW_NORMAL_LINKED ){
+        /* draw boxes from sequence */
+        m_gc->set_foreground( m_black );
+        seq->reset_draw_marker();
 
-					if (tick_f >= tick_s) {
-						note_width = (tick_f - tick_s) / m_zoom;
-						if ( note_width < 1 ) note_width = 1;
-					} else {
-						note_width = (m_seq->get_length() - tick_s) / m_zoom;
-                                        }
+        while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note, &selected, &velocity )) != DRAW_FIN ) {
 
-				} else {
-					note_width = 16 / m_zoom;
-				}
+            if ((tick_s >= start_tick && tick_s <= end_tick) ||
+                    ( (dt == DRAW_NORMAL_LINKED) && (tick_f >= start_tick && tick_f <= end_tick))
+               ) {
 
-				if ( dt == DRAW_NOTE_ON ){
-					in_shift = 0;
-					length_add = 2;
-				}       
+                /* turn into screen corrids */
+                note_x = tick_s / m_zoom;
+                note_y = c_rollarea_y -(note * c_key_y) - c_key_y - 1 + 2;
+                note_height = c_key_y - 3;
 
-				if ( dt == DRAW_NOTE_OFF ){
-					in_shift = -1;
-					length_add = 1;
-				}
+                //				printf( "DEBUG: drawing note[%d] tick_s[%d] tick_f[%d] start_tick[%d] end_tick[%d]\n",
+                //				note, tick_s, tick_f, start_tick, end_tick );
+                //				printf( "DEBUG: seq.get_lenght() = %d\n",  m_seq->get_length());
 
-				note_x -= m_scroll_offset_x;
-				note_y -= m_scroll_offset_y;
+                int in_shift = 0;
+                int length_add = 0;
 
-				m_gc->set_foreground(m_black);
-				/* draw boxes from sequence */
+                if ( dt == DRAW_NORMAL_LINKED ){
 
-				if ( method == 0 )
-					m_gc->set_foreground( m_dk_grey );
+                    if (tick_f >= tick_s) {
+                        note_width = (tick_f - tick_s) / m_zoom;
+                        if ( note_width < 1 ) note_width = 1;
+                    } else {
+                        note_width = (m_seq->get_length() - tick_s) / m_zoom;
+                    }
 
-				a_draw->draw_rectangle(	m_gc,true,
-							note_x,
-							note_y, 
-							note_width, 
-							note_height);
-				if (tick_f < tick_s) {
-					a_draw->draw_rectangle(	m_gc,true,
-								0,
-								note_y, 
-								tick_f/m_zoom, 
-								note_height);
-				}
+                } else {
+                    note_width = 16 / m_zoom;
+                }
 
-				/* draw inside box if there is room */
-				if ( note_width > 3 ){
+                if ( dt == DRAW_NOTE_ON ){
+                    in_shift = 0;
+                    length_add = 2;
+                }       
 
-					if ( selected )
-						m_gc->set_foreground(m_red);
-					else
-						m_gc->set_foreground(m_white);
+                if ( dt == DRAW_NOTE_OFF ){
+                    in_shift = -1;
+                    length_add = 1;
+                }
 
-					if ( method == 1 ) {
-						if (tick_f >= tick_s) {
-							a_draw->draw_rectangle(	m_gc,true,
-										note_x + 1 + in_shift,
-										note_y + 1, 
-										note_width - 3 + length_add, 
-										note_height - 3);
-						} else {
-							a_draw->draw_rectangle(	m_gc,true,
-										note_x + 1 + in_shift,
-										note_y + 1, 
-										note_width , 
-										note_height - 3);
-							a_draw->draw_rectangle(	m_gc,true,
-										0,
-										note_y + 1, 
-										(tick_f/m_zoom) - 3 + length_add, 
-										note_height - 3);
-						}
-                                        }
-				}
-			}
-		}
-	}
+                note_x -= m_scroll_offset_x;
+                note_y -= m_scroll_offset_y;
+
+                m_gc->set_foreground(m_black);
+                /* draw boxes from sequence */
+
+                if ( method == 0 )
+                    m_gc->set_foreground( m_dk_grey );
+
+                a_draw->draw_rectangle(	m_gc,true,
+                        note_x,
+                        note_y, 
+                        note_width, 
+                        note_height);
+                if (tick_f < tick_s) {
+                    a_draw->draw_rectangle(	m_gc,true,
+                            0,
+                            note_y, 
+                            tick_f/m_zoom, 
+                            note_height);
+                }
+
+                /* draw inside box if there is room */
+                if ( note_width > 3 ){
+
+                    if ( selected )
+                        m_gc->set_foreground(m_red);
+                    else
+                        m_gc->set_foreground(m_white);
+
+                    if ( method == 1 ) {
+                        if (tick_f >= tick_s) {
+                            a_draw->draw_rectangle(	m_gc,true,
+                                    note_x + 1 + in_shift,
+                                    note_y + 1, 
+                                    note_width - 3 + length_add, 
+                                    note_height - 3);
+                        } else {
+                            a_draw->draw_rectangle(	m_gc,true,
+                                    note_x + 1 + in_shift,
+                                    note_y + 1, 
+                                    note_width , 
+                                    note_height - 3);
+                            a_draw->draw_rectangle(	m_gc,true,
+                                    0,
+                                    note_y + 1, 
+                                    (tick_f/m_zoom) - 3 + length_add, 
+                                    note_height - 3);
+                        }
+                    }
+                }
+            }
+        }
+    }
 } 
 
 
@@ -924,336 +940,55 @@ seqroll::start_paste( )
 bool
 seqroll::on_button_press_event(GdkEventButton* a_ev)
 {
-    int numsel;
-	
-    long tick_s;
-    long tick_f;
-    int note_h;
-    int note_l;
-	
-    int norm_x, norm_y, snapped_x, snapped_y;
-	
-    grab_focus(  );
+    bool result;
 
-    bool needs_update = false;
-	
-    snapped_x = norm_x = (int) (a_ev->x + m_scroll_offset_x );
-    snapped_y = norm_y = (int) (a_ev->y + m_scroll_offset_y );
-	
-    snap_x( &snapped_x );
-    snap_y( &snapped_y );
-	
-    /* y is always snapped */
-    m_current_y = m_drop_y = snapped_y;
+    switch (global_interactionmethod)
+    {
+        case e_fruity_interaction:
+            result = m_fruity_interaction.on_button_press_event(a_ev, *this);
+        case e_seq24_interaction:
+            result = m_seq24_interaction.on_button_press_event(a_ev, *this);
+        default:
+            result = false;
 
-    /* reset box that holds dirty redraw spot */
-    m_old.x = 0;
-    m_old.y = 0;
-    m_old.width = 0;
-    m_old.height = 0;
-
-    if ( m_paste ){
-
-        convert_xy( snapped_x, snapped_y, &tick_s, &note_h );
-        m_paste = false;
-        m_seq->push_undo();
-        m_seq->paste_selected( tick_s, note_h );
-
-        needs_update = true;
-
-    } else { 
-
-        /*  left mouse button     */
-        if ( a_ev->button == 1 ||
-             a_ev->button == 2 )
-        { 
-
-            /* selection, normal x */
-            m_current_x = m_drop_x = norm_x;
-
-            /* turn x,y in to tick/note */
-            convert_xy( m_drop_x, m_drop_y, &tick_s, &note_h );
-
-            if ( m_adding )
-            {
-                /* start the paint job */
-                m_painting = true;
-
-                /* adding, snapped x */
-                m_current_x = m_drop_x = snapped_x;
-                convert_xy( m_drop_x, m_drop_y, &tick_s, &note_h );
-
-                // test if a note is already there
-                // fake select, if so, no add
-                if ( ! m_seq->select_note_events( tick_s, note_h, 
-                                                  tick_s, note_h,
-                                                  sequence::e_would_select ))
-                {
-                
-                    /* add note, length = little less than snap */
-                    m_seq->push_undo();
-                    m_seq->add_note( tick_s, m_note_length - 2, note_h, true );
-
-                    needs_update = true;
-                }
-
-            }
-            else /* selecting */
-            {
-
-               
-                if ( !m_seq->select_note_events( tick_s, note_h,
-                                                tick_s, note_h, 
-                                                sequence::e_is_selected ))
-                {
-                    if ( ! (a_ev->state & GDK_CONTROL_MASK) )
-                    {
-                        m_seq->unselect();	    
-                    }
- 
-
-                    /* on direct click select only one event */
-                    numsel = m_seq->select_note_events( tick_s,note_h,tick_s,note_h, 
-                                                        sequence::e_select_one );
-
-                    /* none selected, start selection box */
-                    if ( numsel == 0 )
-                    {
-                        if ( a_ev->button == 1 )
-                            m_selecting = true;
-                    }
-                    else
-                    {
-                        needs_update = true;
-                    }
-                }
- 
-                
-                if ( m_seq->select_note_events( tick_s, note_h,
-                                                tick_s, note_h, 
-                                                sequence::e_is_selected ))
-                {
-                    if ( a_ev->button == 1 )
-                    {
-                        m_moving_init = true;
-                        needs_update = true;
-
-
-                        /* get the box that selected elements are in */
-                        m_seq->get_selected_box( &tick_s, &note_h, 
-                                &tick_f, &note_l );
-
-
-                        convert_tn_box_to_rect( tick_s, tick_f, note_h, note_l,
-                                &m_selected.x,
-                                &m_selected.y,
-                                &m_selected.width,
-                                &m_selected.height );
-
-                        /* save offset that we get from the snap above */
-                        int adjusted_selected_x = m_selected.x;
-                        snap_x( &adjusted_selected_x );
-                        m_move_snap_offset_x = ( m_selected.x - adjusted_selected_x);
-
-                        /* align selection for drawing */
-                        snap_x( &m_selected.x );
-
-                        m_current_x = m_drop_x = snapped_x;
-                    }
-
-                    /* middle mouse button  */
-                    if ( a_ev->button == 2 ){	
-
-                        /* moving, normal x */
-                        //m_current_x = m_drop_x = norm_x;
-                        //convert_xy( m_drop_x, m_drop_y, &tick_s, &note_h );
-
-                        m_growing = true;
-
-                        /* get the box that selected elements are in */
-                        m_seq->get_selected_box( &tick_s, &note_h, 
-                                    &tick_f, &note_l );
-
-                        convert_tn_box_to_rect( tick_s, tick_f, note_h, note_l,
-                                &m_selected.x,
-                                &m_selected.y,
-                                &m_selected.width,
-                                &m_selected.height );	
-                        
-                    }
-                }
-           }
-       }
-
-        /*     right mouse button      */
-        if ( a_ev->button == 3 ){
-            set_adding( true );
-        }
-
-   }
-
-    /* if they clicked, something changed */
-    if ( needs_update ){
-    
-        ////printf( "needs update\n" );
-        m_seq->set_dirty();
-        //redraw_events();
     }
-    return true;
+    return result;
 }
 
 
 bool
 seqroll::on_button_release_event(GdkEventButton* a_ev)
 {
-    long tick_s;
-    long tick_f;
-    int note_h;
-    int note_l;
-    int x,y,w,h;
-    int numsel;
+    bool result;
 
-    bool needs_update = false;
-
-    m_current_x = (int) (a_ev->x + m_scroll_offset_x );
-    m_current_y = (int) (a_ev->y + m_scroll_offset_y );
-
-    snap_y ( &m_current_y );
-
-    if ( m_moving )
-        snap_x( &m_current_x );
-
-    int delta_x = m_current_x - m_drop_x;
-    int delta_y = m_current_y - m_drop_y;
-
-    long delta_tick;
-    int delta_note;
-
-    if ( a_ev->button == 1 ){
-
-        if ( m_selecting ){
-
-            xy_to_rect ( m_drop_x,
-                    m_drop_y,
-                    m_current_x,
-                    m_current_y,
-                    &x, &y,
-                    &w, &h );
-
-            convert_xy( x,     y, &tick_s, &note_h );
-            convert_xy( x+w, y+h, &tick_f, &note_l );
-
-            numsel = m_seq->select_note_events( tick_s, note_h, tick_f, note_l, sequence::e_select );
-
-            needs_update = true;
-        }
-
-        if (  m_moving  ){
-
-            /* adjust for snap */
-            delta_x -= m_move_snap_offset_x;
-
-            /* convert deltas into screen corridinates */
-            convert_xy( delta_x, delta_y, &delta_tick, &delta_note );
-
-            /* since delta_note was from delta_y, it will be filpped
-               ( delta_y[0] = note[127], etc.,so we have to adjust */
-            delta_note = delta_note - (c_num_keys-1);
-
-            m_seq->push_undo();
-            m_seq->move_selected_notes( delta_tick, delta_note );
-            needs_update = true;
-        }
-
-   }
-
-    if ( a_ev->button == 2 ){	
-
-        if ( m_growing ){
-
-            /* convert deltas into screen corridinates */
-            convert_xy( delta_x, delta_y, &delta_tick, &delta_note );
-            m_seq->push_undo();
-
-            if ( a_ev->state & GDK_SHIFT_MASK )
-            {
-                m_seq->stretch_selected( delta_tick );
-            }
-            else
-            {
-                m_seq->grow_selected( delta_tick );
-            }
-
-            needs_update = true;
-        }
+    switch (global_interactionmethod)
+    {
+        case e_fruity_interaction:
+            result = m_fruity_interaction.on_button_release_event(a_ev, *this);
+        case e_seq24_interaction:
+            result = m_seq24_interaction.on_button_release_event(a_ev, *this);
+        default:
+            result = false;
     }
-
-    if ( a_ev->button == 3 ){	
-        set_adding( false );
-    }
-
-    /* turn off */
-    m_selecting = false;
-    m_moving = false;
-    m_growing = false;
-    m_paste = false;
-    m_moving_init = false;
-    m_painting = false;
-
-    m_seq->unpaint_all();
- 
-    /* if they clicked, something changed */
-    if (  needs_update ){
-
-        ////printf( "needs_update2\n" );
-        m_seq->set_dirty();
-        //redraw_events();
-    }
-    return true;
+    return result;
 }
  
 
 bool
 seqroll::on_motion_notify_event(GdkEventMotion* a_ev)
 {
-    m_current_x = (int) (a_ev->x  + m_scroll_offset_x );
-    m_current_y = (int) (a_ev->y  + m_scroll_offset_y );
+    bool result;
 
-    int note;
-    long tick;
-
-    if ( m_moving_init ){
-        m_moving_init = false;
-        m_moving = true;
-    }
-		 
-    
-    snap_y( &m_current_y );
-    convert_xy( 0, m_current_y, &tick, &note );
-	
-    m_seqkeys_wid->set_hint_key( note );
-	
-    if ( m_selecting || m_moving || m_growing || m_paste ){
-        
-        if ( m_moving || m_paste ){
-            snap_x( &m_current_x );
-        }
-        
-        draw_selection_on_window();
-        return true;
-	
-    }
-
-    if ( m_painting )
+    switch (global_interactionmethod)
     {
-        snap_x( &m_current_x );
-        convert_xy( m_current_x, m_current_y, &tick, &note );
-
-        m_seq->add_note( tick, m_note_length - 2, note, true );
-        return true;
+        case e_fruity_interaction:
+            result = m_fruity_interaction.on_motion_notify_event(a_ev, *this);
+        case e_seq24_interaction:
+            result = m_seq24_interaction.on_motion_notify_event(a_ev, *this);
+        default:
+            result = false;
     }
-    
-    return false;
+    return result;
 }
 
 
@@ -1320,18 +1055,20 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
 {
     bool ret = false;
 
-	if ( a_p0->keyval ==  GDK_space ){
-		    if (is_pattern_playing) {
-			    m_perform->stop_jack();
-			    m_perform->stop();
-		    	    is_pattern_playing=false;
-		    } else {
-			    m_perform->position_jack( false );  
-			    m_perform->start( false );
-			    m_perform->start_jack( );
-		    	    is_pattern_playing=true;
- 		    }
-            }
+     // the start/end key may be the same key (i.e. SPACEBAR)
+     // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
+     bool dont_toggle = m_perform->m_key_start != m_perform->m_key_stop;
+     if ( a_p0->keyval ==  m_perform->m_key_start && (dont_toggle || !is_pattern_playing) ){
+ 	    m_perform->position_jack( false );
+ 	    m_perform->start( false );
+ 	    m_perform->start_jack( );
+         is_pattern_playing=true;
+     }
+     else if ( a_p0->keyval ==  m_perform->m_key_stop && (dont_toggle || is_pattern_playing) ){
+         m_perform->stop_jack();
+         m_perform->stop();
+         is_pattern_playing=false;
+     }
 
     if ( a_p0->type == GDK_KEY_PRESS ){
 
@@ -1373,6 +1110,13 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
             if ( a_p0->keyval == GDK_z || a_p0->keyval == GDK_Z ){
 
                 m_seq->pop_undo();
+                ret = true;
+            }
+            
+            /* select all events */
+            if ( a_p0->keyval == GDK_a || a_p0->keyval == GDK_A ){
+
+                m_seq->select_all();
                 ret = true;
             }
         }
@@ -1434,3 +1178,913 @@ seqroll::on_scroll_event( GdkEventScroll* a_ev )
     return true;
 }
 
+
+
+//////////////////////////
+// interaction methods
+//////////////////////////
+
+void FruitySeqRollInput::updateMousePtr(seqroll& ths)
+{
+     // context sensitive mouse
+     {
+        long drop_tick;
+        int drop_note;
+        ths.convert_xy( ths.m_current_x, ths.m_current_y, &drop_tick, &drop_note );
+        long start, end, note;
+        if (ths.m_is_drag_pasting || ths.m_selecting || ths.m_moving || ths.m_growing || ths.m_paste)
+        {
+            ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+        }
+        else if (!m_adding &&
+            ths.m_seq->intersectNotes( drop_tick, drop_note, start, end, note ) && note == drop_note)
+	    {
+            long handle_size = clamp( c_handlesize, 0, (end-start)/3 );
+            if (start <= drop_tick && drop_tick <= start + handle_size)
+            {
+               //get_window()->set_cursor( Gdk::Cursor( Gdk::RIGHT_PTR ));
+               ths.get_window()->set_cursor( Gdk::Cursor( Gdk::CENTER_PTR )); // not supported yet
+            }
+            else if (end - handle_size <= drop_tick && drop_tick <= end)
+            {
+               ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+            }
+            else
+            {
+               ths.get_window()->set_cursor( Gdk::Cursor( Gdk::CENTER_PTR ));
+            }
+        }
+        else
+        {
+            ths.get_window()->set_cursor( Gdk::Cursor( Gdk::PENCIL ));
+        }
+    }
+}
+
+
+bool FruitySeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths)
+{
+    int numsel;
+
+    long tick_s;
+    long tick_f;
+    int note_h;
+    int note_l;
+
+    int norm_x, norm_y, snapped_x, snapped_y;
+
+    ths.grab_focus(  );
+
+    bool needs_update = false;
+
+    snapped_x = norm_x = (int) (a_ev->x + ths.m_scroll_offset_x );
+    snapped_y = norm_y = (int) (a_ev->y + ths.m_scroll_offset_y );
+
+    ths.snap_x( &snapped_x );
+    ths.snap_y( &snapped_y );
+
+    /* y is always snapped */
+    ths.m_current_y = ths.m_drop_y = snapped_y;
+
+    /* reset box that holds dirty redraw spot */
+    ths.m_old.x = 0;
+    ths.m_old.y = 0;
+    ths.m_old.width = 0;
+    ths.m_old.height = 0;
+
+    // ctrl-v pressed, we're waiting for a click to show where to paste
+    if ( ths.m_paste ){
+
+        ths.convert_xy( snapped_x, snapped_y, &tick_s, &note_h );
+        ths.m_paste = false;
+        ths.m_seq->push_undo();
+        ths.m_seq->paste_selected( tick_s, note_h );
+
+        needs_update = true;
+
+    } else {
+
+        /*  left mouse button     */
+        if ( a_ev->button == 1)
+        {
+
+            /* selection, normal x */
+            ths.m_current_x = ths.m_drop_x = norm_x;
+
+            /* turn x,y in to tick/note */
+            ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &tick_s, &note_h );
+
+            // if not on top of event then add one...
+            if ( m_canadd && ! ths.m_seq->select_note_events( tick_s, note_h,
+                                             tick_s, note_h,
+                                             sequence::e_would_select ) &&
+                 !(a_ev->state & GDK_CONTROL_MASK) )
+            {
+                /* start the paint job */
+                ths.m_painting = true;
+                m_adding = true;
+
+                /* adding, snapped x */
+                ths.m_current_x = ths.m_drop_x = snapped_x;
+                ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &tick_s, &note_h );
+
+                // test if a note is already there
+                // fake select, if so, no add
+                if ( ! ths.m_seq->select_note_events( tick_s, note_h,
+                                                  tick_s, note_h,
+                                                  sequence::e_would_select ))
+                {
+                    /* add note, length = little less than snap */
+                    ths.m_seq->push_undo();
+                    ths.m_seq->add_note( tick_s, ths.m_note_length - 2, note_h, true );
+
+                    needs_update = true;
+                }
+
+            }
+            else /* selecting */
+            {
+                // if the under the cursor is not a selected note...
+                if ( !ths.m_seq->select_note_events( tick_s, note_h,
+                                                tick_s, note_h,
+                                                sequence::e_is_selected ))
+                {
+                    // if clicking a note ...
+                    if (ths.m_seq->select_note_events( tick_s,note_h,tick_s,note_h,
+                                                   sequence::e_would_select ) )
+                    {
+                        // ... unselect all if ctrl not held
+                        if (! (a_ev->state & GDK_CONTROL_MASK))
+                           ths.m_seq->unselect();
+                    }
+                    // if clicking empty space ...
+                    else
+                    {
+                        // ... unselect all if ctrl-shift not held
+                        if (! ((a_ev->state & GDK_CONTROL_MASK) &&
+                               (a_ev->state & GDK_SHIFT_MASK)) )
+                           ths.m_seq->unselect();
+                    }
+
+                    /* on direct click select only one event */
+                    numsel = ths.m_seq->select_note_events( tick_s,note_h,tick_s,note_h,
+                                                        sequence::e_select_one );
+                    // prevent deselect in button_release()
+                    if (numsel)
+                       ths.m_justselected_one = true;
+
+                    // if nothing selected, start the selection box
+                    if (numsel == 0 && (a_ev->state & GDK_CONTROL_MASK))
+                        ths.m_selecting = true;
+
+                    needs_update = true;
+                }
+
+                // if note under cursor is selected
+                if ( ths.m_seq->select_note_events( tick_s, note_h,
+                                                tick_s, note_h,
+                                                sequence::e_is_selected ))
+                {
+                    // context sensitive mouse
+                    //bool left_mouse_handle = false;
+                    bool right_mouse_handle = false;
+                    bool center_mouse_handle = false;
+                    {
+                        long drop_tick;
+                        int drop_note;
+                        ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &drop_tick, &drop_note );
+                        long start, end, note;
+                        if (ths.m_seq->intersectNotes( drop_tick, drop_note, start, end, note ) && note == drop_note)
+                	    {
+                            long handle_size = clamp( c_handlesize, 0, (end-start)/3 ); // 16 wide unless very small...
+                            if (start <= drop_tick && drop_tick <= start + handle_size)
+                            {
+                                //left_mouse_handle = true; // not supported yet
+                                center_mouse_handle = true;  
+                            }
+                            else if (end - handle_size <= drop_tick && drop_tick <= end)
+                            {
+                                right_mouse_handle = true;
+                            }
+                            else
+                            {
+                                center_mouse_handle = true;
+                            }
+                        }
+                    }
+
+                    // grab/move the note
+                    if ( center_mouse_handle &&
+                         a_ev->button == 1 && !(a_ev->state & GDK_CONTROL_MASK) )
+                    {
+                        ths.m_moving_init = true;
+                        needs_update = true;
+
+
+                        /* get the box that selected elements are in */
+                        ths.m_seq->get_selected_box( &tick_s, &note_h,
+                                &tick_f, &note_l );
+
+
+                        ths.convert_tn_box_to_rect( tick_s, tick_f, note_h, note_l,
+                                &ths.m_selected.x,
+                                &ths.m_selected.y,
+                                &ths.m_selected.width,
+                                &ths.m_selected.height );
+
+                        /* save offset that we get from the snap above */
+                        int adjusted_selected_x = ths.m_selected.x;
+                        ths.snap_x( &adjusted_selected_x );
+                        ths.m_move_snap_offset_x = ( ths.m_selected.x - adjusted_selected_x);
+
+                        /* align selection for drawing */
+                        ths.snap_x( &ths.m_selected.x );
+
+                        ths.m_current_x = ths.m_drop_x = snapped_x;
+                    }
+                    // ctrl left click when stuff is already selected
+                    else if (a_ev->button == 1 && (a_ev->state & GDK_CONTROL_MASK) &&
+                             ths.m_seq->select_note_events( tick_s, note_h,
+                                                        tick_s, note_h,
+                                                        sequence::e_is_selected ))
+                    {
+                        ths.m_is_drag_pasting_start = true;
+                        m_drag_paste_start_pos[0] = (long)a_ev->x;
+                        m_drag_paste_start_pos[1] = (long)a_ev->y;
+                        //printf( "start: %lf  %lf\n", a_ev->x, a_ev->y );
+                    }
+
+                    /* left click on the right handle - grow/resize event  */
+                    if ( (right_mouse_handle &&
+                          a_ev->button == 1 && ! (a_ev->state & GDK_CONTROL_MASK)) ||
+                          a_ev->button == 2 ){
+                        ths.m_growing = true;
+
+                        /* get the box that selected elements are in */
+                        ths.m_seq->get_selected_box( &tick_s, &note_h,
+                                    &tick_f, &note_l );
+
+                        ths.convert_tn_box_to_rect( tick_s, tick_f, note_h, note_l,
+                                &ths.m_selected.x,
+                                &ths.m_selected.y,
+                                &ths.m_selected.width,
+                                &ths.m_selected.height );
+                    }
+                }
+           }
+       }
+
+
+        /*     right click      */
+        if ( a_ev->button == 3 ){
+            /* selection, normal x */
+            ths.m_current_x = ths.m_drop_x = norm_x;
+
+            /* turn x,y in to tick/note */
+            ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &tick_s, &note_h );
+
+
+            // erase event(s) under cursor if there is one
+            if ( ths.m_seq->select_note_events( tick_s, note_h,
+                                            tick_s, note_h,
+                                            sequence::e_would_select) )
+            {
+                /* right ctrl click: remove all selected notes */
+                if (a_ev->state & GDK_CONTROL_MASK)
+                {
+                    ths.m_seq->select_note_events( tick_s, note_h,
+                                                tick_s, note_h,
+                                                sequence::e_select_one );
+                    ths.m_seq->push_undo();
+                    ths.m_seq->mark_selected();
+                    ths.m_seq->remove_marked();
+                }
+                /* right click: remove only the note under the cursor,
+                   leave the selection intact */
+                else
+                {
+                    ths.m_seq->push_undo();
+                    ths.m_seq->select_note_events( tick_s, note_h,
+                                                tick_s, note_h,
+                                                sequence::e_remove_one );
+                }
+
+                // hold down the right button, drag mouse around erasing notes:
+                m_erase_painting = true;
+
+                // repaint... we've changed the notes.
+                needs_update = true;
+            }
+            else /* selecting */
+            {
+
+                if  ( ! (a_ev->state & GDK_CONTROL_MASK) )
+                    ths.m_seq->unselect();
+
+                // nothing selected, start the selection box
+                ths.m_selecting = true;
+
+                needs_update = true;
+            }
+        }
+    }
+
+    // context sensative mouse pointer...
+    updateMousePtr( ths );
+
+    /* if they clicked, something changed */
+    if ( needs_update ){
+        ////printf( "needs update\n" );
+        ths.m_seq->set_dirty();
+        //redraw_events();
+    }
+    return true;
+}
+
+bool FruitySeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& ths)
+{
+    long tick_s;
+    long tick_f;
+    int note_h;
+    int note_l;
+    int x,y,w,h;
+    int numsel;
+
+    bool needs_update = false;
+
+    ths.m_current_x = (int) (a_ev->x + ths.m_scroll_offset_x );
+    ths.m_current_y = (int) (a_ev->y + ths.m_scroll_offset_y );
+
+    ths.snap_y( &ths.m_current_y );
+
+    if ( ths.m_moving || ths.m_is_drag_pasting )
+        ths.snap_x( &ths.m_current_x );
+
+    int delta_x = ths.m_current_x - ths.m_drop_x;
+    int delta_y = ths.m_current_y - ths.m_drop_y;
+
+    long delta_tick;
+    int delta_note;
+
+    // middle click, or ctrlleft click button up
+    if ( a_ev->button == 1 ||
+         a_ev->button == 2 ){
+        if ( ths.m_growing )
+        {
+            /* convert deltas into screen corridinates */
+            ths.convert_xy( delta_x, delta_y, &delta_tick, &delta_note );
+            ths.m_seq->push_undo();
+
+            if ( a_ev->state & GDK_SHIFT_MASK )
+                ths.m_seq->stretch_selected( delta_tick );
+            else
+                ths.m_seq->grow_selected( delta_tick );
+
+            needs_update = true;
+        }
+    }
+    long int current_tick;
+    int current_note;
+    ths.convert_xy( ths.m_current_x, ths.m_current_y, &current_tick, &current_note );
+
+
+    // ctrl-left click button up for select/drag copy/paste
+    // left click button up for ending a move of selected notes
+    if ( a_ev->button == 1 ){
+        m_adding = false;
+        if ( ths.m_is_drag_pasting )
+        {
+            ths.m_is_drag_pasting = false;
+            ths.m_is_drag_pasting_start = false;
+
+            /* convert deltas into screen corridinates */
+            ths.m_paste = false;
+            ths.m_seq->push_undo();
+            ths.m_seq->paste_selected( current_tick, current_note );
+
+            needs_update = true;
+
+            //m_seq->unselect();
+        }
+        // ctrl-left click but without movement - select a note
+        if (ths.m_is_drag_pasting_start)
+        {
+            ths.m_is_drag_pasting_start = false;
+
+            // if ctrl-left click without movement and
+            // if note under cursor is selected, and ctrl is held
+            // and buttondown didn't just select one
+            if (!ths.m_justselected_one &&
+                ths.m_seq->select_note_events( current_tick, current_note,
+                                           current_tick, current_note,
+                                           sequence::e_is_selected ) &&
+                (a_ev->state & GDK_CONTROL_MASK))
+            {
+                // deselect the note
+                numsel = ths.m_seq->select_note_events( current_tick, current_note,
+                                                    current_tick, current_note,
+                                                    sequence::e_deselect );
+                needs_update = true;
+            }
+        }
+        ths.m_justselected_one = false; // clear flag on left button up
+
+        if (  ths.m_moving  ){
+
+            /* adjust for snap */
+            delta_x -= ths.m_move_snap_offset_x;
+
+            /* convert deltas into screen corridinates */
+            ths.convert_xy( delta_x, delta_y, &delta_tick, &delta_note );
+
+            /* since delta_note was from delta_y, it will be filpped
+               ( delta_y[0] = note[127], etc.,so we have to adjust */
+            delta_note = delta_note - (c_num_keys-1);
+
+            ths.m_seq->push_undo();
+            ths.m_seq->move_selected_notes( delta_tick, delta_note );
+            needs_update = true;
+        }
+    }
+
+    // right click or leftctrl click button up for selection box
+    if ( a_ev->button == 3 || a_ev->button == 1 ){
+        if ( ths.m_selecting )
+        {
+            ths.xy_to_rect ( ths.m_drop_x,
+                    ths.m_drop_y,
+                    ths.m_current_x,
+                    ths.m_current_y,
+                    &x, &y,
+                    &w, &h );
+
+            ths.convert_xy( x,     y, &tick_s, &note_h );
+            ths.convert_xy( x+w, y+h, &tick_f, &note_l );
+
+            numsel = ths.m_seq->select_note_events( tick_s, note_h, tick_f, note_l, sequence::e_toggle_selection );
+
+            needs_update = true;
+        }
+    }
+    if ( a_ev->button == 3 )
+    {
+        m_erase_painting = false;
+    }
+
+    /* turn off */
+    ths.m_selecting = false;
+    ths.m_moving = false;
+    ths.m_growing = false;
+    ths.m_paste = false;
+    ths.m_moving_init = false;
+    ths.m_painting = false;
+
+    ths.m_seq->unpaint_all();
+
+    // context sensative mouse pointer...
+    updateMousePtr( ths );
+
+
+    /* if they clicked, something changed */
+    if (  needs_update ){
+
+        ////printf( "needs_update2\n" );
+
+        ths.m_seq->set_dirty();
+        //redraw_events();
+
+    }
+    return true;
+}
+
+bool FruitySeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& ths)
+{
+    ths.m_current_x = (int) (a_ev->x  + ths.m_scroll_offset_x );
+    ths.m_current_y = (int) (a_ev->y  + ths.m_scroll_offset_y );
+
+    int note;
+    long tick;
+
+    if ( ths.m_moving_init ){
+        ths.m_moving_init = false;
+        ths.m_moving = true;
+    }
+
+    // context sensitive mouse pointer...
+    updateMousePtr( ths );
+
+    // ctrl-left click drag on selected note(s) starts a copy/unselect/paste
+    // don't begin the paste until mouse moves a few pixels, filter out the unsteady hand
+    if ( ths.m_is_drag_pasting_start &&
+         (6 <= abs(m_drag_paste_start_pos[0] - (long)a_ev->x) ||
+          6 <= abs(m_drag_paste_start_pos[1] - (long)a_ev->y))  )
+    {
+        ths.m_seq->copy_selected();
+        ths.m_seq->unselect();
+        ths.start_paste();
+
+        ths.m_is_drag_pasting_start = false;
+        ths.m_is_drag_pasting = true;
+    }
+
+
+
+    ths.snap_y( &ths.m_current_y );
+    ths.convert_xy( 0, ths.m_current_y, &tick, &note );
+
+    ths.m_seqkeys_wid->set_hint_key( note );
+
+    if ( ths.m_selecting || ths.m_moving || ths.m_growing || ths.m_paste ){
+
+        if ( ths.m_moving || ths.m_paste ){
+            ths.snap_x( &ths.m_current_x );
+        }
+
+        ths.draw_selection_on_window();
+        return true;
+
+    }
+
+    if ( ths.m_painting )
+    {
+        ths.snap_x( &ths.m_current_x );
+        ths.convert_xy( ths.m_current_x, ths.m_current_y, &tick, &note );
+
+        ths.m_seq->add_note( tick, ths.m_note_length - 2, note, true );
+        return true;
+    }
+
+    if (m_erase_painting)
+    {
+        ths.convert_xy( ths.m_current_x, ths.m_current_y, &tick, &note );
+        if ( ths.m_seq->select_note_events( tick, note,
+                                            tick, note,
+                                            sequence::e_would_select) )
+        {
+            /* remove only the note under the cursor,
+               leave the selection intact */
+            ths.m_seq->push_undo();
+            ths.m_seq->select_note_events( tick, note,
+                                        tick, note,
+                                        sequence::e_remove_one );
+            ths.m_seq->set_dirty();
+        }
+    }
+    
+
+    return false;
+}
+
+
+
+
+
+/* popup menu calls this */
+void
+Seq24SeqRollInput::set_adding( bool a_adding, seqroll& ths )
+{
+    if ( a_adding ){
+
+	ths.get_window()->set_cursor(  Gdk::Cursor( Gdk::PENCIL ));
+	m_adding = true;
+
+    } else {
+
+	ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+	m_adding = false;
+    }
+}
+
+bool Seq24SeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths)
+{
+    int numsel;
+
+    long tick_s;
+    long tick_f;
+    int note_h;
+    int note_l;
+
+    int norm_x, norm_y, snapped_x, snapped_y;
+
+    ths.grab_focus(  );
+
+    bool needs_update = false;
+
+    snapped_x = norm_x = (int) (a_ev->x + ths.m_scroll_offset_x );
+    snapped_y = norm_y = (int) (a_ev->y + ths.m_scroll_offset_y );
+
+    ths.snap_x( &snapped_x );
+    ths.snap_y( &snapped_y );
+
+    /* y is always snapped */
+    ths.m_current_y = ths.m_drop_y = snapped_y;
+
+    /* reset box that holds dirty redraw spot */
+    ths.m_old.x = 0;
+    ths.m_old.y = 0;
+    ths.m_old.width = 0;
+    ths.m_old.height = 0;
+
+    if ( ths.m_paste ){
+
+        ths.convert_xy( snapped_x, snapped_y, &tick_s, &note_h );
+        ths.m_paste = false;
+        ths.m_seq->push_undo();
+        ths.m_seq->paste_selected( tick_s, note_h );
+
+        needs_update = true;
+
+    } else {
+
+        /*  left mouse button     */
+        if ( a_ev->button == 1 ||
+             a_ev->button == 2 )
+        {
+
+            /* selection, normal x */
+            ths.m_current_x = ths.m_drop_x = norm_x;
+
+            /* turn x,y in to tick/note */
+            ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &tick_s, &note_h );
+
+            if ( m_adding )
+            {
+                /* start the paint job */
+                ths.m_painting = true;
+
+                /* adding, snapped x */
+                ths.m_current_x = ths.m_drop_x = snapped_x;
+                ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &tick_s, &note_h );
+
+                // test if a note is already there
+                // fake select, if so, no add
+                if ( ! ths.m_seq->select_note_events( tick_s, note_h,
+                                                  tick_s, note_h,
+                                                  sequence::e_would_select ))
+                {
+
+                    /* add note, length = little less than snap */
+                    ths.m_seq->push_undo();
+                    ths.m_seq->add_note( tick_s, ths.m_note_length - 2, note_h, true );
+
+                    needs_update = true;
+                }
+
+            }
+            else /* selecting */
+            {
+
+
+                if ( !ths.m_seq->select_note_events( tick_s, note_h,
+                                                tick_s, note_h,
+                                                sequence::e_is_selected ))
+                {
+                    if ( ! (a_ev->state & GDK_CONTROL_MASK) )
+                    {
+                        ths.m_seq->unselect();
+                    }
+
+
+                    /* on direct click select only one event */
+                    numsel = ths.m_seq->select_note_events( tick_s,note_h,tick_s,note_h,
+                                                        sequence::e_select_one );
+
+                    /* none selected, start selection box */
+                    if ( numsel == 0 )
+                    {
+                        if ( a_ev->button == 1 )
+                            ths.m_selecting = true;
+                    }
+                    else
+                    {
+                        needs_update = true;
+                    }
+                }
+
+
+                if ( ths.m_seq->select_note_events( tick_s, note_h,
+                                                tick_s, note_h,
+                                                sequence::e_is_selected ))
+                {
+                    // moving - left click only
+                    if ( a_ev->button == 1 && !(a_ev->state & GDK_CONTROL_MASK) )
+                    {
+                        ths.m_moving_init = true;
+                        needs_update = true;
+
+
+                        /* get the box that selected elements are in */
+                        ths.m_seq->get_selected_box( &tick_s, &note_h,
+                                &tick_f, &note_l );
+
+
+                        ths.convert_tn_box_to_rect( tick_s, tick_f, note_h, note_l,
+                                &ths.m_selected.x,
+                                &ths.m_selected.y,
+                                &ths.m_selected.width,
+                                &ths.m_selected.height );
+
+                        /* save offset that we get from the snap above */
+                        int adjusted_selected_x = ths.m_selected.x;
+                        ths.snap_x( &adjusted_selected_x );
+                        ths.m_move_snap_offset_x = ( ths.m_selected.x - adjusted_selected_x);
+
+                        /* align selection for drawing */
+                        ths.snap_x( &ths.m_selected.x );
+
+                        ths.m_current_x = ths.m_drop_x = snapped_x;
+                    }
+
+                    /* middle mouse button, or left-ctrl click (for 2button mice) */
+                    if ( a_ev->button == 2 ||
+                         (a_ev->button == 1 && (a_ev->state & GDK_CONTROL_MASK)) ){
+
+                        /* moving, normal x */
+                        //m_current_x = m_drop_x = norm_x;
+                        //convert_xy( m_drop_x, m_drop_y, &tick_s, &note_h );
+
+                        ths.m_growing = true;
+
+                        /* get the box that selected elements are in */
+                        ths.m_seq->get_selected_box( &tick_s, &note_h,
+                                    &tick_f, &note_l );
+
+                        ths.convert_tn_box_to_rect( tick_s, tick_f, note_h, note_l,
+                                &ths.m_selected.x,
+                                &ths.m_selected.y,
+                                &ths.m_selected.width,
+                                &ths.m_selected.height );
+
+                    }
+                }
+           }
+       }
+
+        /*     right mouse button      */
+        if ( a_ev->button == 3 ){
+            set_adding( true, ths );
+        }
+
+   }
+
+    /* if they clicked, something changed */
+    if ( needs_update ){
+
+        ////printf( "needs update\n" );
+        ths.m_seq->set_dirty();
+        //redraw_events();
+    }
+    return true;
+}
+
+bool Seq24SeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& ths)
+{
+    long tick_s;
+    long tick_f;
+    int note_h;
+    int note_l;
+    int x,y,w,h;
+    int numsel;
+
+    bool needs_update = false;
+
+    ths.m_current_x = (int) (a_ev->x + ths.m_scroll_offset_x );
+    ths.m_current_y = (int) (a_ev->y + ths.m_scroll_offset_y );
+
+    ths.snap_y ( &ths.m_current_y );
+
+    if ( ths.m_moving )
+        ths.snap_x( &ths.m_current_x );
+
+    int delta_x = ths.m_current_x - ths.m_drop_x;
+    int delta_y = ths.m_current_y - ths.m_drop_y;
+
+    long delta_tick;
+    int delta_note;
+
+    if ( a_ev->button == 1 ){
+
+        if ( ths.m_selecting ){
+
+            ths.xy_to_rect ( ths.m_drop_x,
+                    ths.m_drop_y,
+                    ths.m_current_x,
+                    ths.m_current_y,
+                    &x, &y,
+                    &w, &h );
+
+            ths.convert_xy( x,     y, &tick_s, &note_h );
+            ths.convert_xy( x+w, y+h, &tick_f, &note_l );
+
+            numsel = ths.m_seq->select_note_events( tick_s, note_h, tick_f, note_l, sequence::e_select );
+
+            needs_update = true;
+        }
+
+        if (  ths.m_moving  ){
+
+            /* adjust for snap */
+            delta_x -= ths.m_move_snap_offset_x;
+
+            /* convert deltas into screen corridinates */
+            ths.convert_xy( delta_x, delta_y, &delta_tick, &delta_note );
+
+            /* since delta_note was from delta_y, it will be filpped
+               ( delta_y[0] = note[127], etc.,so we have to adjust */
+            delta_note = delta_note - (c_num_keys-1);
+
+            ths.m_seq->push_undo();
+            ths.m_seq->move_selected_notes( delta_tick, delta_note );
+            needs_update = true;
+        }
+
+   }
+
+    if ( a_ev->button == 2 || a_ev->button == 1 ){
+
+        if ( ths.m_growing ){
+
+            /* convert deltas into screen corridinates */
+            ths.convert_xy( delta_x, delta_y, &delta_tick, &delta_note );
+            ths.m_seq->push_undo();
+
+            if ( a_ev->state & GDK_SHIFT_MASK )
+            {
+                ths.m_seq->stretch_selected( delta_tick );
+            }
+            else
+            {
+                ths.m_seq->grow_selected( delta_tick );
+            }
+
+            needs_update = true;
+        }
+    }
+
+    if ( a_ev->button == 3 ){
+        set_adding( false, ths );
+    }
+
+    /* turn off */
+    ths.m_selecting = false;
+    ths.m_moving = false;
+    ths.m_growing = false;
+    ths.m_paste = false;
+    ths.m_moving_init = false;
+    ths.m_painting = false;
+
+    ths.m_seq->unpaint_all();
+
+    /* if they clicked, something changed */
+    if (  needs_update ){
+
+        ////printf( "needs_update2\n" );
+
+        ths.m_seq->set_dirty();
+        //redraw_events();
+
+    }
+    return true;
+}
+
+bool Seq24SeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& ths)
+{
+    ths.m_current_x = (int) (a_ev->x  + ths.m_scroll_offset_x );
+    ths.m_current_y = (int) (a_ev->y  + ths.m_scroll_offset_y );
+
+    int note;
+    long tick;
+
+    if ( ths.m_moving_init ){
+        ths.m_moving_init = false;
+        ths.m_moving = true;
+    }
+
+
+    ths.snap_y( &ths.m_current_y );
+    ths.convert_xy( 0, ths.m_current_y, &tick, &note );
+
+    ths.m_seqkeys_wid->set_hint_key( note );
+
+    if ( ths.m_selecting || ths.m_moving || ths.m_growing || ths.m_paste ){
+
+        if ( ths.m_moving || ths.m_paste ){
+            ths.snap_x( &ths.m_current_x );
+        }
+
+        ths.draw_selection_on_window();
+        return true;
+
+    }
+
+    if ( ths.m_painting )
+    {
+        ths.snap_x( &ths.m_current_x );
+        ths.convert_xy( ths.m_current_x, ths.m_current_y, &tick, &note );
+
+        ths.m_seq->add_note( tick, ths.m_note_length - 2, note, true );
+        return true;
+    }
+
+    return false;
+}

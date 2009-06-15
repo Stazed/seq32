@@ -34,6 +34,13 @@
 
 using namespace sigc;
 
+// tooltip helper, for old vs new gtk...
+#if GTK_MINOR_VERSION >= 12
+#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
+#else
+#   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
+#endif
+
 perfedit::perfedit( perform *a_perf ) 
 {
     using namespace Menu_Helpers;
@@ -79,7 +86,7 @@ perfedit::perfedit( perform *a_perf )
     m_button_grow = manage( new Button());
     m_button_grow->add( *manage( new Arrow( Gtk::ARROW_RIGHT, Gtk::SHADOW_OUT )));
     m_button_grow->signal_clicked().connect( mem_fun( *this, &perfedit::grow)); 
-    m_tooltips->set_tip( *m_button_grow, "Increase size of Grid." );
+    add_tooltip( m_button_grow, "Increase size of Grid." );
 
 
     /* fill table */
@@ -113,7 +120,7 @@ perfedit::perfedit( perform *a_perf )
     m_button_snap = manage( new Button());
     m_button_snap->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( snap_xpm ))));
     m_button_snap->signal_clicked().connect(  bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_snap  ));
-    m_tooltips->set_tip( *m_button_snap, "Grid snap. (Fraction of Measure Length)" );
+    add_tooltip( m_button_snap, "Grid snap. (Fraction of Measure Length)" );
     m_entry_snap = manage( new Entry());
     m_entry_snap->set_size_request( 40, -1 );
     m_entry_snap->set_editable( false );
@@ -146,7 +153,7 @@ perfedit::perfedit( perform *a_perf )
     m_button_bpm = manage( new Button());
     m_button_bpm->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
     m_button_bpm->signal_clicked().connect(  bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bpm  ));
-    m_tooltips->set_tip( *m_button_bpm, "Time Signature. Beats per Measure" );
+    add_tooltip( m_button_bpm, "Time Signature. Beats per Measure" );
     m_entry_bpm = manage( new Entry());
     m_entry_bpm->set_width_chars(2);
     m_entry_bpm->set_editable( false );
@@ -156,7 +163,7 @@ perfedit::perfedit( perform *a_perf )
     m_button_bw = manage( new Button());
     m_button_bw->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
     m_button_bw->signal_clicked().connect(  bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bw  ));
-    m_tooltips->set_tip( *m_button_bw, "Time Signature.  Length of Beat" );
+    add_tooltip( m_button_bw, "Time Signature.  Length of Beat" );
     m_entry_bw = manage( new Entry());
     m_entry_bw->set_width_chars(2);
     m_entry_bw->set_editable( false );
@@ -165,43 +172,43 @@ perfedit::perfedit( perform *a_perf )
     m_button_undo = manage( new Button());
     m_button_undo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( undo_xpm  ))));
     m_button_undo->signal_clicked().connect(  mem_fun( *this, &perfedit::undo));
-    m_tooltips->set_tip( *m_button_undo, "Undo." );
+    add_tooltip( m_button_undo, "Undo." );
  
 
     /* expand */
     m_button_expand = manage( new Button());
     m_button_expand->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( expand_xpm ))));
     m_button_expand->signal_clicked().connect(  mem_fun( *this, &perfedit::expand));
-    m_tooltips->set_tip( *m_button_expand, "Expand between L and R markers." );
+    add_tooltip( m_button_expand, "Expand between L and R markers." );
 
     /* collapse */
     m_button_collapse = manage( new Button());
     m_button_collapse->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( collapse_xpm ))));
     m_button_collapse->signal_clicked().connect(  mem_fun( *this, &perfedit::collapse));
-    m_tooltips->set_tip( *m_button_collapse, "Collapse between L and R markers." );
+    add_tooltip( m_button_collapse, "Collapse between L and R markers." );
 
     /* copy */
     m_button_copy = manage( new Button());
     m_button_copy->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( copy_xpm ))));
     m_button_copy->signal_clicked().connect(  mem_fun( *this, &perfedit::copy ));
-    m_tooltips->set_tip( *m_button_copy, "Expand and copy between L and R markers." );
+    add_tooltip( m_button_copy, "Expand and copy between L and R markers." );
 
 
     m_button_loop = manage( new ToggleButton() );
     m_button_loop->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( loop_xpm ))));
     m_button_loop->signal_toggled().connect(  mem_fun( *this, &perfedit::set_looped ));
-    m_tooltips->set_tip( *m_button_loop, "Play looped between L and R." );
+    add_tooltip( m_button_loop, "Play looped between L and R." );
 
 
     m_button_stop = manage( new Button() );
     m_button_stop->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
     m_button_stop->signal_clicked().connect( mem_fun( *this, &perfedit::stop_playing));
-    m_tooltips->set_tip( *m_button_stop, "Stop playing." );
+    add_tooltip( m_button_stop, "Stop playing." );
 
     m_button_play = manage( new Button() );
     m_button_play->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( play2_xpm ))));
     m_button_play->signal_clicked().connect(  mem_fun( *this, &perfedit::start_playing));
-    m_tooltips->set_tip( *m_button_play, "Begin playing at L marker." );
+    add_tooltip( m_button_play, "Begin playing at L marker." );
 
 
     m_hlbox->pack_end( *m_button_copy , false, false ); 
@@ -253,15 +260,17 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
     if ( a_ev->type == GDK_KEY_PRESS ){
 
         if ( global_print_keys ){
-            printf( "key_press[%d]\n", a_ev->keyval );
+            printf( "key_press[%d] == %s\n", a_ev->keyval, key2text( a_ev->keyval ) );
         }
-        if ( a_ev->keyval == m_mainperf->m_key_start )
+        // the start/end key may be the same key (i.e. SPACE)
+        // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
+        bool dont_toggle = m_mainperf->m_key_start != m_mainperf->m_key_stop;
+        if ( a_ev->keyval == m_mainperf->m_key_start && (dont_toggle || !m_mainperf->is_running()) )
         {
             start_playing();
             return true;
         }
-
-        if ( a_ev->keyval == m_mainperf->m_key_stop )
+        else if ( a_ev->keyval == m_mainperf->m_key_stop && (dont_toggle || m_mainperf->is_running()) )
         {
             stop_playing();
             return true;

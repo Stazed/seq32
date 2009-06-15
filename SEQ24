@@ -1,6 +1,6 @@
-
 SEQ24 - Midi Sequencer
------------------------------------------------------------
+======================
+
 
 [1] What & Why
 [2] Who 
@@ -37,7 +37,8 @@ using it.  So, I released it under the GPL.
 The program is basically a loop playing machine with a 
 simple interface.
 
-  [3a] Main Window
+
+[3a] Main Window
 
 	* File. 
 
@@ -80,7 +81,7 @@ simple interface.
 	the spin widget labeled set.  
 	There are a total of 32 sets, for a total of 
 	1024 loops. 
- 
+
 	* BPM
 
 	The ; and ' keys will increase/decrease tempo as
@@ -98,7 +99,20 @@ simple interface.
 	[a    ][s    ][d    ][f    ][g    ][h    ][j    ][k    ]
 	[z    ][x    ][c    ][v    ][b    ][n    ][m    ][,    ]
 
-        * Replace
+     	* Mute/Unmute patterns (Groups)
+
+	You can toggle the playing status of up to 32 previously 
+	defined mute/unmute patterns (groups) in the active screen 
+	set, similar to hardware sequencers. 
+	This is done either by one of the 'group toggle' keys 
+	or by a MIDI controller, both assigned in the .seq24rc file. 
+	A Mute/Unmute pattern (group) is stored by holding a 
+	'group learn' key while pressing the corresponding 
+	'group toggle' key. 
+	There are also keys assigned to turn on/off the group 
+	functionality.
+    
+    	* Replace
 
 	Holding down 'Left Ctrl' while selecting a sequence 
 	will mute all other sequences and turn on the selected
@@ -116,14 +130,24 @@ simple interface.
         * Queue
 
 	Holding 'Right Ctrl' will queue a on/off toggle for a 
-	sequence when the loop ends.
+	sequence when the loop ends. Queue also works for mute/unmute 
+	patterns (groups), in this case every sequence will toggle 
+	its status after its individual loop end. 
 
- [3b] Options Window
+        * keep queue
+
+	Pressing the 'keep queue' key assigned in the .seq24rc file 
+	activates permanent queue mode until you use the temporary 
+	Queue function again pressing 'Right Ctrl'. 
+
+
+[3b] Options Window
 
 	This window allows us to select which sequence gets midi
         clock, and which incoming midi events control the sequencer.
 
- [3c] Edit Window
+
+[3c] Edit Window
 
 	Right clicking on the main window then selecting
 	New/Edit will bring up the edit window.	
@@ -189,7 +213,8 @@ simple interface.
 	The [Event] button allows you to select which type of data
 	the event strip and data editor are currently displaying.
 
- [3d] Performace Edit
+
+[3d] Performace Edit
 
 	Right Click on the Roll to enter draw mode, gray boxes
 	represent when the track is on.  Right and left click to
@@ -200,7 +225,7 @@ simple interface.
 	is not playing.
 
 
- [3e] .seq24rc File 
+[3e] .seq24rc File 
 
         After you run seq24 for the first time, it will generate 
         a .seq24rc file in your home directory.
@@ -261,12 +286,24 @@ simple interface.
         5  [0 0 0 0 0 0]  [1 1 176 1  80   95]  [0 0 0 0 0 0]
         6  [0 0 0 0 0 0]  [1 1 176 1  96  111]  [0 0 0 0 0 0]
         7  [0 0 0 0 0 0]  [1 1 176 1 112  127]  [0 0 0 0 0 0]
+        # mute in group
+       
+        This section controls 32 groups of mutes in the same way as 
+	defined for [midi-control]. A group is a set of sequences 
+	that can toggle their playing state together.
+        Every group contains all 32 sequences in the active screen 
+	set (see after).
+       
+
+     
+        [mute-group]
+
+        Here there are the definitions of the state of the 32 sequences
+        in the playing screen set when a group is selected.
+        group [state of the first 8 sequences] [second 8] [third 8] [fourth 8]
 
         After the list of sequences and their midi events, you can 
         set seq24 to handle midi events and change the following: 
-
-        bpm up and down, screen set up and down.
-        replace, snapshot, and queue ( see the end of 3a )
 
 
         * [midi-clock]
@@ -278,16 +315,36 @@ simple interface.
         * [keyboard-control]      
         
         The keyboard control is a dump of the keys that seq24 
-        recognises and its corresponding sequence number. 
-        There are also the modifier keys: replace, snapshot, 
-        and queue ( see the end of 3a ).
+        recognises and its corresponding sequence number.
+	Note that the first number corresponds to the number of sequences in
+	the active screen set.
 
-        To get the correct keys, run seq24 with --show_keys.
+        * [keyboard-group]
 
+        Same as keyboard-control, but to control groups.
 
+   	#bpm up and down					
+	-> keys to control bpm
+	#screen set up and down					
+	-> keys for changing the active screenset
+	#group functionality on, group functionality off, group learn
+	-> note that the group learn key is a modifier key to be held while 
+	   pressing a group toggle key
+        #replace, queue, snapshot_1, snapshot_2, keep queue
+	-> These are the other modifier keys explained in section 3a.
+	
+   
+     *NOTES*: 
+	To see the required key codes when pressed, run seq24 with --show_keys.
 
-   [3f] JACK Transport
+	Seq24 will overwrite the .seq24rc file on quit. You should therefore
+	quit seq24 before doing modifications to the .seq24rc file.
 
+	Some keys should not be assigned to control sequences in seq24 as they
+	are already assigned in the seq24 menu (with ctrl). 
+	
+
+[3f] JACK Transport
 
         In order to run seq24 with JACK Tranport Sync, you need 
         to enable it at the command line with the following flags:
@@ -309,9 +366,8 @@ simple interface.
                                 If you want live mode, set 
                                 --jack_start_mode 0.
 
-        It is best to run seq24 with another master like ardour.  
-        You can not change the BPM of seq24 while 
-        rolling in JACK sync mode.
+        It is best to run seq24 with another master like ardour.  You
+        can not change the BPM of seq24 while rolling in JACK sync mode.
 
 
 -----------------------------------------------------------

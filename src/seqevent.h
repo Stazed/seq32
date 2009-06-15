@@ -45,11 +45,43 @@
 
 using namespace Gtk;
 
+// interaction methods
+class seqevent;
+struct FruitySeqEventInput
+{
+    FruitySeqEventInput() : m_justselected_one(false),
+                            m_is_drag_pasting_start(false),
+                            m_is_drag_pasting(false)
+    {}
+    bool m_justselected_one;
+    bool m_is_drag_pasting_start;
+    bool m_is_drag_pasting;
+    bool on_button_press_event(GdkEventButton* a_ev, seqevent& ths);
+    bool on_button_release_event(GdkEventButton* a_ev, seqevent& ths);
+    bool on_motion_notify_event(GdkEventMotion* a_ev, seqevent& ths);
+    void updateMousePtr(seqevent& ths);
+};
+struct Seq24SeqEventInput
+{
+    Seq24SeqEventInput() : m_adding( false ) {}
+    bool on_button_press_event(GdkEventButton* a_ev, seqevent& ths);
+    bool on_button_release_event(GdkEventButton* a_ev, seqevent& ths);
+    bool on_motion_notify_event(GdkEventMotion* a_ev, seqevent& ths);
+    void set_adding( bool a_adding, seqevent& ths );
+    bool m_adding;
+};
+
+
 /* piano event */
 class seqevent : public Gtk::DrawingArea
 {
 
  private: 
+    friend struct FruitySeqEventInput;
+    FruitySeqEventInput m_fruity_interaction;
+
+    friend struct Seq24SeqEventInput;
+    Seq24SeqEventInput m_seq24_interaction;
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
@@ -81,7 +113,6 @@ class seqevent : public Gtk::DrawingArea
     bool m_moving_init;
     bool m_moving;
     bool m_growing;
-    bool m_adding;
     bool m_painting;
     bool m_paste;
 
@@ -150,7 +181,6 @@ class seqevent : public Gtk::DrawingArea
     
     int idle_redraw();
 
-    void set_adding( bool a_adding );
 
 
   

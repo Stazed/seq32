@@ -28,11 +28,20 @@
 
 #include "play2.xpm"
 #include "stop.xpm"
+#include "learn.xpm"
+#include "learn2.xpm"
 #include "perfedit.xpm"
 #include "seq24.xpm"
 #include "seq24_32.xpm"
 
 bool is_pattern_playing = false;
+
+// tooltip helper, for old vs new gtk...
+#if GTK_MINOR_VERSION >= 12
+#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
+#else
+#   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
+#endif
 
 mainwnd::mainwnd(perform *a_p)
 {
@@ -41,9 +50,15 @@ mainwnd::mainwnd(perform *a_p)
     /* set the performance */
     m_mainperf = a_p;
 
+    /* register for notification */
+    m_mainperf->m_notify.push_back( this );
+
     /* main window */
     update_window_title();
 
+#if GTK_MINOR_VERSION < 12
+    m_tooltips = manage( new Tooltips() );
+#endif
     m_main_wid = manage( new mainwid( m_mainperf ));
     m_main_time = manage( new maintime( ));
 
@@ -99,9 +114,7 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
     m_button_stop->signal_clicked().connect(
             mem_fun(*this, &mainwnd::stop_playing));
-#if GTK_MINOR_VERSION >= 12
-    m_button_stop->set_tooltip_text("Stop playing MIDI sequence");
-#endif
+    add_tooltip( m_button_stop, "Stop playing MIDI sequence" );
     hbox->pack_start(*m_button_stop, false, false);
 
     /* play button */
@@ -110,9 +123,7 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( play2_xpm ))));
     m_button_play->signal_clicked().connect(
             mem_fun( *this, &mainwnd::start_playing));
-#if GTK_MINOR_VERSION >= 12
-    m_button_play->set_tooltip_text("Play MIDI sequence");
-#endif
+    add_tooltip( m_button_play, "Play MIDI sequence" );
     hbox->pack_start(*m_button_play, false, false);
 
     /* song edit button */
@@ -121,9 +132,7 @@ mainwnd::mainwnd(perform *a_p)
                     Gdk::Pixbuf::create_from_xpm_data( perfedit_xpm  ))));
     m_button_perfedit->signal_clicked().connect(
             mem_fun( *this, &mainwnd::open_performance_edit ));
-#if GTK_MINOR_VERSION >= 12
-    m_button_perfedit->set_tooltip_text("Show or hide song editor window");
-#endif
+    add_tooltip( m_button_perfedit, "Show or hide song editor window" );
     hbox->pack_end(*m_button_perfedit, false, false, 4);
 
     /* bpm spin button */
@@ -132,9 +141,7 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_bpm->set_editable( false );
     m_adjust_bpm->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_bpm ));
-#if GTK_MINOR_VERSION >= 12
-    m_spinbutton_bpm->set_tooltip_text("Adjust beats per minute (BPM) value");
-#endif
+    add_tooltip( m_spinbutton_bpm, "Adjust beats per minute (BPM) value" );
     hbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
     hbox->pack_start(*m_spinbutton_bpm, false, false );
 
@@ -145,9 +152,7 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_ss->set_wrap( true );
     m_adjust_ss->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_ss ));
-#if GTK_MINOR_VERSION >= 12
-    m_spinbutton_ss->set_tooltip_text("Select sreen set");
-#endif
+    add_tooltip( m_spinbutton_ss, "Select sreen set" );
     hbox->pack_end(*m_spinbutton_ss, false, false );
     hbox->pack_end(*(manage( new Label( "  set " ))), false, false, 4);
 
@@ -157,9 +162,7 @@ mainwnd::mainwnd(perform *a_p)
             mem_fun(*this, &mainwnd::edit_callback_notepad));
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
-#if GTK_MINOR_VERSION >= 12
-    m_entry_notes->set_tooltip_text("Enter screen set name");
-#endif
+    add_tooltip( m_entry_notes, "Enter screen set name" );
     hbox->pack_start( *m_entry_notes, true, true );
 
 
@@ -168,7 +171,34 @@ mainwnd::mainwnd(perform *a_p)
     hbox2->pack_start(*manage(new Image(
                     Gdk::Pixbuf::create_from_xpm_data(seq24_xpm))),
             false, false);
-    hbox2->pack_end( *m_main_time, false, false );
+
+    // adjust placement...
+    VBox *vbox_b = manage( new VBox() );
+    HBox *hbox3 = manage( new HBox( false, 0 ) );
+    vbox_b->pack_start( *hbox3, false, false );
+    hbox2->pack_end( *vbox_b, false, false );
+    hbox3->set_spacing( 10 );
+
+    /* timeline */
+    hbox3->pack_start( *m_main_time, false, false );
+
+    /* group learn button */
+    m_button_learn = manage( new Button( ));
+    m_button_learn->set_focus_on_click( false );
+    m_button_learn->set_flags( m_button_learn->get_flags() & ~Gtk::CAN_FOCUS );
+    m_button_learn->set_image(*manage(new Image(
+                    Gdk::Pixbuf::create_from_xpm_data( learn_xpm ))));
+    m_button_learn->signal_clicked().connect(
+            mem_fun(*this, &mainwnd::learn_toggle));
+    add_tooltip( m_button_learn, "Mute Group Learn\n\n"
+            "Click 'L' then press a mutegroup key to store the mute state of "
+            "the sequences in that key.\n\n"
+            "(see File/Options/Keyboard for available mutegroup keys "
+            "and the corresponding hotkey for the 'L' button)" );
+    hbox3->pack_end( *m_button_learn, false, false );
+
+    Button w;
+    hbox3->set_focus_child( w ); // clear the focus, don't want to trigger L via keys
 
     /* set up a vbox, put the menu in it, and add it */
     VBox *vbox = new VBox();
@@ -277,6 +307,28 @@ mainwnd::stop_playing( void )
     m_main_wid->update_sequences_on_window();
     is_pattern_playing = false;
 }
+
+void
+mainwnd::on_grouplearnchange(bool state)
+{
+    /* respond to learn mode change from m_mainperf */
+    m_button_learn->set_image(*manage(new Image(
+        Gdk::Pixbuf::create_from_xpm_data( state ? learn2_xpm : learn_xpm))));
+}
+
+void
+mainwnd::learn_toggle()
+{
+    if (m_mainperf->is_group_learning())
+    {
+        m_mainperf->unset_mode_group_learn();
+    }
+    else
+    {
+        m_mainperf->set_mode_group_learn();
+    }
+}
+
 
 
 /* callback function */
@@ -636,8 +688,7 @@ mainwnd::about_dialog( void )
 
     dialog.set_copyright(
             "(C) 2002 - 2006 Rob C. Buse\n"
-            "(C) 2008 Seq24team");
-
+            "(C) 2008 - 2009 Seq24team");
     dialog.set_website(
             "http://www.filter24.org/seq24\n"
             "http://edge.launchpad.net/seq24");
@@ -650,6 +701,7 @@ mainwnd::about_dialog( void )
     list_authors.push_back("Peter Leigh <pete.leigh@gmail.com>");
     list_authors.push_back("Anthony Green <green@redhat.com>");
     list_authors.push_back("Daniel Ellis <mail@danellis.co.uk>");
+    list_authors.push_back("Kevin Meinert <kevin@subatomicglue.com>");
     dialog.set_authors(list_authors);
 
     std::list<Glib::ustring> list_documenters;
@@ -692,6 +744,9 @@ mainwnd::on_key_release_event(GdkEventKey* a_ev)
     if ( a_ev->keyval == m_mainperf->m_key_snapshot_1 ||
             a_ev->keyval == m_mainperf->m_key_snapshot_2 )
         m_mainperf->unset_sequence_control_status( c_status_snapshot );
+    if ( a_ev->keyval == m_mainperf->m_key_group_learn ){
+        m_mainperf->unset_mode_group_learn();
+    }
 
     return false;
 }
@@ -712,10 +767,10 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
     // control and modifier key combinations matching
     // menu items have first priority
-    if (Gtk::Window::on_key_press_event(a_ev))
-        return true;
+    /*if (*/Gtk::Window::on_key_press_event(a_ev);
+        //return true;  // on win32, it'd always return true here (i.e. for SPACE bar)... ?
 
-    else if ( m_entry_notes->has_focus()) {
+    /*else */if ( m_entry_notes->has_focus()) {
         m_entry_notes->event( (GdkEvent*) a_ev );
         return false;
     }
@@ -724,6 +779,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 
             if ( global_print_keys ){
                 printf( "key_press[%d]\n", a_ev->keyval );
+                fflush( stdout );
             }
 
             if ( a_ev->keyval == m_mainperf->m_key_bpm_dn ){
@@ -741,7 +797,8 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 m_mainperf->set_sequence_control_status( c_status_replace );
             }
 
-            if (a_ev->keyval ==  m_mainperf->m_key_queue )
+              if ((a_ev->keyval ==  m_mainperf->m_key_queue )
+             || (a_ev->keyval == m_mainperf->m_key_keep_queue ))
             {
                 m_mainperf->set_sequence_control_status( c_status_queue );
             }
@@ -767,19 +824,75 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 m_adjust_ss->set_value( m_mainperf->get_screenset()  );
                 m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()  ));
             }
-
-            if ( a_ev->keyval == m_mainperf->m_key_start )
-            {
-                if (is_pattern_playing)
-                    stop_playing();
-                else
-                    start_playing();
+             if ( a_ev->keyval == m_mainperf->m_key_set_playing_screenset ){
+                m_mainperf->set_playing_screenset();
             }
 
+            if ( a_ev->keyval == m_mainperf->m_key_group_on ){
+                m_mainperf->set_mode_group_mute();
+            }
+            if ( a_ev->keyval == m_mainperf->m_key_group_off ){
+                m_mainperf->unset_mode_group_mute();
+            }
 
+            if ( a_ev->keyval == m_mainperf->m_key_group_learn ){
+                m_mainperf->set_mode_group_learn();
+            }
+
+            // activate mute group key
+            if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
+            {
+                m_mainperf->select_and_mute_group( m_mainperf->lookup_keygroup_group( a_ev->keyval ) );
+            }
+
+            // mute group learn
+            if (m_mainperf->is_learn_mode() &&
+                a_ev->keyval != m_mainperf->m_key_group_learn)
+            {
+                if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
+                {
+                    char buf[512];
+                    sprintf( buf, "Midi Group Learn: Learned! key:%s (code:%d) "
+                                  "mapped", key2text( a_ev->keyval ), a_ev->keyval );
+                    Gtk::MessageDialog dialog(*this,
+                           buf, false,
+                           Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK, true);
+                    dialog.run();
+
+                    // we miss the keyup msg for learn, force set it off
+                    m_mainperf->unset_mode_group_learn();
+                }
+                else
+                {
+                    char buf[512];
+                    sprintf( buf, "Midi Group Learn: key:%s (code:%d) not "
+                                  "one of the configured mute-group keys, to change "
+                                  "see file/options menu or .seq24rc",
+                                  key2text( a_ev->keyval ), a_ev->keyval );
+                    Gtk::MessageDialog errdialog(*this, buf, false,
+                           Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+                    errdialog.run();
+                    // we miss the keyup msg for learn, force set it
+                    m_mainperf->unset_mode_group_learn();
+                }
+            }
+
+            // the start/end key may be the same key (i.e. SPACE)
+            // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
+            bool dont_toggle = m_mainperf->m_key_start != m_mainperf->m_key_stop;
+            if ( a_ev->keyval == m_mainperf->m_key_start && (dont_toggle || !is_pattern_playing))
+            {
+                start_playing();
+            }
+            else if ( a_ev->keyval == m_mainperf->m_key_stop && (dont_toggle || is_pattern_playing))
+            {
+                stop_playing();
+            }
+
+            /* toggle sequence mute/unmute using keyboard keys... */
             if( m_mainperf->get_key_events()->count( a_ev->keyval) != 0 ){
 
-                sequence_key(  (*m_mainperf->get_key_events())[a_ev->keyval] );
+                sequence_key( m_mainperf->lookup_keyevent_seq( a_ev->keyval ) );
             }
         }
     }

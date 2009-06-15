@@ -32,7 +32,10 @@ seqmenu::seqmenu( perform *a_p  )
     m_mainperf = a_p;
     m_menu = NULL;
 
-} 
+    // init the clipboard, so that we don't get a crash
+    // on paste with no previous copy...
+    m_clipboard.set_master_midi_bus( a_p->get_master_midi_bus() );
+}
 
 
     void

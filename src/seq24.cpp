@@ -45,9 +45,11 @@ option long_options[] = {
     {"file",     required_argument, 0, 'f'},
     {"help",     0, 0, 'h'},
     {"showmidi",     0, 0, 's'},
+    {"show_keys",     0, 0, 'k' },
     {"stats",     0, 0, 'S' },
     {"priority", 0, 0, 'p' },
     {"ignore",required_argument, 0, 'i'},
+    {"interaction_method",required_argument, 0, 'x'},
     {"jack_transport",0, 0, 'j'},
     {"jack_master",0, 0, 'J'},
     {"jack_master_cond",0,0,'C'},
@@ -71,6 +73,7 @@ Glib::ustring last_used_dir ="/";
 std::string config_filename = ".seq24rc";
 std::string user_filename = ".seq24usr";
 bool global_print_keys = false;
+interaction_method_e global_interactionmethod = e_seq24_interaction;
 
 bool global_with_jack_transport = false;
 bool global_with_jack_master = false;
@@ -183,6 +186,7 @@ main (int argc, char *argv[])
                 printf( "    --priority : runs higher priority with FIFO scheduler (must be root)\n" );
                 printf( "    --pass_sysex : passes any incoming sysex messages to all outputs \n" );
                 printf( "    --show_keys : prints pressed key value\n" );
+                printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
                 printf( "    --jack_transport : seq24 will sync to jack transport\n" );
                 printf( "    --jack_master : seq24 will try to be jack master\n" );
                 printf( "    --jack_master_cond : jack master will fail if there is already a master\n" );
@@ -249,6 +253,10 @@ main (int argc, char *argv[])
                 global_device_ignore_num = atoi( optarg );
                 break;
                 
+            case 'x':
+                global_interactionmethod = (interaction_method_e)atoi( optarg );
+                break;
+
                 
             default:
                 break;
@@ -301,4 +309,41 @@ main (int argc, char *argv[])
 #endif
 
     return 0;
+}
+
+
+/* declared in globals.h */
+char* key2text( unsigned long int val )
+{
+    unsigned long int s[] = {GDK_Insert, GDK_Escape, GDK_Return, GDK_Delete,
+                          GDK_BackSpace, GDK_Pause, GDK_Break, GDK_Tab, GDK_Scroll_Lock,
+                          GDK_Left, GDK_Right, GDK_Up, GDK_Down, GDK_Page_Up, GDK_Page_Down,
+                          GDK_Break, GDK_Num_Lock, GDK_F1, GDK_F2, GDK_F3, GDK_F4, GDK_F5,
+                          GDK_F6, GDK_F7, GDK_F8, GDK_F9, GDK_F10, GDK_F11, GDK_F12,
+                          GDK_Shift_L, GDK_Shift_R, GDK_Control_L, GDK_Control_R,
+                          GDK_Caps_Lock, GDK_Alt_L, GDK_Alt_R, GDK_Home, GDK_End, '\n', '\t', 0 };
+    char* str[] = {"Ins", "Esc", "Ret", "Del",
+                   "Bck", "Paus", "Brk", "Tab", "ScLk",
+                   "<-", "->", "Up", "Dn", "PgUp", "PgDn",
+                   "Brk", "NmLk", "F1", "F2", "F3", "F4", "F5",
+                   "F6", "F7", "F8", "F9", "F10", "F11", "F12",
+                   "ShL", "ShR", "CtlL", "CtlR",
+                   "Caps", "AltL", "AltR", "Home", "End", "Ret", "Tab", 0 };
+    unsigned long int* s2 = s;
+    char** str2 = str;
+    while (*s2 != 0) { if (val == s2[0]) return str2[0];  s2++; str2++; }
+    //for ( int x = '!'; x <= '~'; ++x) printf( "ascii: %d  '%c'\n", x, (char)x);
+
+    static char buf[16][16];
+    static int rotate = 0; //lets us use this in iostreams for example...
+    rotate = (rotate + 1) % 16;
+    strcpy( buf[rotate], "??" );
+
+    //printf( "%d %d %d %d - ", val, ' ' <= val, val <= '~', *s2 );
+    if (*s2 == 0 && ' ' <= val && val <= '~')
+    {
+        sprintf( buf[rotate], "'%c'", (char)val );
+    }
+    //printf( "  ret: %s\n", buf[rotate] );
+    return buf[rotate];
 }
