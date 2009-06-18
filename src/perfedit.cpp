@@ -260,7 +260,7 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
     if ( a_ev->type == GDK_KEY_PRESS ){
 
         if ( global_print_keys ){
-            printf( "key_press[%d] == %s\n", a_ev->keyval, key2text( a_ev->keyval ) );
+            printf( "key_press[%d] == %s\n", a_ev->keyval, gdk_keyval_name( a_ev->keyval ) );
         }
         // the start/end key may be the same key (i.e. SPACE)
         // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)

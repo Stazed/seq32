@@ -331,7 +331,4 @@ const char* const c_interaction_method_descs[] =
 
 extern interaction_method_e global_interactionmethod;
 
-// makes printable text from the given key
-// see seq24.cpp for implementation
-char* key2text( unsigned long int val );
 #endif

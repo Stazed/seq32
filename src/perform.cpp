@@ -101,39 +101,40 @@ perform::perform()
     set_key_event( GDK_i, 29 );
     set_key_event( GDK_k, 30 );
     set_key_event( GDK_comma, 31 );
-    set_key_group( 33, 0 );
-    set_key_group( 34, 1 );
-    set_key_group( 163, 2 );
-    set_key_group( 36, 3 );
-    set_key_group( 37, 4 );
-    set_key_group( 38, 5 );
-    set_key_group( 47, 6 );
-    set_key_group( 40, 7 );
-    set_key_group( 81, 8 );
-    set_key_group( 87, 9 );
-    set_key_group( 69, 10 );
-    set_key_group( 82, 11 );
-    set_key_group( 84, 12 );
-    set_key_group( 89, 13 );
-    set_key_group( 85, 14 );
-    set_key_group( 73, 15 );
-    set_key_group( 65, 16 );
-    set_key_group( 83, 17 );
-    set_key_group( 68, 18 );
-    set_key_group( 70, 19 );
-    set_key_group( 71, 20 );
-    set_key_group( 72, 21 );
-    set_key_group( 74, 22 );
-    set_key_group( 75, 23 );
-    set_key_group( 90, 24 );
-    set_key_group( 88, 25 );
-    set_key_group( 67, 26 );
-    set_key_group( 86, 27 );
-    set_key_group( 66, 28 );
-    set_key_group( 78, 29 );
-    set_key_group( 77, 30 );
-    set_key_group( 59, 31 );
     
+    set_key_group( GDK_exclam,  0 );
+    set_key_group( GDK_quotedbl,  1  );
+    set_key_group( GDK_numbersign,  2  );
+    set_key_group( GDK_dollar,  3  );
+    set_key_group( GDK_percent,  4  );
+    set_key_group( GDK_ampersand,  5  );
+    set_key_group( GDK_parenleft,  7  );
+    set_key_group( GDK_slash,  6  );
+    set_key_group( GDK_semicolon,  31 );
+    set_key_group( GDK_A,  16 );
+    set_key_group( GDK_B,  28 );
+    set_key_group( GDK_C,  26 );
+    set_key_group( GDK_D,  18 );
+    set_key_group( GDK_E,  10 );
+    set_key_group( GDK_F,  19 );
+    set_key_group( GDK_G,  20 );
+    set_key_group( GDK_H,  21 );
+    set_key_group( GDK_I,  15 );
+    set_key_group( GDK_J,  22 );
+    set_key_group( GDK_K,  23 );
+    set_key_group( GDK_M,  30 );
+    set_key_group( GDK_N,  29 );
+    set_key_group( GDK_Q,  8  );
+    set_key_group( GDK_R,  11 );
+    set_key_group( GDK_S,  17 );
+    set_key_group( GDK_T,  12 );
+    set_key_group( GDK_U,  14 );
+    set_key_group( GDK_V,  27 );
+    set_key_group( GDK_W,  9  );
+    set_key_group( GDK_X,  25 );
+    set_key_group( GDK_Y,  13 );
+    set_key_group( GDK_Z,  24 );
+
     m_key_bpm_up = GDK_apostrophe;
     m_key_bpm_dn = GDK_semicolon;
 
@@ -141,13 +142,13 @@ perform::perform()
     m_key_queue = GDK_Control_R;
     m_key_snapshot_1 = GDK_Alt_L;
     m_key_snapshot_2 = GDK_Alt_R;
-    m_key_keep_queue = 92;
+    m_key_keep_queue = GDK_backslash;
     
     m_key_screenset_up = GDK_bracketright;
     m_key_screenset_dn = GDK_bracketleft;
-    m_key_set_playing_screenset = 65360;
-    m_key_group_on = 236;
-    m_key_group_off = 39;
+    m_key_set_playing_screenset = GDK_Home;
+    m_key_group_on = GDK_igrave;
+    m_key_group_off = GDK_apostrophe;
     m_key_group_learn = GDK_Insert;
 
     m_key_start  = GDK_space;
@@ -340,14 +341,14 @@ void perform::set_mode_group_learn (void)
 {
     set_mode_group_mute();
     m_mode_group_learn = true;
-    for (int x = 0; x < m_notify.size(); ++x)
+    for (size_t x = 0; x < m_notify.size(); ++x)
         m_notify[x]->on_grouplearnchange( true );
     return;
 }
 
 void perform::unset_mode_group_learn (void)
 {
-    for (int x = 0; x < m_notify.size(); ++x)
+    for (size_t x = 0; x < m_notify.size(); ++x)
         m_notify[x]->on_grouplearnchange( false );
     m_mode_group_learn = false;
     return;
@@ -1332,8 +1333,8 @@ perform::output_func(void)
         /* current time */
         long current;
 
-        long stats_loop_start;
-        long stats_loop_finish;
+        long stats_loop_start = 0;
+        long stats_loop_finish = 0;
 
 
         /* difference between last and current */
@@ -1362,10 +1363,11 @@ perform::output_func(void)
 
         bool init_clock = true;
 
+#ifdef JACK_SUPPORT
         double jack_ticks_converted = 0.0;
         double jack_ticks_converted_last = 0.0;
         double jack_ticks_delta = 0.0;
-
+#endif
         for( int i=0; i<100; i++ ){
             stats_all[i] = 0;
             stats_clock[i] = 0;

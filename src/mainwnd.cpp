@@ -683,8 +683,8 @@ mainwnd::about_dialog( void )
     Gtk::AboutDialog dialog;
     dialog.set_transient_for(*this);
     dialog.set_name(PACKAGE_NAME);
-    dialog.set_version(PACKAGE_VERSION);
-    dialog.set_comments("Interactive MIDI Sequencer");
+    dialog.set_version(VERSION);
+    dialog.set_comments("Interactive MIDI Sequencer\n");
 
     dialog.set_copyright(
             "(C) 2002 - 2006 Rob C. Buse\n"
@@ -854,7 +854,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 {
                     char buf[512];
                     sprintf( buf, "Midi Group Learn: Learned! key:%s (code:%d) "
-                                  "mapped", key2text( a_ev->keyval ), a_ev->keyval );
+                                  "mapped", gdk_keyval_name( a_ev->keyval ), a_ev->keyval );
                     Gtk::MessageDialog dialog(*this,
                            buf, false,
                            Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK, true);
@@ -869,7 +869,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                     sprintf( buf, "Midi Group Learn: key:%s (code:%d) not "
                                   "one of the configured mute-group keys, to change "
                                   "see file/options menu or .seq24rc",
-                                  key2text( a_ev->keyval ), a_ev->keyval );
+                                  gdk_keyval_name( a_ev->keyval ), a_ev->keyval );
                     Gtk::MessageDialog errdialog(*this, buf, false,
                            Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                     errdialog.run();

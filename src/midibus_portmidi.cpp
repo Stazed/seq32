@@ -157,7 +157,7 @@ midibus::play( event *a_e24, unsigned char a_channel )
 
     event.message = Pm_Message(buffer[0], buffer[1], buffer[2]);
     
-    PmError err = Pm_Write( m_pms, &event, 1 );
+    /*PmError err = */Pm_Write( m_pms, &event, 1 );
 
     unlock();
 }
@@ -482,7 +482,7 @@ mastermidibus::flush()
 mastermidibus::mastermidibus()
 {
     /* temp return */
-    int ret;
+    //int ret;
     
     /* set initial number buses */
     m_num_out_buses = 0;
@@ -677,6 +677,7 @@ mastermidibus::get_midi_out_bus_name( int a_bus )
 	if ( m_buses_out_active[a_bus] && a_bus < m_num_out_buses ){
 		return m_buses_out[a_bus]->get_name();
 	}
+	return "error...";
 }
 
 
@@ -686,6 +687,7 @@ mastermidibus::get_midi_in_bus_name( int a_bus )
 	if ( m_buses_in_active[a_bus] && a_bus < m_num_in_buses ){
 		return m_buses_in[a_bus]->get_name();
 	}
+	return "error...";
 }
 
 
@@ -715,7 +717,7 @@ mastermidibus::get_num_in_buses()
 int
 mastermidibus::poll_for_midi( )
 {
-    int ret = 0;
+    //int ret = 0;
 
     while(1)
     {

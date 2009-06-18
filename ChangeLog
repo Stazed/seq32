@@ -1,3 +1,9 @@
+2009-06-18 Kevin Meinert <kevin@subatomicglue.com>
+	* src/globals.h, src/mainwnd.cpp, src/midibus_portmidi.cpp,
+	src/options.cpp, src/optionsfile.cpp, src/perfedit.cpp,
+	src/perform.cpp, src/seq24.cpp, src/seqroll.cpp: Some compiler
+	warnings fixed, generic key name translation.
+
 2009-05-29 Guido Scholz <guido.scholz@bayernline.de>
 	* src/options.cpp: Fixed missing return value for
 	on_key_press_event().

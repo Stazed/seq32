@@ -282,7 +282,6 @@ seqroll::redraw()
 
 }
 
-
 void 
 seqroll::redraw_events()
 {
@@ -293,13 +292,11 @@ seqroll::redraw_events()
     force_draw();
 }
 
-
 void
 seqroll::set_ignore_redraw(bool a_ignore)
 {
     m_ignore_redraw = a_ignore;
 }
-
 
 void
 seqroll::draw_background_on_pixmap()
@@ -337,35 +334,35 @@ seqroll::update_background()
     
     for ( int i=0; i< (m_window_y / c_key_y) + 1; i++ )
     {
-         if (global_interactionmethod == e_fruity_interaction)
-         {
-             if (0 == (((c_num_keys - i) - m_scroll_offset_key + ( 12 - m_key )) % 12))
-             {
-                 /* draw horz black lines at C */
-                 m_gc->set_foreground(m_dk_grey);
-                 m_gc->set_line_attributes( 1,
-                                            Gdk::LINE_SOLID,
-                                            Gdk::CAP_NOT_LAST,
-                                            Gdk::JOIN_MITER );
-             }
-             else if (11 == (((c_num_keys - i) - m_scroll_offset_key + ( 12 - m_key )) % 12))
-             {
-                 /* draw horz grey lines for the other notes */
-                 m_gc->set_foreground(m_grey);
-                 m_gc->set_line_attributes( 1,
-                                            Gdk::LINE_ON_OFF_DASH,
-                                            Gdk::CAP_NOT_LAST,
-                                            Gdk::JOIN_MITER );
-             }
-         }
-         
+        if (global_interactionmethod == e_fruity_interaction)
+        {
+            if (0 == (((c_num_keys - i) - m_scroll_offset_key + ( 12 - m_key )) % 12))
+            {
+                /* draw horz black lines at C */
+                m_gc->set_foreground(m_dk_grey);
+                m_gc->set_line_attributes( 1,
+                                           Gdk::LINE_SOLID,
+                                           Gdk::CAP_NOT_LAST,
+                                           Gdk::JOIN_MITER );
+            }
+            else if (11 == (((c_num_keys - i) - m_scroll_offset_key + ( 12 - m_key )) % 12))
+            {
+                /* draw horz grey lines for the other notes */
+                m_gc->set_foreground(m_grey);
+                m_gc->set_line_attributes( 1,
+                                           Gdk::LINE_ON_OFF_DASH,
+                                           Gdk::CAP_NOT_LAST,
+                                           Gdk::JOIN_MITER );
+            }
+        }
+
         m_background->draw_line(m_gc,
                             0,
                             i * c_key_y,
                             m_window_x,
                             i * c_key_y );
-        
-        if ( m_scale != c_scale_off ) {
+
+        if ( m_scale != c_scale_off ){
             
             if ( !c_scales_policy[m_scale][ ((c_num_keys - i)
                                              - m_scroll_offset_key
@@ -478,13 +475,11 @@ seqroll::set_snap( int a_snap )
     reset();
 }
 
-
 void 
 seqroll::set_note_length( int a_note_length )
 {
     m_note_length = a_note_length;
 }
-
 
 /* sets the music scale */
 void 
@@ -1055,20 +1050,20 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
 {
     bool ret = false;
 
-     // the start/end key may be the same key (i.e. SPACEBAR)
-     // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
-     bool dont_toggle = m_perform->m_key_start != m_perform->m_key_stop;
-     if ( a_p0->keyval ==  m_perform->m_key_start && (dont_toggle || !is_pattern_playing) ){
- 	    m_perform->position_jack( false );
- 	    m_perform->start( false );
- 	    m_perform->start_jack( );
-         is_pattern_playing=true;
-     }
-     else if ( a_p0->keyval ==  m_perform->m_key_stop && (dont_toggle || is_pattern_playing) ){
-         m_perform->stop_jack();
-         m_perform->stop();
-         is_pattern_playing=false;
-     }
+    // the start/end key may be the same key (i.e. SPACEBAR)
+    // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
+    bool dont_toggle = m_perform->m_key_start != m_perform->m_key_stop;
+    if ( a_p0->keyval ==  m_perform->m_key_start && (dont_toggle || !is_pattern_playing) ){
+        m_perform->position_jack( false );
+        m_perform->start( false );
+        m_perform->start_jack( );
+        is_pattern_playing=true;
+    }
+    else if ( a_p0->keyval ==  m_perform->m_key_stop && (dont_toggle || is_pattern_playing) ){
+        m_perform->stop_jack();
+        m_perform->stop();
+        is_pattern_playing=false;
+    }
 
     if ( a_p0->type == GDK_KEY_PRESS ){
 

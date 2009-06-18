@@ -68,14 +68,14 @@ public:
     void set( unsigned int val )
     {
         char buf[256] = "";
-        char* special = key2text( val );
+        char* special = gdk_keyval_name( val );
         if (special)
-            sprintf( &buf[strlen(buf)], "%s ", special );
+            sprintf( &buf[strlen(buf)], "%s", special );
         else
-            sprintf( &buf[strlen(buf)], "'%c' ", (char)val );
-        sprintf( &buf[strlen(buf)], "(%u)", val );
+            sprintf( &buf[strlen(buf)], "'%c'", (char)val );
         set_text( buf );
-        set_width_chars( strlen(buf)-3 );
+        int width = strlen(buf)-1;
+        set_width_chars( 1 <= width ? width : 1 );
     }
 
     virtual bool on_key_press_event(GdkEventKey* event)
@@ -234,130 +234,124 @@ options::options (Gtk::Window & parent, perform * a_p):
         vbox->pack_start (*check, false, false);
     }
 
- 
-     // KeyBoard keybinding setup (editor for .seq24rc keybindings.
-     vbox = manage (new VBox ());
-     m_notebook->pages ().push_back (Notebook_Helpers::TabElem (*vbox, "Keyboard"));
-     {
-         Label* label;
-         KeyBindEntry* entry;
-         HBox *hbox;
- 
-         #define AddKey(text, integer) \
-             label = manage (new Label( text )); \
-             hbox->pack_start (*label, false, false, 4); \
-             entry = manage (new KeyBindEntry( KeyBindEntry::location, &integer )); \
-             hbox->pack_start (*entry, false, false, 4);
-         #define AddKeyL(text) \
-             label = manage (new Label( text )); \
-             hbox->pack_start (*label, false, false, 4);
-         #define AddKeyM(text, type, slot) \
-             label = manage (new Label( text )); \
-             hbox->pack_start (*label, false, false, 4); \
-             entry = manage (new KeyBindEntry( type, NULL, m_perf, slot )); \
-             hbox->pack_start (*entry, false, false, 4);
- 
-         hbox = manage (new HBox ());
-         check = manage (new CheckButton ("show key labels on sequences", 0));
-         check->signal_toggled ().
-             connect (bind (mem_fun (*this, &options::input_callback), (int)e_keylabelsonsequence, check));
-         check->set_active (m_perf->m_show_ui_sequence_key);
-         vbox->pack_start (*check, false, false);
- 
-         hbox = manage (new HBox ());
-         AddKey( "stop:", m_perf->m_key_stop );
-         AddKey( "start:", m_perf->m_key_start );
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         AddKey( "bpm dn:", m_perf->m_key_bpm_dn );
-         AddKey( "bpm up:", m_perf->m_key_bpm_up );
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         AddKey( "snpsht1:", m_perf->m_key_snapshot_1 );
-         AddKey( "snpsht2:", m_perf->m_key_snapshot_2 );
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         AddKey( "replace:", m_perf->m_key_replace );
-         AddKey( "queue:", m_perf->m_key_queue );
-         AddKey( "keep queue:", m_perf->m_key_keep_queue );
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         AddKey( "scrnset dn:", m_perf->m_key_screenset_dn );
-         AddKey( "scrnset up:", m_perf->m_key_screenset_up );
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         AddKey( "set plying scrnset:", m_perf->m_key_set_playing_screenset );
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         AddKeyL( "sequence toggle keys >>" );
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         std::map<unsigned int, long>::const_iterator it;
-         int x = 0;
+    // KeyBoard keybinding setup (editor for .seq24rc keybindings.
+    vbox = manage (new VBox ());
+    m_notebook->pages ().push_back (Notebook_Helpers::TabElem (*vbox, "Keyboard"));
+    {
+        Label* label;
+        KeyBindEntry* entry;
+        HBox *hbox;
 
-         for (int ss = 0; ss < 32; ++ss)
-         {
-             int s = (ss%8) * 4 + ss/8; // count this way... 0,4,8,16...
-             // FIXME: keycode is not used
-             unsigned int keycode = m_perf->lookup_keyevent_key( s );
-             char buf[16];
-             sprintf( buf, "%d", s );
-             AddKeyM( buf, KeyBindEntry::events, s );
-             ++x;
-             if (x == 8)
-             {
-                 vbox->pack_start (*hbox, false, false);
-                 hbox = manage (new HBox ());
-                 x = 0;
-             }
-         }
-         vbox->pack_start (*hbox, false, false);
-         
-         hbox = manage (new HBox ());
-         AddKeyL( "mute-group slots >>" );
-         vbox->pack_start (*hbox, false, false);
-         
-         hbox = manage (new HBox ());
-         x = 0;
+        #define AddKey(text, integer) \
+            label = manage (new Label( text )); \
+            hbox->pack_start (*label, false, false, 4); \
+            entry = manage (new KeyBindEntry( KeyBindEntry::location, &integer )); \
+            hbox->pack_start (*entry, false, false, 4);
+        #define AddKeyL(text) \
+            label = manage (new Label( text )); \
+            hbox->pack_start (*label, false, false, 4);
+        #define AddKeyM(text, type, slot) \
+            label = manage (new Label( text )); \
+            hbox->pack_start (*label, false, false, 4); \
+            entry = manage (new KeyBindEntry( type, NULL, m_perf, slot )); \
+            hbox->pack_start (*entry, false, false, 4);
 
-         for (int s = 0; s < 32; ++s)
-         {
-             // FIXME: keycode is not used
-             unsigned int keycode = m_perf->lookup_keygroup_key( s );
-             char buf[16];
-             sprintf( buf, "%d", s );
-             AddKeyM( buf, KeyBindEntry::groups, s );
-             ++x;
-             if (x == 8)
-             {
-                 vbox->pack_start (*hbox, false, false);
-                 hbox = manage (new HBox ());
-                 x = 0;
-             }
-         }
-         vbox->pack_start (*hbox, false, false);
- 
-         hbox = manage (new HBox ());
-         AddKey( "learn (while pressing a mute-group key):",
-                 m_perf->m_key_group_learn );
-         AddKey( "disable:", m_perf->m_key_group_off );
-         AddKey( "enable:", m_perf->m_key_group_on );
-         vbox->pack_start (*hbox, false, false);
-         
-         #undef AddKeyL
-         #undef AddKey
-     }
- 
+        hbox = manage (new HBox ());
+        check = manage (new CheckButton ("show key labels on sequences", 0));
+        check->signal_toggled ().
+            connect (bind (mem_fun (*this, &options::input_callback), (int)e_keylabelsonsequence, check));
+        check->set_active (m_perf->m_show_ui_sequence_key);
+        vbox->pack_start (*check, false, false);
+
+        hbox = manage (new HBox ());
+        AddKey( "stop:", m_perf->m_key_stop );
+        AddKey( "start:", m_perf->m_key_start );
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        AddKey( "bpm dn:", m_perf->m_key_bpm_dn );
+        AddKey( "bpm up:", m_perf->m_key_bpm_up );
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        AddKey( "snpsht1:", m_perf->m_key_snapshot_1 );
+        AddKey( "snpsht2:", m_perf->m_key_snapshot_2 );
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        AddKey( "replace:", m_perf->m_key_replace );
+        AddKey( "queue:", m_perf->m_key_queue );
+        AddKey( "keep queue:", m_perf->m_key_keep_queue );
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        AddKey( "scrnset dn:", m_perf->m_key_screenset_dn );
+        AddKey( "scrnset up:", m_perf->m_key_screenset_up );
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        AddKey( "set plying scrnset:", m_perf->m_key_set_playing_screenset );
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        AddKeyL( "sequence toggle keys >>" );
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        std::map<unsigned int, long>::const_iterator it;
+        int x = 0;
+        for (int ss = 0; ss < 32; ++ss)
+        {
+            int s = (ss%8) * 4 + ss/8; // count this way... 0,4,8,16...
+            //unsigned int keycode = m_perf->lookup_keyevent_key( s );
+            char buf[16];
+            sprintf( buf, "%d", s );
+            AddKeyM( buf, KeyBindEntry::events, s );
+            ++x;
+            if (x == 8)
+            {
+                vbox->pack_start (*hbox, false, false);
+                hbox = manage (new HBox ());
+                x = 0;
+            }
+        }
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        AddKeyL( "mute-group slots >>" );
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        x = 0;
+        for (int s = 0; s < 32; ++s)
+        {
+            //unsigned int keycode = m_perf->lookup_keygroup_key( s );
+            char buf[16];
+            sprintf( buf, "%d", s );
+            AddKeyM( buf, KeyBindEntry::groups, s );
+            ++x;
+            if (x == 8)
+            {
+                vbox->pack_start (*hbox, false, false);
+                hbox = manage (new HBox ());
+                x = 0;
+            }
+        }
+        vbox->pack_start (*hbox, false, false);
+
+        hbox = manage (new HBox ());
+        AddKey( "learn (while pressing a mute-group key):", m_perf->m_key_group_learn );
+        AddKey( "disable:", m_perf->m_key_group_off );
+        AddKey( "enable:", m_perf->m_key_group_on );
+        vbox->pack_start (*hbox, false, false);
+
+        #undef AddKeyL
+        #undef AddKey
+    }
+
     // Jack
 #ifdef JACK_SUPPORT
     VBox *vbox2 = manage (new VBox ());
