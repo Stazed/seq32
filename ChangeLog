@@ -1,4 +1,4 @@
-2009-05-29 Guido Scholz <guido.scholz@bayernline.de>
+2009-06-23 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwid.cpp, src/mainwnd.cpp, src/options.cpp,
 	src/perfnames.cpp, src/perftime.cpp, src/perfedit.cpp,
 	src/seqdata.cpp, src/perform.cpp, src/seqedit.cpp, src/seqkeys.cpp,
