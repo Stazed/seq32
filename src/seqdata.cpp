@@ -119,7 +119,7 @@ seqdata::on_realize()
                                      30 );
 
         char val[5];
-        sprintf( val, "%3d\n", i );
+        snprintf(val, sizeof(val), "%3d\n", i);
         char num[6];
         memset( num, 0, 6);
         num[0] = val[0];

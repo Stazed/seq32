@@ -189,7 +189,7 @@ perform::init_jack( void )
         do {
 
             char client_name[100];
-            sprintf( client_name, "seq24 (%d)", getpid());
+            snprintf(client_name, sizeof(client_name), "seq24 (%d)", getpid());
             
             /* become a new client of the JACK server */
             if (( m_jack_client = jack_client_open(client_name, JackNullOption, NULL)) == 0) {

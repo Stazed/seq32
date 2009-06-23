@@ -313,10 +313,9 @@ seqedit::create_menus( void )
     char b[20];
     
     /* zoom */
-    for(int i = c_min_zoom; i <= c_max_zoom; i*=2)
+    for (int i = c_min_zoom; i <= c_max_zoom; i*=2)
     {
-        char b[10];
-        sprintf( b, "1:%d", i );
+        snprintf(b, sizeof(b), "1:%d", i);
         m_menu_zoom->items().push_back(MenuElem(b,
                     sigc::bind(mem_fun(*this, &seqedit::set_zoom), i )));
     }
@@ -491,7 +490,7 @@ seqedit::create_menus( void )
     /* midi channel menu */
     for( int i=0; i<16; i++ ){
         
-        sprintf( b, "%d", i+1 );
+        snprintf(b, sizeof(b), "%d", i + 1);
         
         /* length */
         m_menu_length->items().push_back(MenuElem(b,
@@ -579,7 +578,7 @@ seqedit::popup_tool_menu( void )
     for ( int i=-12; i<=12; ++i) {
 
         if (i != 0){
-            sprintf( num, "%+d [%s]", i, c_interval_text[ abs(i) ]  );
+            snprintf(num, sizeof(num), "%+d [%s]", i, c_interval_text[abs(i)]);
             holder2->items().push_front( MenuElem( num,
                         sigc::bind(mem_fun(*this,&seqedit::do_action),
                             transpose, i )));
@@ -592,7 +591,7 @@ seqedit::popup_tool_menu( void )
     for ( int i=-7; i<=7; ++i) {
 
         if (i != 0){
-            sprintf( num, "%+d [%s]", (i<0) ? i-1 : i+1, c_chord_text[abs(i)]);
+            snprintf(num, sizeof(num), "%+d [%s]", (i<0) ? i-1 : i+1, c_chord_text[abs(i)]);
             holder2->items().push_front( MenuElem( num,
                         sigc::bind(mem_fun(*this,&seqedit::do_action),
                             transpose_h, i )));
@@ -975,7 +974,7 @@ seqedit::popup_midich_menu( void )
     /* midi channel menu */
     for( int i=0; i<16; i++ ){
         
-        sprintf( b, "%d", i+1 );
+        snprintf( b, sizeof(b), "%d", i+1 );
         std::string name = string(b);
         int instrument = global_user_midi_bus_definitions[midi_bus].instrument[i]; 
         if ( instrument >= 0 && instrument < c_maxBuses )
@@ -1020,13 +1019,13 @@ seqedit::popup_sequence_menu( void )
 
                 if ( !inserted ){
                     inserted = true;
-                    sprintf( name, "[%d]", ss );
+                    snprintf(name, sizeof(name), "[%d]", ss);
                     menu_ss = manage( new Menu());
                     m_menu_sequences->items().push_back(MenuElem(name,*menu_ss));
                 }
                 
                 sequence *seq = m_mainperf->get_sequence( i );                
-                sprintf( name, "[%d] %.13s", i, seq->get_name() );
+                snprintf(name, sizeof(name),"[%d] %.13s", i, seq->get_name());
 
                 menu_ss->items().push_back(MenuElem(name,
                             sigc::bind(mem_fun(*this, &seqedit::set_background_sequence), i)));
@@ -1054,7 +1053,7 @@ seqedit::set_background_sequence( int a_seq )
     if ( m_mainperf->is_active( a_seq )){
 
         sequence *seq = m_mainperf->get_sequence( a_seq );                
-        sprintf( name, "[%d] %.13s", a_seq, seq->get_name() );
+        snprintf(name, sizeof(name),"[%d] %.13s", a_seq, seq->get_name());
         m_entry_sequence->set_text(name);
 
         m_seqroll_wid->set_background_sequence( true, a_seq );
@@ -1162,7 +1161,7 @@ seqedit::popup_event_menu( void )
     /* create control change */
     for ( int i=0; i<8; i++ ){
 
-        sprintf( b, "Controls %d-%d", (i*16), (i*16)+15 );
+        snprintf(b, sizeof(b), "Controls %d-%d", (i*16), (i*16) + 15);
         Menu *menu_cc = manage( new Menu() ); 
 
         for( int j=0; j<16; j++ ){
@@ -1193,7 +1192,8 @@ void
 seqedit::set_midi_channel( int a_midichannel  )
 {
     char b[10];
-    sprintf( b, "%d", a_midichannel+1 );
+
+    snprintf( b, sizeof(b), "%d", a_midichannel + 1);
     m_entry_channel->set_text(b);
     m_seq->set_midi_channel( a_midichannel );
     // m_mainwid->update_sequence_on_window( m_pos );
@@ -1214,7 +1214,8 @@ void
 seqedit::set_zoom( int a_zoom  )
 {
     char b[10];
-    sprintf( b, "1:%d", a_zoom );
+
+    snprintf(b, sizeof(b), "1:%d", a_zoom);
     m_entry_zoom->set_text(b);
 
     m_zoom = a_zoom;
@@ -1230,7 +1231,8 @@ void
 seqedit::set_snap( int a_snap  )
 {
     char b[10];
-    sprintf( b, "1/%d",   c_ppqn * 4 / a_snap );
+
+    snprintf(b, sizeof(b), "1/%d",   c_ppqn * 4 / a_snap);
     m_entry_snap->set_text(b);
     
     m_snap = a_snap;
@@ -1245,7 +1247,8 @@ void
 seqedit::set_note_length( int a_note_length  )
 {
     char b[10];
-    sprintf( b, "1/%d",   c_ppqn * 4 / a_note_length );
+
+    snprintf(b, sizeof(b), "1/%d",   c_ppqn * 4 / a_note_length);
     m_entry_note_length->set_text(b);
     
     m_note_length = a_note_length;
@@ -1311,7 +1314,8 @@ void
 seqedit::set_measures( int a_length_measures  )
 {
     char b[10];
-    sprintf( b, "%d", a_length_measures );
+
+    snprintf(b, sizeof(b), "%d", a_length_measures);
     m_entry_length->set_text(b);
 
     m_measures = a_length_measures;
@@ -1322,32 +1326,34 @@ seqedit::set_measures( int a_length_measures  )
 void 
 seqedit::set_bpm( int a_beats_per_measure )
 {
-  char b[4];
-  sprintf( b, "%d", a_beats_per_measure );
-  m_entry_bpm->set_text(b);
+    char b[4];
 
-  if ( a_beats_per_measure != m_seq->get_bpm() ){
-    
-    long length = get_measures();
-    m_seq->set_bpm( a_beats_per_measure );
-    apply_length( a_beats_per_measure, m_seq->get_bw(), length );
-  }
+    snprintf(b, sizeof(b), "%d", a_beats_per_measure);
+    m_entry_bpm->set_text(b);
+
+    if ( a_beats_per_measure != m_seq->get_bpm() ){
+
+        long length = get_measures();
+        m_seq->set_bpm( a_beats_per_measure );
+        apply_length( a_beats_per_measure, m_seq->get_bw(), length );
+    }
 }
 
 
 void 
 seqedit::set_bw( int a_beat_width  )
 {
-  char b[4];
-  sprintf( b, "%d",   a_beat_width );
-  m_entry_bw->set_text(b);
-  
-  if ( a_beat_width != m_seq->get_bw()){
-    
-    long length = get_measures();
-    m_seq->set_bw( a_beat_width );
-    apply_length( m_seq->get_bpm(), a_beat_width, length );
-  }
+    char b[4];
+
+    snprintf(b, sizeof(b), "%d", a_beat_width);
+    m_entry_bw->set_text(b);
+
+    if ( a_beat_width != m_seq->get_bw()){
+
+        long length = get_measures();
+        m_seq->set_bw( a_beat_width );
+        apply_length( m_seq->get_bpm(), a_beat_width, length );
+    }
 }
 
 
@@ -1435,14 +1441,14 @@ seqedit::set_data_type( unsigned char a_status, unsigned char a_control  )
     char hex[20];
     char type[80];
 
-    sprintf( hex, "[0x%02X]", a_status );  
+    snprintf(hex, sizeof(hex), "[0x%02X]", a_status);  
 
     if ( a_status == EVENT_NOTE_OFF )         
-        sprintf( type, "Note Off" );
+        snprintf(type, sizeof(type),"Note Off" );
     else if ( a_status == EVENT_NOTE_ON )          
-        sprintf( type, "Note On" );  
+        snprintf(type, sizeof(type),"Note On" );  
     else if ( a_status == EVENT_AFTERTOUCH )       
-        sprintf( type, "Aftertouch" );       
+        snprintf(type, sizeof(type), "Aftertouch" );       
     else if ( a_status == EVENT_CONTROL_CHANGE )
     {
         int midi_bus = m_seq->get_midi_bus();
@@ -1455,19 +1461,20 @@ seqedit::set_data_type( unsigned char a_status, unsigned char a_control  )
             if ( global_user_instrument_definitions[instrument].controllers_active[a_control] )
                 controller_name = global_user_instrument_definitions[instrument].controllers[a_control];
         }
-        sprintf( type, "Control Change - %s", controller_name.c_str() );  
+        snprintf(type, sizeof(type), "Control Change - %s",
+                controller_name.c_str() );  
     }
 
     else if ( a_status == EVENT_PROGRAM_CHANGE )   
-        sprintf( type, "Program Change" );       
+        snprintf(type, sizeof(type), "Program Change");       
     else if ( a_status == EVENT_CHANNEL_PRESSURE ) 
-        sprintf( type, "Channel Pressure" );     
+        snprintf(type, sizeof(type), "Channel Pressure");     
     else if ( a_status == EVENT_PITCH_WHEEL )      
-        sprintf( type, "Pitch Wheel" );          
+        snprintf(type, sizeof(type), "Pitch Wheel");          
     else
-        sprintf( type, "Unknown MIDI Event");          
+        snprintf(type, sizeof(type), "Unknown MIDI Event");          
 
-    sprintf( text, "%s %s", hex, type );
+    snprintf(text, sizeof(text), "%s %s", hex, type );
 
     m_entry_data->set_text( text );
 }

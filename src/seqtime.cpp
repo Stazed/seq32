@@ -244,7 +244,7 @@ seqtime::update_pixmap()
         
             
         char bar[5];
-        sprintf( bar, "%d", (i/ ticks_per_measure ) + 1  ); 
+        snprintf(bar, sizeof(bar), "%d", (i/ ticks_per_measure ) + 1); 
         
         m_gc->set_foreground(m_black);
         

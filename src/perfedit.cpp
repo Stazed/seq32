@@ -140,7 +140,7 @@ perfedit::perfedit( perform *a_perf )
     
     for( int i=0; i<16; i++ ){
         
-        sprintf( b, "%d", i+1 );
+        snprintf( b, sizeof(b), "%d", i+1 );
         
         /* length */
         m_menu_bpm->items().push_back(MenuElem(b, 
@@ -355,7 +355,7 @@ void
 perfedit::set_snap( int a_snap  )
 {
     char b[10];
-    sprintf( b, "1/%d", a_snap );
+    snprintf( b, sizeof(b), "1/%d", a_snap );
     m_entry_snap->set_text(b);
     
     m_snap = a_snap;
@@ -365,7 +365,7 @@ perfedit::set_snap( int a_snap  )
 void perfedit::set_bpm( int a_beats_per_measure )
 {
     char b[10];
-    sprintf( b, "%d", a_beats_per_measure );
+    snprintf(b, sizeof(b), "%d", a_beats_per_measure );
     m_entry_bpm->set_text(b);
     
     m_bpm = a_beats_per_measure;
@@ -376,7 +376,7 @@ void perfedit::set_bpm( int a_beats_per_measure )
 void perfedit::set_bw( int a_beat_width )
 {
     char b[10];
-    sprintf( b, "%d", a_beat_width );
+    snprintf(b, sizeof(b), "%d", a_beat_width );
     m_entry_bw->set_text(b);
     
     m_bw = a_beat_width;

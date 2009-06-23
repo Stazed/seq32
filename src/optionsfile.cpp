@@ -312,10 +312,10 @@ optionsfile::write( perform *a_perf  )
             default: break;
         }
         
-        sprintf( outs, "%d [%1d %1d %3ld %3ld %3ld %3ld] [%1d %1d %3ld %3ld %3ld %3ld] [%1d %1d %3ld %3ld %3ld %3ld]",
-
+        snprintf( outs, sizeof(outs), "%d [%1d %1d %3ld %3ld %3ld %3ld]"
+                " [%1d %1d %3ld %3ld %3ld %3ld]"
+                " [%1d %1d %3ld %3ld %3ld %3ld]",
                  i,
-                 
                  a_perf->get_midi_control_toggle(i)->m_active,
                  a_perf->get_midi_control_toggle(i)->m_inverse_active,
                  a_perf->get_midi_control_toggle(i)->m_status,
@@ -351,7 +351,11 @@ optionsfile::write( perform *a_perf  )
         for (int i=0; i < c_seqs_in_set; i++) {
             mtx[i] = a_perf->get_group_mute_state(i);
         }
-        sprintf (outs, "%d [%1d %1d %1d %1d %1d %1d %1d %1d] [%1d %1d %1d %1d %1d %1d %1d %1d] [%1d %1d %1d %1d %1d %1d %1d %1d] [%1d %1d %1d %1d %1d %1d %1d %1d]",
+        snprintf(outs, sizeof(outs),
+                "%d [%1d %1d %1d %1d %1d %1d %1d %1d]"
+                " [%1d %1d %1d %1d %1d %1d %1d %1d]"
+                " [%1d %1d %1d %1d %1d %1d %1d %1d]"
+                " [%1d %1d %1d %1d %1d %1d %1d %1d]",
             j,
             mtx[0], mtx[1], mtx[2], mtx[3],
             mtx[4], mtx[5], mtx[6], mtx[7],
@@ -380,7 +384,8 @@ optionsfile::write( perform *a_perf  )
 
 
         file << "# " << a_perf->get_master_midi_bus( )->get_midi_out_bus_name(i) << "\n";
-        sprintf( outs, "%d %d", i, (char) a_perf->get_master_midi_bus( )->get_clock(i));
+        snprintf(outs, sizeof(outs), "%d %d", i,
+                (char) a_perf->get_master_midi_bus( )->get_clock(i));
         file << outs << "\n";
     }
 
@@ -401,7 +406,8 @@ optionsfile::write( perform *a_perf  )
 
 
         file << "# " << a_perf->get_master_midi_bus( )->get_midi_in_bus_name(i) << "\n";
-        sprintf( outs, "%d %d", i, (char) a_perf->get_master_midi_bus( )->get_input(i));
+        snprintf(outs, sizeof(outs), "%d %d", i,
+                (char) a_perf->get_master_midi_bus( )->get_input(i));
         file << outs << "\n";
     }
 
@@ -433,7 +439,8 @@ optionsfile::write( perform *a_perf  )
     for( std::map<unsigned int,long>::const_iterator i = a_perf->key_events.begin();
          i != a_perf->key_events.end(); ++i ){
         
-        sprintf( outs, "%u  %ld        # %s", i->first, i->second, gdk_keyval_name( i->first ) );
+        snprintf(outs, sizeof(outs), "%u  %ld        # %s", i->first,
+                i->second, gdk_keyval_name( i->first ) );
         file << string(outs) << "\n";
     }
     file << "\n\n\n[keyboard-group]\n";
@@ -444,7 +451,8 @@ optionsfile::write( perform *a_perf  )
     for( std::map<unsigned int,long>::const_iterator i = a_perf->key_groups.begin();
          i != a_perf->key_groups.end(); ++i ){
        
-        sprintf( outs, "%u  %ld        # %s", i->first, i->second, gdk_keyval_name(i->first) );
+        snprintf(outs, sizeof(outs), "%u  %ld        # %s", i->first,
+                i->second, gdk_keyval_name(i->first));
         file << string(outs) << "\n";
     }
 

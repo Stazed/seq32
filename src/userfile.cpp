@@ -58,7 +58,7 @@ userfile::parse( perform *a_perf )
     
     for ( int i=0; i<buses; i++ )
     {
-        sprintf( bus_num, "%d", i );
+        snprintf(bus_num, sizeof(bus_num), "%d", i);
         line_after( &file, "[user-midi-bus-" + string(bus_num) + "]");
         global_user_midi_bus_definitions[i].alias = m_line;
         next_data_line( &file );
@@ -83,7 +83,7 @@ userfile::parse( perform *a_perf )
 
     for ( int i=0; i<instruments; i++ )
     {
-        sprintf( instrument_num, "%d", i );
+        snprintf(instrument_num, sizeof(instrument_num), "%d", i);
         line_after( &file, "[user-instrument-" + string(instrument_num) + "]");
         global_user_instrument_definitions[i].instrument = m_line;
         // printf( "%d %s\n", i, m_line );

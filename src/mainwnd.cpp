@@ -853,8 +853,10 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
                 {
                     char buf[512];
-                    sprintf( buf, "Midi Group Learn: Learned! key:%s (code:%d) "
-                                  "mapped", gdk_keyval_name( a_ev->keyval ), a_ev->keyval );
+                    snprintf(buf, sizeof(buf),
+                            "Midi Group Learn: Learned! key:%s (code:%d) "
+                            "mapped", gdk_keyval_name( a_ev->keyval ),
+                            a_ev->keyval);
                     Gtk::MessageDialog dialog(*this,
                            buf, false,
                            Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK, true);
@@ -866,10 +868,11 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 else
                 {
                     char buf[512];
-                    sprintf( buf, "Midi Group Learn: key:%s (code:%d) not "
-                                  "one of the configured mute-group keys, to change "
-                                  "see file/options menu or .seq24rc",
-                                  gdk_keyval_name( a_ev->keyval ), a_ev->keyval );
+                    snprintf(buf, sizeof(buf),
+                            "Midi Group Learn: key:%s (code:%d) not "
+                            "one of the configured mute-group keys, to change "
+                            "see file/options menu or .seq24rc",
+                            gdk_keyval_name( a_ev->keyval ), a_ev->keyval );
                     Gtk::MessageDialog errdialog(*this, buf, false,
                            Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
                     errdialog.run();

@@ -98,7 +98,7 @@ seqmenu::popup_menu( void )
 
             /* midi channel menu */
             for( int j=0; j<16; j++ ){
-                sprintf( b, "%d", j+1 );
+                snprintf(b, sizeof(b), "%d", j + 1);
                 std::string name = string(b);
                 int instrument = global_user_midi_bus_definitions[i].instrument[j]; 
                 if ( instrument >= 0 && instrument < c_maxBuses )

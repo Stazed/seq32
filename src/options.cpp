@@ -308,7 +308,7 @@ options::options (Gtk::Window & parent, perform * a_p):
             int s = (ss%8) * 4 + ss/8; // count this way... 0,4,8,16...
             //unsigned int keycode = m_perf->lookup_keyevent_key( s );
             char buf[16];
-            sprintf( buf, "%d", s );
+            snprintf(buf, sizeof(buf), "%d", s);
             AddKeyM( buf, KeyBindEntry::events, s );
             ++x;
             if (x == 8)
@@ -330,7 +330,7 @@ options::options (Gtk::Window & parent, perform * a_p):
         {
             //unsigned int keycode = m_perf->lookup_keygroup_key( s );
             char buf[16];
-            sprintf( buf, "%d", s );
+            snprintf(buf, sizeof(buf), "%d", s);
             AddKeyM( buf, KeyBindEntry::groups, s );
             ++x;
             if (x == 8)
