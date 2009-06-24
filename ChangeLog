@@ -1,3 +1,7 @@
+2009-06-24 Kevin Meinert <kevin@subatomicglue.com>
+	* src/globals.h, src/midifile.cpp: Support for mute groups in
+	MIDI files added.
+
 2009-06-23 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwid.cpp, src/mainwnd.cpp, src/options.cpp,
 	src/perfnames.cpp, src/perftime.cpp, src/perfedit.cpp,
