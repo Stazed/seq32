@@ -952,7 +952,6 @@ void perform::position_jack( bool a_state )
        num minutes * 60 = num seconds
        num secords * frame_rate  = frame */
 
-
     pos.bar++;
     pos.beat++;
 
@@ -961,22 +960,20 @@ void perform::position_jack( bool a_state )
     jack_transport_reposition( m_jack_client, &pos );
 
 #endif
-
 }   
 
 
-void perform::start( bool a_state )
+void perform::start(bool a_state)
 {
     if (m_jack_running) {
         return;
     }
 
-    inner_start( a_state );
+    inner_start(a_state);
 }
 
 
-
-void perform::stop( )
+void perform::stop()
 {
     if (m_jack_running) {
         return;
@@ -986,47 +983,41 @@ void perform::stop( )
 }
 
 
-void perform::inner_start( bool a_state )
+void perform::inner_start(bool a_state)
 {
     m_condition_var.lock();
 
-    if ( ! is_running() ){
+    if (!is_running()) {
 
         set_playback_mode( a_state );
 
-        if ( a_state )
-            off_sequences( );
+        if (a_state)
+            off_sequences();
 
-        set_running( true );
-
-
-
+        set_running(true);
         m_condition_var.signal();
-
     }
 
     m_condition_var.unlock();
 }
 
 
-void perform::inner_stop( )
+void perform::inner_stop()
 {
-    set_running( false );
+    set_running(false);
     //off_sequences();
-    reset_sequences(  );
-
+    reset_sequences();
     m_usemidiclock = false;
 }
 
 
-void perform::off_sequences( void )
+void perform::off_sequences(void)
 {
-    for (int i=0; i< c_max_sequence; i++ ){
+    for (int i = 0; i < c_max_sequence; i++) {
 
-        if ( is_active(i) == true ){
-            assert( m_seqs[i] );
-            m_seqs[i]->set_playing( false );
-
+        if (is_active(i)) {
+            assert(m_seqs[i]);
+            m_seqs[i]->set_playing(false);
         } 
     }
 }
@@ -1034,12 +1025,11 @@ void perform::off_sequences( void )
 
 void perform::all_notes_off( void )
 {
-    for (int i=0; i< c_max_sequence; i++ ){
+    for (int i=0; i< c_max_sequence; i++) {
 
-        if ( is_active(i) == true ){
-            assert( m_seqs[i] );
-
-            m_seqs[i]->off_playing_notes( );
+        if (is_active(i)) {
+            assert(m_seqs[i]);
+            m_seqs[i]->off_playing_notes();
         } 
     }
     /* flush the bus */
@@ -1047,21 +1037,21 @@ void perform::all_notes_off( void )
 }
 
 
-void perform::reset_sequences( void )
+void perform::reset_sequences(void)
 {
-    for (int i=0; i< c_max_sequence; i++ ){
+    for (int i=0; i< c_max_sequence; i++) {
 
-        if ( is_active(i) == true ){
+        if (is_active(i)) {
             assert( m_seqs[i] );
 
             bool state = m_seqs[i]->get_playing();
 
-            m_seqs[i]->off_playing_notes( );
-            m_seqs[i]->set_playing( false );
-            m_seqs[i]->zero_markers( );
+            m_seqs[i]->off_playing_notes();
+            m_seqs[i]->set_playing(false);
+            m_seqs[i]->zero_markers();
 
-            if( !m_playback_mode )
-                m_seqs[i]->set_playing( state );
+            if (!m_playback_mode)
+                m_seqs[i]->set_playing(state);
         } 
     }
     /* flush the bus */
@@ -1069,14 +1059,16 @@ void perform::reset_sequences( void )
 }
 
 
-void perform::launch_output_thread( void )
+void perform::launch_output_thread(void)
 {
     int err;
-    err = pthread_create( &m_out_thread, 
-            NULL, 
-            output_thread_func,
-            this );
-    m_out_thread_launched= true;
+
+    err = pthread_create(&m_out_thread, NULL, output_thread_func, this);
+    if (err != 0) {
+        /*TODO: error handling*/
+    }
+    else
+        m_out_thread_launched= true;
 }
 
 
@@ -1089,12 +1081,13 @@ void perform::set_playback_mode( bool a_playback_mode )
 void perform::launch_input_thread()
 {
     int err;
-    err = pthread_create( &m_in_thread, 
-            NULL, 
-            input_thread_func,
-            this );
-    m_in_thread_launched= true;
 
+    err = pthread_create(&m_in_thread, NULL, input_thread_func, this);
+    if (err != 0) {
+        /*TODO: error handling*/
+    }
+    else
+    m_in_thread_launched = true;
 }
 
 
@@ -1678,7 +1671,6 @@ void perform::output_func(void)
                     stats_min = delta_us;
 
                 stats_avg += delta_us;
-
                 stats_loop_index++;	  
 
                 if ( stats_loop_index > 200 ){
@@ -1693,27 +1685,24 @@ void perform::output_func(void)
                     stats_min = 0x7FFFFFFF;
                     stats_max = 0;
                     stats_avg = 0;
-
                 }
-
             }
 
-            if (jack_stopped )
+            if (jack_stopped)
                 inner_stop();
         }
 
 
-        if ( global_stats ){
+        if (global_stats){
 
-            printf ( "\n\n-- trigger width --\n" );
-            for ( int i=0; i<100; i++ ){
+            printf("\n\n-- trigger width --\n");
+            for (int i=0; i<100; i++ ){
                 printf( "[%3d][%8ld]\n", i * 100, stats_all[i] );
             }
-            printf ( "\n\n-- clock width --\n" );
+            printf("\n\n-- clock width --\n" );
             int bpm  = m_master_bus.get_bpm();
 
-            printf ( "optimal : [%d]us\n", ((c_ppqn / 24)* 60000000 / c_ppqn  / bpm ));
-
+            printf("optimal: [%d]us\n", ((c_ppqn / 24)* 60000000 / c_ppqn / bpm));
 
             for ( int i=0; i<100; i++ ){
                 printf( "[%3d][%8ld]\n", i * 300, stats_clock[i] );
@@ -1721,7 +1710,7 @@ void perform::output_func(void)
         }
 
         m_tick = 0;
-        m_master_bus.flush( );
+        m_master_bus.flush();
         m_master_bus.stop();
     }
 
@@ -1855,85 +1844,94 @@ void perform::input_func(void)
 {
     event ev;
 
-    while( m_inputing ){
+    while (m_inputing) {
 
-        if ( m_master_bus.poll_for_midi() > 0 ){
+        if (m_master_bus.poll_for_midi() > 0) {
 
             do {
 
-                if ( m_master_bus.get_midi_event( &ev ) ){
+                if (m_master_bus.get_midi_event(&ev)) {
 
-                    // Obey MidiTimeClock:
-                    if (ev.get_status() == EVENT_MIDI_START)
-                    {
-                        stop();
-                        start( false );
-                        m_midiclockrunning = true;
-                        m_usemidiclock = true;
-                        m_midiclocktick = 0;
-                        m_midiclockpos = 0;
-                    }
-                    // midi continue: start from current pos.
-                    else if (ev.get_status() == EVENT_MIDI_CONTINUE)
-                    {
-                        m_midiclockrunning = true;
-                        start( false );
-                        //m_usemidiclock = true;
-                    }
-                    else if (ev.get_status() == EVENT_MIDI_STOP)
-                    {
-                        // do nothing, just let the system pause
-                        // since we're not getting ticks after the stop, the song wont advance
-                        // when start is recieved, we'll reset the position, or
-                        // when continue is recieved, we wont
-                        m_midiclockrunning = false;
-                        all_notes_off();
-                    }
-                    else if (ev.get_status() == EVENT_MIDI_CLOCK)
+                    /* start propagation if not already running*/
+                    if (ev.get_status() == EVENT_MIDI_CLOCK)
                     {
                         if (m_midiclockrunning)
                             m_midiclocktick += 8;
+                        else if (m_usemidiclock) {
+                            start(false);
+                            m_midiclockrunning = true;
+                        }
                     }
-                    // not tested (todo: test it!)
+                    
+                    /*prapare for MIDI clock usage at song position 0*/
+                    else if (ev.get_status() == EVENT_MIDI_START)
+                    {
+                        if (!m_midiclockrunning) {
+                            m_usemidiclock = true;
+                            m_midiclocktick = 0;
+                            m_midiclockpos = 0;
+                        }
+                    }
+
+                    /*prapare for MIDI clock usage at current song position*/
+                    else if (ev.get_status() == EVENT_MIDI_CONTINUE)
+                    {
+                        if (!m_midiclockrunning) {
+                            m_usemidiclock = true;
+                        }
+                    }
+                    
+                    /*stop MIDI clock usage*/
+                    else if (ev.get_status() == EVENT_MIDI_STOP)
+                    {
+                        if (m_midiclockrunning) {
+                            m_midiclockrunning = false;
+                            m_usemidiclock = false;
+                            stop();
+                            all_notes_off();
+                        }
+                    }
+                    
+                    /*adjust position if not in MIDI clock run mode*/
                     else if (ev.get_status() == EVENT_MIDI_SONG_POS)
                     {
-                        unsigned char a, b;
-                        ev.get_data( &a, &b );
-                        m_midiclockpos = ((int)a << 7) && (int)b;
+                        if (!m_midiclockrunning) {
+                            unsigned char a, b;
+                            ev.get_data(&a, &b);
+                            m_midiclockpos = ((unsigned int)a << 7) + b;
+                        }
                     }
 
                     /* filter system wide messages */
-                    if ( ev.get_status() <= EVENT_SYSEX ){  
+                    if (ev.get_status() <= EVENT_SYSEX) {  
 
                         if( global_showmidi) 
                             ev.print();
 
-                        /* is there a sequence set ? */
-                        if ( m_master_bus.is_dumping( )) {
+                        /* is there a sequence set? */
+                        if (m_master_bus.is_dumping()) {
 
-                            ev.set_timestamp( m_tick );
-
+                            ev.set_timestamp(m_tick);
 
                             /* dump to it */
-                            (m_master_bus.get_sequence( ))->stream_event( &ev );
-
+                            (m_master_bus.get_sequence())->stream_event(&ev);
                         }
 
                         /* use it to control our sequencer */
                         else {
 
-                            for ( int i=0; i<c_midi_controls; i++ ){
+                            for (int i = 0; i < c_midi_controls; i++) {
 
                                 unsigned char data[2] = {0,0};
                                 unsigned char status = ev.get_status();
 
                                 ev.get_data( &data[0], &data[1] );
 
-                                if(  get_midi_control_toggle(i)->m_active &&
+                                if (get_midi_control_toggle(i)->m_active &&
                                         status  == get_midi_control_toggle(i)->m_status &&
                                         data[0] == get_midi_control_toggle(i)->m_data ){
 
-                                    if ( data[1] >= get_midi_control_toggle(i)->m_min_value &&
+                                    if (data[1] >= get_midi_control_toggle(i)->m_min_value &&
                                             data[1] <= get_midi_control_toggle(i)->m_max_value ){
 
                                         if ( i <  c_seqs_in_set )
@@ -1991,17 +1989,17 @@ void perform::input_func(void)
 
                     }
 
-                    if ( ev.get_status() == EVENT_SYSEX ){  
+                    if (ev.get_status() == EVENT_SYSEX) {  
 
-                        if( global_showmidi ) 
+                        if (global_showmidi) 
                             ev.print();
 
-                        if( global_pass_sysex )
-                            m_master_bus.sysex( &ev );   
+                        if (global_pass_sysex)
+                            m_master_bus.sysex(&ev);   
                     }
                 }
 
-            } while ( m_master_bus.is_more_input( ));
+            } while (m_master_bus.is_more_input());
         }
     }
     pthread_exit(0);

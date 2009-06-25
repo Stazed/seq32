@@ -1,3 +1,6 @@
+2009-06-25 Guido Scholz <guido.scholz@bayernline.de>
+	* src/perform.cpp: MIDI clock control modified.
+
 2009-06-24 Kevin Meinert <kevin@subatomicglue.com>
 	* src/globals.h, src/midifile.cpp: Support for mute groups in
 	MIDI files added.
