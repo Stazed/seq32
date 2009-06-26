@@ -1887,7 +1887,6 @@ void perform::input_func(void)
                         if (m_midiclockrunning) {
                             m_midiclockrunning = false;
                             m_usemidiclock = false;
-                            stop();
                             all_notes_off();
                         }
                     }
@@ -1898,7 +1897,7 @@ void perform::input_func(void)
                         if (!m_midiclockrunning) {
                             unsigned char a, b;
                             ev.get_data(&a, &b);
-                            m_midiclockpos = ((unsigned int)a << 7) + b;
+                            m_midiclockpos = ((unsigned int)a << 7) | b;
                         }
                     }
 
