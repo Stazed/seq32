@@ -1,3 +1,7 @@
+2009-06-26 Guido Scholz <guido.scholz@bayernline.de>
+	* configure.in: Support for --as-needed linker flag added to
+	remove unused library references.
+
 2009-06-25 Guido Scholz <guido.scholz@bayernline.de>
 	* src/perform.cpp: MIDI clock control modified.
 
