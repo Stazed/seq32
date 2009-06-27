@@ -1,3 +1,7 @@
+2009-06-27 Guido Scholz <guido.scholz@bayernline.de>
+	* src/mainwnd.cpp: Mute group learn dialogs changed to use
+	std:string formatting.
+
 2009-06-26 Guido Scholz <guido.scholz@bayernline.de>
 	* configure.in: Support for --as-needed linker flag added to
 	remove unused library references.
