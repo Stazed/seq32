@@ -683,8 +683,8 @@ mainwnd::about_dialog( void )
     Gtk::AboutDialog dialog;
     dialog.set_transient_for(*this);
     dialog.set_name(PACKAGE_NAME);
-    dialog.set_version(PACKAGE_VERSION);
-    dialog.set_comments("Interactive MIDI Sequencer");
+    dialog.set_version(VERSION);
+    dialog.set_comments("Interactive MIDI Sequencer\n");
 
     dialog.set_copyright(
             "(C) 2002 - 2006 Rob C. Buse\n"
@@ -842,7 +842,8 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             // activate mute group key
             if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
             {
-                m_mainperf->select_and_mute_group( m_mainperf->lookup_keygroup_group( a_ev->keyval ) );
+                m_mainperf->select_and_mute_group(
+                        m_mainperf->lookup_keygroup_group(a_ev->keyval));
             }
 
             // mute group learn
@@ -851,12 +852,17 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             {
                 if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
                 {
-                    char buf[512];
-                    sprintf( buf, "Midi Group Learn: Learned! key:%s (code:%d) "
-                                  "mapped", key2text( a_ev->keyval ), a_ev->keyval );
+                    std::ostringstream os;
+                    os << "Key \""
+                       << gdk_keyval_name(a_ev->keyval)
+                       << "\" (code = "
+                       << a_ev->keyval
+                       << ") successfully mapped.";
+
                     Gtk::MessageDialog dialog(*this,
-                           buf, false,
-                           Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK, true);
+                           "MIDI mute group learn success", false,
+                           Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+                    dialog.set_secondary_text(os.str(), false);
                     dialog.run();
 
                     // we miss the keyup msg for learn, force set it off
@@ -864,35 +870,46 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 }
                 else
                 {
-                    char buf[512];
-                    sprintf( buf, "Midi Group Learn: key:%s (code:%d) not "
-                                  "one of the configured mute-group keys, to change "
-                                  "see file/options menu or .seq24rc",
-                                  key2text( a_ev->keyval ), a_ev->keyval );
-                    Gtk::MessageDialog errdialog(*this, buf, false,
+                    std::ostringstream os;
+                    os << "Key \""
+                        << gdk_keyval_name(a_ev->keyval)
+                        << "\" (code = "
+                        << a_ev->keyval
+                        << ") is not one of the configured mute-group keys.\n"
+                        << "To change this see File/Options menu or .seq24rc";
+
+                    Gtk::MessageDialog dialog(*this,
+                           "MIDI mute group learn failed", false,
                            Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-                    errdialog.run();
+
+                    dialog.set_secondary_text(os.str(), false);
+                    dialog.run();
                     // we miss the keyup msg for learn, force set it
                     m_mainperf->unset_mode_group_learn();
                 }
             }
 
             // the start/end key may be the same key (i.e. SPACE)
-            // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
-            bool dont_toggle = m_mainperf->m_key_start != m_mainperf->m_key_stop;
-            if ( a_ev->keyval == m_mainperf->m_key_start && (dont_toggle || !is_pattern_playing))
+            // allow toggling when the same key is mapped to both
+            // triggers (i.e. SPACEBAR)
+            bool dont_toggle = m_mainperf->m_key_start
+                != m_mainperf->m_key_stop;
+
+            if ( a_ev->keyval == m_mainperf->m_key_start
+                    && (dont_toggle || !is_pattern_playing))
             {
                 start_playing();
             }
-            else if ( a_ev->keyval == m_mainperf->m_key_stop && (dont_toggle || is_pattern_playing))
+            else if ( a_ev->keyval == m_mainperf->m_key_stop
+                    && (dont_toggle || is_pattern_playing))
             {
                 stop_playing();
             }
 
             /* toggle sequence mute/unmute using keyboard keys... */
-            if( m_mainperf->get_key_events()->count( a_ev->keyval) != 0 ){
-
-                sequence_key( m_mainperf->lookup_keyevent_seq( a_ev->keyval ) );
+            if (m_mainperf->get_key_events()->count( a_ev->keyval) != 0)
+            {
+                sequence_key(m_mainperf->lookup_keyevent_seq( a_ev->keyval));
             }
         }
     }

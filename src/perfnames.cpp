@@ -127,7 +127,7 @@ perfnames::draw_sequence( int sequence )
         if ( sequence % c_seqs_in_set == 0 ){
 		
             char ss[3];
-            sprintf( ss, "%2d", sequence / c_seqs_in_set );
+            snprintf(ss, sizeof(ss), "%2d", sequence / c_seqs_in_set );
 		
             m_gc->set_foreground(m_white);
                 
@@ -165,7 +165,7 @@ perfnames::draw_sequence( int sequence )
 		
             /* names */
             char name[50];
-            sprintf( name, "%-14.14s   %2d", 
+            snprintf(name, sizeof(name), "%-14.14s   %2d", 
                      m_mainperf->get_sequence(sequence)->get_name(),
                      m_mainperf->get_sequence(sequence)->get_midi_channel() + 1);
                 
@@ -175,7 +175,7 @@ perfnames::draw_sequence( int sequence )
                                                        m_window, name, font::BLACK );
                 
             char str[20];
-            sprintf( str, 
+            snprintf(str, sizeof(str), 
                      "%d-%d %ld/%ld",
                      m_mainperf->get_sequence(sequence)->get_midi_bus(), 
                      m_mainperf->get_sequence(sequence)->get_midi_channel()+1,

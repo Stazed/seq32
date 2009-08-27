@@ -172,7 +172,7 @@ perftime::on_expose_event(GdkEventExpose* a_e)
 			   m_window_y );
 	
 	char bar[5];
-	sprintf( bar, "%d", i + 1 ); 
+	snprintf( bar, sizeof(bar), "%d", i + 1 ); 
 	
 	m_gc->set_foreground(m_black);
 

@@ -1728,11 +1728,10 @@ sequence::stream_event(  event *a_ev  )
     link_new();
 
     if ( m_quanized_rec ){
-	if (a_ev->is_note_off()) {
-	    select_note_events( a_ev->get_timestamp(), a_ev->get_note(),
-			        a_ev->get_timestamp(), a_ev->get_note(), e_select);
+        if (a_ev->is_note_off()) {
+            select_note_events( a_ev->get_timestamp(), a_ev->get_note(),
+            a_ev->get_timestamp(), a_ev->get_note(), e_select);
             quanize_events( EVENT_NOTE_ON, 0, m_snap_tick, 1 , true );
-
 	}
     }
     /* update view */

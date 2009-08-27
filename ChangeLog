@@ -1,3 +1,32 @@
+2009-06-27 Guido Scholz <guido.scholz@bayernline.de>
+	* src/mainwnd.cpp: Mute group learn dialogs changed to use
+	std:string formatting.
+
+2009-06-26 Guido Scholz <guido.scholz@bayernline.de>
+	* configure.in: Support for --as-needed linker flag added to
+	remove unused library references.
+
+2009-06-25 Guido Scholz <guido.scholz@bayernline.de>
+	* src/perform.cpp: MIDI clock control modified.
+
+2009-06-24 Kevin Meinert <kevin@subatomicglue.com>
+	* src/globals.h, src/midifile.cpp: Support for mute groups in
+	MIDI files added.
+
+2009-06-23 Guido Scholz <guido.scholz@bayernline.de>
+	* src/mainwid.cpp, src/mainwnd.cpp, src/options.cpp,
+	src/perfnames.cpp, src/perftime.cpp, src/perfedit.cpp,
+	src/seqdata.cpp, src/perform.cpp, src/seqedit.cpp, src/seqkeys.cpp,
+	seqtime.cpp. src/seqmenu.cpp, src/optionsfile.cpp,
+	src/userfile.cpp: sprintf() replaced by snprintf() to avoid
+	buffer overflows.
+
+2009-06-18 Kevin Meinert <kevin@subatomicglue.com>
+	* src/globals.h, src/mainwnd.cpp, src/midibus_portmidi.cpp,
+	src/options.cpp, src/optionsfile.cpp, src/perfedit.cpp,
+	src/perform.cpp, src/seq24.cpp, src/seqroll.cpp: Some compiler
+	warnings fixed, generic key name translation.
+
 2009-05-29 Guido Scholz <guido.scholz@bayernline.de>
 	* src/options.cpp: Fixed missing return value for
 	on_key_press_event().

@@ -174,7 +174,7 @@ seqkeys::update_pixmap()
             if ( octave < 0 )
                 octave *= -1;
             
-            sprintf( notes, "%2s%1d", c_key_text[key], octave );
+            snprintf(notes, sizeof(notes), "%2s%1d", c_key_text[key], octave);
             
             p_font_renderer->render_string_on_drawable(m_gc,
                                                        2, 
@@ -182,7 +182,7 @@ seqkeys::update_pixmap()
                                                        m_pixmap, notes, font::BLACK );
         }
 
-        //sprintf( notes, "%c %d", c_scales_symbol[m_scale][key], m_scale );
+        //snprintf(notes, sizeof(notes), "%c %d", c_scales_symbol[m_scale][key], m_scale );
             
         //p_font_renderer->render_string_on_drawable(m_gc,
         //                                             2 + (c_text_x * 4), 

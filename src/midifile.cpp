@@ -530,6 +530,27 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         }
     }
 
+    // read in the mute group info.
+    if ((file_size - m_pos) > (int) sizeof (unsigned long))
+    {
+        ID = read_long ();
+        if (ID == c_mutegroups)
+        {
+            long length = read_long ();
+            if (c_gmute_tracks != length)
+            {
+                printf( "corrupt data in mutegroup section\n" );
+            }
+            for (int i = 0; i < c_seqs_in_set; i++)
+            {
+                a_perf->select_group_mute(read_long ());
+                for (int k = 0; k < c_seqs_in_set; ++k) {
+                    a_perf->set_group_mute_state(k, read_long ());
+                }
+            }
+        }
+    }
+
     // *** ADD NEW TAGS AT END **************/
 
     delete[]m_d;
@@ -648,6 +669,17 @@ bool midifile::write (perform * a_perf)
     write_long (c_bpmtag);
     write_long (a_perf->get_bpm ());
 
+    /* write out the mute groups */
+    write_long (c_mutegroups);
+    write_long (c_gmute_tracks);
+    for (int j=0; j < c_seqs_in_set; ++j){
+        a_perf->select_group_mute(j);
+        write_long(j);
+        for (int i=0; i < c_seqs_in_set; ++i) {
+            write_long( a_perf->get_group_mute_state(i) );
+        }
+    }
+    
     int data_size = m_l.size ();
     m_d = (unsigned char *) new char[data_size];
 
