@@ -26,7 +26,7 @@ const int c_perfroll_size_box_click_w = c_perfroll_size_box_w+1 ;
 
 perfroll::perfroll( perform *a_perf,
 		    Adjustment * a_hadjust,
-		    Adjustment * a_vadjust  ) : DrawingArea() 
+		    Adjustment * a_vadjust  ) : DrawingArea()
 {    
     
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
@@ -74,6 +74,16 @@ perfroll::perfroll( perform *a_perf,
     for( int i=0; i<c_total_seqs; ++i )
         m_sequence_active[i]=false;
 
+    switch (global_interactionmethod)
+    {
+      case e_fruity_interaction:
+        m_interaction = &m_fruity_interaction;
+        break;
+      default:
+      case e_seq24_interaction:
+        m_interaction = &m_seq24_interaction;
+        break;
+    }
 } 
 
 perfroll::~perfroll( )
@@ -623,36 +633,14 @@ perfroll::stop_playing( void )
 bool
 perfroll::on_button_press_event(GdkEventButton* a_ev)
 {
-    bool result;
-
-    switch (global_interactionmethod)
-    {
-        case e_fruity_interaction:
-            result = m_fruity_interaction.on_button_press_event(a_ev, *this);
-        case e_seq24_interaction:
-            result = m_seq24_interaction.on_button_press_event(a_ev, *this);
-        default:
-            result = false;
-    }
-    return result;
+    return m_interaction->on_button_press_event(a_ev, *this);
 }
 
 
 bool
 perfroll::on_button_release_event(GdkEventButton* a_ev)
 {
-    bool result;
-
-    switch (global_interactionmethod)
-    {
-        case e_fruity_interaction:
-            result = m_fruity_interaction.on_button_release_event(a_ev, *this);
-        case e_seq24_interaction:
-            result = m_seq24_interaction.on_button_release_event(a_ev, *this);
-        default:
-            result = false;
-    }
-    return result;
+    return m_interaction->on_button_release_event(a_ev, *this);
 }
 
 bool
@@ -695,18 +683,7 @@ perfroll::on_scroll_event( GdkEventScroll* a_ev )
 bool
 perfroll::on_motion_notify_event(GdkEventMotion* a_ev)
 {
-    bool result;
-
-    switch (global_interactionmethod)
-    {
-        case e_fruity_interaction:
-             result = m_fruity_interaction.on_motion_notify_event(a_ev, *this);
-        case e_seq24_interaction:
-             result = m_seq24_interaction.on_motion_notify_event(a_ev, *this);
-        default:
-             result = false;
-    }
-    return result;
+    return m_interaction->on_motion_notify_event(a_ev, *this);
 }
 
 bool 
