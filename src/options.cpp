@@ -69,10 +69,11 @@ public:
     {
         char buf[256] = "";
         char* special = gdk_keyval_name( val );
+        char* p_buf = &buf[strlen(buf)];
         if (special)
-            sprintf( &buf[strlen(buf)], "%s", special );
+            snprintf( p_buf, sizeof buf - (p_buf - buf), "%s", special );
         else
-            sprintf( &buf[strlen(buf)], "'%c'", (char)val );
+            snprintf( p_buf, sizeof buf - (p_buf - buf), "'%c'", (char)val );
         set_text( buf );
         int width = strlen(buf)-1;
         set_width_chars( 1 <= width ? width : 1 );

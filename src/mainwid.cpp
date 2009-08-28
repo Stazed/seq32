@@ -188,7 +188,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 	    
 	    m_gc->set_foreground(m_foreground);
 	    char name[20];
-	    sprintf( name, "%.13s", seq->get_name() );
+	    snprintf( name, sizeof name, "%.13s", seq->get_name() );
 
 
         font::Color col = font::BLACK;;
@@ -213,7 +213,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 
         if (m_mainperf->show_ui_sequence_key())
         {
-    	    sprintf( str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
+    	    snprintf( str, sizeof str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
 
     	    p_font_renderer->render_string_on_drawable(m_gc,
                                                        base_x + c_seqarea_x - 7,
@@ -221,7 +221,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
                                                        m_pixmap, str, col );
         }
 
-	    sprintf( str,
+	    snprintf( str, sizeof str,
 		     "%d-%d %ld/%ld",
 		     seq->get_midi_bus(), 
 		     seq->get_midi_channel()+1,
