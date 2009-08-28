@@ -189,31 +189,6 @@ options::options (Gtk::Window & parent, perform * a_p):
     
     clock_mod_adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::clock_mod_callback),clock_mod_adj));
 
-    // add controls for input method
-    {
-        Adjustment *adj = new Adjustment( global_interactionmethod, 0, e_number_of_interactions-1, 1 );
-        SpinButton *spin = new SpinButton( *adj );
-
-        HBox *hbox2 = manage (new HBox ());
-        HBox *hbox3 = manage (new HBox ());
-
-        //m_spinbutton_bpm->set_editable( false );
-        interaction_method_label = new Label("Input Method");
-        hbox2->pack_start(*(manage( interaction_method_label )), false, false, 4);
-        hbox2->pack_start(*spin, false, false );
-
-        vbox->pack_start( *hbox2, false, false );
-
-        interaction_method_desc_label = new Label(" ----- ");
-        hbox3->pack_start(*(manage( interaction_method_desc_label )), false, false, 4);
-        vbox->pack_start(*hbox3, false, false );
-
-        adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::interaction_method_callback),adj));
-
-        // force it to refresh.
-        interaction_method_callback( adj );
-    }
-
     // Input Buses
     buses = m_perf->get_master_midi_bus ()->get_num_in_buses ();
 
@@ -351,6 +326,35 @@ options::options (Gtk::Window & parent, perform * a_p):
 
         #undef AddKeyL
         #undef AddKey
+    }
+
+    vbox = manage(new VBox());
+    m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox,
+                "Mouse"));
+
+    // add controls for input method
+    {
+        Adjustment *adj = new Adjustment( global_interactionmethod, 0, e_number_of_interactions-1, 1 );
+        SpinButton *spin = new SpinButton( *adj );
+
+        HBox *hbox2 = manage (new HBox ());
+        HBox *hbox3 = manage (new HBox ());
+
+        //m_spinbutton_bpm->set_editable( false );
+        interaction_method_label = new Label("Input Method");
+        hbox2->pack_start(*(manage( interaction_method_label )), false, false, 4);
+        hbox2->pack_start(*spin, false, false );
+
+        vbox->pack_start( *hbox2, false, false );
+
+        interaction_method_desc_label = new Label(" ----- ");
+        hbox3->pack_start(*(manage( interaction_method_desc_label )), false, false, 4);
+        vbox->pack_start(*hbox3, false, false );
+
+        adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::interaction_method_callback),adj));
+
+        // force it to refresh.
+        interaction_method_callback( adj );
     }
 
     // Jack
