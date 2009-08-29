@@ -629,8 +629,10 @@ perfroll::on_button_press_event(GdkEventButton* a_ev)
     {
         case e_fruity_interaction:
             result = m_fruity_interaction.on_button_press_event(a_ev, *this);
+            break;
         case e_seq24_interaction:
             result = m_seq24_interaction.on_button_press_event(a_ev, *this);
+            break;
         default:
             result = false;
     }
@@ -647,8 +649,10 @@ perfroll::on_button_release_event(GdkEventButton* a_ev)
     {
         case e_fruity_interaction:
             result = m_fruity_interaction.on_button_release_event(a_ev, *this);
+            break;
         case e_seq24_interaction:
             result = m_seq24_interaction.on_button_release_event(a_ev, *this);
+            break;
         default:
             result = false;
     }
@@ -701,8 +705,10 @@ perfroll::on_motion_notify_event(GdkEventMotion* a_ev)
     {
         case e_fruity_interaction:
              result = m_fruity_interaction.on_motion_notify_event(a_ev, *this);
+             break;
         case e_seq24_interaction:
              result = m_seq24_interaction.on_motion_notify_event(a_ev, *this);
+             break;
         default:
              result = false;
     }
