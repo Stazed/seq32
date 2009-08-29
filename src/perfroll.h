@@ -45,58 +45,19 @@
 
 using namespace Gtk;
 
-class perfroll;
+#include "perfroll_input.h"
 
-class AbstractPerfInput
-{
-  public:
-    virtual ~AbstractPerfInput() { };
-
-    virtual bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths) = 0;
-    virtual bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths) = 0;
-    virtual bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths) = 0;
-};
-
-class FruityPerfInput : public AbstractPerfInput
-{
-  public:
-    FruityPerfInput() : m_adding_pressed( false ), m_current_x( 0 ),
-                         m_current_y( 0 )
-    {}
-    bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths);
-    bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths);
-    bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths);
-
-  private:
-    void updateMousePtr(perfroll& ths);
-    bool m_adding_pressed;
-    long m_current_x, m_current_y;
-};
-
-class Seq24PerfInput : public AbstractPerfInput
-{
-  public:
-    Seq24PerfInput() : m_adding( false ), m_adding_pressed( false ) {}
-    bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths);
-    bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths);
-    bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths);
-
-  private:
-    void set_adding( bool a_adding, perfroll& ths );
-    bool m_adding;
-    bool m_adding_pressed;
-};
+const int c_perfroll_background_x = (c_ppqn * 4 * 16) / c_perf_scale_x;
+const int c_perfroll_size_box_w = 3;
+const int c_perfroll_size_box_click_w = c_perfroll_size_box_w+1 ;
 
 /* performance roll */
 class perfroll : public Gtk::DrawingArea
 {
 
  private: 
-    friend struct FruityPerfInput;
-    FruityPerfInput m_fruity_interaction;
-
-    friend struct Seq24PerfInput;
-    Seq24PerfInput m_seq24_interaction;
+    friend class FruityPerfInput;
+    friend class Seq24PerfInput;
 
     AbstractPerfInput* m_interaction;
 
