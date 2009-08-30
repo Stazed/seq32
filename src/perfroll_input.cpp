@@ -1,5 +1,4 @@
 #include "perform.h"
-//#include "globals.h"
 #include "perfroll_input.h"
 #include "perfroll.h"
 
@@ -40,7 +39,6 @@ void FruityPerfInput::updateMousePtr( perfroll& ths )
     }
 }
 
-
 bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 {
     ths.grab_focus( );
@@ -62,18 +60,59 @@ bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
     ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &ths.m_drop_tick, &ths.m_drop_sequence );
 
     /*      left mouse button     */
-    if ( a_ev->button == 1 && !(a_ev->state & GDK_CONTROL_MASK)){
+    if ( a_ev->button == 1)
+    {
+        on_left_button_pressed(a_ev, ths);
+    }
 
+    /*     right mouse button      */
+    if ( a_ev->button == 3 )
+    {
+        on_right_button_pressed(a_ev, ths);
+    }
+
+    /* left-ctrl, or middle: split */
+    if ( a_ev->button == 2 )
+    {
+        if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
+
+            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( ths.m_drop_tick );
+
+            if ( state )
+            {
+                ths.split_trigger(ths.m_drop_sequence, ths.m_drop_tick);
+            }
+        }
+    }
+
+    updateMousePtr( ths );
+    return true;
+}
+
+void FruityPerfInput::on_left_button_pressed(GdkEventButton* a_ev, perfroll& ths)
+{
+    if ( a_ev->state & GDK_CONTROL_MASK )
+    {
+        if ( ths.m_mainperf->is_active( ths.m_drop_sequence ))
+        {
+            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( ths.m_drop_tick );
+
+            if ( state )
+            {
+                ths.split_trigger(ths.m_drop_sequence, ths.m_drop_tick);
+            }
+        }
+    }
+    else
+    {
         long tick = ths.m_drop_tick;
 
         /* add a new note if we didnt select anything */
         //if (m_adding)
         {
-
             m_adding_pressed = true;
 
             if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
-
                 long seq_length = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_length( );
 
                 bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( tick );
@@ -130,7 +169,6 @@ bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
                 // add an event:
                 else
                 {
-
                     // snap to length of sequence
                     tick = tick - (tick % seq_length);
 
@@ -145,51 +183,26 @@ bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
             }
         }
     }
+}
 
-    /*     right mouse button      */
-    if ( a_ev->button == 3 ){
-        //set_adding( false );
+void FruityPerfInput::on_right_button_pressed(GdkEventButton* a_ev, perfroll& ths)
+{
+    //set_adding( false );
 
-        long tick = ths.m_drop_tick;
+    long tick = ths.m_drop_tick;
 
-        if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
+    if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
 
-            //long seq_length = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_length();
+        //long seq_length = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_length();
 
-            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( tick );
+        bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( tick );
 
-            if ( state )
-            {
-                ths.m_mainperf->push_trigger_undo();
-                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->del_trigger( tick );
-            }
+        if ( state )
+        {
+            ths.m_mainperf->push_trigger_undo();
+            ths.m_mainperf->get_sequence( ths.m_drop_sequence )->del_trigger( tick );
         }
     }
-
-    /* left-ctrl, or middle: split */
-    if ( a_ev->button == 2 ||
-            a_ev->button == 1 && (a_ev->state & GDK_CONTROL_MASK) )
-    {
-        long tick = ths.m_drop_tick;
-
-        if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
-
-            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( tick );
-
-            if ( state )
-            {
-                ths.m_mainperf->push_trigger_undo();
-
-                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->split_trigger( tick );
-
-                ths.draw_background_on( ths.m_pixmap, ths.m_drop_sequence );
-                ths.draw_sequence_on( ths.m_pixmap, ths.m_drop_sequence );
-                ths.draw_drawable_row( ths.m_window, ths.m_pixmap, ths.m_drop_y);
-            }
-        }
-    }
-    updateMousePtr( ths );
-    return true;
 }
 
 bool FruityPerfInput::on_button_release_event(GdkEventButton* a_ev, perfroll& ths)
@@ -280,8 +293,7 @@ bool FruityPerfInput::on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths
 
 
 /* popup menu calls this */
-    void
-Seq24PerfInput::set_adding( bool a_adding, perfroll& ths )
+void Seq24PerfInput::set_adding( bool a_adding, perfroll& ths )
 {
     if ( a_adding )
     {
@@ -295,8 +307,7 @@ Seq24PerfInput::set_adding( bool a_adding, perfroll& ths )
     }
 }
 
-    bool
-Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
+bool Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 {
     ths.grab_focus( );
 
@@ -407,21 +418,13 @@ Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
     /* middle, split */
     if ( a_ev->button == 2 )
     {
-        long tick = ths.m_drop_tick;
-
         if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
 
-            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( tick );
+            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( ths.m_drop_tick );
 
             if ( state )
             {
-                ths.m_mainperf->push_trigger_undo();
-
-                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->split_trigger( tick );
-
-                ths.draw_background_on( ths.m_pixmap, ths.m_drop_sequence );
-                ths.draw_sequence_on( ths.m_pixmap, ths.m_drop_sequence );
-                ths.draw_drawable_row( ths.m_window, ths.m_pixmap, ths.m_drop_y);
+                ths.split_trigger(ths.m_drop_sequence, ths.m_drop_tick);
             }
         }
     }

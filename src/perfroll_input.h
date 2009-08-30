@@ -47,6 +47,8 @@ class FruityPerfInput : public AbstractPerfInput
 
     private:
         void updateMousePtr(perfroll& ths);
+        void on_left_button_pressed(GdkEventButton* a_ev, perfroll& ths);
+        void on_right_button_pressed(GdkEventButton* a_ev, perfroll& ths);
         bool m_adding_pressed;
         long m_current_x, m_current_y;
 };
