@@ -257,6 +257,7 @@ perfedit::perfedit( perform *a_perf )
 bool 
 perfedit::on_key_press_event(GdkEventKey* a_ev)
 {
+    bool event_was_handled = false;
     if ( a_ev->type == GDK_KEY_PRESS ){
 
         if ( global_print_keys ){
@@ -275,6 +276,14 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             stop_playing();
             return true;
         }
+
+        if(a_ev->keyval == m_mainperf->m_key_start || a_ev->keyval == m_mainperf->m_key_stop)
+          event_was_handled = true;
+    }
+
+    if(!event_was_handled)
+    {
+      return Gtk::Window::on_key_press_event(a_ev);
     }
 
     return false;
