@@ -2167,13 +2167,11 @@ void perform::set_key_group( unsigned int keycode, long group_slot )
 }
 
 
-
 #ifdef JACK_SUPPORT
 void jack_timebase_callback(jack_transport_state_t state,
         jack_nframes_t nframes, 
         jack_position_t *pos, int new_pos, void *arg)
 {
-
     static double jack_tick;
     static jack_nframes_t last_frame;
     static jack_nframes_t current_frame;
@@ -2203,40 +2201,33 @@ void jack_timebase_callback(jack_transport_state_t state,
     if (  state_last    ==  JackTransportStarting &&
             state_current ==  JackTransportRolling ){
 
-        //printf ( "Starting [%d] [%d]\n", last_frame, current_frame );
+        // printf ( "Starting [%d] [%d]\n", last_frame, current_frame );
 
-        jack_tick = 0.0;
-        last_frame = current_frame;
-    }
-
-    if ( current_frame > last_frame ){
-
-        double jack_delta_tick =
-            (current_frame - last_frame) *
+		 double jack_delta_tick =
+            (current_frame) *
             pos->ticks_per_beat *
             pos->beats_per_minute / (pos->frame_rate * 60.0);
+		
+		jack_tick = (jack_delta_tick < 0) ? -jack_delta_tick : jack_delta_tick;
+		last_frame = current_frame;
+		
+		long ptick = 0, pbeat = 0, pbar = 0;
+	
+		pbar  = (long) ((long) jack_tick / (pos->ticks_per_beat *  pos->beats_per_bar ));
 
-        jack_tick += jack_delta_tick;
+		pbeat = (long) ((long) jack_tick % (long) (pos->ticks_per_beat *  pos->beats_per_bar ));
+		pbeat = pbeat / (long) pos->ticks_per_beat;
 
-        last_frame = current_frame;
+		ptick = (long) jack_tick % (long) pos->ticks_per_beat;
+
+		// printf( " bbb [%2d:%2d:%4d]\n", pos->bar, pos->beat, pos->tick );
+
+		pos->bar = pbar + 1;
+		pos->beat = pbeat + 1;
+		pos->tick = ptick;
+		pos->bar_start_tick = pos->bar * pos->beats_per_bar *
+			pos->ticks_per_beat;
     }
-
-    long ptick = 0, pbeat = 0, pbar = 0;
-
-    pbar  = (long) ((long) jack_tick / (pos->ticks_per_beat *  pos->beats_per_bar ));
-
-    pbeat = (long) ((long) jack_tick % (long) (pos->ticks_per_beat *  pos->beats_per_bar ));
-    pbeat = pbeat / (long) pos->ticks_per_beat;
-
-    ptick = (long) jack_tick % (long) pos->ticks_per_beat;
-
-    pos->bar = pbar + 1;
-    pos->beat = pbeat + 1;
-    pos->tick = ptick;;
-    pos->bar_start_tick = pos->bar * pos->beats_per_bar *
-        pos->ticks_per_beat;
-
-    //printf( " bbb [%2d:%2d:%4d]\n", pos->bar, pos->beat, pos->tick );
 
     state_last = state_current;
 }

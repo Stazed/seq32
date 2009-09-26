@@ -1,3 +1,8 @@
+2009-09-26 Killian EBEL <killian.ebel@gmail.com>
+	* src/perform.cpp: Fixed jack_position_t->bar calculation which
+    always where 0 or negative while using Hydrogen 0.9.4 at the same
+    time.
+
 2009-06-27 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwnd.cpp: Mute group learn dialogs changed to use
 	std:string formatting.
