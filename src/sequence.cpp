@@ -1714,11 +1714,23 @@ sequence::stream_event(  event *a_ev  )
 
     a_ev->mod_timestamp( m_length );
 
-    if ( m_recording && is_pattern_playing){
-        add_event( a_ev );
-        set_dirty();
+    if ( m_recording )
+	{
+		if ( is_pattern_playing )
+		{
+			add_event( a_ev );
+			set_dirty();
+		} else {
+			if ( a_ev->is_note_on() ) 
+			{
+				push_undo();
+				add_note( m_last_tick % m_length, m_snap_tick - 2, a_ev->get_note(), false );
+				set_dirty();
+				m_last_tick += m_snap_tick;
+			}
+		}
     }
-
+	
     if ( m_thru )
     {
         put_event_on_bus( a_ev );
