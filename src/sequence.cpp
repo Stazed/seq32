@@ -1726,8 +1726,10 @@ sequence::stream_event(  event *a_ev  )
 				push_undo();
 				add_note( m_last_tick % m_length, m_snap_tick - 2, a_ev->get_note(), false );
 				set_dirty();
-				m_last_tick += m_snap_tick;
+				m_notes_on++;
 			}
+			if (a_ev->is_note_off()) m_notes_on--;
+			if (m_notes_on <= 0) m_last_tick += m_snap_tick;
 		}
     }
 	
@@ -3108,6 +3110,7 @@ sequence::set_recording( bool a_r )
 {
     lock();
     m_recording = a_r;
+	m_notes_on = 0;
     unlock();
 }
 

@@ -101,6 +101,9 @@ class sequence
     /* song playback mode mute */
     bool m_song_mute;
 
+    /* polyphonic step edit note counter */
+    int m_notes_on;
+
     /* outputs to sequence to this Bus on midichannel */
     mastermidibus *m_masterbus;
 
