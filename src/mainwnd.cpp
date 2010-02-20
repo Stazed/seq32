@@ -233,10 +233,8 @@ mainwnd::mainwnd(perform *a_p)
 
 mainwnd::~mainwnd()
 {
-    if ( m_perf_edit != NULL )
-        delete m_perf_edit;
-    if ( m_options != NULL )
-        delete m_options;
+    delete m_perf_edit;
+    delete m_options;
 }
 
 
@@ -282,8 +280,7 @@ mainwnd::open_performance_edit( void )
 void
 mainwnd::options_dialog( void )
 {
-    if ( m_options != NULL )
-        delete m_options;
+    delete m_options;
     m_options = new options( *this,  m_mainperf );
     m_options->show_all();
 }
