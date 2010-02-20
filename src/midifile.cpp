@@ -585,18 +585,10 @@ midifile::write_byte (unsigned char a_x)
 
 bool midifile::write (perform * a_perf)
 {
-    /* used in small loops */
-    int i;
-
-    /* sequence pointer */
-    sequence * seq;
-    event e;
-    list<char> l;
-
     int numtracks = 0;
 
     /* get number of tracks */
-    for (i = 0; i < c_max_sequence; i++)
+    for (int i = 0; i < c_max_sequence; i++)
     {
         if (a_perf->is_active (i))
             numtracks++;
@@ -618,13 +610,13 @@ bool midifile::write (perform * a_perf)
     /* for each Track in the midi file */
     for (int curTrack = 0; curTrack < c_max_sequence; curTrack++)
     {
-
         if (a_perf->is_active (curTrack))
         {
+            /* sequence pointer */
+            sequence * seq = a_perf->get_sequence (curTrack);
 
             //printf ("track[%d]\n", curTrack );
-
-            seq = a_perf->get_sequence (curTrack);
+            list<char> l;
             seq->fill_list (&l, curTrack);
 
             /* magic number 'MTrk' */
@@ -656,7 +648,7 @@ bool midifile::write (perform * a_perf)
     write_long (c_notes);
     write_short (c_max_sets);
 
-    for (i = 0; i < c_max_sets; i++)
+    for (int i = 0; i < c_max_sets; i++)
     {
         string * note = a_perf->get_screen_set_notepad (i);
         write_short (note->length ());
@@ -673,10 +665,12 @@ bool midifile::write (perform * a_perf)
     /* write out the mute groups */
     write_long (c_mutegroups);
     write_long (c_gmute_tracks);
-    for (int j=0; j < c_seqs_in_set; ++j){
+    for (int j=0; j < c_seqs_in_set; ++j)
+    {
         a_perf->select_group_mute(j);
         write_long(j);
-        for (int i=0; i < c_seqs_in_set; ++i) {
+        for (int i=0; i < c_seqs_in_set; ++i) 
+        {
             write_long( a_perf->get_group_mute_state(i) );
         }
     }
