@@ -18,8 +18,8 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "midifile.h"
 #include <iostream>
+#include "midifile.h"
 
 midifile::midifile(const Glib::ustring& a_name)
 {
@@ -96,12 +96,16 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     file.seekg (0, ios::beg);
 
     /* alloc data */
-    m_d = (unsigned char *) new char[file_size];
-    if (m_d == NULL) {
+	try
+	{
+	    m_d.resize(file_size);
+	}
+	catch(std::bad_alloc& ex)
+	{
         fprintf(stderr, "Memory allocation failed\n");
         return false;
     }
-    file.read ((char *) m_d, file_size);
+    file.read ((char *) &m_d[0], file_size);
     file.close ();
 
     /* set position to 0 */
@@ -145,14 +149,12 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     /* magic number 'MThd' */
     if (ID != 0x4D546864) {
         fprintf(stderr, "Invalid MIDI header detected: %8lX\n", ID);
-        delete[]m_d;
         return false;
     }
 
     /* we are only supporting format 1 for now */
     if (Format != 1) {
         fprintf(stderr, "Unsupported MIDI format detected: %d\n", Format);
-        delete[]m_d;
         return false;
     }
 
@@ -183,7 +185,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             seq = new sequence ();
             if (seq == NULL) {
                 fprintf(stderr, "Memory allocation failed\n");
-                delete[]m_d;
                 return false;
             }
             seq->set_master_midi_bus (&a_perf->m_master_bus);
@@ -410,7 +411,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                         else
                         {
                             fprintf(stderr, "Unexpected system event : 0x%.2X", status);
-                            delete[]m_d;
                             return false;
                         }
 
@@ -418,7 +418,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                     default:
                         fprintf(stderr, "Unsupported MIDI event: %hhu\n", status);
-                        delete[]m_d;
                         return false;
                         break;
                 }
@@ -506,15 +505,12 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             {
                 /* get the length of the string */
                 unsigned int len = read_short ();
-                char * notes = new char[len + 1];
+                string notess;
 
                 for (unsigned int i = 0; i < len; i++)
-                    notes[i] = m_d[m_pos++];
+                    notess += m_d[m_pos++];
 
-                notes[len] = '\0';
-                string notess (notes);
                 a_perf->set_screen_set_notepad (x, &notess);
-                delete[]notes;
             }
         }
     }
@@ -553,7 +549,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
     // *** ADD NEW TAGS AT END **************/
 
-    delete[]m_d;
     return true;
     //printf ( "done\n");
 }
@@ -681,7 +676,7 @@ bool midifile::write (perform * a_perf)
     }
     
     int data_size = m_l.size ();
-    m_d = (unsigned char *) new char[data_size];
+	m_d.resize(data_size);
 
     m_pos = 0;
 
@@ -699,10 +694,8 @@ bool midifile::write (perform * a_perf)
     //  m_l.pop_back();
     //}
 
-    file.write ((char *) m_d, data_size);
+    file.write ((char *) &m_d[0], data_size);
     file.close ();
-
-    delete[]m_d;
 
     return true;
 }

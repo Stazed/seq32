@@ -25,6 +25,7 @@
 #include <fstream>
 #include <string>
 #include <list>
+#include <vector>
 
 class midifile 
 {
@@ -35,7 +36,7 @@ class midifile
     Glib::ustring m_name;
 
     /* holds our data */
-    unsigned char *m_d;
+	std::vector<unsigned char> m_d;
     
     list<unsigned char> m_l;
 
