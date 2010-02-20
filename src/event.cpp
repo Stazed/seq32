@@ -38,8 +38,7 @@ event::event()
 
 event::~event()
 {
-  if ( m_sysex != NULL )
-    delete[] m_sysex;
+  delete[] m_sysex;
   
   m_sysex = NULL;
 }
@@ -135,8 +134,7 @@ event::get_status( )
 void 
 event::start_sysex( void  )
 {
-  if ( m_sysex != NULL )
-    delete[] m_sysex;
+  delete[] m_sysex;
 
   m_sysex = NULL;
   m_size = 0;
@@ -153,8 +151,7 @@ event::append_sysex( unsigned char *a_data, long a_size )
   memcpy(  buffer        , m_sysex, m_size );
   memcpy( &buffer[m_size], a_data, a_size );
 
-  if ( m_sysex != NULL )
-    delete[] m_sysex;
+  delete[] m_sysex;
 
   m_size = m_size + a_size;
   m_sysex = buffer;

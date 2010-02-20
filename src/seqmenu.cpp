@@ -44,8 +44,7 @@ seqmenu::popup_menu( void )
 
     using namespace Menu_Helpers;
 
-    if ( m_menu != NULL )
-        delete m_menu;
+    delete m_menu;
 
     m_menu = manage( new Menu());
 
