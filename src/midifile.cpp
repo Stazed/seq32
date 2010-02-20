@@ -37,10 +37,10 @@ midifile::read_long ()
 {
     unsigned long ret = 0;
 
-    ret += (m_d[m_pos++] << 24);
-    ret += (m_d[m_pos++] << 16);
-    ret += (m_d[m_pos++] << 8);
-    ret += (m_d[m_pos++]);
+    ret += (read_byte() << 24);
+    ret += (read_byte() << 16);
+    ret += (read_byte() << 8);
+    ret += (read_byte());
 
     return ret;
 }
@@ -50,11 +50,17 @@ midifile::read_short ()
 {
     unsigned short ret = 0;
 
-    ret += (m_d[m_pos++] << 8);
-    ret += (m_d[m_pos++]);
+    ret += (read_byte() << 8);
+    ret += (read_byte());
 
     //printf( "read_short 0x%4x\n", ret );
     return ret;
+}
+
+unsigned char 
+midifile::read_byte ()
+{
+    return m_d[m_pos++];
 }
 
 unsigned long
@@ -64,7 +70,7 @@ midifile::read_var ()
     unsigned char c;
 
     /* while bit #7 is set */
-    while (((c = m_d[m_pos++]) & 0x80) != 0x00)
+    while (((c = read_byte()) & 0x80) != 0x00)
     {
         /* shift ret 7 bits */
         ret <<= 7;
@@ -236,8 +242,8 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                     case EVENT_CONTROL_CHANGE:
                     case EVENT_PITCH_WHEEL:
 
-                        data[0] = m_d[m_pos++];
-                        data[1] = m_d[m_pos++];
+                        data[0] = read_byte();
+                        data[1] = read_byte();
 
                         // some files have vel=0 as note off
                         if ((status & 0xF0) == EVENT_NOTE_ON && data[1] == 0)
@@ -259,7 +265,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                     case EVENT_PROGRAM_CHANGE:
                     case EVENT_CHANNEL_PRESSURE:
 
-                        data[0] = m_d[m_pos++];
+                        data[0] = read_byte();
                         //printf( "%02X\n", data[0] );
 
                         /* set data and add */
@@ -276,7 +282,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                         if (status == 0xFF)
                         {
                             /* get meta type */
-                            type = m_d[m_pos++];
+                            type = read_byte();
                             len = read_var ();
 
                             //printf( "%02X %08X ", type, (int) len );
@@ -295,20 +301,20 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                                     if (proprietary == c_midibus)
                                     {
-                                        seq->set_midi_bus (m_d[m_pos++]);
+                                        seq->set_midi_bus (read_byte());
                                         len--;
                                     }
 
                                     else if (proprietary == c_midich)
                                     {
-                                        seq->set_midi_channel (m_d[m_pos++]);
+                                        seq->set_midi_channel (read_byte());
                                         len--;
                                     }
 
                                     else if (proprietary == c_timesig)
                                     {
-                                        seq->set_bpm (m_d[m_pos++]);
-                                        seq->set_bw (m_d[m_pos++]);
+                                        seq->set_bpm (read_byte());
+                                        seq->set_bw (read_byte());
                                         len -= 2;
                                     }
 
@@ -369,7 +375,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                 case 0x03:
                                     for (i = 0; i < len; i++)
                                     {
-                                        TrackName[i] = m_d[m_pos++];
+                                        TrackName[i] = read_byte();
                                     }
 
                                     TrackName[i] = '\0';
@@ -391,7 +397,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                 default:
                                     for (i = 0; i < len; i++)
                                     {
-                                        c = m_d[m_pos++];
+                                        c = read_byte();
                                         //printf( "%02X ", c  );
                                     }
                                     //printf("\n");
@@ -453,29 +459,29 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             for (unsigned int i = 0; i < seqs; i++)
             {
 
-                a_perf->get_midi_control_toggle (i)->m_active = m_d[m_pos++];
+                a_perf->get_midi_control_toggle (i)->m_active = read_byte();
                 a_perf->get_midi_control_toggle (i)->m_inverse_active =
-                    m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_status = m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_data = m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_min_value = m_d[m_pos++];
-                a_perf->get_midi_control_toggle (i)->m_max_value = m_d[m_pos++];
+                    read_byte();
+                a_perf->get_midi_control_toggle (i)->m_status = read_byte();
+                a_perf->get_midi_control_toggle (i)->m_data = read_byte();
+                a_perf->get_midi_control_toggle (i)->m_min_value = read_byte();
+                a_perf->get_midi_control_toggle (i)->m_max_value = read_byte();
 
-                a_perf->get_midi_control_on (i)->m_active = m_d[m_pos++];
+                a_perf->get_midi_control_on (i)->m_active = read_byte();
                 a_perf->get_midi_control_on (i)->m_inverse_active =
-                    m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_status = m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_data = m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_min_value = m_d[m_pos++];
-                a_perf->get_midi_control_on (i)->m_max_value = m_d[m_pos++];
+                    read_byte();
+                a_perf->get_midi_control_on (i)->m_status = read_byte();
+                a_perf->get_midi_control_on (i)->m_data = read_byte();
+                a_perf->get_midi_control_on (i)->m_min_value = read_byte();
+                a_perf->get_midi_control_on (i)->m_max_value = read_byte();
 
-                a_perf->get_midi_control_off (i)->m_active = m_d[m_pos++];
+                a_perf->get_midi_control_off (i)->m_active = read_byte();
                 a_perf->get_midi_control_off (i)->m_inverse_active =
-                    m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_status = m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_data = m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_min_value = m_d[m_pos++];
-                a_perf->get_midi_control_off (i)->m_max_value = m_d[m_pos++];
+                    read_byte();
+                a_perf->get_midi_control_off (i)->m_status = read_byte();
+                a_perf->get_midi_control_off (i)->m_data = read_byte();
+                a_perf->get_midi_control_off (i)->m_min_value = read_byte();
+                a_perf->get_midi_control_off (i)->m_max_value = read_byte();
             }
         }
 
@@ -487,7 +493,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             /* TrackLength is nyumber of buses */
             for (unsigned int x = 0; x < TrackLength; x++)
             {
-                int bus_on = m_d[m_pos++];
+                int bus_on = read_byte();
                 a_perf->get_master_midi_bus ()->set_clock (x, (clock_e) bus_on);
             }
         }
@@ -508,7 +514,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                 string notess;
 
                 for (unsigned int i = 0; i < len; i++)
-                    notess += m_d[m_pos++];
+                    notess += read_byte();
 
                 a_perf->set_screen_set_notepad (x, &notess);
             }
@@ -557,28 +563,28 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 void
 midifile::write_long (unsigned long a_x)
 {
-    m_l.push_front ((a_x & 0xFF000000) >> 24);
-    m_l.push_front ((a_x & 0x00FF0000) >> 16);
-    m_l.push_front ((a_x & 0x0000FF00) >> 8);
-    m_l.push_front ((a_x & 0x000000FF));
+    write_byte ((a_x & 0xFF000000) >> 24);
+    write_byte ((a_x & 0x00FF0000) >> 16);
+    write_byte ((a_x & 0x0000FF00) >> 8);
+    write_byte ((a_x & 0x000000FF));
 }
 
 
 void
 midifile::write_short (unsigned short a_x)
 {
-    m_l.push_front ((a_x & 0xFF00) >> 8);
-    m_l.push_front ((a_x & 0x00FF));
+    write_byte ((a_x & 0xFF00) >> 8);
+    write_byte ((a_x & 0x00FF));
+}
+
+void
+midifile::write_byte (unsigned char a_x)
+{
+    m_l.push_back (a_x);
 }
 
 bool midifile::write (perform * a_perf)
 {
-    /* open binary file */
-    ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
-
-    if (!file.is_open ())
-        return false;
-
     /* used in small loops */
     int i;
 
@@ -629,7 +635,7 @@ bool midifile::write (perform * a_perf)
 
             while (l.size () > 0)
             {
-                m_l.push_front (l.back ());
+                write_byte (l.back ());
                 l.pop_back ();
             }
         }
@@ -656,7 +662,7 @@ bool midifile::write (perform * a_perf)
         write_short (note->length ());
 
         for (unsigned int j = 0; j < note->length (); j++)
-            m_l.push_front ((*note)[j]);
+            write_byte ((*note)[j]);
     }
 
 
@@ -675,27 +681,26 @@ bool midifile::write (perform * a_perf)
         }
     }
     
-    int data_size = m_l.size ();
-	m_d.resize(data_size);
+    /* open binary file */
+    ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
 
-    m_pos = 0;
+    if (!file.is_open ())
+        return false;
 
-    for (list < unsigned char >::reverse_iterator ri = m_l.rbegin ();
-            ri != m_l.rend (); ri++)
+    /* enable bufferization */
+    char file_buffer[1024];
+    file.rdbuf()->pubsetbuf(file_buffer, sizeof file_buffer);
+
+    for (list < unsigned char >::iterator i = m_l.begin ();
+            i != m_l.end (); i++)
     {
-        m_d[m_pos++] = *ri;
+      char c = *i;
+      file.write(&c, 1);
     }
 
     m_l.clear ();
 
-    // super slow
-    //while ( m_l.size() > 0 ){
-    //m_d[m_pos++] =  m_l.back();
-    //  m_l.pop_back();
-    //}
-
-    file.write ((char *) &m_d[0], data_size);
-    file.close ();
-
     return true;
 }
+
+

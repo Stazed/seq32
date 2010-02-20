@@ -42,10 +42,12 @@ class midifile
 
     unsigned long read_long();
     unsigned short read_short();
+    unsigned char read_byte();
     unsigned long read_var();
 
     void write_long( unsigned long );
     void write_short( unsigned short );
+    void write_byte( unsigned char );
 
  public:
 
