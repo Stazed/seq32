@@ -21,21 +21,19 @@
 #include "maintime.h"
 
 
-maintime::maintime( ): DrawingArea() 
+maintime::maintime( ):
+    m_black(Gdk::Color("black")),
+    m_white(Gdk::Color("white")),
+    m_grey(Gdk::Color("grey")),
+    m_tick(0)
 {     
     // in the construor you can only allocate colors, 
     // get_window() returns 0 because we have not be realized
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
 
-    m_black = Gdk::Color( "black" );
-    m_white = Gdk::Color( "white" );
-    m_grey  = Gdk::Color( "grey" );
-
     colormap->alloc_color( m_black );
     colormap->alloc_color( m_white );
     colormap->alloc_color( m_grey );
-
-    m_tick = 0;
 } 
 
 void 

@@ -64,6 +64,9 @@ class event
     /* data for sysex */
     unsigned char *m_sysex;
 
+    /* size of sysex message */
+    long m_size;
+
     /* used to link note ons and offs together */
     event *m_linked;
     bool m_has_link;
@@ -77,9 +80,6 @@ class event
     /* is this event being painted */
     bool m_painted;
     
-    /* size of sysex message */
-    long m_size;
-
     /* used in sorting */
     int get_rank( ) const;
 

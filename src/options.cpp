@@ -100,11 +100,9 @@ public:
 
 
 options::options (Gtk::Window & parent, perform * a_p):
-    Gtk::Dialog ("Options", parent, true, true)
+    Gtk::Dialog ("Options", parent, true, true),
+    m_perf(a_p)
 {
-    m_perf = a_p;
-    VBox *vbox = NULL;
-    
     HBox *hbox = manage (new HBox ());
     get_vbox ()->pack_start (*hbox, false, false);
 
@@ -124,19 +122,16 @@ options::options (Gtk::Window & parent, perform * a_p):
     //Notebook *clock_notebook = manage( new Notebook());
     //clock_notebook->set_scrollable(true);
 
-    vbox = manage(new VBox());
+    VBox *vbox = manage(new VBox());
     m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox,
                 "MIDI Clock"));
 
-    CheckButton *check;
-    Label *label;
-    
-    Gtk::Tooltips * tooltips = manage (new Tooltips ());
+    manage (new Tooltips ());
 
     for (int i = 0; i < buses; i++)
     {  
         HBox *hbox2 = manage (new HBox ());
-        label = manage( new Label(m_perf->get_master_midi_bus ()->
+        Label *label = manage( new Label(m_perf->get_master_midi_bus ()->
                                             get_midi_out_bus_name (i), 0));
 
         hbox2->pack_start (*label, false, false);
@@ -198,11 +193,8 @@ options::options (Gtk::Window & parent, perform * a_p):
 
     for (int i = 0; i < buses; i++)
     {
-
-        check =
-            manage (new
-                    CheckButton (m_perf->get_master_midi_bus ()->
-                        get_midi_in_bus_name (i), 0));
+        CheckButton *check = manage(
+            new CheckButton (m_perf->get_master_midi_bus ()-> get_midi_in_bus_name (i), 0));
         check->signal_toggled ().
             connect (bind (mem_fun (*this, &options::input_callback), i, check));
         check->set_active (m_perf->get_master_midi_bus ()->get_input (i));
@@ -233,7 +225,7 @@ options::options (Gtk::Window & parent, perform * a_p):
             hbox->pack_start (*entry, false, false, 4);
 
         hbox = manage (new HBox ());
-        check = manage (new CheckButton ("show key labels on sequences", 0));
+        CheckButton *check = manage (new CheckButton ("show key labels on sequences", 0));
         check->signal_toggled ().
             connect (bind (mem_fun (*this, &options::input_callback), (int)e_keylabelsonsequence, check));
         check->set_active (m_perf->m_show_ui_sequence_key);
@@ -364,7 +356,7 @@ options::options (Gtk::Window & parent, perform * a_p):
     m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox2,
                 "Jack Sync"));
 
-    check = manage (new CheckButton ("Jack Transport"));
+    CheckButton *check = manage (new CheckButton ("Jack Transport"));
     check->set_active (global_with_jack_transport);
     add_tooltip( check, "Enable sync with JACK Transport.");
     check->signal_toggled ().

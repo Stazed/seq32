@@ -25,12 +25,11 @@
 
 // Constructor
 
-seqmenu::seqmenu( perform *a_p  )
+seqmenu::seqmenu( perform *a_p  ) :
+    m_menu(NULL),
+    m_mainperf(a_p)
 {    
     using namespace Menu_Helpers;
-
-    m_mainperf = a_p;
-    m_menu = NULL;
 
     // init the clipboard, so that we don't get a crash
     // on paste with no previous copy...

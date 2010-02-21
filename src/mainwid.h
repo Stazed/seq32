@@ -70,7 +70,7 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
     
     int          m_screenset;
 
-    perform      *m_mainperf;
+    perform      * const m_mainperf;
 
     sequence     m_clipboard;
     sequence     m_moving_seq;

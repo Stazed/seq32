@@ -21,16 +21,15 @@
 #include <iostream>
 #include "midifile.h"
 
-midifile::midifile(const Glib::ustring& a_name)
+midifile::midifile(const Glib::ustring& a_name) :
+    m_pos(0),
+    m_name(a_name)
 {
-    m_name = a_name;
-    m_pos = 0;
 }
 
 midifile::~midifile ()
 {
 }
-
 
 unsigned long
 midifile::read_long ()

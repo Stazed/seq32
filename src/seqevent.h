@@ -92,15 +92,13 @@ class seqevent : public Gtk::DrawingArea
     GdkRectangle m_old;
     GdkRectangle m_selected;
 
-    Gtk::Adjustment   *m_hadjust;
+    Gtk::Adjustment   * const m_hadjust;
 
     int m_scroll_offset_ticks;
     int m_scroll_offset_x;
-
-   
     
-    sequence     *m_seq;
-    seqdata      *m_seqdata_wid;
+    sequence     * const m_seq;
+    seqdata      * const m_seqdata_wid;
 
     /* one pixel == m_zoom ticks */
     int          m_zoom;
@@ -180,10 +178,6 @@ class seqevent : public Gtk::DrawingArea
     void update_pixmap();
     
     int idle_redraw();
-
-
-
-  
 };
 
 #endif

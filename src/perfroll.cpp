@@ -22,32 +22,35 @@
 
 perfroll::perfroll( perform *a_perf,
 		    Adjustment * a_hadjust,
-		    Adjustment * a_vadjust  ) : DrawingArea()
-{    
-    
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
+		    Adjustment * a_vadjust  ) : 
+    m_black(Gdk::Color("black")),
+    m_white(Gdk::Color("white")),
+    m_grey(Gdk::Color("grey")),
+    m_lt_grey(Gdk::Color("light grey")),
 
-    m_black = Gdk::Color( "black" );
-    m_white = Gdk::Color( "white" );
-    m_grey = Gdk::Color( "grey" );
-    m_lt_grey = Gdk::Color( "light grey" );
-    
-    //m_text_font_6_12 = Gdk_Font( c_font_6_12 );
-  
+    m_mainperf(a_perf),
+
+    m_old_progress_ticks(0),
+
+    m_4bar_offset(0),
+    m_sequence_offset(0),
+    m_roll_length_ticks(0),
+    m_drop_sequence(0),
+
+    m_vadjust(a_vadjust),
+    m_hadjust(a_hadjust),
+
+    m_moving(false),
+    m_growing(false)
+{
+    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color( m_black );
     colormap->alloc_color( m_white );
     colormap->alloc_color( m_grey );
     colormap->alloc_color( m_lt_grey );
     
-    m_mainperf = a_perf;
-    m_vadjust = a_vadjust;
-    m_hadjust = a_hadjust;
-
-    m_moving = false;
-    m_growing = false;
-
-    m_old_progress_ticks = 0;
-
+    //m_text_font_6_12 = Gdk_Font( c_font_6_12 );
+  
     add_events( Gdk::BUTTON_PRESS_MASK | 
 		Gdk::BUTTON_RELEASE_MASK |
 		Gdk::POINTER_MOTION_MASK |
@@ -58,12 +61,6 @@ perfroll::perfroll( perform *a_perf,
 
 
     set_size_request( 10, 10 );
-
-    m_4bar_offset = 0;
-    m_sequence_offset = 0;
-    m_roll_length_ticks = 0;
-
-    m_drop_sequence = 0;
 
     set_double_buffered( false );
 

@@ -33,7 +33,7 @@ class midifile
  private:
     
     int m_pos;
-    Glib::ustring m_name;
+    const std::string m_name;
 
     /* holds our data */
 	std::vector<unsigned char> m_d;

@@ -56,9 +56,9 @@ class perftime: public Gtk::DrawingArea
     Glib::RefPtr<Gdk::Pixmap> m_pixmap;
 
 
-    perform      *m_mainperf;
+    perform      * const m_mainperf;
 
-    Adjustment   *m_hadjust;
+    Adjustment   * const m_hadjust;
 
     int m_window_x, m_window_y;
 
