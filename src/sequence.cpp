@@ -23,47 +23,51 @@
     
 list < event > sequence::m_list_clipboard;
 
-sequence::sequence( )
+sequence::sequence( ) :
+    m_midi_channel(0),
+    m_bus(0),
+
+    m_song_mute(false),
+
+    m_masterbus(NULL),
+    m_was_playing(false),
+    m_playing(false),
+    m_recording(false),
+    m_quanized_rec(false),
+    m_thru(false),
+    m_queued(false),
+
+    m_trigger_copied(false),
+        
+    m_dirty_main(true),
+    m_dirty_edit(true),
+    m_dirty_perf(true),
+    m_dirty_names(true),
+
+    m_editing(false),
+    m_raise(false),
+
+    m_name(c_dummy),
+
+    m_last_tick(0),
+    m_queued_tick(0),
+
+    m_trigger_offset(0),
+
+    m_length(4 * c_ppqn),
+    m_snap_tick(c_ppqn / 4),
+
+    m_time_beats_per_measure(4),
+    m_time_beat_width(4),
+    m_rec_vol(0)
+
+    //m_tag(0),
+
 {
  
-    m_editing       = false;
-    m_raise         = false;
-    m_playing       = false;
-    m_was_playing   = false;
-    m_recording     = false;
-    m_quanized_rec  = false;
-    m_thru          = false;
-    m_queued        = false;
-
-    m_trigger_copied = false;
-        
-    m_time_beats_per_measure = 4;
-    m_time_beat_width = 4;
-    m_rec_vol = 0;
-
-    //m_tag           = 0;
-
-    m_name          = c_dummy;
-    m_bus           = 0;
-    m_length        = 4 * c_ppqn;
-    m_snap_tick     = c_ppqn / 4;
-    m_midi_channel  = 0;
-  
     /* no notes are playing */
     for (int i=0; i< c_midi_notes; i++ )
         m_playing_notes[i] = 0;
-
-    m_last_tick = 0;
-
-    m_masterbus = NULL;
-    m_dirty_main = true;
-    m_dirty_edit = true;
-    m_dirty_perf = true;
-    m_dirty_names = true;
-    
-    m_song_mute = false;
-
-    m_trigger_offset = 0;
 }
 
 void 

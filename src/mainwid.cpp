@@ -37,21 +37,25 @@ const char mainwid::m_seq_to_char[c_seqs_in_set] =
 
 // Constructor
 
-mainwid::mainwid( perform *a_p  ): DrawingArea(), seqmenu( a_p ) 
+mainwid::mainwid( perform *a_p  ): 
+    seqmenu( a_p ),
+    m_black(Gdk::Color("black")),
+    m_white(Gdk::Color("white")),
+    m_grey (Gdk::Color("grey")),
+
+    m_screenset(0),
+
+    m_mainperf(a_p),
+
+    m_window_x(c_mainwid_x),
+    m_window_y(c_mainwid_y),
+
+    m_button_down(false),
+    m_moving(false)
 {    
     using namespace Menu_Helpers;
-
-    m_mainperf = a_p;
-
-    m_window_x = c_mainwid_x;
-    m_window_y = c_mainwid_y;
     
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-
-    m_black = Gdk::Color( "black" );
-    m_white = Gdk::Color( "white" );
-    m_grey  = Gdk::Color( "grey" );
-
     colormap->alloc_color( m_black );
     colormap->alloc_color( m_white );
     colormap->alloc_color( m_grey );
@@ -63,15 +67,8 @@ mainwid::mainwid( perform *a_p  ): DrawingArea(), seqmenu( a_p )
 		Gdk::KEY_PRESS_MASK |
 		Gdk::BUTTON_MOTION_MASK |
 		Gdk::FOCUS_CHANGE_MASK  );
-  
-    m_screenset = 0;
-
-  
-    m_button_down = false;
-    m_moving = false;
 
     set_double_buffered( false );
-
 } 
 
 

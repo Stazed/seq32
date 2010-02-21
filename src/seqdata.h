@@ -55,7 +55,7 @@ class seqdata : public Gtk::DrawingArea
     Glib::RefPtr<Gdk::Pixmap>   m_numbers[c_dataarea_y];
  
     
-    sequence     *m_seq;
+    sequence     * const m_seq;
 
     /* one pixel == m_zoom ticks */
     int          m_zoom;
@@ -66,7 +66,7 @@ class seqdata : public Gtk::DrawingArea
     int m_current_x, m_current_y;
 
 
-    Gtk::Adjustment   *m_hadjust;
+    Gtk::Adjustment   * const m_hadjust;
 
     int m_scroll_offset_ticks;
     int m_scroll_offset_x;

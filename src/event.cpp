@@ -20,20 +20,19 @@
 #include "event.h"
 #include "string.h"
 
-event::event()
+event::event() : 
+    m_timestamp(0),
+    m_status(EVENT_NOTE_OFF),
+    m_sysex(NULL),
+    m_size(0),
+    m_linked(NULL),
+    m_has_link(false),
+    m_selected(false),
+    m_marked(false),
+    m_painted(false)
 {
-    m_timestamp = 0;
-    m_status = EVENT_NOTE_OFF;
     m_data[0] = 0;
     m_data[1] = 0;
-
-    m_sysex = NULL;
-
-    m_linked = NULL;
-    m_selected = false;
-    m_marked = false;
-    m_has_link = false;
-    m_painted = false;
 } 
 
 event::~event()

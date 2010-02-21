@@ -22,39 +22,33 @@
 #include "font.h"
 
 
-perftime::perftime( perform *a_perf, Adjustment *a_hadjust ): DrawingArea() 
-{     
-    m_mainperf = a_perf;
+perftime::perftime( perform *a_perf, Adjustment *a_hadjust ) :
+    m_black(Gdk::Color("black")),
+    m_white(Gdk::Color("white")),
+    m_grey(Gdk::Color("grey")),
 
+    m_mainperf(a_perf),
+    m_hadjust(a_hadjust),
+
+    m_4bar_offset(0),
+
+    m_snap(c_ppqn),
+    m_measure_length(c_ppqn * 4)
+{     
     add_events( Gdk::BUTTON_PRESS_MASK |  
 		Gdk::BUTTON_RELEASE_MASK );
 
     // in the construor you can only allocate colors, 
     // get_window() returns 0 because we have not be realized
-   Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-
-    m_black = Gdk::Color( "black" );
-    m_white = Gdk::Color( "white" );
-    m_grey = Gdk::Color( "grey" );
-    
+    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color( m_black );
     colormap->alloc_color( m_white );
     colormap->alloc_color( m_grey );
-
-    m_hadjust = a_hadjust;
-
-    m_4bar_offset = 0;
-
-
-    m_snap = c_ppqn;
-    m_measure_length = c_ppqn * 4;
-
     
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &perftime::change_horz ));
 
     set_double_buffered( false );
 } 
-
 
 void
 perftime::increment_size()

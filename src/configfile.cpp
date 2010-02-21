@@ -21,18 +21,15 @@
 #include "configfile.h"
 #include <iostream>
 
-configfile::configfile(const Glib::ustring& a_name)
+configfile::configfile(const Glib::ustring& a_name) :
+    m_pos(0),
+    m_name(a_name)
 {
-    m_name = a_name;
-    m_pos = 0;
 }
 
 configfile::~configfile( )
 {
-
 }
-
-
 
 void
 configfile::next_data_line( ifstream *a_file)

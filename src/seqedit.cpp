@@ -90,23 +90,22 @@ seqedit::menu_action_quantise( void )
 seqedit::seqedit( sequence *a_seq, 
 		  perform *a_perf,  
 		  // mainwid *a_mainwid, 
-		  int a_pos  )
+		  int a_pos  ) :
+    /* set the performance */
+    m_seq(a_seq),
+    m_mainperf(a_perf),
+    // m_mainwid(a_mainwid),
+    m_pos(a_pos),
+
+    m_zoom(m_initial_zoom),
+    m_snap(m_initial_snap),
+    m_note_length(m_initial_note_length),
+    m_scale(m_initial_scale),
+    m_key(m_initial_key),
+    m_sequence(m_initial_sequence)
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq_editor_xpm));
 
-    /* set the performance */
-    m_seq = a_seq;
-
-    m_zoom        =  m_initial_zoom;
-    m_snap        =  m_initial_snap;
-    m_note_length = m_initial_note_length;
-    m_scale       = m_initial_scale;
-    m_key         =   m_initial_key;
-    m_sequence    = m_initial_sequence;
-
-    m_mainperf = a_perf;
-    // m_mainwid = a_mainwid;
-    m_pos = a_pos;
 
     /* main window */
     std::string title = "seq24 - ";
