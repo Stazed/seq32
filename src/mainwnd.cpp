@@ -595,7 +595,7 @@ mainwnd::file_import_dialog( void )
 
     dialog.set_current_folder(last_used_dir);
 
-    HButtonBox *btnbox = dialog.get_action_area();
+    ButtonBox *btnbox = dialog.get_action_area();
     HBox hbox( false, 2 );
 
     m_adjust_load_offset = manage( new Adjustment( 0, -(c_max_sets - 1),
