@@ -233,6 +233,7 @@ void
 options::add_keyboard_page()
 {
     VBox *vbox = manage(new VBox());
+    vbox->set_spacing(6);
     m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox,
                 "Keyboard"));
     Label* label;
@@ -255,47 +256,97 @@ options::add_keyboard_page()
     entry = manage (new KeyBindEntry( type, NULL, m_perf, slot )); \
     hbox->pack_start (*entry, false, false, 4);
 
-    hbox = manage (new HBox ());
+    hbox = manage (new HBox());
     CheckButton *check = manage(new CheckButton(
                 "Show key labels on sequences", 0));
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::input_callback), (int)e_keylabelsonsequence,
                 check));
-    check->set_active (m_perf->m_show_ui_sequence_key);
-    vbox->pack_start (*check, false, false);
+    check->set_active(m_perf->m_show_ui_sequence_key);
+    vbox->pack_start(*check, false, false);
 
-    hbox = manage (new HBox ());
-    AddKey( "stop:", m_perf->m_key_stop );
-    AddKey( "start:", m_perf->m_key_start );
-    vbox->pack_start (*hbox, false, false);
+    /*Frame for sequence toggle keys*/
+    Frame* controlframe = manage(new Frame("Control keys"));
+    vbox->pack_start(*controlframe, Gtk::PACK_SHRINK);
 
-    hbox = manage (new HBox ());
-    AddKey( "bpm dn:", m_perf->m_key_bpm_dn );
-    AddKey( "bpm up:", m_perf->m_key_bpm_up );
-    vbox->pack_start (*hbox, false, false);
+    Table* controltable = manage(new Table(4, 8, false));
+    controlframe->add(*controltable);
 
-    hbox = manage (new HBox ());
-    AddKey( "snpsht1:", m_perf->m_key_snapshot_1 );
-    AddKey( "snpsht2:", m_perf->m_key_snapshot_2 );
-    vbox->pack_start (*hbox, false, false);
+    label = manage(new Label("Start:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_start));
+    controltable->attach(*label, 0, 1, 0, 1);
+    controltable->attach(*entry, 1, 2, 0, 1);
 
-    hbox = manage (new HBox ());
-    AddKey( "replace:", m_perf->m_key_replace );
-    AddKey( "queue:", m_perf->m_key_queue );
-    AddKey( "keep queue:", m_perf->m_key_keep_queue );
-    vbox->pack_start (*hbox, false, false);
+    label = manage(new Label("Stop:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_stop));
+    controltable->attach(*label, 0, 1, 1, 2);
+    controltable->attach(*entry, 1, 2, 1, 2);
 
-    hbox = manage (new HBox ());
-    AddKey( "scrnset dn:", m_perf->m_key_screenset_dn );
-    AddKey( "scrnset up:", m_perf->m_key_screenset_up );
-    vbox->pack_start (*hbox, false, false);
+    label = manage(new Label("bpm down:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_bpm_dn));
+    controltable->attach(*label, 2, 3, 3, 4);
+    controltable->attach(*entry, 3, 4, 3, 4);
 
-    hbox = manage (new HBox ());
-    AddKey("set playing screenset:", m_perf->m_key_set_playing_screenset );
-    vbox->pack_start (*hbox, false, false);
+    label = manage(new Label("bpm up:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_bpm_up));
+    controltable->attach(*label, 2, 3, 2, 3);
+    controltable->attach(*entry, 3, 4, 2, 3);
 
-    hbox = manage (new HBox ());
-    vbox->pack_start (*hbox, false, false);
+
+    label = manage(new Label("Snapshot 1:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_snapshot_1));
+    controltable->attach(*label, 2, 3, 0, 1);
+    controltable->attach(*entry, 3, 4, 0, 1);
+
+    label = manage(new Label("Snapshot 2:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_snapshot_2));
+    controltable->attach(*label, 2, 3, 1, 2);
+    controltable->attach(*entry, 3, 4, 1, 2);
+
+
+    label = manage(new Label("Replace:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_replace));
+    controltable->attach(*label, 4, 5, 0, 1);
+    controltable->attach(*entry, 5, 6, 0, 1);
+
+    label = manage(new Label("Queue:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_queue));
+    controltable->attach(*label, 4, 5, 1, 2);
+    controltable->attach(*entry, 5, 6, 1, 2);
+
+    label = manage(new Label("Keep queue:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_keep_queue));
+    controltable->attach(*label, 4, 5, 2, 3);
+    controltable->attach(*entry, 5, 6, 2, 3);
+
+
+    label = manage(new Label("Screenset up:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_screenset_up));
+    controltable->attach(*label, 6, 7, 0, 1);
+    controltable->attach(*entry, 7, 8, 0, 1);
+
+    label = manage(new Label("Screenset down:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_screenset_dn));
+    controltable->attach(*label, 6, 7, 1, 2);
+    controltable->attach(*entry, 7, 8, 1, 2);
+
+    label = manage(new Label("Set playing screenset:", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_set_playing_screenset));
+    controltable->attach(*label, 6, 7, 2, 3);
+    controltable->attach(*entry, 7, 8, 2, 3);
+
 
     /*Frame for sequence toggle keys*/
     Frame* toggleframe = manage(new Frame("Sequence toggle keys"));

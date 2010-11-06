@@ -1,3 +1,6 @@
+2010-11-07 Guido Scholz <guido.scholz@bayernline.de>
+	* src/options.cpp: table container for control keys
+
 2010-11-06 Guido Scholz <guido.scholz@bayernline.de>
 	* src/options.cpp: Use stock-id for OK button, split notebook
 	setup according to contained pages, table container for sequence
