@@ -91,6 +91,13 @@ class options : public Gtk::Dialog
     void input_callback( int a_bus, Button *a_button );
 
     void transport_callback( button a_type, Button *a_button );
+   
+    /*notebook pages*/ 
+    void add_midi_clock_page();
+    void add_midi_input_page();
+    void add_keyboard_page();
+    void add_mouse_page();
+    void add_jack_sync_page();
     
 public:
     

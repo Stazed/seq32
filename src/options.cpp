@@ -18,14 +18,16 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "options.h"
+#include <gtkmm/stock.h>
 #include <sstream>
+
+#include "options.h"
 
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
-#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
+#   define add_tooltip(obj, text) obj->set_tooltip_text(text);
 #else
-#   define add_tooltip( obj, text ) tooltips->set_tip( *obj, text );
+#   define add_tooltip(obj, text) tooltips->set_tip(*obj, text);
 #endif
 
 const int c_status = 0;
@@ -33,10 +35,7 @@ const int c_status_inv = 1;
 const int c_d1 = 2;
 const int c_d2 = 3;
 const int c_d3 = 4;
-enum
-{
-    e_keylabelsonsequence = 9999
-};
+enum {e_keylabelsonsequence = 9999};
 
 
 // GTK text edit widget for getting keyboard button values (for binding keys)
@@ -48,14 +47,14 @@ class KeyBindEntry : public Entry
 public:
     enum type { location, events, groups };
 
-    KeyBindEntry(   type t,
-                    unsigned int* location_to_write = NULL,
-                    perform* p = NULL,
-                    long s = 0 ) :  Entry(),
-                                    m_key( location_to_write ),
-                                    m_type( t ),
-                                    m_perf( p ),
-                                    m_slot( s )
+    KeyBindEntry(type t,
+                 unsigned int* location_to_write = NULL,
+                 perform* p = NULL,
+                 long s = 0):  Entry(),
+                               m_key( location_to_write ),
+                               m_type( t ),
+                               m_perf( p ),
+                               m_slot( s )
     {
         switch (m_type)
         {
@@ -109,7 +108,7 @@ options::options (Gtk::Window & parent, perform * a_p):
     get_action_area ()->set_border_width (2);
     hbox->set_border_width (6);
 
-    m_button_ok = manage (new Button ("Ok"));
+    m_button_ok = manage (new Button(Gtk::Stock::OK));
     get_action_area ()->pack_end (*m_button_ok, false, false);
     m_button_ok->signal_clicked ().connect (mem_fun (*this, &options::hide));
 
@@ -117,10 +116,23 @@ options::options (Gtk::Window & parent, perform * a_p):
     m_notebook = manage (new Notebook ());
     hbox->pack_start (*m_notebook);
 
+    add_midi_clock_page();
+    add_midi_input_page();
+    add_keyboard_page();
+    add_mouse_page();
+    add_jack_sync_page();
+
+    /* show everything */
+    show_all_children();
+}
+
+
+/*MIDI Clock page*/
+void
+options::add_midi_clock_page()
+{
     // Clock  Buses
     int buses = m_perf->get_master_midi_bus ()->get_num_out_buses ();
-    //Notebook *clock_notebook = manage( new Notebook());
-    //clock_notebook->set_scrollable(true);
 
     VBox *vbox = manage(new VBox());
     m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox,
@@ -151,9 +163,12 @@ options::options (Gtk::Window & parent, perform * a_p):
         rb_on->set_group (group);
         rb_mod->set_group (group);
 
-        rb_off->signal_toggled().connect (sigc::bind(mem_fun (*this, &options::clock_callback_off), i, rb_off ));
-        rb_on->signal_toggled ().connect (sigc::bind(mem_fun (*this, &options::clock_callback_on),  i, rb_on  ));
-        rb_mod->signal_toggled().connect (sigc::bind(mem_fun (*this, &options::clock_callback_mod), i, rb_mod ));
+        rb_off->signal_toggled().connect (sigc::bind(mem_fun (*this,
+                        &options::clock_callback_off), i, rb_off ));
+        rb_on->signal_toggled ().connect (sigc::bind(mem_fun (*this,
+                        &options::clock_callback_on),  i, rb_on  ));
+        rb_mod->signal_toggled().connect (sigc::bind(mem_fun (*this,
+                        &options::clock_callback_mod), i, rb_mod ));
         
         hbox2->pack_end (*rb_mod, false, false ); 
         hbox2->pack_end (*rb_on, false, false);
@@ -167,189 +182,215 @@ options::options (Gtk::Window & parent, perform * a_p):
             case e_clock_pos: rb_on->set_active(1); break;
             case e_clock_mod: rb_mod->set_active(1); break;
         }
-                              
-        // SET DEFAULT STATES check->set_active (m_perf->get_master_midi_bus ()->get_clock (i));
     }
 
-    Adjustment *clock_mod_adj = new Adjustment( midibus::get_clock_mod(), 1, 16 << 10, 1 );
+    Adjustment *clock_mod_adj = new Adjustment(midibus::get_clock_mod(),
+            1, 16 << 10, 1 );
     SpinButton *clock_mod_spin = new SpinButton( *clock_mod_adj );
 
     HBox *hbox2 = manage (new HBox ());
     
     //m_spinbutton_bpm->set_editable( false );
-    hbox2->pack_start(*(manage( new Label( "Clock Start Modulo (1/16 Notes)"))), false, false, 4);
+    hbox2->pack_start(*(manage(new Label(
+                        "Clock Start Modulo (1/16 Notes)"))), false, false, 4);
     hbox2->pack_start(*clock_mod_spin, false, false );
 
     vbox->pack_start( *hbox2, false, false );
     
-    clock_mod_adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::clock_mod_callback),clock_mod_adj));
+    clock_mod_adj->signal_value_changed().connect(sigc::bind(mem_fun(*this,
+                    &options::clock_mod_callback), clock_mod_adj));
+}
 
+
+/*MIDI Input page*/
+void
+options::add_midi_input_page()
+{
     // Input Buses
-    buses = m_perf->get_master_midi_bus ()->get_num_in_buses ();
+    int buses = m_perf->get_master_midi_bus ()->get_num_in_buses ();
 
-    vbox = manage (new VBox ());
+    VBox *vbox = manage (new VBox ());
     m_notebook->pages ().
         push_back (Notebook_Helpers::TabElem (*vbox, "MIDI Input"));
 
     for (int i = 0; i < buses; i++)
     {
-        CheckButton *check = manage(
-            new CheckButton (m_perf->get_master_midi_bus ()-> get_midi_in_bus_name (i), 0));
-        check->signal_toggled ().
-            connect (bind (mem_fun (*this, &options::input_callback), i, check));
-        check->set_active (m_perf->get_master_midi_bus ()->get_input (i));
+        CheckButton *check = manage(new CheckButton(
+                    m_perf->get_master_midi_bus()->get_midi_in_bus_name(i), 0));
+        check->signal_toggled().connect(bind(mem_fun(*this,
+                        &options::input_callback), i, check));
+        check->set_active(m_perf->get_master_midi_bus()->get_input(i));
 
-        vbox->pack_start (*check, false, false);
+        vbox->pack_start(*check, false, false);
     }
+}
 
-    // KeyBoard keybinding setup (editor for .seq24rc keybindings.
-    vbox = manage (new VBox ());
-    m_notebook->pages ().push_back (Notebook_Helpers::TabElem (*vbox, "Keyboard"));
-    {
-        Label* label;
-        KeyBindEntry* entry;
-        HBox *hbox;
 
-        #define AddKey(text, integer) \
-            label = manage (new Label( text )); \
-            hbox->pack_start (*label, false, false, 4); \
-            entry = manage (new KeyBindEntry( KeyBindEntry::location, &integer )); \
-            hbox->pack_start (*entry, false, false, 4);
-        #define AddKeyL(text) \
-            label = manage (new Label( text )); \
-            hbox->pack_start (*label, false, false, 4);
-        #define AddKeyM(text, type, slot) \
-            label = manage (new Label( text )); \
-            hbox->pack_start (*label, false, false, 4); \
-            entry = manage (new KeyBindEntry( type, NULL, m_perf, slot )); \
-            hbox->pack_start (*entry, false, false, 4);
-
-        hbox = manage (new HBox ());
-        CheckButton *check = manage (new CheckButton ("show key labels on sequences", 0));
-        check->signal_toggled ().
-            connect (bind (mem_fun (*this, &options::input_callback), (int)e_keylabelsonsequence, check));
-        check->set_active (m_perf->m_show_ui_sequence_key);
-        vbox->pack_start (*check, false, false);
-
-        hbox = manage (new HBox ());
-        AddKey( "stop:", m_perf->m_key_stop );
-        AddKey( "start:", m_perf->m_key_start );
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        AddKey( "bpm dn:", m_perf->m_key_bpm_dn );
-        AddKey( "bpm up:", m_perf->m_key_bpm_up );
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        AddKey( "snpsht1:", m_perf->m_key_snapshot_1 );
-        AddKey( "snpsht2:", m_perf->m_key_snapshot_2 );
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        AddKey( "replace:", m_perf->m_key_replace );
-        AddKey( "queue:", m_perf->m_key_queue );
-        AddKey( "keep queue:", m_perf->m_key_keep_queue );
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        AddKey( "scrnset dn:", m_perf->m_key_screenset_dn );
-        AddKey( "scrnset up:", m_perf->m_key_screenset_up );
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        AddKey( "set plying scrnset:", m_perf->m_key_set_playing_screenset );
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        AddKeyL( "sequence toggle keys >>" );
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        std::map<unsigned int, long>::const_iterator it;
-        int x = 0;
-        for (int ss = 0; ss < 32; ++ss)
-        {
-            int s = (ss%8) * 4 + ss/8; // count this way... 0,4,8,16...
-            //unsigned int keycode = m_perf->lookup_keyevent_key( s );
-            char buf[16];
-            snprintf(buf, sizeof(buf), "%d", s);
-            AddKeyM( buf, KeyBindEntry::events, s );
-            ++x;
-            if (x == 8)
-            {
-                vbox->pack_start (*hbox, false, false);
-                hbox = manage (new HBox ());
-                x = 0;
-            }
-        }
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        AddKeyL( "mute-group slots >>" );
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        x = 0;
-        for (int s = 0; s < 32; ++s)
-        {
-            //unsigned int keycode = m_perf->lookup_keygroup_key( s );
-            char buf[16];
-            snprintf(buf, sizeof(buf), "%d", s);
-            AddKeyM( buf, KeyBindEntry::groups, s );
-            ++x;
-            if (x == 8)
-            {
-                vbox->pack_start (*hbox, false, false);
-                hbox = manage (new HBox ());
-                x = 0;
-            }
-        }
-        vbox->pack_start (*hbox, false, false);
-
-        hbox = manage (new HBox ());
-        AddKey( "learn (while pressing a mute-group key):", m_perf->m_key_group_learn );
-        AddKey( "disable:", m_perf->m_key_group_off );
-        AddKey( "enable:", m_perf->m_key_group_on );
-        vbox->pack_start (*hbox, false, false);
-
-        #undef AddKeyL
-        #undef AddKey
-    }
-
-    vbox = manage(new VBox());
+/*Keyboard page*/
+/*Keybinding setup (editor for .seq24rc keybindings).*/
+void
+options::add_keyboard_page()
+{
+    VBox *vbox = manage(new VBox());
     m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox,
-                "Mouse"));
+                "Keyboard"));
+    Label* label;
+    KeyBindEntry* entry;
+    HBox *hbox;
+
+    #define AddKey(text, integer) \
+    label = manage (new Label( text )); \
+    hbox->pack_start (*label, false, false, 4); \
+    entry = manage (new KeyBindEntry( KeyBindEntry::location, &integer )); \
+    hbox->pack_start (*entry, false, false, 4);
+
+    #define AddKeyL(text) \
+    label = manage (new Label( text )); \
+    hbox->pack_start (*label, false, false, 4);
+
+    #define AddKeyM(text, type, slot) \
+    label = manage (new Label( text )); \
+    hbox->pack_start (*label, false, false, 4); \
+    entry = manage (new KeyBindEntry( type, NULL, m_perf, slot )); \
+    hbox->pack_start (*entry, false, false, 4);
+
+    hbox = manage (new HBox ());
+    CheckButton *check = manage(new CheckButton(
+                "Show key labels on sequences", 0));
+    check->signal_toggled().connect(bind(mem_fun(*this,
+                    &options::input_callback), (int)e_keylabelsonsequence,
+                check));
+    check->set_active (m_perf->m_show_ui_sequence_key);
+    vbox->pack_start (*check, false, false);
+
+    hbox = manage (new HBox ());
+    AddKey( "stop:", m_perf->m_key_stop );
+    AddKey( "start:", m_perf->m_key_start );
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    AddKey( "bpm dn:", m_perf->m_key_bpm_dn );
+    AddKey( "bpm up:", m_perf->m_key_bpm_up );
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    AddKey( "snpsht1:", m_perf->m_key_snapshot_1 );
+    AddKey( "snpsht2:", m_perf->m_key_snapshot_2 );
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    AddKey( "replace:", m_perf->m_key_replace );
+    AddKey( "queue:", m_perf->m_key_queue );
+    AddKey( "keep queue:", m_perf->m_key_keep_queue );
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    AddKey( "scrnset dn:", m_perf->m_key_screenset_dn );
+    AddKey( "scrnset up:", m_perf->m_key_screenset_up );
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    AddKey( "set plying scrnset:", m_perf->m_key_set_playing_screenset );
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    AddKeyL( "sequence toggle keys >>" );
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    std::map<unsigned int, long>::const_iterator it;
+    int x = 0;
+    for (int ss = 0; ss < 32; ++ss)
+    {
+        int s = (ss%8) * 4 + ss/8; // count this way... 0,4,8,16...
+        //unsigned int keycode = m_perf->lookup_keyevent_key( s );
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%d", s);
+        AddKeyM( buf, KeyBindEntry::events, s );
+        ++x;
+        if (x == 8)
+        {
+            vbox->pack_start (*hbox, false, false);
+            hbox = manage (new HBox ());
+            x = 0;
+        }
+    }
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    AddKeyL( "mute-group slots >>" );
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    x = 0;
+    for (int s = 0; s < 32; ++s)
+    {
+        //unsigned int keycode = m_perf->lookup_keygroup_key( s );
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%d", s);
+        AddKeyM( buf, KeyBindEntry::groups, s );
+        ++x;
+        if (x == 8)
+        {
+            vbox->pack_start (*hbox, false, false);
+            hbox = manage (new HBox ());
+            x = 0;
+        }
+    }
+    vbox->pack_start (*hbox, false, false);
+
+    hbox = manage (new HBox ());
+    AddKey( "learn (while pressing a mute-group key):", m_perf->m_key_group_learn );
+    AddKey( "disable:", m_perf->m_key_group_off );
+    AddKey( "enable:", m_perf->m_key_group_on );
+    vbox->pack_start (*hbox, false, false);
+
+#undef AddKeyL
+#undef AddKey
+}
+
+
+/*Mouse page*/
+void
+options::add_mouse_page()
+{
+    VBox *vbox = manage(new VBox());
+    m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox, "Mouse"));
 
     // add controls for input method
-    {
-        Adjustment *adj = new Adjustment( global_interactionmethod, 0, e_number_of_interactions-1, 1 );
-        SpinButton *spin = new SpinButton( *adj );
+    Adjustment *adj = new Adjustment( global_interactionmethod, 0,
+            e_number_of_interactions-1, 1 );
+    SpinButton *spin = new SpinButton( *adj );
 
-        HBox *hbox2 = manage (new HBox ());
-        HBox *hbox3 = manage (new HBox ());
+    HBox *hbox2 = manage (new HBox ());
+    HBox *hbox3 = manage (new HBox ());
 
-        //m_spinbutton_bpm->set_editable( false );
-        interaction_method_label = new Label("Input Method");
-        hbox2->pack_start(*(manage( interaction_method_label )), false, false, 4);
-        hbox2->pack_start(*spin, false, false );
+    //m_spinbutton_bpm->set_editable( false );
+    interaction_method_label = new Label("Input Method");
+    hbox2->pack_start(*(manage( interaction_method_label )), false, false, 4);
+    hbox2->pack_start(*spin, false, false );
 
-        vbox->pack_start( *hbox2, false, false );
+    vbox->pack_start( *hbox2, false, false );
 
-        interaction_method_desc_label = new Label(" ----- ");
-        hbox3->pack_start(*(manage( interaction_method_desc_label )), false, false, 4);
-        vbox->pack_start(*hbox3, false, false );
+    interaction_method_desc_label = new Label(" ----- ");
+    hbox3->pack_start(*(manage(interaction_method_desc_label)), false, false, 4);
+    vbox->pack_start(*hbox3, false, false );
 
-        adj->signal_value_changed().connect( sigc::bind(mem_fun(*this,&options::interaction_method_callback),adj));
+    adj->signal_value_changed().connect(sigc::bind(mem_fun(*this,
+                    &options::interaction_method_callback),adj));
 
-        // force it to refresh.
-        interaction_method_callback( adj );
-    }
+    // force it to refresh.
+    interaction_method_callback( adj );
+}
 
-    // Jack
+
+/*Jack Sync page */
+void
+options::add_jack_sync_page()
+{
 #ifdef JACK_SUPPORT
     VBox *vbox2 = manage (new VBox ());
     vbox2->set_border_width (4);
@@ -359,19 +400,15 @@ options::options (Gtk::Window & parent, perform * a_p):
     CheckButton *check = manage (new CheckButton ("Jack Transport"));
     check->set_active (global_with_jack_transport);
     add_tooltip( check, "Enable sync with JACK Transport.");
-    check->signal_toggled ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback), e_jack_transport,
-                 check));
+    check->signal_toggled().connect(bind(mem_fun(*this,
+                    &options::transport_callback), e_jack_transport, check));
     vbox2->pack_start (*check, false, false);
 
     check = manage (new CheckButton ("Transport Master"));
     check->set_active (global_with_jack_master);
     add_tooltip( check, "Seq24 will attempt to serve as JACK Master.");
-    check->signal_toggled ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback), e_jack_master,
-                 check));
+    check->signal_toggled().connect(bind(mem_fun(*this,
+                    &options::transport_callback), e_jack_master, check));
 
     vbox2->pack_start (*check, false, false);
 
@@ -379,17 +416,15 @@ options::options (Gtk::Window & parent, perform * a_p):
     check->set_active (global_with_jack_master_cond);
     add_tooltip( check,
             "Seq24 will fail to be master if there is already a master set.");
-    check->signal_toggled ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback), e_jack_master_cond,
-                 check));
+    check->signal_toggled().connect(bind(mem_fun(*this,
+                    &options::transport_callback), e_jack_master_cond, check));
 
     vbox2->pack_start (*check, false, false);
 
 
     Gtk::RadioButton * rb_live = manage (new RadioButton ("Live Mode"));
-    add_tooltip( rb_live,
-            "Playback will be in live mode.  Use this to allow muting and unmuting of loops.");
+    add_tooltip(rb_live, "Playback will be in live mode.  Use this to "
+            "allow muting and unmuting of loops.");
 
     Gtk::RadioButton * rb_perform = manage (new RadioButton ("Song Mode"));
     add_tooltip( rb_perform, "Playback will use the song editors data.");
@@ -426,12 +461,7 @@ options::options (Gtk::Window & parent, perform * a_p):
                     &options::transport_callback), e_jack_disconnect, button));
     vbox2->pack_start (*button, false, false);
 #endif
-
-    /* show everything */
-    show_all_children ();
 }
-
-
 
 void
 options::clock_callback_off (int a_bus, RadioButton *a_button)
