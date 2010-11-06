@@ -1,7 +1,64 @@
+2010-11-05 Guido Scholz <guido.scholz@bayernline.de>
+	* src/mainwnd.cpp: fix HButtonBox compile error
+
+2010-02-21 Sebastien Alaiwan <sebastien.alaiwan@gmail.com>
+
+	* src/configfile.cpp, src/event.cpp, src/event.h, src/maintime.cpp,
+	src/mainwid.cpp, src/mainwid.h, src/midibus.cpp, src/midibus.h,
+	src/midifile.cpp, src/midifile.h, src/options.cpp,
+	src/perfnames.cpp, src/perfroll.cpp, src/perftime.cpp,
+	src/perftime.h, src/seqdata.cpp, src/seqdata.h, src/seqedit.cpp,
+	src/seqedit.h, src/seqevent.cpp, src/seqevent.h, src/seqkeys.cpp,
+	src/seqmenu.cpp, src/seqroll.cpp, src/seqroll.h, src/seqtime.cpp,
+	src/sequence.cpp: Merged constructor initializer lists
+
+2010-02-21 Sebastien Alaiwan <sebastien.alaiwan@gmail.com>
+	* src/event.cpp, src/mainwnd.cpp, src/seqmenu.cpp: Merged
+
+2010-02-21 Sebastien Alaiwan <sebastien.alaiwan@gmail.com>
+	* src/configfile.cpp, src/event.cpp, src/event.h, src/maintime.cpp,
+	src/mainwid.cpp, src/mainwid.h, src/midibus.cpp, src/midibus.h,
+	src/midifile.cpp, src/midifile.h, src/options.cpp, src/perfnames.cpp,
+	src/perfroll.cpp, src/perftime.cpp, src/perftime.h, src/seqdata.cpp,
+	src/seqdata.h, src/seqedit.cpp, src/seqedit.h, src/seqevent.cpp,
+	src/seqevent.h, src/seqkeys.cpp, src/seqmenu.cpp, src/seqroll.cpp,
+	src/seqroll.h, src/seqtime.cpp, src/sequence.cpp: Code improvement:
+	use initializer lists in constructors
+
+2010-02-20 Sebastien Alaiwan <sebastien.alaiwan@gmail.com>
+	* src/event.cpp, src/mainwnd.cpp, src/seqmenu.cpp: Merge removal
+	of useless nullity tests
+
+2010-02-20 Sebastien Alaiwan <sebastien.alaiwan@gmail.com>
+	* src/event.cpp, src/mainwnd.cpp, src/seqmenu.cpp: Removed
+	unecessary nullity tests before deletes. deleting NULL has no effect.
+
+2010-02-20 Sebastien Alaiwan <sebastien.alaiwan@gmail.com>
+	* src/midifile.cpp: Cleanup: removed some unused variables,
+	reduced unecessary big scope of some other variables
+
+2010-02-20 Sebastien Alaiwan <sebastien.alaiwan@gmail.com>
+	* src/midifile.cpp, src/midifile.h: Wrapped reading of single
+	bytes, and removed the push_front/reverse list browsing insanity.
+
+2010-02-20 Sebastien Alaiwan <sebastien.alaiwan@gmail.com>
+	* src/midifile.cpp, src/midifile.h: Use STL in midifile instead of
+	news/deletes
+
+2009-10-06 Ivan Hernandez <ihernandez@kiuts>
+	* src/sequence.cpp, src/sequence.h: Plyphonic Step Edit
+
+2009-10-06 Ivan Hernandez <ihernandez@kiuts>
+	* src/seqroll.cpp, src/sequence.cpp: Monophonic Step Edit on Sequence
+
+2009-10-05 Ivan Hernandez <ihernandez@kiuts>
+	* src/sequence.cpp: Fixed adding notes on the begining when midi
+	record is on and not playing sequence
+
 2009-09-26 Killian EBEL <killian.ebel@gmail.com>
 	* src/perform.cpp: Fixed jack_position_t->bar calculation which
-    always where 0 or negative while using Hydrogen 0.9.4 at the same
-    time.
+	always where 0 or negative while using Hydrogen 0.9.4 at the same
+	time.
 
 2009-06-27 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwnd.cpp: Mute group learn dialogs changed to use
