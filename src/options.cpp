@@ -19,6 +19,7 @@
 //-----------------------------------------------------------------------------
 
 #include <gtkmm/stock.h>
+#include <gtkmm/table.h>
 #include <sstream>
 
 #include "options.h"
@@ -290,36 +291,37 @@ options::add_keyboard_page()
     vbox->pack_start (*hbox, false, false);
 
     hbox = manage (new HBox ());
-    AddKey( "set plying scrnset:", m_perf->m_key_set_playing_screenset );
+    AddKey("set playing screenset:", m_perf->m_key_set_playing_screenset );
     vbox->pack_start (*hbox, false, false);
 
     hbox = manage (new HBox ());
     vbox->pack_start (*hbox, false, false);
 
-    hbox = manage (new HBox ());
-    AddKeyL( "sequence toggle keys >>" );
-    vbox->pack_start (*hbox, false, false);
+    /*Frame for sequence toggle keys*/
+    Frame* toggleframe = manage(new Frame("Sequence toggle keys"));
+    vbox->pack_start(*toggleframe, Gtk::PACK_SHRINK);
 
-    hbox = manage (new HBox ());
-    std::map<unsigned int, long>::const_iterator it;
+    Table* toggletable = manage(new Table(4, 16, false));
+    toggleframe->add(*toggletable);
+
     int x = 0;
-    for (int ss = 0; ss < 32; ++ss)
-    {
-        int s = (ss%8) * 4 + ss/8; // count this way... 0,4,8,16...
-        //unsigned int keycode = m_perf->lookup_keyevent_key( s );
-        char buf[16];
-        snprintf(buf, sizeof(buf), "%d", s);
-        AddKeyM( buf, KeyBindEntry::events, s );
-        ++x;
-        if (x == 8)
-        {
-            vbox->pack_start (*hbox, false, false);
-            hbox = manage (new HBox ());
-            x = 0;
-        }
-    }
-    vbox->pack_start (*hbox, false, false);
+    int y = 0;
+    Label* numlabel;
 
+    for (int i = 0; i <32; i++) {
+        x = i%8*2;
+        y = i/8;
+        int slot = x * 2 + y; // count this way... 0,4,8,16...
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%d", slot);
+        numlabel = manage(new Label(buf));
+        toggletable->attach(*numlabel, x, x+1, y, y+1);
+        entry = manage(new KeyBindEntry(KeyBindEntry::events, NULL,
+                    m_perf, slot));
+        toggletable->attach(*entry, x+1, x+2, y, y+1);
+    }
+
+    /*mute group slots*/
     hbox = manage (new HBox ());
     AddKeyL( "mute-group slots >>" );
     vbox->pack_start (*hbox, false, false);

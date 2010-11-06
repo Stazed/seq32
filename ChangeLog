@@ -1,6 +1,7 @@
 2010-11-06 Guido Scholz <guido.scholz@bayernline.de>
 	* src/options.cpp: Use stock-id for OK button, split notebook
-	setup according to contained pages
+	setup according to contained pages, table container for sequence
+	group keys
 
 2010-11-05 Guido Scholz <guido.scholz@bayernline.de>
 	* src/mainwnd.cpp: fix HButtonBox compile error
