@@ -239,7 +239,7 @@ options::add_keyboard_page()
 
     HBox *hbox = manage (new HBox());
     CheckButton *check = manage(new CheckButton(
-                "Show key labels on sequences", 0));
+                "_Show key labels on sequences", true));
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::input_callback), (int)e_keylabelsonsequence,
                 check));
@@ -439,73 +439,95 @@ void
 options::add_jack_sync_page()
 {
 #ifdef JACK_SUPPORT
-    VBox *vbox = manage (new VBox ());
+    VBox *vbox = manage(new VBox());
     vbox->set_border_width(4);
     m_notebook->append_page(*vbox, "_Jack Sync", true);
 
-    CheckButton *check = manage (new CheckButton ("Jack Transport"));
+    /*Frame for transport options*/
+    Frame* transportframe = manage(new Frame("Transport"));
+    transportframe->set_border_width(4);
+    vbox->pack_start(*transportframe, Gtk::PACK_SHRINK);
+
+    VBox *transportbox = manage(new VBox());
+    transportbox->set_border_width(4);
+    transportframe->add(*transportbox);
+
+    CheckButton *check = manage(new CheckButton("Jack _Transport", true));
     check->set_active (global_with_jack_transport);
     add_tooltip( check, "Enable sync with JACK Transport.");
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_transport, check));
-    vbox->pack_start (*check, false, false);
+    transportbox->pack_start(*check, false, false);
 
-    check = manage (new CheckButton ("Transport Master"));
+    check = manage(new CheckButton("Trans_port Master", true));
     check->set_active (global_with_jack_master);
     add_tooltip( check, "Seq24 will attempt to serve as JACK Master.");
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_master, check));
 
-    vbox->pack_start(*check, false, false);
+    transportbox->pack_start(*check, false, false);
 
-    check = manage (new CheckButton ("Master Conditional"));
+    check = manage (new CheckButton ("Master C_onditional", true));
     check->set_active (global_with_jack_master_cond);
     add_tooltip( check,
             "Seq24 will fail to be master if there is already a master set.");
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_master_cond, check));
 
-    vbox->pack_start(*check, false, false);
+    transportbox->pack_start(*check, false, false);
 
 
-    Gtk::RadioButton * rb_live = manage (new RadioButton ("Live Mode"));
+    /*Frame for jack start mode options*/
+    Frame* modeframe = manage(new Frame("Jack start mode"));
+    modeframe->set_border_width(4);
+    vbox->pack_start(*modeframe, Gtk::PACK_SHRINK);
+
+    VBox *modebox = manage(new VBox());
+    modebox->set_border_width(4);
+    modeframe->add(*modebox);
+
+    Gtk::RadioButton * rb_live = manage(
+            new RadioButton("_Live Mode", true));
     add_tooltip(rb_live, "Playback will be in live mode.  Use this to "
             "allow muting and unmuting of loops.");
 
-    Gtk::RadioButton * rb_perform = manage (new RadioButton ("Song Mode"));
+    Gtk::RadioButton * rb_perform = manage(
+            new RadioButton("_Song Mode", true));
     add_tooltip( rb_perform, "Playback will use the song editors data.");
 
     Gtk::RadioButton::Group group = rb_live->get_group ();
     rb_perform->set_group (group);
 
     if (global_jack_start_mode)
-    {
-        rb_perform->set_active (true);
-    }
+        rb_perform->set_active(true);
     else
-    {
-        rb_live->set_active (true);
-    }
+        rb_live->set_active(true);
 
-    rb_perform->signal_toggled ().
-        connect (bind
-                (mem_fun (*this, &options::transport_callback),
-                 e_jack_start_mode_song, rb_perform));
+    rb_perform->signal_toggled().connect(bind(mem_fun(*this,
+                    &options::transport_callback), e_jack_start_mode_song,
+                rb_perform));
 
-    vbox->pack_start(*rb_live, false, false);
-    vbox->pack_start(*rb_perform, false, false);
+    modebox->pack_start(*rb_live, false, false);
+    modebox->pack_start(*rb_perform, false, false);
 
-    Gtk::Button * button = manage (new Button ("Connect"));
-    add_tooltip( button, "Connect to Jack.");
+
+    /*Connetion buttons*/
+    HButtonBox* buttonbox = manage(new HButtonBox());
+    buttonbox->set_layout(Gtk::BUTTONBOX_START);
+    buttonbox->set_spacing(6);
+    vbox->pack_start(*buttonbox, false, false);
+
+    Gtk::Button * button = manage(new Button("Co_nnect", true));
+    add_tooltip(button, "Connect to Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_connect, button));
-    vbox->pack_start(*button, false, false);
+    buttonbox->pack_start(*button, false, false);
 
-    button = manage (new Button ("Disconnect"));
-    add_tooltip( button, "Disconnect Jack.");
+    button = manage(new Button("_Disconnect", true));
+    add_tooltip(button, "Disconnect Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_disconnect, button));
-    vbox->pack_start(*button, false, false);
+    buttonbox->pack_start(*button, false, false);
 #endif
 }
 
@@ -552,7 +574,7 @@ options::interaction_method_callback( Adjustment *adj )
 }
 
 
-    void
+void
 options::input_callback (int a_bus, Button * i_button)
 {
     CheckButton *a_button = (CheckButton *) i_button;
@@ -569,50 +591,35 @@ options::input_callback (int a_bus, Button * i_button)
 }
 
 
-    void
-options::transport_callback (button a_type, Button * a_check)
+void
+options::transport_callback(button a_type, Button *a_check)
 {
     CheckButton *check = (CheckButton *) a_check;
 
     switch (a_type)
     {
-
         case e_jack_transport:
-            {
-                global_with_jack_transport = check->get_active ();
-            }
+            global_with_jack_transport = check->get_active();
             break;
 
         case e_jack_master:
-            {
-                global_with_jack_master = check->get_active ();
-            }
+            global_with_jack_master = check->get_active();
             break;
 
         case e_jack_master_cond:
-            {
-                global_with_jack_master_cond = check->get_active ();
-            }
+            global_with_jack_master_cond = check->get_active();
             break;
 
         case e_jack_start_mode_song:
-            {
-                //printf( "toggle %d\n" ,  check->get_active() );
-                global_jack_start_mode = check->get_active ();
-            }
+            global_jack_start_mode = check->get_active();
             break;
 
         case e_jack_connect:
-            {
-                m_perf->init_jack ();
-            }
+            m_perf->init_jack();
             break;
 
-
         case e_jack_disconnect:
-            {
-                m_perf->deinit_jack ();
-            }
+            m_perf->deinit_jack();
             break;
 
         default:

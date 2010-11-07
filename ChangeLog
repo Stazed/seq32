@@ -1,6 +1,7 @@
 2010-11-07 Guido Scholz <guido.scholz@bayernline.de>
 	* src/options.cpp: table container for control keys, table
-	container for mute-group keys, mnemonics for notebook pages
+	container for mute-group keys, mnemonics for notebook pages,
+	Jack sync page redesigned using group frames and mnemonics
 
 2010-11-06 Guido Scholz <guido.scholz@bayernline.de>
 	* src/options.cpp: Use stock-id for OK button, split notebook
