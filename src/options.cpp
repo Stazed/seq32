@@ -136,8 +136,7 @@ options::add_midi_clock_page()
     int buses = m_perf->get_master_midi_bus ()->get_num_out_buses ();
 
     VBox *vbox = manage(new VBox());
-    m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox,
-                "MIDI Clock"));
+    m_notebook->append_page(*vbox, "MIDI _Clock", true);
 
     manage (new Tooltips ());
 
@@ -210,9 +209,8 @@ options::add_midi_input_page()
     // Input Buses
     int buses = m_perf->get_master_midi_bus ()->get_num_in_buses ();
 
-    VBox *vbox = manage (new VBox ());
-    m_notebook->pages ().
-        push_back (Notebook_Helpers::TabElem (*vbox, "MIDI Input"));
+    VBox *vbox = manage(new VBox ());
+    m_notebook->append_page(*vbox, "MIDI _Input", true);
 
     for (int i = 0; i < buses; i++)
     {
@@ -232,116 +230,103 @@ options::add_midi_input_page()
 void
 options::add_keyboard_page()
 {
-    VBox *vbox = manage(new VBox());
-    vbox->set_spacing(6);
-    m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox,
-                "Keyboard"));
+    VBox *mainbox = manage(new VBox());
+    mainbox->set_spacing(6);
+    m_notebook->append_page(*mainbox, "_Keyboard", true);
+
     Label* label;
     KeyBindEntry* entry;
-    HBox *hbox;
 
-    #define AddKey(text, integer) \
-    label = manage (new Label( text )); \
-    hbox->pack_start (*label, false, false, 4); \
-    entry = manage (new KeyBindEntry( KeyBindEntry::location, &integer )); \
-    hbox->pack_start (*entry, false, false, 4);
-
-    #define AddKeyL(text) \
-    label = manage (new Label( text )); \
-    hbox->pack_start (*label, false, false, 4);
-
-    #define AddKeyM(text, type, slot) \
-    label = manage (new Label( text )); \
-    hbox->pack_start (*label, false, false, 4); \
-    entry = manage (new KeyBindEntry( type, NULL, m_perf, slot )); \
-    hbox->pack_start (*entry, false, false, 4);
-
-    hbox = manage (new HBox());
+    HBox *hbox = manage (new HBox());
     CheckButton *check = manage(new CheckButton(
                 "Show key labels on sequences", 0));
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::input_callback), (int)e_keylabelsonsequence,
                 check));
     check->set_active(m_perf->m_show_ui_sequence_key);
-    vbox->pack_start(*check, false, false);
+    mainbox->pack_start(*check, false, false);
 
     /*Frame for sequence toggle keys*/
     Frame* controlframe = manage(new Frame("Control keys"));
-    vbox->pack_start(*controlframe, Gtk::PACK_SHRINK);
+    controlframe->set_border_width(4);
+    mainbox->pack_start(*controlframe, Gtk::PACK_SHRINK);
 
     Table* controltable = manage(new Table(4, 8, false));
+    controltable->set_border_width(4);
+    controltable->set_spacings(4);
     controlframe->add(*controltable);
 
-    label = manage(new Label("Start:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Start", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_start));
     controltable->attach(*label, 0, 1, 0, 1);
     controltable->attach(*entry, 1, 2, 0, 1);
 
-    label = manage(new Label("Stop:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Stop", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_stop));
     controltable->attach(*label, 0, 1, 1, 2);
     controltable->attach(*entry, 1, 2, 1, 2);
 
-    label = manage(new Label("bpm down:", Gtk::ALIGN_RIGHT));
-    entry = manage(new KeyBindEntry(KeyBindEntry::location,
-                &m_perf->m_key_bpm_dn));
-    controltable->attach(*label, 2, 3, 3, 4);
-    controltable->attach(*entry, 3, 4, 3, 4);
 
-    label = manage(new Label("bpm up:", Gtk::ALIGN_RIGHT));
-    entry = manage(new KeyBindEntry(KeyBindEntry::location,
-                &m_perf->m_key_bpm_up));
-    controltable->attach(*label, 2, 3, 2, 3);
-    controltable->attach(*entry, 3, 4, 2, 3);
-
-
-    label = manage(new Label("Snapshot 1:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Snapshot 1", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_snapshot_1));
     controltable->attach(*label, 2, 3, 0, 1);
     controltable->attach(*entry, 3, 4, 0, 1);
 
-    label = manage(new Label("Snapshot 2:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Snapshot 2", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_snapshot_2));
     controltable->attach(*label, 2, 3, 1, 2);
     controltable->attach(*entry, 3, 4, 1, 2);
 
 
-    label = manage(new Label("Replace:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("bpm down", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_bpm_dn));
+    controltable->attach(*label, 2, 3, 3, 4);
+    controltable->attach(*entry, 3, 4, 3, 4);
+
+    label = manage(new Label("bpm up", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_bpm_up));
+    controltable->attach(*label, 2, 3, 2, 3);
+    controltable->attach(*entry, 3, 4, 2, 3);
+
+
+    label = manage(new Label("Replace", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_replace));
     controltable->attach(*label, 4, 5, 0, 1);
     controltable->attach(*entry, 5, 6, 0, 1);
 
-    label = manage(new Label("Queue:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Queue", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_queue));
     controltable->attach(*label, 4, 5, 1, 2);
     controltable->attach(*entry, 5, 6, 1, 2);
 
-    label = manage(new Label("Keep queue:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Keep queue", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_keep_queue));
     controltable->attach(*label, 4, 5, 2, 3);
     controltable->attach(*entry, 5, 6, 2, 3);
 
 
-    label = manage(new Label("Screenset up:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Screenset up", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_screenset_up));
     controltable->attach(*label, 6, 7, 0, 1);
     controltable->attach(*entry, 7, 8, 0, 1);
 
-    label = manage(new Label("Screenset down:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Screenset down", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_screenset_dn));
     controltable->attach(*label, 6, 7, 1, 2);
     controltable->attach(*entry, 7, 8, 1, 2);
 
-    label = manage(new Label("Set playing screenset:", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Set playing screenset", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_set_playing_screenset));
     controltable->attach(*label, 6, 7, 2, 3);
@@ -350,58 +335,67 @@ options::add_keyboard_page()
 
     /*Frame for sequence toggle keys*/
     Frame* toggleframe = manage(new Frame("Sequence toggle keys"));
-    vbox->pack_start(*toggleframe, Gtk::PACK_SHRINK);
+    toggleframe->set_border_width(4);
+    mainbox->pack_start(*toggleframe, Gtk::PACK_SHRINK);
 
     Table* toggletable = manage(new Table(4, 16, false));
+    toggletable->set_border_width(4);
+    toggletable->set_spacings(4);
     toggleframe->add(*toggletable);
 
     int x = 0;
     int y = 0;
     Label* numlabel;
 
+    for (int i = 0; i < 32; i++) {
+        x = i % 8 * 2;
+        y = i / 8;
+        int slot = x * 2 + y; // count this way: 0, 4, 8, 16...
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%d", slot);
+        numlabel = manage(new Label(buf, Gtk::ALIGN_RIGHT));
+        entry = manage(new KeyBindEntry(KeyBindEntry::events, NULL,
+                    m_perf, slot));
+        toggletable->attach(*numlabel, x, x + 1, y, y + 1);
+        toggletable->attach(*entry, x + 1, x + 2, y, y + 1);
+    }
+
+    /*Frame for mute group slots*/
+    Frame* mutegroupframe = manage(new Frame("Mute-group slots"));
+    mutegroupframe->set_border_width(4);
+    mainbox->pack_start(*mutegroupframe, Gtk::PACK_SHRINK);
+
+    Table* mutegrouptable = manage(new Table(4, 16, false));
+    mutegrouptable->set_border_width(4);
+    mutegrouptable->set_spacings(4);
+    mutegroupframe->add(*mutegrouptable);
+
     for (int i = 0; i <32; i++) {
         x = i%8*2;
         y = i/8;
-        int slot = x * 2 + y; // count this way... 0,4,8,16...
         char buf[16];
-        snprintf(buf, sizeof(buf), "%d", slot);
-        numlabel = manage(new Label(buf));
-        toggletable->attach(*numlabel, x, x+1, y, y+1);
-        entry = manage(new KeyBindEntry(KeyBindEntry::events, NULL,
-                    m_perf, slot));
-        toggletable->attach(*entry, x+1, x+2, y, y+1);
+        snprintf(buf, sizeof(buf), "%d", i);
+        numlabel = manage(new Label(buf, Gtk::ALIGN_RIGHT));
+        entry = manage(new KeyBindEntry(KeyBindEntry::groups, NULL,
+                    m_perf, i));
+        mutegrouptable->attach(*numlabel, x, x + 1, y, y + 1);
+        mutegrouptable->attach(*entry, x + 1, x + 2, y, y + 1);
     }
 
-    /*mute group slots*/
-    hbox = manage (new HBox ());
-    AddKeyL( "mute-group slots >>" );
-    vbox->pack_start (*hbox, false, false);
 
-    hbox = manage (new HBox ());
-    x = 0;
-    for (int s = 0; s < 32; ++s)
-    {
-        //unsigned int keycode = m_perf->lookup_keygroup_key( s );
-        char buf[16];
-        snprintf(buf, sizeof(buf), "%d", s);
-        AddKeyM( buf, KeyBindEntry::groups, s );
-        ++x;
-        if (x == 8)
-        {
-            vbox->pack_start (*hbox, false, false);
-            hbox = manage (new HBox ());
-            x = 0;
-        }
-    }
-    vbox->pack_start (*hbox, false, false);
+    #define AddKey(text, integer) \
+    label = manage(new Label(text)); \
+    hbox->pack_start(*label, false, false, 4); \
+    entry = manage(new KeyBindEntry(KeyBindEntry::location, &integer)); \
+    hbox->pack_start(*entry, false, false, 4);
 
-    hbox = manage (new HBox ());
-    AddKey( "learn (while pressing a mute-group key):", m_perf->m_key_group_learn );
-    AddKey( "disable:", m_perf->m_key_group_off );
-    AddKey( "enable:", m_perf->m_key_group_on );
-    vbox->pack_start (*hbox, false, false);
+    hbox = manage(new HBox());
+    AddKey("Learn (while pressing a mute-group key):",
+            m_perf->m_key_group_learn);
+    AddKey("Disable:", m_perf->m_key_group_off);
+    AddKey("Enable:", m_perf->m_key_group_on);
+    mainbox->pack_start (*hbox, false, false);
 
-#undef AddKeyL
 #undef AddKey
 }
 
@@ -411,7 +405,7 @@ void
 options::add_mouse_page()
 {
     VBox *vbox = manage(new VBox());
-    m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox, "Mouse"));
+    m_notebook->append_page(*vbox, "_Mouse", true);
 
     // add controls for input method
     Adjustment *adj = new Adjustment( global_interactionmethod, 0,
@@ -445,17 +439,16 @@ void
 options::add_jack_sync_page()
 {
 #ifdef JACK_SUPPORT
-    VBox *vbox2 = manage (new VBox ());
-    vbox2->set_border_width (4);
-    m_notebook->pages().push_back(Notebook_Helpers::TabElem(*vbox2,
-                "Jack Sync"));
+    VBox *vbox = manage (new VBox ());
+    vbox->set_border_width(4);
+    m_notebook->append_page(*vbox, "_Jack Sync", true);
 
     CheckButton *check = manage (new CheckButton ("Jack Transport"));
     check->set_active (global_with_jack_transport);
     add_tooltip( check, "Enable sync with JACK Transport.");
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_transport, check));
-    vbox2->pack_start (*check, false, false);
+    vbox->pack_start (*check, false, false);
 
     check = manage (new CheckButton ("Transport Master"));
     check->set_active (global_with_jack_master);
@@ -463,7 +456,7 @@ options::add_jack_sync_page()
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_master, check));
 
-    vbox2->pack_start (*check, false, false);
+    vbox->pack_start(*check, false, false);
 
     check = manage (new CheckButton ("Master Conditional"));
     check->set_active (global_with_jack_master_cond);
@@ -472,7 +465,7 @@ options::add_jack_sync_page()
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_master_cond, check));
 
-    vbox2->pack_start (*check, false, false);
+    vbox->pack_start(*check, false, false);
 
 
     Gtk::RadioButton * rb_live = manage (new RadioButton ("Live Mode"));
@@ -499,20 +492,20 @@ options::add_jack_sync_page()
                 (mem_fun (*this, &options::transport_callback),
                  e_jack_start_mode_song, rb_perform));
 
-    vbox2->pack_start (*rb_live, false, false);
-    vbox2->pack_start (*rb_perform, false, false);
+    vbox->pack_start(*rb_live, false, false);
+    vbox->pack_start(*rb_perform, false, false);
 
     Gtk::Button * button = manage (new Button ("Connect"));
     add_tooltip( button, "Connect to Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_connect, button));
-    vbox2->pack_start (*button, false, false);
+    vbox->pack_start(*button, false, false);
 
     button = manage (new Button ("Disconnect"));
     add_tooltip( button, "Disconnect Jack.");
     button->signal_clicked().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_disconnect, button));
-    vbox2->pack_start (*button, false, false);
+    vbox->pack_start(*button, false, false);
 #endif
 }
 
