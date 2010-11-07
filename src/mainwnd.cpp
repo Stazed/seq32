@@ -685,7 +685,7 @@ mainwnd::about_dialog( void )
 
     dialog.set_copyright(
             "(C) 2002 - 2006 Rob C. Buse\n"
-            "(C) 2008 - 2009 Seq24team");
+            "(C) 2008 - 2010 Seq24team");
     dialog.set_website(
             "http://www.filter24.org/seq24\n"
             "http://edge.launchpad.net/seq24");
