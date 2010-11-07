@@ -136,6 +136,7 @@ options::add_midi_clock_page()
     int buses = m_perf->get_master_midi_bus ()->get_num_out_buses ();
 
     VBox *vbox = manage(new VBox());
+    vbox->set_border_width(6);
     m_notebook->append_page(*vbox, "MIDI _Clock", true);
 
     manage (new Tooltips ());
@@ -210,6 +211,7 @@ options::add_midi_input_page()
     int buses = m_perf->get_master_midi_bus ()->get_num_in_buses ();
 
     VBox *vbox = manage(new VBox ());
+    vbox->set_border_width(6);
     m_notebook->append_page(*vbox, "MIDI _Input", true);
 
     for (int i = 0; i < buses; i++)
@@ -407,30 +409,46 @@ options::add_mouse_page()
     VBox *vbox = manage(new VBox());
     m_notebook->append_page(*vbox, "_Mouse", true);
 
-    // add controls for input method
-    Adjustment *adj = new Adjustment( global_interactionmethod, 0,
-            e_number_of_interactions-1, 1 );
-    SpinButton *spin = new SpinButton( *adj );
+    /*Frame for transport options*/
+    Frame* interactionframe = manage(new Frame("Interaction method"));
+    interactionframe->set_border_width(4);
+    vbox->pack_start(*interactionframe, Gtk::PACK_SHRINK);
 
-    HBox *hbox2 = manage (new HBox ());
-    HBox *hbox3 = manage (new HBox ());
+    VBox *interactionbox = manage(new VBox());
+    interactionbox->set_border_width(4);
+    interactionframe->add(*interactionbox);
 
-    //m_spinbutton_bpm->set_editable( false );
-    interaction_method_label = new Label("Input Method");
-    hbox2->pack_start(*(manage( interaction_method_label )), false, false, 4);
-    hbox2->pack_start(*spin, false, false );
+    Gtk::RadioButton *rb_seq24 = manage(new RadioButton(
+                "se_q24 (original style)", true));
+    interactionbox->pack_start(*rb_seq24, Gtk::PACK_SHRINK);
 
-    vbox->pack_start( *hbox2, false, false );
+    Gtk::RadioButton * rb_fruity = manage(new RadioButton(
+                "_fruity (similar to a certain well known sequencer)", true));
+    interactionbox->pack_start(*rb_fruity, Gtk::PACK_SHRINK);
 
-    interaction_method_desc_label = new Label(" ----- ");
-    hbox3->pack_start(*(manage(interaction_method_desc_label)), false, false, 4);
-    vbox->pack_start(*hbox3, false, false );
+    Gtk::RadioButton::Group group = rb_seq24->get_group();
+    rb_fruity->set_group(group);
 
-    adj->signal_value_changed().connect(sigc::bind(mem_fun(*this,
-                    &options::interaction_method_callback),adj));
+    switch(global_interactionmethod)
+    {
+        case e_seq24_interaction:
+            rb_seq24->set_active();
+            break;
+    
+        case e_fruity_interaction:
+            rb_fruity->set_active();
+            break;
+    
+        default:
+            rb_seq24->set_active();
+            break;
+    }
 
-    // force it to refresh.
-    interaction_method_callback( adj );
+    rb_seq24->signal_toggled().connect(sigc::bind(mem_fun(*this,
+                    &options::mouse_seq24_callback), rb_seq24));
+
+    rb_fruity->signal_toggled().connect(sigc::bind(mem_fun(*this,
+                    &options::mouse_fruity_callback), rb_fruity));
 }
 
 
@@ -558,21 +576,6 @@ options::clock_mod_callback( Adjustment *adj )
     midibus::set_clock_mod((int)adj->get_value());
 }
  
-void
-options::interaction_method_callback( Adjustment *adj )
-{
-    global_interactionmethod = (interaction_method_e)(int)adj->get_value();
-    std::string text = "Interaction Method (";
-    text += c_interaction_method_names[(int)adj->get_value()];
-    text += "): ";
-    interaction_method_label->set_text( text.c_str() );
-    
-    text = "     (";
-    text += c_interaction_method_descs[(int)adj->get_value()];
-    text += ")";
-    interaction_method_desc_label->set_text( text.c_str() );
-}
-
 
 void
 options::input_callback (int a_bus, Button * i_button)
@@ -590,6 +593,20 @@ options::input_callback (int a_bus, Button * i_button)
     m_perf->get_master_midi_bus ()->set_input (a_bus, input);
 }
 
+
+void
+options::mouse_seq24_callback(Gtk::RadioButton *btn)
+{
+    if (btn->get_active())
+        global_interactionmethod = e_seq24_interaction;
+}
+
+void
+options::mouse_fruity_callback(Gtk::RadioButton *btn)
+{
+    if (btn->get_active())
+        global_interactionmethod = e_fruity_interaction;
+}
 
 void
 options::transport_callback(button a_type, Button *a_check)
