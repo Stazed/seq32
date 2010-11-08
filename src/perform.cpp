@@ -1190,6 +1190,9 @@ int jack_sync_callback(jack_transport_state_t state,
         case JackTransportLooping:
             //printf( "[JackTransportLooping]" );
             break;
+
+        default:
+            break;
     }
 
     //printf( "starting frame[%d] tick[%8.2f]\n", p->m_jack_frame_current, p->m_jack_tick );
