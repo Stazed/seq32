@@ -2,9 +2,9 @@ seq24-0.9.1 (2010-11-??)
 
 Fixed Bugs
  * Fixed error if path for last used directory is not properly set
- * Fixed adding notes on the begining when midi record is on and not
+ * Fixed adding notes on the beginning when MIDI record is on and not
    playing sequence
- * Buffer overflows caused by string handling fixed
+ * Fixed buffer overflow caused by string handling (tool menu)
  * Fixed file save as crash
  * Fixed MIDI sysex event reading
  * Fixed error if path for last used directory is not properly set
@@ -13,13 +13,14 @@ Fixed Bugs
 New Features
  * Support for MIDI clock synchronization 
  * Support for mute groups
- * Fruitty loop editing added
+ * Optionally show shortcut key label on sequence icon
+ * Fruity loop mouse interaction mode added
  * Monophonic step editing on sequence
- * Plyphonic step editing
+ * Polyphonic step editing
 
 General Changes
  * A lot of code cleanups
- * Support for (lost) Win32 platform support added
+ * Support for (lost) Win32 platform added
  * Optimized redraw for sequencer roll background (from Win32 version,
    Rob Buse)
  * Adaptations for jack2 applied
