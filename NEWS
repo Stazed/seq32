@@ -1,4 +1,4 @@
-seq24-0.9.1 (2010-11-??)
+seq24-0.9.1 (2010-11-08)
 
 Fixed Bugs
  * Fixed error if path for last used directory is not properly set
