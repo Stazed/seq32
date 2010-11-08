@@ -51,8 +51,8 @@ AC_CHECK_LIB(gtkmm-2.4, _init,,
              AC_MSG_ERROR(Essential library libgtkmm-2.4 not found))
 AC_CHECK_LIB(sigc-2.0, main,,
              AC_MSG_ERROR(Essential library libsigc++-2.0 not found))
-AC_CHECK_LIB(asound, snd_pcm_open,,
-             AC_MSG_ERROR(Essential library asound not found))
+dnl AC_CHECK_LIB(asound, snd_pcm_open,,
+dnl              AC_MSG_ERROR(Essential library asound not found))
 
 dnl Checks for header files.
 AC_HEADER_STDC
