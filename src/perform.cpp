@@ -1846,59 +1846,49 @@ void perform::input_func(void)
 
     while (m_inputing) {
 
-        if (m_master_bus.poll_for_midi() > 0) {
+        if ( m_master_bus.poll_for_midi() > 0 ){
 
             do {
 
-                if (m_master_bus.get_midi_event(&ev)) {
+                if (m_master_bus.get_midi_event(&ev) ){
 
-                    /* start propagation if not already running*/
-                    if (ev.get_status() == EVENT_MIDI_CLOCK)
+                    // Obey MidiTimeClock:
+                    if (ev.get_status() == EVENT_MIDI_START)
+                    {
+                        stop();
+                        start(false);
+                        m_midiclockrunning = true;
+                        m_usemidiclock = true;
+                        m_midiclocktick = 0;
+                        m_midiclockpos = 0;
+                    }
+                    // midi continue: start from current pos.
+                    else if (ev.get_status() == EVENT_MIDI_CONTINUE)
+                    {
+                        m_midiclockrunning = true;
+                        start(false);
+                        //m_usemidiclock = true;
+                    }
+                    else if (ev.get_status() == EVENT_MIDI_STOP)
+                    {
+                        // do nothing, just let the system pause
+                        // since we're not getting ticks after the stop, the song wont advance
+                        // when start is recieved, we'll reset the position, or
+                        // when continue is recieved, we wont
+                        m_midiclockrunning = false;
+                        all_notes_off();
+                    }
+                    else if (ev.get_status() == EVENT_MIDI_CLOCK)
                     {
                         if (m_midiclockrunning)
                             m_midiclocktick += 8;
-                        else if (m_usemidiclock) {
-                            start(false);
-                            m_midiclockrunning = true;
-                        }
                     }
-                    
-                    /*prapare for MIDI clock usage at song position 0*/
-                    else if (ev.get_status() == EVENT_MIDI_START)
-                    {
-                        if (!m_midiclockrunning) {
-                            m_usemidiclock = true;
-                            m_midiclocktick = 0;
-                            m_midiclockpos = 0;
-                        }
-                    }
-
-                    /*prapare for MIDI clock usage at current song position*/
-                    else if (ev.get_status() == EVENT_MIDI_CONTINUE)
-                    {
-                        if (!m_midiclockrunning) {
-                            m_usemidiclock = true;
-                        }
-                    }
-                    
-                    /*stop MIDI clock usage*/
-                    else if (ev.get_status() == EVENT_MIDI_STOP)
-                    {
-                        if (m_midiclockrunning) {
-                            m_midiclockrunning = false;
-                            m_usemidiclock = false;
-                            all_notes_off();
-                        }
-                    }
-                    
-                    /*adjust position if not in MIDI clock run mode*/
+                    // not tested (todo: test it!)
                     else if (ev.get_status() == EVENT_MIDI_SONG_POS)
                     {
-                        if (!m_midiclockrunning) {
-                            unsigned char a, b;
-                            ev.get_data(&a, &b);
-                            m_midiclockpos = ((unsigned int)a << 7) | b;
-                        }
+                        unsigned char a, b;
+                        ev.get_data(&a, &b);
+                        m_midiclockpos = ((int)a << 7) && (int)b;
                     }
 
                     /* filter system wide messages */
@@ -1907,13 +1897,15 @@ void perform::input_func(void)
                         if( global_showmidi) 
                             ev.print();
 
-                        /* is there a sequence set? */
+                        /* is there a sequence set ? */
                         if (m_master_bus.is_dumping()) {
 
                             ev.set_timestamp(m_tick);
 
+
                             /* dump to it */
                             (m_master_bus.get_sequence())->stream_event(&ev);
+
                         }
 
                         /* use it to control our sequencer */
