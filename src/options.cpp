@@ -28,7 +28,7 @@
 #if GTK_MINOR_VERSION >= 12
 #   define add_tooltip(obj, text) obj->set_tooltip_text(text);
 #else
-#   define add_tooltip(obj, text) tooltips->set_tip(*obj, text);
+#   define add_tooltip(obj, text) m_tooltips->set_tip(*obj, text);
 #endif
 
 const int c_status = 0;
