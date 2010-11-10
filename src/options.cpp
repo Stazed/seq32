@@ -103,6 +103,10 @@ options::options (Gtk::Window & parent, perform * a_p):
     Gtk::Dialog ("Options", parent, true, true),
     m_perf(a_p)
 {
+#if GTK_MINOR_VERSION < 12
+    m_tooltips = manage(new Tooltips());
+#endif
+
     HBox *hbox = manage (new HBox ());
     get_vbox ()->pack_start (*hbox, false, false);
 
