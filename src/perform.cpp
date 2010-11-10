@@ -1116,19 +1116,19 @@ void* output_thread_func(void *a_pef )
     perform *p = (perform *) a_pef;
     assert(p);
 
-    struct sched_param *schp = new sched_param;
+    struct sched_param schp;
     /*
      * set the process to realtime privs
      */
 
     if ( global_priority ){
 
-        memset(schp, 0, sizeof(sched_param));
-        schp->sched_priority = 1;
+        memset(&schp, 0, sizeof(sched_param));
+        schp.sched_priority = 1;
 
 #ifndef __WIN32__
         // Not in MinGW RCB
-        if (sched_setscheduler(0, SCHED_FIFO, schp) != 0) 	{
+        if (sched_setscheduler(0, SCHED_FIFO, &schp) != 0) 	{
             printf("output_thread_func: couldnt sched_setscheduler"
                     " (FIFO), you need to be root.\n");
             pthread_exit(0);
@@ -1729,19 +1729,19 @@ void* input_thread_func(void *a_pef )
     assert(p);
 
 
-    struct sched_param *schp = new sched_param;
+    struct sched_param schp;
     /*
      * set the process to realtime privs
      */
 
     if ( global_priority ){
 
-        memset(schp, 0, sizeof(sched_param));
-        schp->sched_priority = 1;
+        memset(&schp, 0, sizeof(sched_param));
+        schp.sched_priority = 1;
 
 #ifndef __WIN32__
         // MinGW RCB        
-        if (sched_setscheduler(0, SCHED_FIFO, schp) != 0) 	{
+        if (sched_setscheduler(0, SCHED_FIFO, &schp) != 0) 	{
 
             printf("input_thread_func: couldnt sched_setscheduler"
                     " (FIFO), you need to be root.\n");
