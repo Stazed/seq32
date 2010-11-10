@@ -18,14 +18,14 @@
 //
 //-----------------------------------------------------------------------------
 
+#include <string>
+
 #include "font.h"
 #include "string.h"
 
+#include "pixmaps/font_w.xpm"
+#include "pixmaps/font_b.xpm"
 
-#include "font_w.xpm"
-#include "font_b.xpm"
-
-#include <string>
 
 font::font( )
 {

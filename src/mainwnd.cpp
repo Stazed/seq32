@@ -26,13 +26,13 @@
 #include "midifile.h"
 #include "perfedit.h"
 
-#include "play2.xpm"
-#include "stop.xpm"
-#include "learn.xpm"
-#include "learn2.xpm"
-#include "perfedit.xpm"
-#include "seq24.xpm"
-#include "seq24_32.xpm"
+#include "pixmaps/play2.xpm"
+#include "pixmaps/stop.xpm"
+#include "pixmaps/learn.xpm"
+#include "pixmaps/learn2.xpm"
+#include "pixmaps/perfedit.xpm"
+#include "pixmaps/seq24.xpm"
+#include "pixmaps/seq24_32.xpm"
 
 bool is_pattern_playing = false;
 

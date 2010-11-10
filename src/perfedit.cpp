@@ -21,16 +21,16 @@
 #include "perfedit.h" 
 #include "sequence.h"
 
-#include "snap.xpm"
-#include "play2.xpm"
-#include "stop.xpm"
-#include "expand.xpm"
-#include "collapse.xpm"
-#include "loop.xpm"
-#include "copy.xpm"
-#include "undo.xpm"
-#include "down.xpm"
-#include "perfedit.xpm"
+#include "pixmaps/snap.xpm"
+#include "pixmaps/play2.xpm"
+#include "pixmaps/stop.xpm"
+#include "pixmaps/expand.xpm"
+#include "pixmaps/collapse.xpm"
+#include "pixmaps/loop.xpm"
+#include "pixmaps/copy.xpm"
+#include "pixmaps/undo.xpm"
+#include "pixmaps/down.xpm"
+#include "pixmaps/perfedit.xpm"
 
 using namespace sigc;
 
