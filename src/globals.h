@@ -159,6 +159,7 @@ extern bool global_jack_start_mode;
 extern bool global_manual_alsa_ports;
 
 extern Glib::ustring global_filename;
+extern Glib::ustring global_jack_session_uuid;
 extern Glib::ustring last_used_dir;
 extern bool is_pattern_playing;
 

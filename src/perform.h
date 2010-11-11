@@ -38,6 +38,9 @@ class perform;
 #ifdef JACK_SUPPORT
 #include <jack/jack.h>
 #include <jack/transport.h>
+#ifdef JACK_SESSION
+#include <jack/session.h>
+#endif
 #endif
 
 
@@ -168,7 +171,12 @@ class perform
     jack_transport_state_t m_jack_transport_state;
     jack_transport_state_t m_jack_transport_state_last;
     double m_jack_tick;
-    
+#ifdef JACK_SESSION
+ public:
+    jack_session_event_t *m_jsession_ev;
+    bool jack_session_event();
+ private:
+#endif
 #endif
     
     bool m_jack_running;
@@ -367,6 +375,9 @@ void print_jack_pos( jack_position_t* jack_pos );
 void jack_shutdown(void *arg);
 void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes, 
                             jack_position_t *pos, int new_pos, void *arg);
+#ifdef JACK_SESSION
+void jack_session_callback(jack_session_event_t *ev, void *arg);
+#endif
 #endif
 
 
