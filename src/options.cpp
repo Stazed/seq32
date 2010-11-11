@@ -126,9 +126,6 @@ options::options (Gtk::Window & parent, perform * a_p):
     add_keyboard_page();
     add_mouse_page();
     add_jack_sync_page();
-
-    /* show everything */
-    show_all_children();
 }
 
 
