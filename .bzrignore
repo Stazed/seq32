@@ -1,0 +1,15 @@
+Makefile.in
+Makefile
+src/config.h
+src/config.h.in
+config.log
+config.status
+configure
+depcomp
+install-sh
+missing
+src/.deps
+aclocal.m4
+autom4te.cache
+src/seq24
+src/stamp-h1
