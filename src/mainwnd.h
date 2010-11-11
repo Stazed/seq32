@@ -23,7 +23,6 @@
 #include "perform.h"
 #include "sequence.h"
 #include "event.h"
-#include "options.h"
 #include "maintime.h"
 #include "perfedit.h"
 #include "options.h"
