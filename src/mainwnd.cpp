@@ -106,7 +106,7 @@ mainwnd::mainwnd(perform *a_p)
 
 
     /* bottom line items */
-    HBox *hbox = manage( new HBox( false, 2 ) );
+    HBox *bottomhbox = manage( new HBox( false, 2 ) );
 
     /* stop button */
     m_button_stop = manage( new Button( ));
@@ -115,7 +115,7 @@ mainwnd::mainwnd(perform *a_p)
     m_button_stop->signal_clicked().connect(
             mem_fun(*this, &mainwnd::stop_playing));
     add_tooltip( m_button_stop, "Stop playing MIDI sequence" );
-    hbox->pack_start(*m_button_stop, false, false);
+    bottomhbox->pack_start(*m_button_stop, false, false);
 
     /* play button */
     m_button_play = manage(new Button() );
@@ -124,7 +124,7 @@ mainwnd::mainwnd(perform *a_p)
     m_button_play->signal_clicked().connect(
             mem_fun( *this, &mainwnd::start_playing));
     add_tooltip( m_button_play, "Play MIDI sequence" );
-    hbox->pack_start(*m_button_play, false, false);
+    bottomhbox->pack_start(*m_button_play, false, false);
 
     /* song edit button */
     m_button_perfedit = manage( new Button( ));
@@ -133,7 +133,7 @@ mainwnd::mainwnd(perform *a_p)
     m_button_perfedit->signal_clicked().connect(
             mem_fun( *this, &mainwnd::open_performance_edit ));
     add_tooltip( m_button_perfedit, "Show or hide song editor window" );
-    hbox->pack_end(*m_button_perfedit, false, false, 4);
+    bottomhbox->pack_end(*m_button_perfedit, false, false, 4);
 
     /* bpm spin button */
     m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 20, 500, 1));
@@ -142,8 +142,8 @@ mainwnd::mainwnd(perform *a_p)
     m_adjust_bpm->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_bpm ));
     add_tooltip( m_spinbutton_bpm, "Adjust beats per minute (BPM) value" );
-    hbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
-    hbox->pack_start(*m_spinbutton_bpm, false, false );
+    bottomhbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
+    bottomhbox->pack_start(*m_spinbutton_bpm, false, false );
 
     /* sequence set spin button */
     m_adjust_ss = manage( new Adjustment( 0, 0, c_max_sets - 1, 1 ));
@@ -153,8 +153,8 @@ mainwnd::mainwnd(perform *a_p)
     m_adjust_ss->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_ss ));
     add_tooltip( m_spinbutton_ss, "Select sreen set" );
-    hbox->pack_end(*m_spinbutton_ss, false, false );
-    hbox->pack_end(*(manage( new Label( "  set " ))), false, false, 4);
+    bottomhbox->pack_end(*m_spinbutton_ss, false, false );
+    bottomhbox->pack_end(*(manage( new Label( "  set " ))), false, false, 4);
 
     /* screen set name edit line */
     m_entry_notes = manage( new Entry());
@@ -163,12 +163,12 @@ mainwnd::mainwnd(perform *a_p)
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
     add_tooltip( m_entry_notes, "Enter screen set name" );
-    hbox->pack_start( *m_entry_notes, true, true );
+    bottomhbox->pack_start( *m_entry_notes, true, true );
 
 
     /* top line items */
-    HBox *hbox2 = manage( new HBox( false, 0 ) );
-    hbox2->pack_start(*manage(new Image(
+    HBox *tophbox = manage( new HBox( false, 0 ) );
+    tophbox->pack_start(*manage(new Image(
                     Gdk::Pixbuf::create_from_xpm_data(seq24_xpm))),
             false, false);
 
@@ -176,7 +176,7 @@ mainwnd::mainwnd(perform *a_p)
     VBox *vbox_b = manage( new VBox() );
     HBox *hbox3 = manage( new HBox( false, 0 ) );
     vbox_b->pack_start( *hbox3, false, false );
-    hbox2->pack_end( *vbox_b, false, false );
+    tophbox->pack_end( *vbox_b, false, false );
     hbox3->set_spacing( 10 );
 
     /* timeline */
@@ -197,24 +197,26 @@ mainwnd::mainwnd(perform *a_p)
             "and the corresponding hotkey for the 'L' button)" );
     hbox3->pack_end( *m_button_learn, false, false );
 
+    /*this seems to be a dirty hack:*/
     Button w;
-    hbox3->set_focus_child( w ); // clear the focus, don't want to trigger L via keys
+    hbox3->set_focus_child( w ); // clear the focus not to trigger L via keys
 
-    /* set up a vbox, put the menu in it, and add it */
-    VBox *vbox = new VBox();
-    vbox->set_border_width( 10 );
-    vbox->pack_start(*hbox2, false, false );
-    vbox->pack_start(*m_main_wid, true, true, 10 );
-    vbox->pack_start(*hbox, false, false );
+    /* vertical layout container for window content*/
+    VBox *contentvbox = new VBox();
+    contentvbox->set_border_width( 10 );
+    contentvbox->pack_start(*tophbox, false, false );
+    contentvbox->pack_start(*m_main_wid, true, true, 10 );
+    contentvbox->pack_start(*bottomhbox, false, false );
 
 
-    VBox *ovbox = new VBox();
+    /*main container for menu and window content */
+    VBox *mainvbox = new VBox();
 
-    ovbox->pack_start(*m_menubar, false, false );
-    ovbox->pack_start( *vbox );
+    mainvbox->pack_start(*m_menubar, false, false );
+    mainvbox->pack_start( *contentvbox );
 
-    /* add box */
-    this->add (*ovbox);
+    /* add main layout box */
+    this->add (*mainvbox);
 
     /* show everything */
     show_all();
