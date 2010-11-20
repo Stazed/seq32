@@ -48,8 +48,8 @@ option long_options[] = {
     {"show_keys", 0, 0, 'k'},
     {"stats", 0, 0, 'S'},
     {"priority", 0, 0, 'p'},
-    {"ignore",required_argument, 0, 'i'},
-    {"interaction_method",required_argument, 0, 'x'},
+    {"ignore", required_argument, 0, 'i'},
+    {"interaction_method", required_argument, 0, 'x'},
     {"jack_transport",0, 0, 'j'},
     {"jack_master",0, 0, 'J'},
     {"jack_master_cond", 0, 0, 'C'},
@@ -57,10 +57,12 @@ option long_options[] = {
     {"jack_session_uuid", required_argument, 0, 'U'},
     {"manual_alsa_ports", 0, 0, 'm'},
     {"pass_sysex", 0, 0, 'P'},
-    {"show_keys", 0, 0, 'k'},
+    {"version", 0, 0, 'v'},
     {0, 0, 0, 0}
 
 };
+
+static const char versiontext[] = PACKAGE " " VERSION "\n"; 
 
 bool global_manual_alsa_ports = false;
 bool global_showmidi = false;
@@ -112,7 +114,8 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "p:f:v", long_options, &option_index);
+        c = getopt_long (argc, argv, "Cf:hi:jJmM:pPsSU:vx:", long_options,
+                &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
@@ -125,20 +128,24 @@ main (int argc, char *argv[])
 
                 printf( "Usage: seq24 [OPTIONS]\n\n" );
                 printf( "Options:\n" );
-                printf( "    --help: show this message\n" );
-                printf( "    --file <filename>: load midi file on startup\n" );
-                printf( "    --manual_alsa_ports: seq24 won't attach alsa ports\n" );
-                printf( "    --showmidi: dumps incoming midi to screen\n" );
-                printf( "    --priority: runs higher priority with FIFO scheduler (must be root)\n" );
-                printf( "    --pass_sysex: passes any incoming sysex messages to all outputs \n" );
-                printf( "    --show_keys: prints pressed key value\n" );
-                printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
-                printf( "    --jack_transport: seq24 will sync to jack transport\n" );
-                printf( "    --jack_master: seq24 will try to be jack master\n" );
-                printf( "    --jack_master_cond: jack master will fail if there is already a master\n" );
-                printf( "    --jack_start_mode <x>: when seq24 is synced to jack, the following play\n" );
+                printf( "   -h, --help: show this message\n" );
+                printf( "   -v, --version: show program version information\n" );
+                printf( "   -f, --file <filename>: load midi file on startup\n" );
+                printf( "   -m, --manual_alsa_ports: seq24 won't attach alsa ports\n" );
+                printf( "   -s, --showmidi: dumps incoming midi events to screen\n" );
+                printf( "   -p, --priority: runs higher priority with FIFO scheduler (must be root)\n" );
+                printf( "   -P, --pass_sysex: passes any incoming sysex messages to all outputs \n" );
+                printf( "   -i, --ignore <number>: ignore ALSA device\n" );
+                printf( "   -k, --show_keys: prints pressed key value\n" );
+                printf( "   -x, --interaction_method <number>: see .seq24rc for methods to use\n" );
+                printf( "   -j, --jack_transport: seq24 will sync to jack transport\n" );
+                printf( "   -J, --jack_master: seq24 will try to be jack master\n" );
+                printf( "   -C, --jack_master_cond: jack master will fail if there is already a master\n" );
+                printf( "   -M, --jack_start_mode <x>: when seq24 is synced to jack, the following play\n" );
                 printf( "                          modes are available (0 = live mode)\n");
                 printf( "                                              (1 = song mode) (default)\n" );
+                printf( "   -S, --stats: show statistics\n" );
+                printf( "   -U, --jack_session_uuid <uuid>: set uuid for jack session\n" );
                 printf( "\n\n\n" );
 
                 return EXIT_SUCCESS;
@@ -198,13 +205,19 @@ main (int argc, char *argv[])
                 global_device_ignore = true;
                 global_device_ignore_num = atoi( optarg );
                 break;
-            case 'U':
-                global_jack_session_uuid = Glib::ustring(optarg);
 
-            case 'x':
-                global_interactionmethod = (interaction_method_e)atoi( optarg );
+            case 'v':
+                printf(versiontext);
+                return EXIT_SUCCESS;
                 break;
 
+            case 'U':
+                global_jack_session_uuid = Glib::ustring(optarg);
+                break;
+
+            case 'x':
+                global_interactionmethod = (interaction_method_e)atoi(optarg);
+                break;
 
             default:
                 break;
