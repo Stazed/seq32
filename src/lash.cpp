@@ -30,9 +30,11 @@ lash::lash(int *argc, char ***argv)
 {
 #ifdef LASH_SUPPORT
     m_client = lash_init(lash_extract_args(argc, argv), PACKAGE_NAME,
-        LASH_Config_File, LASH_PROTOCOL(2, 0));
+            LASH_Config_File, LASH_PROTOCOL(2, 0));
+
     if (m_client == NULL) {
-        fprintf(stderr, "Failed to connect to LASH.  Session management will not occur.\n");
+        fprintf(stderr, "Failed to connect to LASH.  "
+                "Session management will not occur.\n");
     } else {
         lash_event_t* event = lash_event_new_with_type(LASH_Client_Name);
         lash_event_set_string(event, "Seq24");

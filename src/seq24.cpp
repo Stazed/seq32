@@ -42,22 +42,22 @@
 static struct 
 option long_options[] = {
 
-    {"file",     required_argument, 0, 'f'},
-    {"help",     0, 0, 'h'},
-    {"showmidi",     0, 0, 's'},
-    {"show_keys",     0, 0, 'k' },
-    {"stats",     0, 0, 'S' },
-    {"priority", 0, 0, 'p' },
+    {"file", required_argument, 0, 'f'},
+    {"help", 0, 0, 'h'},
+    {"showmidi", 0, 0, 's'},
+    {"show_keys", 0, 0, 'k'},
+    {"stats", 0, 0, 'S'},
+    {"priority", 0, 0, 'p'},
     {"ignore",required_argument, 0, 'i'},
     {"interaction_method",required_argument, 0, 'x'},
     {"jack_transport",0, 0, 'j'},
     {"jack_master",0, 0, 'J'},
-    {"jack_master_cond",0,0,'C'},
-    {"jack_start_mode", required_argument, 0, 'M' },
-    {"jack_session_uuid", required_argument, 0, 'U' },
-    {"manual_alsa_ports", 0, 0, 'm' },
+    {"jack_master_cond", 0, 0, 'C'},
+    {"jack_start_mode", required_argument, 0, 'M'},
+    {"jack_session_uuid", required_argument, 0, 'U'},
+    {"manual_alsa_ports", 0, 0, 'm'},
     {"pass_sysex", 0, 0, 'P'},
-    {"show_keys", 0,0,'k'},
+    {"show_keys", 0, 0, 'k'},
     {0, 0, 0, 0}
 
 };
@@ -103,131 +103,75 @@ lash *lash_driver = NULL;
 int 
 main (int argc, char *argv[])
 {
-    for ( int i=0; i<c_maxBuses; i++ )
-    {
-        for ( int j=0; j<16; j++ )
-            global_user_midi_bus_definitions[i].instrument[j] = -1;
-    }
-
-    for ( int i=0; i<c_max_instruments; i++ )
-    {
-        for ( int j=0; j<128; j++ )
-            global_user_instrument_definitions[i].controllers_active[j] = false;
-    }
-    
-	/* init the lash driver (strips lash specific cmdline arguments */
-#ifdef LASH_SUPPORT
-	lash_driver = new lash(&argc, &argv);
-#endif
-
-    /* the main performance object */
-    perform p; 
-
-    /* all GTK applications must have a gtk_main(). Control ends here
-       and waits for an event to occur (like a key press or mouse event). */
-    Gtk::Main kit(argc, argv);
-
-    p_font_renderer = new font();
-
-
-    if ( getenv( HOME ) != NULL ){
-        
-        Glib::ustring home( getenv( HOME ));
-        last_used_dir = home;
-        Glib::ustring total_file = home + SLASH + config_filename;
-        printf( "Reading [%s]\n", total_file.c_str());
-
-        optionsfile options( total_file );
-
-        if ( !options.parse( &p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());  
-        }
-
-        total_file = home + SLASH + user_filename;
-        printf( "Reading [%s]\n", total_file.c_str());
-
-        userfile user( total_file );
-
-        if ( !user.parse( &p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());  
-        }
-    
-    } else {
-        
-        printf( "Error calling getenv( \"%s\" )\n", HOME );  
-    }
-
-    
 
     /* parse parameters */
     int c;
 
+    while (true) {
 
-    while (1){
-	
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        
+
         c = getopt_long (argc, argv, "p:f:v", long_options, &option_index);
-        
+
         /* Detect the end of the options. */
         if (c == -1)
             break;
-        
+
         switch (c){
-            
+
             case '?':
             case 'h':
-                
-                printf( "usage: seq24 [options]\n\n" );
-                printf( "options:\n" );
-                printf( "    --help : show this message\n" );
-                printf( "    --file <filename> : load midi file on startup\n" );
-                printf( "    --manual_alsa_ports : seq24 won't attach alsa ports\n" );
-                printf( "    --showmidi : dumps incoming midi to screen\n" );
-                printf( "    --priority : runs higher priority with FIFO scheduler (must be root)\n" );
-                printf( "    --pass_sysex : passes any incoming sysex messages to all outputs \n" );
-                printf( "    --show_keys : prints pressed key value\n" );
+
+                printf( "Usage: seq24 [OPTIONS]\n\n" );
+                printf( "Options:\n" );
+                printf( "    --help: show this message\n" );
+                printf( "    --file <filename>: load midi file on startup\n" );
+                printf( "    --manual_alsa_ports: seq24 won't attach alsa ports\n" );
+                printf( "    --showmidi: dumps incoming midi to screen\n" );
+                printf( "    --priority: runs higher priority with FIFO scheduler (must be root)\n" );
+                printf( "    --pass_sysex: passes any incoming sysex messages to all outputs \n" );
+                printf( "    --show_keys: prints pressed key value\n" );
                 printf( "    --interaction_method <number>: see .seq24rc for methods to use\n" );
-                printf( "    --jack_transport : seq24 will sync to jack transport\n" );
-                printf( "    --jack_master : seq24 will try to be jack master\n" );
-                printf( "    --jack_master_cond : jack master will fail if there is already a master\n" );
-                printf( "    --jack_start_mode <x> : when seq24 is synced to jack, the following play\n" );
+                printf( "    --jack_transport: seq24 will sync to jack transport\n" );
+                printf( "    --jack_master: seq24 will try to be jack master\n" );
+                printf( "    --jack_master_cond: jack master will fail if there is already a master\n" );
+                printf( "    --jack_start_mode <x>: when seq24 is synced to jack, the following play\n" );
                 printf( "                          modes are available (0 = live mode)\n");
                 printf( "                                              (1 = song mode) (default)\n" );
                 printf( "\n\n\n" );
-                
-                return 0;
+
+                return EXIT_SUCCESS;
                 break;
-                
+
             case 'S':
                 global_stats = true;
                 break;
-                
+
             case 's':
                 global_showmidi = true;
                 break;
-                
+
             case 'p':
                 global_priority = true;
                 break;
-                
+
             case 'P':
                 global_pass_sysex = true;
                 break;
-                
+
             case 'k':
                 global_print_keys = true;
                 break;
-                
+
             case 'j':
                 global_with_jack_transport = true;
                 break;
-                
+
             case 'J':
                 global_with_jack_master = true;
                 break;
-                
+
             case 'C':
                 global_with_jack_master_cond = true;
                 break;
@@ -247,34 +191,92 @@ main (int argc, char *argv[])
 
             case 'f':
                 global_filename = Glib::ustring(optarg);
-               break;
-                
+                break;
+
             case 'i':
                 /* ignore alsa device */
                 global_device_ignore = true;
                 global_device_ignore_num = atoi( optarg );
                 break;
-	    case 'U':
-		global_jack_session_uuid = Glib::ustring(optarg);
-                
+            case 'U':
+                global_jack_session_uuid = Glib::ustring(optarg);
+
             case 'x':
                 global_interactionmethod = (interaction_method_e)atoi( optarg );
                 break;
 
-                
+
             default:
                 break;
         }
-        
+
     } /* end while */
 
 
+    /*prepare global MIDI definitions*/
+    for ( int i=0; i<c_maxBuses; i++ )
+    {
+        for ( int j=0; j<16; j++ )
+            global_user_midi_bus_definitions[i].instrument[j] = -1;
+    }
+
+    for ( int i=0; i<c_max_instruments; i++ )
+    {
+        for ( int j=0; j<128; j++ )
+            global_user_instrument_definitions[i].controllers_active[j] = false;
+    }
+
+
+    /* init the lash driver (strips lash specific command line arguments) */
+#ifdef LASH_SUPPORT
+    lash_driver = new lash(&argc, &argv);
+#endif
+
+
+    /* the main performance object */
+    perform p; 
+
+    /* all GTK applications must have a gtk_main(). Control ends here
+       and waits for an event to occur (like a key press or mouse event). */
+    Gtk::Main kit(argc, argv);
+
+    p_font_renderer = new font();
+
+
+    if ( getenv( HOME ) != NULL ){
+
+        Glib::ustring home( getenv( HOME ));
+        last_used_dir = home;
+        Glib::ustring total_file = home + SLASH + config_filename;
+        printf( "Reading [%s]\n", total_file.c_str());
+
+        optionsfile options( total_file );
+
+        if ( !options.parse( &p ) ){
+            printf( "Error Reading [%s]\n", total_file.c_str());  
+        }
+
+        total_file = home + SLASH + user_filename;
+        printf( "Reading [%s]\n", total_file.c_str());
+
+        userfile user( total_file );
+
+        if ( !user.parse( &p ) ){
+            printf( "Error Reading [%s]\n", total_file.c_str());  
+        }
+
+    } else {
+
+        printf( "Error calling getenv( \"%s\" )\n", HOME );  
+    }
+
+
     p.init();
-    
+
     p.launch_input_thread();
     p.launch_output_thread();
     p.init_jack();
-    
+
     if (global_filename != "") {
         /* import that midi file */
         midifile *f = new midifile(global_filename);
@@ -285,34 +287,33 @@ main (int argc, char *argv[])
     mainwnd seq24_window( &p );
 
 #ifdef LASH_SUPPORT
-	lash_driver->start( &p );
+    lash_driver->start( &p );
 #endif
     kit.run(seq24_window);
-    
+
     p.deinit_jack();
-    
-    if ( getenv( HOME ) != NULL ){
-        
+
+    if ( getenv( HOME ) != NULL )
+    {
         string home( getenv( HOME ));
         Glib::ustring total_file = home + SLASH + config_filename;
         printf( "Writing [%s]\n", total_file.c_str());
 
         optionsfile options( total_file );
 
-        if ( !options.write( &p ) ){
+        if (!options.write( &p))
             printf( "Error writing [%s]\n", total_file.c_str());  
-        }
-            
-    } else {
-        
+    }
+    else
+    {
         printf( "Error calling getenv( \"%s\" )\n", HOME );  
     }
 
 #ifdef LASH_SUPPORT
-	delete lash_driver;
+    delete lash_driver;
 #endif
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 
