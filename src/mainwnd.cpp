@@ -590,7 +590,8 @@ bool mainwnd::is_save()
 
 /* convert string to lower case letters */
 void
-mainwnd::toLower(basic_string<char>& s) {
+mainwnd::toLower(basic_string<char>& s)
+{
     for (basic_string<char>::iterator p = s.begin();
             p != s.end(); p++) {
         *p = tolower(*p);
@@ -766,6 +767,7 @@ mainwnd::on_key_release_event(GdkEventKey* a_ev)
     if ( a_ev->keyval == m_mainperf->m_key_snapshot_1 ||
             a_ev->keyval == m_mainperf->m_key_snapshot_2 )
         m_mainperf->unset_sequence_control_status( c_status_snapshot );
+
     if ( a_ev->keyval == m_mainperf->m_key_group_learn ){
         m_mainperf->unset_mode_group_learn();
     }
@@ -787,155 +789,150 @@ mainwnd::edit_callback_notepad( )
 bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
+    Gtk::Window::on_key_press_event(a_ev);
+
     // control and modifier key combinations matching
-    // menu items have first priority
-    /*if (*/Gtk::Window::on_key_press_event(a_ev);
-        //return true;  // on win32, it'd always return true here (i.e. for SPACE bar)... ?
+    if ( a_ev->type == GDK_KEY_PRESS ){
 
-    /*else */if ( m_entry_notes->has_focus()) {
-        m_entry_notes->event( (GdkEvent*) a_ev );
-        return false;
-    }
-    else {
-        if ( a_ev->type == GDK_KEY_PRESS ){
+        if ( global_print_keys ){
+            printf( "key_press[%d]\n", a_ev->keyval );
+            fflush( stdout );
+        }
 
-            if ( global_print_keys ){
-                printf( "key_press[%d]\n", a_ev->keyval );
-                fflush( stdout );
-            }
+        if ( a_ev->keyval == m_mainperf->m_key_bpm_dn ){
+            m_mainperf->set_bpm( m_mainperf->get_bpm() - 1 );
+            m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
+        }
 
-            if ( a_ev->keyval == m_mainperf->m_key_bpm_dn ){
-                m_mainperf->set_bpm( m_mainperf->get_bpm() - 1 );
-                m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
-            }
+        if ( a_ev->keyval ==  m_mainperf->m_key_bpm_up ){
+            m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
+            m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
+        }
 
-            if ( a_ev->keyval ==  m_mainperf->m_key_bpm_up ){
-                m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
-                m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
-            }
+        if ( a_ev->keyval == m_mainperf->m_key_replace )
+        {
+            m_mainperf->set_sequence_control_status( c_status_replace );
+        }
 
-            if ( a_ev->keyval == m_mainperf->m_key_replace )
-            {
-                m_mainperf->set_sequence_control_status( c_status_replace );
-            }
+        if ((a_ev->keyval ==  m_mainperf->m_key_queue )
+                || (a_ev->keyval == m_mainperf->m_key_keep_queue ))
+        {
+            m_mainperf->set_sequence_control_status( c_status_queue );
+        }
 
-              if ((a_ev->keyval ==  m_mainperf->m_key_queue )
-             || (a_ev->keyval == m_mainperf->m_key_keep_queue ))
-            {
-                m_mainperf->set_sequence_control_status( c_status_queue );
-            }
+        if ( a_ev->keyval == m_mainperf->m_key_snapshot_1 ||
+                a_ev->keyval == m_mainperf->m_key_snapshot_2 )
+        {
+            m_mainperf->set_sequence_control_status( c_status_snapshot );
+        }
 
-            if ( a_ev->keyval == m_mainperf->m_key_snapshot_1 ||
-                 a_ev->keyval == m_mainperf->m_key_snapshot_2 )
-            {
-                m_mainperf->set_sequence_control_status( c_status_snapshot );
-            }
+        if ( a_ev->keyval == m_mainperf->m_key_screenset_dn ){
 
-            if ( a_ev->keyval == m_mainperf->m_key_screenset_dn ){
+            m_mainperf->set_screenset(  m_mainperf->get_screenset() - 1 );
+            m_main_wid->set_screenset(  m_mainperf->get_screenset() );
+            m_adjust_ss->set_value( m_mainperf->get_screenset()  );
+            m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                        m_mainperf->get_screenset()));
+        }
 
-                m_mainperf->set_screenset(  m_mainperf->get_screenset() - 1 );
-                m_main_wid->set_screenset(  m_mainperf->get_screenset() );
-                m_adjust_ss->set_value( m_mainperf->get_screenset()  );
-                m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()  ));
-            }
+        if ( a_ev->keyval == m_mainperf->m_key_screenset_up ){
 
-            if ( a_ev->keyval == m_mainperf->m_key_screenset_up ){
+            m_mainperf->set_screenset(  m_mainperf->get_screenset() + 1 );
+            m_main_wid->set_screenset(  m_mainperf->get_screenset() );
+            m_adjust_ss->set_value( m_mainperf->get_screenset()  );
+            m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                        m_mainperf->get_screenset()));
+        }
 
-                m_mainperf->set_screenset(  m_mainperf->get_screenset() + 1 );
-                m_main_wid->set_screenset(  m_mainperf->get_screenset() );
-                m_adjust_ss->set_value( m_mainperf->get_screenset()  );
-                m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(m_mainperf->get_screenset()  ));
-            }
-             if ( a_ev->keyval == m_mainperf->m_key_set_playing_screenset ){
-                m_mainperf->set_playing_screenset();
-            }
+        if ( a_ev->keyval == m_mainperf->m_key_set_playing_screenset ){
+            m_mainperf->set_playing_screenset();
+        }
 
-            if ( a_ev->keyval == m_mainperf->m_key_group_on ){
-                m_mainperf->set_mode_group_mute();
-            }
-            if ( a_ev->keyval == m_mainperf->m_key_group_off ){
-                m_mainperf->unset_mode_group_mute();
-            }
+        if ( a_ev->keyval == m_mainperf->m_key_group_on ){
+            m_mainperf->set_mode_group_mute();
+        }
 
-            if ( a_ev->keyval == m_mainperf->m_key_group_learn ){
-                m_mainperf->set_mode_group_learn();
-            }
+        if ( a_ev->keyval == m_mainperf->m_key_group_off ){
+            m_mainperf->unset_mode_group_mute();
+        }
 
-            // activate mute group key
+        if ( a_ev->keyval == m_mainperf->m_key_group_learn ){
+            m_mainperf->set_mode_group_learn();
+        }
+
+        // activate mute group key
+        if (m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
+        {
+            m_mainperf->select_and_mute_group(
+                    m_mainperf->lookup_keygroup_group(a_ev->keyval));
+        }
+
+        // mute group learn
+        if (m_mainperf->is_learn_mode() &&
+                a_ev->keyval != m_mainperf->m_key_group_learn)
+        {
             if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
             {
-                m_mainperf->select_and_mute_group(
-                        m_mainperf->lookup_keygroup_group(a_ev->keyval));
+                std::ostringstream os;
+                os << "Key \""
+                    << gdk_keyval_name(a_ev->keyval)
+                    << "\" (code = "
+                    << a_ev->keyval
+                    << ") successfully mapped.";
+
+                Gtk::MessageDialog dialog(*this,
+                        "MIDI mute group learn success", false,
+                        Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+                dialog.set_secondary_text(os.str(), false);
+                dialog.run();
+
+                // we miss the keyup msg for learn, force set it off
+                m_mainperf->unset_mode_group_learn();
             }
-
-            // mute group learn
-            if (m_mainperf->is_learn_mode() &&
-                a_ev->keyval != m_mainperf->m_key_group_learn)
+            else
             {
-                if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
-                {
-                    std::ostringstream os;
-                    os << "Key \""
-                       << gdk_keyval_name(a_ev->keyval)
-                       << "\" (code = "
-                       << a_ev->keyval
-                       << ") successfully mapped.";
+                std::ostringstream os;
+                os << "Key \""
+                    << gdk_keyval_name(a_ev->keyval)
+                    << "\" (code = "
+                    << a_ev->keyval
+                    << ") is not one of the configured mute-group keys.\n"
+                    << "To change this see File/Options menu or .seq24rc";
 
-                    Gtk::MessageDialog dialog(*this,
-                           "MIDI mute group learn success", false,
-                           Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
-                    dialog.set_secondary_text(os.str(), false);
-                    dialog.run();
+                Gtk::MessageDialog dialog(*this,
+                        "MIDI mute group learn failed", false,
+                        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
 
-                    // we miss the keyup msg for learn, force set it off
-                    m_mainperf->unset_mode_group_learn();
-                }
-                else
-                {
-                    std::ostringstream os;
-                    os << "Key \""
-                        << gdk_keyval_name(a_ev->keyval)
-                        << "\" (code = "
-                        << a_ev->keyval
-                        << ") is not one of the configured mute-group keys.\n"
-                        << "To change this see File/Options menu or .seq24rc";
-
-                    Gtk::MessageDialog dialog(*this,
-                           "MIDI mute group learn failed", false,
-                           Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-
-                    dialog.set_secondary_text(os.str(), false);
-                    dialog.run();
-                    // we miss the keyup msg for learn, force set it
-                    m_mainperf->unset_mode_group_learn();
-                }
-            }
-
-            // the start/end key may be the same key (i.e. SPACE)
-            // allow toggling when the same key is mapped to both
-            // triggers (i.e. SPACEBAR)
-            bool dont_toggle = m_mainperf->m_key_start
-                != m_mainperf->m_key_stop;
-
-            if ( a_ev->keyval == m_mainperf->m_key_start
-                    && (dont_toggle || !is_pattern_playing))
-            {
-                start_playing();
-            }
-            else if ( a_ev->keyval == m_mainperf->m_key_stop
-                    && (dont_toggle || is_pattern_playing))
-            {
-                stop_playing();
-            }
-
-            /* toggle sequence mute/unmute using keyboard keys... */
-            if (m_mainperf->get_key_events()->count( a_ev->keyval) != 0)
-            {
-                sequence_key(m_mainperf->lookup_keyevent_seq( a_ev->keyval));
+                dialog.set_secondary_text(os.str(), false);
+                dialog.run();
+                // we miss the keyup msg for learn, force set it
+                m_mainperf->unset_mode_group_learn();
             }
         }
-    }
 
+        // the start/end key may be the same key (i.e. SPACE)
+        // allow toggling when the same key is mapped to both
+        // triggers (i.e. SPACEBAR)
+        bool dont_toggle = m_mainperf->m_key_start
+            != m_mainperf->m_key_stop;
+
+        if ( a_ev->keyval == m_mainperf->m_key_start
+                && (dont_toggle || !is_pattern_playing))
+        {
+            start_playing();
+        }
+        else if ( a_ev->keyval == m_mainperf->m_key_stop
+                && (dont_toggle || is_pattern_playing))
+        {
+            stop_playing();
+        }
+
+        /* toggle sequence mute/unmute using keyboard keys... */
+        if (m_mainperf->get_key_events()->count( a_ev->keyval) != 0)
+        {
+            sequence_key(m_mainperf->lookup_keyevent_seq( a_ev->keyval));
+        }
+    }
     return false;
 }
 
