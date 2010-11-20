@@ -141,16 +141,20 @@ mainwnd::mainwnd(perform *a_p)
 
 
     /* bottom line items */
-    HBox *bottomhbox = manage( new HBox( false, 2 ) );
+    HBox *bottomhbox = manage( new HBox(false, 10));
+
+    /* container for start+stop buttons */
+    HBox *startstophbox = manage(new HBox(false, 4));
+    bottomhbox->pack_start(*startstophbox, Gtk::PACK_SHRINK);
 
     /* stop button */
-    m_button_stop = manage( new Button( ));
+    m_button_stop = manage( new Button());
     m_button_stop->add(*manage(new Image(
                     Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
     m_button_stop->signal_clicked().connect(
             mem_fun(*this, &mainwnd::stop_playing));
     add_tooltip( m_button_stop, "Stop playing MIDI sequence" );
-    bottomhbox->pack_start(*m_button_stop, false, false);
+    startstophbox->pack_start(*m_button_stop, Gtk::PACK_SHRINK);
 
     /* play button */
     m_button_play = manage(new Button() );
@@ -159,28 +163,42 @@ mainwnd::mainwnd(perform *a_p)
     m_button_play->signal_clicked().connect(
             mem_fun( *this, &mainwnd::start_playing));
     add_tooltip( m_button_play, "Play MIDI sequence" );
-    bottomhbox->pack_start(*m_button_play, false, false);
+    startstophbox->pack_start(*m_button_play, Gtk::PACK_SHRINK);
 
-    /* bpm spin button */
+    /* bpm spin button with label*/
+    HBox *bpmhbox = manage(new HBox(false, 4));
+    bottomhbox->pack_start(*bpmhbox, Gtk::PACK_SHRINK);
+
     m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 20, 500, 1));
     m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
     m_spinbutton_bpm->set_editable( false );
     m_adjust_bpm->signal_value_changed().connect(
-            mem_fun(*this, &mainwnd::adj_callback_bpm ));
-    add_tooltip( m_spinbutton_bpm, "Adjust beats per minute (BPM) value" );
-    bottomhbox->pack_start(*(manage( new Label( "  bpm " ))), false, false, 4);
-    bottomhbox->pack_start(*m_spinbutton_bpm, false, false );
+            mem_fun(*this, &mainwnd::adj_callback_bpm));
+    add_tooltip( m_spinbutton_bpm, "Adjust beats per minute (BPM) value");
+    Label* bpmlabel = manage(new Label("_bpm", true));
+    bpmlabel->set_mnemonic_widget(*m_spinbutton_bpm);
+    bpmhbox->pack_start(*bpmlabel, Gtk::PACK_SHRINK);
+    bpmhbox->pack_start(*m_spinbutton_bpm, Gtk::PACK_SHRINK);
 
     /* screen set name edit line */
+    HBox *notebox = manage(new HBox(false, 4));
+    bottomhbox->pack_start(*notebox, Gtk::PACK_EXPAND_WIDGET);
+
     m_entry_notes = manage( new Entry());
     m_entry_notes->signal_changed().connect(
             mem_fun(*this, &mainwnd::edit_callback_notepad));
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
     add_tooltip( m_entry_notes, "Enter screen set name" );
-    bottomhbox->pack_start( *m_entry_notes, true, true );
+    Label* notelabel = manage(new Label("_Note", true));
+    notelabel->set_mnemonic_widget(*m_entry_notes);
+    notebox->pack_start(*notelabel, Gtk::PACK_SHRINK);
+    notebox->pack_start(*m_entry_notes, Gtk::PACK_EXPAND_WIDGET);
 
     /* sequence set spin button */
+    HBox *sethbox = manage(new HBox(false, 4));
+    bottomhbox->pack_start(*sethbox, Gtk::PACK_SHRINK);
+
     m_adjust_ss = manage( new Adjustment( 0, 0, c_max_sets - 1, 1 ));
     m_spinbutton_ss = manage( new SpinButton( *m_adjust_ss ));
     m_spinbutton_ss->set_editable( false );
@@ -188,8 +206,10 @@ mainwnd::mainwnd(perform *a_p)
     m_adjust_ss->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_ss ));
     add_tooltip( m_spinbutton_ss, "Select sreen set" );
-    bottomhbox->pack_start(*(manage( new Label( "  set " ))), false, false, 4);
-    bottomhbox->pack_start(*m_spinbutton_ss, false, false );
+    Label* setlabel = manage(new Label("_Set", true));
+    setlabel->set_mnemonic_widget(*m_spinbutton_ss);
+    sethbox->pack_start(*setlabel, Gtk::PACK_SHRINK);
+    sethbox->pack_start(*m_spinbutton_ss, Gtk::PACK_SHRINK);
 
     /* song edit button */
     m_button_perfedit = manage( new Button( ));
@@ -198,15 +218,16 @@ mainwnd::mainwnd(perform *a_p)
     m_button_perfedit->signal_clicked().connect(
             mem_fun( *this, &mainwnd::open_performance_edit ));
     add_tooltip( m_button_perfedit, "Show or hide song editor window" );
-    bottomhbox->pack_end(*m_button_perfedit, false, false, 4);
+    bottomhbox->pack_end(*m_button_perfedit, Gtk::PACK_SHRINK);
 
 
     /* vertical layout container for window content*/
     VBox *contentvbox = new VBox();
-    contentvbox->set_border_width( 10 );
-    contentvbox->pack_start(*tophbox, false, false );
-    contentvbox->pack_start(*m_main_wid, true, true, 10 );
-    contentvbox->pack_start(*bottomhbox, false, false );
+    contentvbox->set_spacing(10);
+    contentvbox->set_border_width(10);
+    contentvbox->pack_start(*tophbox, Gtk::PACK_SHRINK);
+    contentvbox->pack_start(*m_main_wid, Gtk::PACK_SHRINK);
+    contentvbox->pack_start(*bottomhbox, Gtk::PACK_SHRINK);
 
 
     /*main container for menu and window content */
