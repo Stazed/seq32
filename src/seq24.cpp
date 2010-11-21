@@ -57,7 +57,7 @@ option long_options[] = {
     {"jack_session_uuid", required_argument, 0, 'U'},
     {"manual_alsa_ports", 0, 0, 'm'},
     {"pass_sysex", 0, 0, 'P'},
-    {"version", 0, 0, 'v'},
+    {"version", 0, 0, 'V'},
     {0, 0, 0, 0}
 
 };
@@ -114,7 +114,7 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "Cf:hi:jJmM:pPsSU:vx:", long_options,
+        c = getopt_long (argc, argv, "Cf:hi:jJmM:pPsSU:Vx:", long_options,
                 &option_index);
 
         /* Detect the end of the options. */
@@ -206,8 +206,8 @@ main (int argc, char *argv[])
                 global_device_ignore_num = atoi( optarg );
                 break;
 
-            case 'v':
-                printf(versiontext);
+            case 'V':
+                printf("%s", versiontext);
                 return EXIT_SUCCESS;
                 break;
 
