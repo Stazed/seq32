@@ -54,7 +54,8 @@ class mainwnd : public Gtk::Window, public performcallback
  private:
 
     bool      m_modified;
-    
+    static int m_sigpipe[2];
+
 #if GTK_MINOR_VERSION < 12
     Tooltips *m_tooltips;
 #endif
@@ -120,6 +121,9 @@ class mainwnd : public Gtk::Window, public performcallback
     void choose_file();
     int query_save_changes();
     bool is_save();
+    static void handle_signal(int sig);
+    bool install_signal_handlers();
+    bool signal_action(Glib::IOCondition condition);
 
  public:
 

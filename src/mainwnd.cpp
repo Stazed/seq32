@@ -19,6 +19,9 @@
 //-----------------------------------------------------------------------------
 
 #include <cctype>
+#include <csignal>
+#include <cerrno>
+#include <cstring>
 #include <gtk/gtkversion.h>
 
 #include "mainwnd.h"
@@ -251,6 +254,7 @@ mainwnd::mainwnd(perform *a_p)
 
     m_perf_edit = new perfedit( m_mainperf );
     m_options = NULL;
+    install_signal_handlers();
 }
 
 
@@ -966,7 +970,95 @@ mainwnd::update_window_title()
 }
 
 
-bool mainwnd::is_modified()
+bool
+mainwnd::is_modified()
 {
     return m_modified;
+}
+
+
+int mainwnd::m_sigpipe[2];
+
+
+/* Handler for system signals (SIGUSR1, SIGINT...)
+ * Write a message to the pipe and leave as soon as possible
+ */
+void
+mainwnd::handle_signal(int sig)
+{
+    if (write(m_sigpipe[1], &sig, sizeof(sig)) == -1)
+    {
+        printf("write() failed: %s", std::strerror(errno));
+    }
+}
+
+
+bool
+mainwnd::install_signal_handlers()
+{
+    /*install pipe to forward received system signals*/
+    if (pipe(m_sigpipe) < 0)
+    {
+        printf("pipe() failed: %s", std::strerror(errno));
+        return false;
+    }
+
+    /*install notifier to handle pipe messages*/
+    Glib::signal_io().connect(sigc::mem_fun(*this, &mainwnd::signal_action),
+            m_sigpipe[0], Glib::IO_IN);
+
+    /*install signal handlers*/
+    struct sigaction action;
+    memset(&action, 0, sizeof(action));
+    action.sa_handler = handle_signal;
+
+    if (sigaction(SIGUSR1, &action, NULL) == -1)
+    {
+        printf("sigaction() failed: %s", std::strerror(errno));
+        return false;
+    }
+
+    if (sigaction(SIGINT, &action, NULL) == -1)
+    {
+        printf("sigaction() failed: %s", std::strerror(errno));
+        return false;
+    }
+
+    return true;
+}
+
+
+bool
+mainwnd::signal_action(Glib::IOCondition condition)
+{
+    int message;
+
+    if ((condition & Glib::IO_IN) == 0)
+    {
+        printf("Error: unexpected IO condition");
+        return false;
+    }
+
+
+    if (read(m_sigpipe[0], &message, sizeof(message)) == -1)
+    {
+        printf("read() failed: %s", std::strerror(errno));
+        return false;
+    }
+
+    switch (message)
+    {
+        case SIGUSR1:
+            save_file();
+            break;
+
+        case SIGINT:
+            file_exit();
+            break;
+
+        default:
+            printf("Unexpected signal received: %d", message);
+            break;
+    }
+    return true;
 }
