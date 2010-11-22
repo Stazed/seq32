@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "options.h"
+#include "keybindentry.h"
 
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
@@ -38,65 +39,6 @@ const int c_d2 = 3;
 const int c_d3 = 4;
 enum {e_keylabelsonsequence = 9999};
 
-
-// GTK text edit widget for getting keyboard button values (for binding keys)
-// put cursor in text box, hit a key, something like  'a' (42)  appears...
-// each keypress replaces the previous text.
-// also supports keyevent and keygroup maps in the perform class
-class KeyBindEntry : public Entry
-{
-public:
-    enum type { location, events, groups };
-
-    KeyBindEntry(type t,
-                 unsigned int* location_to_write = NULL,
-                 perform* p = NULL,
-                 long s = 0):  Entry(),
-                               m_key( location_to_write ),
-                               m_type( t ),
-                               m_perf( p ),
-                               m_slot( s )
-    {
-        switch (m_type)
-        {
-            case location: if (m_key) set( *m_key ); break;
-            case events: set( m_perf->lookup_keyevent_key( m_slot ) ); break;
-            case groups: set( m_perf->lookup_keygroup_key( m_slot ) ); break;
-        }
-    }
-    
-    void set( unsigned int val )
-    {
-        char buf[256] = "";
-        char* special = gdk_keyval_name( val );
-        char* p_buf = &buf[strlen(buf)];
-        if (special)
-            snprintf( p_buf, sizeof buf - (p_buf - buf), "%s", special );
-        else
-            snprintf( p_buf, sizeof buf - (p_buf - buf), "'%c'", (char)val );
-        set_text( buf );
-        int width = strlen(buf)-1;
-        set_width_chars( 1 <= width ? width : 1 );
-    }
-
-    virtual bool on_key_press_event(GdkEventKey* event)
-    {
-        bool result = Entry::on_key_press_event( event );
-        set( event->keyval );
-        switch (m_type)
-        {
-            case location: if (m_key) *m_key = event->keyval; break;
-            case events: m_perf->set_key_event( event->keyval, m_slot ); break;
-            case groups: m_perf->set_key_group( event->keyval, m_slot ); break;
-        }
-        return result;
-    }
-
-    unsigned int* m_key;
-    type m_type;
-    perform* m_perf;
-    long m_slot;
-};
 
 
 options::options (Gtk::Window & parent, perform * a_p):
