@@ -205,7 +205,7 @@ mainwnd::mainwnd(perform *a_p)
     m_spinbutton_ss->set_wrap( true );
     m_adjust_ss->signal_value_changed().connect(
             mem_fun(*this, &mainwnd::adj_callback_ss ));
-    add_tooltip( m_spinbutton_ss, "Select srceen set" );
+    add_tooltip( m_spinbutton_ss, "Select screen set" );
     Label* setlabel = manage(new Label("_Set", true));
     setlabel->set_mnemonic_widget(*m_spinbutton_ss);
     sethbox->pack_start(*setlabel, Gtk::PACK_SHRINK);
