@@ -287,7 +287,7 @@ main (int argc, char *argv[])
         if (Glib::file_test(argv[optind], Glib::FILE_TEST_EXISTS))
             seq24_window.open_file(argv[optind]);
         else
-            printf("File not found: %s", argv[optind]);
+            printf("File not found: %s\n", argv[optind]);
     }
 
     /* connect to lash daemon and poll events*/

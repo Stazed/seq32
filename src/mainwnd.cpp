@@ -988,7 +988,7 @@ mainwnd::handle_signal(int sig)
 {
     if (write(m_sigpipe[1], &sig, sizeof(sig)) == -1)
     {
-        printf("write() failed: %s", std::strerror(errno));
+        printf("write() failed: %s\n", std::strerror(errno));
     }
 }
 
@@ -999,7 +999,7 @@ mainwnd::install_signal_handlers()
     /*install pipe to forward received system signals*/
     if (pipe(m_sigpipe) < 0)
     {
-        printf("pipe() failed: %s", std::strerror(errno));
+        printf("pipe() failed: %s\n", std::strerror(errno));
         return false;
     }
 
@@ -1014,13 +1014,13 @@ mainwnd::install_signal_handlers()
 
     if (sigaction(SIGUSR1, &action, NULL) == -1)
     {
-        printf("sigaction() failed: %s", std::strerror(errno));
+        printf("sigaction() failed: %s\n", std::strerror(errno));
         return false;
     }
 
     if (sigaction(SIGINT, &action, NULL) == -1)
     {
-        printf("sigaction() failed: %s", std::strerror(errno));
+        printf("sigaction() failed: %s\n", std::strerror(errno));
         return false;
     }
 
@@ -1035,14 +1035,14 @@ mainwnd::signal_action(Glib::IOCondition condition)
 
     if ((condition & Glib::IO_IN) == 0)
     {
-        printf("Error: unexpected IO condition");
+        printf("Error: unexpected IO condition\n");
         return false;
     }
 
 
     if (read(m_sigpipe[0], &message, sizeof(message)) == -1)
     {
-        printf("read() failed: %s", std::strerror(errno));
+        printf("read() failed: %s\n", std::strerror(errno));
         return false;
     }
 
@@ -1057,7 +1057,7 @@ mainwnd::signal_action(Glib::IOCondition condition)
             break;
 
         default:
-            printf("Unexpected signal received: %d", message);
+            printf("Unexpected signal received: %d\n", message);
             break;
     }
     return true;
