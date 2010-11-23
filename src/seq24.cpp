@@ -254,21 +254,28 @@ main (int argc, char *argv[])
         Glib::ustring home( getenv( HOME ));
         last_used_dir = home;
         Glib::ustring total_file = home + SLASH + config_filename;
-        printf( "Reading [%s]\n", total_file.c_str());
+        
+        if (Glib::file_test(total_file, Glib::FILE_TEST_EXISTS))
+        {
+            printf( "Reading [%s]\n", total_file.c_str());
 
-        optionsfile options( total_file );
+            optionsfile options( total_file );
 
-        if ( !options.parse( &p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());
+            if ( !options.parse( &p ) ){
+                printf( "Error Reading [%s]\n", total_file.c_str());
+            }
         }
 
         total_file = home + SLASH + user_filename;
-        printf( "Reading [%s]\n", total_file.c_str());
+        if (Glib::file_test(total_file, Glib::FILE_TEST_EXISTS))
+        {
+            printf( "Reading [%s]\n", total_file.c_str());
 
-        userfile user( total_file );
+            userfile user( total_file );
 
-        if ( !user.parse( &p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());
+            if ( !user.parse( &p ) ){
+                printf( "Error Reading [%s]\n", total_file.c_str());
+            }
         }
 
     }
