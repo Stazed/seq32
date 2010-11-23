@@ -79,13 +79,13 @@ class event
 
     /* is this event being painted */
     bool m_painted;
-    
+
     /* used in sorting */
     int get_rank( ) const;
 
  public:
 
-    event(); 
+    event();
     ~event();
 
     void set_timestamp( const unsigned long time );
@@ -144,7 +144,7 @@ class event
     void print();
 
     /* overloads */
- 
+
     bool operator> ( const event &rhsevent );
     bool operator< ( const event &rhsevent );
 

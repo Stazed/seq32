@@ -105,7 +105,7 @@ class perfedit:public Gtk::Window
     Entry       *m_entry_bpm;
 
     Button      *m_button_bw;
-    Entry       *m_entry_bw;    
+    Entry       *m_entry_bw;
 
     HBox *m_hbox;
     HBox *m_hlbox;
@@ -127,7 +127,7 @@ class perfedit:public Gtk::Window
     void set_snap (int a_snap);
 
     void set_guides( void );
-    
+
     void grow (void);
 
     void on_realize ();
@@ -141,14 +141,14 @@ class perfedit:public Gtk::Window
     void collapse (void);
     void copy (void);
     void undo ( void );
-    
+
     void popup_menu (Menu * a_menu);
 
     bool timeout (void);
 
     bool on_delete_event (GdkEventAny * a_event);
     bool on_key_press_event(GdkEventKey* a_ev);
-   
+
   public:
 
     void init_before_show ();
@@ -156,15 +156,6 @@ class perfedit:public Gtk::Window
     perfedit (perform * a_perf);
     ~perfedit ();
 };
-
-
-
-
-
-
-
-
-
 
 
 #endif

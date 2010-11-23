@@ -70,12 +70,12 @@ const int c_mainwid_spacing = 2;
 const int c_control_height = 0;
 
 
-const int c_mainwid_x = ((c_seqarea_x + c_mainwid_spacing ) 
+const int c_mainwid_x = ((c_seqarea_x + c_mainwid_spacing )
 			 * c_mainwnd_cols - c_mainwid_spacing
 			 +  c_mainwid_border * 2 );
-const int c_mainwid_y = ((c_seqarea_y  + c_mainwid_spacing ) 
+const int c_mainwid_y = ((c_seqarea_y  + c_mainwid_spacing )
 			 * c_mainwnd_rows
-			 +  c_mainwid_border * 2 
+			 +  c_mainwid_border * 2
 			 +  c_control_height );
 
 
@@ -242,27 +242,27 @@ const int c_scales_symbol[c_scale_size][12] =
     /* minor */
     { 32,32,32,32,32,32,32,32,129,128,129,128},
 
-};             
+};
 
-// up 128        
+// up 128
 // down 129
 
 
 const char c_scales_text[c_scale_size][6] =
-{ 
-    "Off", 
-    "Major", 
-    "Minor" 
+{
+    "Off",
+    "Major",
+    "Minor"
 };
 
 const char c_key_text[][3] =
 {
-    "C", 
-    "C#", 
-    "D", 
-    "D#", 
+    "C",
+    "C#",
+    "D",
+    "D#",
     "E",
-    "F", 
+    "F",
     "F#",
     "G",
     "G#",
@@ -303,7 +303,7 @@ const char c_chord_text[][5] =
     "VIII"
 };
 
-enum mouse_action_e 
+enum mouse_action_e
 {
     e_action_select,
     e_action_draw,

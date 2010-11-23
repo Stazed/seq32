@@ -73,7 +73,7 @@ class mainwnd : public Gtk::Window, public performcallback
     options *m_options;
 
     Gdk::Cursor   m_main_cursor;
-    
+
     Button      *m_button_learn;
 
     Button      *m_button_stop;

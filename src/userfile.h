@@ -23,9 +23,7 @@
 
 #include "perform.h"
 #include "configfile.h"
-#include <fstream>
 #include <string>
-#include <list>
 
 class userfile  : public configfile
 {
@@ -34,11 +32,10 @@ class userfile  : public configfile
 
     userfile( string a_name );
     ~userfile( );
-    
+
     bool parse( perform *a_perf );
     bool write( perform *a_perf );
-
 };
 
 
-#endif 
+#endif

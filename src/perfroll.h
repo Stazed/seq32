@@ -55,7 +55,7 @@ const int c_perfroll_size_box_click_w = c_perfroll_size_box_w+1 ;
 class perfroll : public Gtk::DrawingArea
 {
 
- private: 
+ private:
     friend class FruityPerfInput;
     friend class Seq24PerfInput;
 
@@ -77,7 +77,7 @@ class perfroll : public Gtk::DrawingArea
     int          m_beat_length;
 
     int          m_window_x, m_window_y;
- 
+
     long         m_old_progress_ticks;
 
     int          m_4bar_offset;
@@ -92,7 +92,7 @@ class perfroll : public Gtk::DrawingArea
     int          m_drop_sequence;
 
     bool         m_sequence_active[c_total_seqs];
-    
+
     Adjustment   *m_vadjust;
     Adjustment   *m_hadjust;
 
@@ -102,7 +102,7 @@ class perfroll : public Gtk::DrawingArea
 
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);
-    bool on_button_press_event(GdkEventButton* a_ev); 
+    bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_ev);
     bool on_scroll_event( GdkEventScroll* a_ev ) ;
@@ -119,18 +119,18 @@ class perfroll : public Gtk::DrawingArea
     void convert_x( int a_x, long *a_ticks);
     void snap_x( int *a_x );
 
-   
+
     void start_playing( void );
     void stop_playing( void );
 
-   
+
 
     void draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_sequence );
     void draw_background_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_sequence );
 
     void draw_drawable_row( Glib::RefPtr<Gdk::Drawable> a_dest, Glib::RefPtr<Gdk::Drawable> a_src,  long a_y );
-    
-    
+
+
     void change_horz( void );
     void change_vert( void );
 
@@ -151,7 +151,7 @@ class perfroll : public Gtk::DrawingArea
 
     void redraw_dirty_sequences( void );
 
-    perfroll( perform *a_perf, 
+    perfroll( perform *a_perf,
 	      Adjustment *a_hadjust,
 	      Adjustment *a_vadjust );
 

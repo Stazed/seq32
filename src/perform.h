@@ -94,7 +94,7 @@ class perform
     int m_mute_group_selected;
     //andy playing screen
     int m_playing_screen;
-   
+
 
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
@@ -105,7 +105,7 @@ class perform
     bool m_was_active_edit[ c_max_sequence ];
     bool m_was_active_perf[ c_max_sequence ];
     bool m_was_active_names[ c_max_sequence ];
-    
+
     bool m_sequence_state[  c_max_sequence ];
 
     /* our midibus */
@@ -124,21 +124,21 @@ class perform
 
     bool m_playback_mode;
 
-    int thread_trigger_width_ms; 
+    int thread_trigger_width_ms;
 
     long m_left_tick;
     long m_right_tick;
     long m_starting_tick;
-    
+
     long m_tick;
     bool m_usemidiclock;
     bool m_midiclockrunning; // stopped or started
     int  m_midiclocktick;
     int  m_midiclockpos;
-    
+
     bool m_show_ui_sequence_key;
 
-   
+
     void set_running( bool a_running );
 
     void set_playback_mode( bool a_playback_mode );
@@ -148,7 +148,7 @@ class perform
     midi_control m_midi_cc_toggle[ c_midi_controls ];
     midi_control m_midi_cc_on[ c_midi_controls ];
     midi_control m_midi_cc_off[ c_midi_controls ];
-    
+
     int m_offset;
     int m_control_status;
     int m_screen_set;
@@ -163,7 +163,7 @@ class perform
 
 
 #ifdef JACK_SUPPORT
-    
+
     jack_client_t *m_jack_client;
     jack_nframes_t m_jack_frame_current,
                    m_jack_frame_last;
@@ -178,7 +178,7 @@ class perform
  private:
 #endif
 #endif
-    
+
     bool m_jack_running;
     bool m_jack_master;
 
@@ -204,11 +204,11 @@ class perform
     unsigned int m_key_screenset_up;
     unsigned int m_key_screenset_dn;
     unsigned int m_key_set_playing_screenset;
-   
+
     unsigned int m_key_group_on;
     unsigned int m_key_group_off;
     unsigned int m_key_group_learn;
-   
+
 
     unsigned int m_key_start;
     unsigned int m_key_stop;
@@ -221,16 +221,16 @@ class perform
     void init( void );
 
     void clear_all( void );
-    
+
     void launch_input_thread( void );
     void launch_output_thread( void );
     void init_jack( void );
     void deinit_jack( void );
-    
+
     void add_sequence( sequence *a_seq, int a_perf );
     void delete_sequence( int a_num );
     bool is_sequence_in_edit( int a_num );
-    
+
     void clear_sequence_triggers( int a_seq  );
 
 
@@ -247,7 +247,7 @@ class perform
 
     void move_triggers( bool a_direction );
     void copy_triggers(  );
-    
+
     void push_trigger_undo( void );
     void pop_trigger_undo( void );
 
@@ -274,7 +274,7 @@ class perform
     void unset_mode_group_learn (void);
     bool is_group_learning( void ) { return m_mode_group_learn; }
     void select_mute_group ( int a_group );
-    void unset_mode_group_mute ();    
+    void unset_mode_group_mute ();
     void start( bool a_state );
     void stop();
 
@@ -292,7 +292,7 @@ class perform
     bool is_dirty_edit (int a_sequence);
     bool is_dirty_perf (int a_sequence);
     bool is_dirty_names (int a_sequence);
-        
+
     void new_sequence( int a_sequence );
 
     /* plays all notes to Curent tick */
@@ -307,7 +307,7 @@ class perform
     int  get_bpm( );
 
     void set_looping( bool a_looping ){ m_looping = a_looping; };
- 
+
     void set_sequence_control_status( int a_status );
     void unset_sequence_control_status( int a_status );
 
@@ -316,25 +316,25 @@ class perform
     void sequence_playing_off( int a_sequence );
     void set_group_mute_state (int a_g_track, bool a_mute_state);
     bool get_group_mute_state (int a_g_track);
-    
+
     void mute_all_tracks( void );
 
     mastermidibus* get_master_midi_bus( );
-    
+
     void output_func();
     void input_func();
-    
+
     long get_max_trigger( void );
 
     void set_offset( int a_offset );
-    
+
     void save_playing_state( void );
     void restore_playing_state( void );
-    
-    
+
+
     const std::map<unsigned int,long> *get_key_events( void ) const { return &key_events; };
     const std::map<unsigned int,long> *get_key_groups( void ) const { return &key_groups; };
-    
+
     void set_key_event( unsigned int keycode, long sequence_slot );
     void set_key_group( unsigned int keycode, long group_slot );
 
@@ -353,10 +353,10 @@ class perform
 
 #ifdef JACK_SUPPORT
 
-    friend int jack_sync_callback(jack_transport_state_t state, 
+    friend int jack_sync_callback(jack_transport_state_t state,
                               jack_position_t *pos, void *arg);
     friend void jack_shutdown(void *arg);
-    friend void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes, 
+    friend void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
                                        jack_position_t *pos, int new_pos, void *arg);
 #endif
 };
@@ -369,11 +369,11 @@ extern void *input_thread_func(void *a_p);
 
 #ifdef JACK_SUPPORT
 
-int jack_sync_callback(jack_transport_state_t state, 
+int jack_sync_callback(jack_transport_state_t state,
 					   jack_position_t *pos, void *arg);
 void print_jack_pos( jack_position_t* jack_pos );
 void jack_shutdown(void *arg);
-void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes, 
+void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
                             jack_position_t *pos, int new_pos, void *arg);
 #ifdef JACK_SESSION
 void jack_session_callback(jack_session_event_t *ev, void *arg);

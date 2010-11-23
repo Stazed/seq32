@@ -56,7 +56,7 @@ midifile::read_short ()
     return ret;
 }
 
-unsigned char 
+unsigned char
 midifile::read_byte ()
 {
     return m_d[m_pos++];
@@ -668,12 +668,12 @@ bool midifile::write (perform * a_perf)
     {
         a_perf->select_group_mute(j);
         write_long(j);
-        for (int i=0; i < c_seqs_in_set; ++i) 
+        for (int i=0; i < c_seqs_in_set; ++i)
         {
             write_long( a_perf->get_group_mute_state(i) );
         }
     }
-    
+
     /* open binary file */
     ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
 
@@ -695,5 +695,4 @@ bool midifile::write (perform * a_perf)
 
     return true;
 }
-
 

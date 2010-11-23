@@ -18,7 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "perfedit.h" 
+#include "perfedit.h"
 #include "sequence.h"
 
 #include "pixmaps/snap.xpm"
@@ -41,7 +41,7 @@ using namespace sigc;
 #   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
 #endif
 
-perfedit::perfedit( perform *a_perf ) 
+perfedit::perfedit( perform *a_perf )
 {
     using namespace Menu_Helpers;
 
@@ -59,7 +59,7 @@ perfedit::perfedit( perform *a_perf )
     /* tooltips */
     m_tooltips = manage( new Tooltips( ) );
 
-    
+
     m_vadjust = manage( new Adjustment(0,0,1,1,1,1 ));
     m_hadjust = manage( new Adjustment(0,0,1,1,1,1 ));
 
@@ -80,17 +80,17 @@ perfedit::perfedit( perform *a_perf )
 
     m_hbox      = manage( new HBox( false, 2 ));
     m_hlbox     = manage( new HBox( false, 2 ));
-    
+
     m_hlbox->set_border_width( 2 );
 
     m_button_grow = manage( new Button());
     m_button_grow->add( *manage( new Arrow( Gtk::ARROW_RIGHT, Gtk::SHADOW_OUT )));
-    m_button_grow->signal_clicked().connect( mem_fun( *this, &perfedit::grow)); 
+    m_button_grow->signal_clicked().connect( mem_fun( *this, &perfedit::grow));
     add_tooltip( m_button_grow, "Increase size of Grid." );
 
 
     /* fill table */
-  
+
     m_table->attach( *m_hlbox,  0, 3, 0, 1,  Gtk::FILL, Gtk::SHRINK, 2, 0 ); // shrink was 0
 
 
@@ -98,7 +98,7 @@ perfedit::perfedit( perform *a_perf )
 
     m_table->attach( *m_perftime, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK );
     m_table->attach( *m_perfroll, 1, 2, 2, 3,
- 		     Gtk::FILL | Gtk::SHRINK,  
+ 		     Gtk::FILL | Gtk::SHRINK,
  		     Gtk::FILL | Gtk::SHRINK );
 
     m_table->attach( *m_vscroll, 2, 3, 2, 3, Gtk::SHRINK, Gtk::FILL | Gtk::EXPAND  );
@@ -114,8 +114,8 @@ perfedit::perfedit( perform *a_perf )
     m_menu_snap->items().push_back(MenuElem("1/8",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 8  )));
     m_menu_snap->items().push_back(MenuElem("1/16",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 16  )));
     m_menu_snap->items().push_back(MenuElem("1/32",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 32  )));
- 
-    
+
+
     /* snap */
     m_button_snap = manage( new Button());
     m_button_snap->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( snap_xpm ))));
@@ -135,21 +135,21 @@ perfedit::perfedit( perform *a_perf )
     m_menu_bw->items().push_back(MenuElem("4", sigc::bind(mem_fun(*this,&perfedit::set_bw), 4  )));
     m_menu_bw->items().push_back(MenuElem("8", sigc::bind(mem_fun(*this,&perfedit::set_bw), 8  )));
     m_menu_bw->items().push_back(MenuElem("16", sigc::bind(mem_fun(*this,&perfedit::set_bw), 16 )));
-    
+
     char b[20];
-    
+
     for( int i=0; i<16; i++ ){
-        
+
         snprintf( b, sizeof(b), "%d", i+1 );
-        
+
         /* length */
-        m_menu_bpm->items().push_back(MenuElem(b, 
-                                               sigc::bind(mem_fun(*this,&perfedit::set_bpm),   
+        m_menu_bpm->items().push_back(MenuElem(b,
+                                               sigc::bind(mem_fun(*this,&perfedit::set_bpm),
                                                     i+1 )));
     }
 
-    
-    /* beats per measure */ 
+
+    /* beats per measure */
     m_button_bpm = manage( new Button());
     m_button_bpm->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
     m_button_bpm->signal_clicked().connect(  bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bpm  ));
@@ -173,7 +173,7 @@ perfedit::perfedit( perform *a_perf )
     m_button_undo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( undo_xpm  ))));
     m_button_undo->signal_clicked().connect(  mem_fun( *this, &perfedit::undo));
     add_tooltip( m_button_undo, "Undo." );
- 
+
 
     /* expand */
     m_button_expand = manage( new Button());
@@ -211,11 +211,11 @@ perfedit::perfedit( perform *a_perf )
     add_tooltip( m_button_play, "Begin playing at L marker." );
 
 
-    m_hlbox->pack_end( *m_button_copy , false, false ); 
+    m_hlbox->pack_end( *m_button_copy , false, false );
     m_hlbox->pack_end( *m_button_expand , false, false );
     m_hlbox->pack_end( *m_button_collapse , false, false );
     m_hlbox->pack_end( *m_button_undo , false, false );
-      
+
 
     m_hlbox->pack_start( *m_button_stop , false, false );
     m_hlbox->pack_start( *m_button_play , false, false );
@@ -225,7 +225,7 @@ perfedit::perfedit( perform *a_perf )
 
     m_hlbox->pack_start( *m_button_bpm , false, false );
     m_hlbox->pack_start( *m_entry_bpm , false, false );
- 
+
     m_hlbox->pack_start( *(manage(new Label( "/" ))), false, false, 4);
 
 
@@ -233,15 +233,15 @@ perfedit::perfedit( perform *a_perf )
     m_hlbox->pack_start( *m_entry_bw , false, false );
 
     m_hlbox->pack_start( *(manage(new Label( "x" ))), false, false, 4);
-  
+
     m_hlbox->pack_start( *m_button_snap , false, false );
     m_hlbox->pack_start( *m_entry_snap , false, false );
-    
-    
+
+
 
     /* add table */
     this->add( *m_table );
-   
+
     m_snap = 8;
     m_bpm = 4;
     m_bw = 4;
@@ -250,11 +250,11 @@ perfedit::perfedit( perform *a_perf )
     set_bpm( 4 );
     set_bw( 4 );
 
-    add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );   
+    add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );
 }
 
 
-bool 
+bool
 perfedit::on_key_press_event(GdkEventKey* a_ev)
 {
     bool event_was_handled = false;
@@ -296,7 +296,7 @@ perfedit::undo( void )
     m_perfroll->queue_draw();
 }
 
-void 
+void
 perfedit::start_playing( void )
 {
     m_mainperf->position_jack( true );
@@ -304,11 +304,11 @@ perfedit::start_playing( void )
     m_mainperf->start( true );
 }
 
-void 
+void
 perfedit::stop_playing( void )
 {
-    
-    m_mainperf->stop_jack(); 
+
+    m_mainperf->stop_jack();
     m_mainperf->stop();
 }
 
@@ -328,7 +328,7 @@ perfedit::copy( void )
     m_perfroll->queue_draw();
 }
 
-void 
+void
 perfedit::expand( void )
 {
     m_mainperf->push_trigger_undo();
@@ -336,13 +336,13 @@ perfedit::expand( void )
     m_perfroll->queue_draw();
 }
 
-void 
+void
 perfedit::set_looped( void )
 {
     m_mainperf->set_looping( m_button_loop->get_active());
 }
 
- 
+
 void
 perfedit::popup_menu(Menu *a_menu)
 {
@@ -360,13 +360,13 @@ perfedit::set_guides( void )
 }
 
 
-void 
+void
 perfedit::set_snap( int a_snap  )
 {
     char b[10];
     snprintf( b, sizeof(b), "1/%d", a_snap );
     m_entry_snap->set_text(b);
-    
+
     m_snap = a_snap;
     set_guides();
 }
@@ -376,7 +376,7 @@ void perfedit::set_bpm( int a_beats_per_measure )
     char b[10];
     snprintf(b, sizeof(b), "%d", a_beats_per_measure );
     m_entry_bpm->set_text(b);
-    
+
     m_bpm = a_beats_per_measure;
     set_guides();
 }
@@ -387,13 +387,13 @@ void perfedit::set_bw( int a_beat_width )
     char b[10];
     snprintf(b, sizeof(b), "%d", a_beat_width );
     m_entry_bw->set_text(b);
-    
+
     m_bw = a_beat_width;
     set_guides();
 }
 
 
-void 
+void
 perfedit::on_realize()
 {
     // we need to do the default realize
@@ -424,7 +424,7 @@ perfedit::timeout( void )
     m_perfroll->redraw_dirty_sequences();
     m_perfroll->draw_progress();
     m_perfnames->redraw_dirty_sequences();
-   
+
     return true;
 }
 
@@ -434,7 +434,7 @@ perfedit::~perfedit()
 }
 
 
-bool 
+bool
 perfedit::on_delete_event(GdkEventAny *a_event)
 {
     return false;

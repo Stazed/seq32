@@ -28,16 +28,16 @@ mutex::mutex( )
     m_mutex_lock = recmutex;
 }
 
-void 
+void
 mutex::lock( )
 {
     pthread_mutex_lock( &m_mutex_lock );
 }
 
 
-void 
+void
 mutex::unlock( )
-{      
+{
     pthread_mutex_unlock( &m_mutex_lock );
 }
 

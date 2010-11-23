@@ -85,17 +85,17 @@ options::add_midi_clock_page()
     manage (new Tooltips ());
 
     for (int i = 0; i < buses; i++)
-    {  
+    {
         HBox *hbox2 = manage (new HBox ());
         Label *label = manage( new Label(m_perf->get_master_midi_bus ()->
                                             get_midi_out_bus_name (i), 0));
 
         hbox2->pack_start (*label, false, false);
-        
-        
+
+
         Gtk::RadioButton * rb_off = manage (new RadioButton ("Off"));
         add_tooltip( rb_off, "Midi Clock will be disabled.");
-        
+
         Gtk::RadioButton * rb_on = manage (new RadioButton ("On (Pos)"));
         add_tooltip( rb_on,
                 "Midi Clock will be sent. Midi Song Position and Midi Continue will be sent if starting greater than tick 0 in song mode, otherwise Midi Start is sent.");
@@ -113,13 +113,13 @@ options::add_midi_clock_page()
                         &options::clock_callback_on),  i, rb_on  ));
         rb_mod->signal_toggled().connect (sigc::bind(mem_fun (*this,
                         &options::clock_callback_mod), i, rb_mod ));
-        
-        hbox2->pack_end (*rb_mod, false, false ); 
+
+        hbox2->pack_end (*rb_mod, false, false );
         hbox2->pack_end (*rb_on, false, false);
         hbox2->pack_end (*rb_off, false, false);
 
         vbox->pack_start( *hbox2, false, false );
-       
+
         switch ( m_perf->get_master_midi_bus ()->get_clock (i))
         {
             case e_clock_off: rb_off->set_active(1); break;
@@ -133,14 +133,14 @@ options::add_midi_clock_page()
     SpinButton *clock_mod_spin = new SpinButton( *clock_mod_adj );
 
     HBox *hbox2 = manage (new HBox ());
-    
+
     //m_spinbutton_bpm->set_editable( false );
     hbox2->pack_start(*(manage(new Label(
                         "Clock Start Modulo (1/16 Notes)"))), false, false, 4);
     hbox2->pack_start(*clock_mod_spin, false, false );
 
     vbox->pack_start( *hbox2, false, false );
-    
+
     clock_mod_adj->signal_value_changed().connect(sigc::bind(mem_fun(*this,
                     &options::clock_mod_callback), clock_mod_adj));
 }
@@ -377,7 +377,7 @@ options::add_mouse_page()
         case e_fruity_interaction:
             rb_fruity->set_active();
             break;
-    
+
         case e_seq24_interaction:
         default:
             rb_seq24->set_active();
@@ -491,31 +491,31 @@ options::add_jack_sync_page()
 
 void
 options::clock_callback_off (int a_bus, RadioButton *a_button)
-{  
+{
     if (a_button->get_active ())
         m_perf->get_master_midi_bus ()->set_clock(a_bus, e_clock_off );
 }
 
 void
 options::clock_callback_on (int a_bus, RadioButton *a_button)
-{  
+{
     if (a_button->get_active ())
         m_perf->get_master_midi_bus ()->set_clock(a_bus, e_clock_pos );
 }
 
 void
 options::clock_callback_mod (int a_bus, RadioButton *a_button)
-{  
+{
     if (a_button->get_active ())
         m_perf->get_master_midi_bus ()->set_clock(a_bus, e_clock_mod );
 }
 
-void 
+void
 options::clock_mod_callback( Adjustment *adj )
 {
     midibus::set_clock_mod((int)adj->get_value());
 }
- 
+
 
 void
 options::input_callback (int a_bus, Button * i_button)

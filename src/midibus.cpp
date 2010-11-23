@@ -76,7 +76,7 @@ midibus::midibus( int a_localclient,
 
 midibus::midibus( int a_localclient,
 		  snd_seq_t *a_seq,
-		  int a_id, int a_queue ) : 
+		  int a_id, int a_queue ) :
     m_id(a_id),
     m_clock_type(e_clock_off),
     m_inputing(false),

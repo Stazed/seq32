@@ -34,7 +34,7 @@
 #include <gtkmm/table.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/label.h>
-#include <gtkmm/frame.h> 
+#include <gtkmm/frame.h>
 #include <gtkmm/fileselection.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/arrow.h>
@@ -71,7 +71,7 @@ class options : public Gtk::Dialog
 
 
     Table   *m_table;
-    
+
     Notebook *m_notebook;
 
     enum button {
@@ -90,23 +90,23 @@ class options : public Gtk::Dialog
     void clock_callback_mod( int a_bus, RadioButton *a_button );
 
     void clock_mod_callback( Adjustment *adj );
-    
+
     void input_callback( int a_bus, Button *a_button );
 
     void transport_callback( button a_type, Button *a_button );
-   
+
     void mouse_seq24_callback(Gtk::RadioButton*);
     void mouse_fruity_callback(Gtk::RadioButton*);
 
-    /*notebook pages*/ 
+    /*notebook pages*/
     void add_midi_clock_page();
     void add_midi_input_page();
     void add_keyboard_page();
     void add_mouse_page();
     void add_jack_sync_page();
-    
+
 public:
-    
+
     options( Gtk::Window &parent, perform *a_p );
 };
 

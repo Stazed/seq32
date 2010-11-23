@@ -20,7 +20,7 @@
 #include "event.h"
 #include "string.h"
 
-event::event() : 
+event::event() :
     m_timestamp(0),
     m_status(EVENT_NOTE_OFF),
     m_sysex(NULL),
@@ -33,34 +33,34 @@ event::event() :
 {
     m_data[0] = 0;
     m_data[1] = 0;
-} 
+}
 
 event::~event()
 {
   delete[] m_sysex;
-  
+
   m_sysex = NULL;
 }
 
-long 
+long
 event::get_timestamp()
-{ 
-    return m_timestamp; 
+{
+    return m_timestamp;
 }
 
-void 
+void
 event::set_timestamp( const unsigned long a_time )
 {
     m_timestamp = a_time;
 }
 
-void 
+void
 event::mod_timestamp( unsigned long a_mod )
 {
     m_timestamp %= a_mod;
 }
 
-void 
+void
 event::set_status( const char a_status  )
 {
    /* bitwise AND to clear the channel portion of the status */
@@ -70,32 +70,32 @@ event::set_status( const char a_status  )
       m_status = (char) (a_status & EVENT_CLEAR_CHAN_MASK);
 }
 
-void 
+void
 event::make_clock( )
 {
     m_status = (unsigned char) EVENT_MIDI_CLOCK;
 }
 
-void 
+void
 event::set_data( char a_D1  )
 {
     m_data[0] = a_D1 & 0x7F;
 }
 
-void 
+void
 event::set_data( char a_D1, char a_D2 )
 {
     m_data[0] = a_D1 & 0x7F;
     m_data[1] = a_D2 & 0x7F;
 }
 
-void 
+void
 event::increment_data2(void )
 {
 	m_data[1] = (m_data[1]+1) & 0x7F;
 }
 
-void 
+void
 event::decrement_data2(void )
 {
 	m_data[1] = (m_data[1]-1) & 0x7F;
@@ -103,34 +103,34 @@ event::decrement_data2(void )
 
 
 
-void 
+void
 event::increment_data1(void )
 {
 	m_data[0] = (m_data[0]+1) & 0x7F;
 }
 
-void 
+void
 event::decrement_data1(void )
 {
 	m_data[0] = (m_data[0]-1) & 0x7F;
 }
 
 
-void 
+void
 event::get_data( unsigned char *D0, unsigned char *D1 )
 {
-    *D0 = m_data[0]; 
+    *D0 = m_data[0];
     *D1 = m_data[1];
 }
 
-unsigned char 
-event::get_status( ) 
-{ 
-    return m_status; 
+unsigned char
+event::get_status( )
+{
+    return m_status;
 }
 
 
-void 
+void
 event::start_sysex( void  )
 {
   delete[] m_sysex;
@@ -160,7 +160,7 @@ event::append_sysex( unsigned char *a_data, long a_size )
     if ( a_data[i] == EVENT_SYSEX_END )
       ret = false;
   }
-    
+
   return ret;
 
 }
@@ -186,44 +186,44 @@ event::get_size( void )
   return m_size;
 }
 
-void 
+void
 event::set_note_velocity( int a_vel )
 {
-    m_data[1] = a_vel & 0x7F; 
+    m_data[1] = a_vel & 0x7F;
 }
 
-bool 
+bool
 event::is_note_on()
 {
-    return (m_status == EVENT_NOTE_ON); 
+    return (m_status == EVENT_NOTE_ON);
 }
 
-bool 
+bool
 event::is_note_off()
 {
     return (m_status == EVENT_NOTE_OFF);
 }
 
-unsigned char 
+unsigned char
 event::get_note()
 {
     return m_data[0];
 }
 
-void 
+void
 event::set_note( char a_note )
 {
     m_data[0] = a_note & 0x7F;
 }
 
-unsigned char 
+unsigned char
 event::get_note_velocity()
 {
     return m_data[1];
 }
 
 
-void 
+void
 event::print()
 {
     printf( "[%06ld] [%04lX] %02X ",
@@ -252,7 +252,7 @@ event::print()
     }
 }
 
-int 
+int
 event::get_rank( void ) const
 {
     switch ( m_status )
@@ -264,9 +264,9 @@ event::get_rank( void ) const
 
         case EVENT_AFTERTOUCH:
         case EVENT_CHANNEL_PRESSURE:
-        case EVENT_PITCH_WHEEL: 
+        case EVENT_PITCH_WHEEL:
             return 0x050;
-            
+
         case EVENT_CONTROL_CHANGE:
             return 0x010;
         case EVENT_PROGRAM_CHANGE:
@@ -276,7 +276,7 @@ event::get_rank( void ) const
     }
 }
 
-bool 
+bool
 event::operator>( const event &a_rhsevent )
 {
     if ( m_timestamp == a_rhsevent.m_timestamp )
@@ -290,9 +290,9 @@ event::operator>( const event &a_rhsevent )
 }
 
 
-bool 
+bool
 event::operator<( const event &a_rhsevent )
-{ 
+{
     if ( m_timestamp == a_rhsevent.m_timestamp )
     {
         return (get_rank() < a_rhsevent.get_rank());
@@ -303,21 +303,21 @@ event::operator<( const event &a_rhsevent )
     }
 }
 
-bool 
+bool
 event::operator<=( const unsigned long &a_rhslong )
-{ 
-    return (m_timestamp <= a_rhslong); 
-}   
+{
+    return (m_timestamp <= a_rhslong);
+}
 
 
 
-bool 
+bool
 event::operator>( const unsigned long &a_rhslong )
-{ 
-    return (m_timestamp > a_rhslong); 
-}   
+{
+    return (m_timestamp > a_rhslong);
+}
 
-void 
+void
 event::link( event *a_event )
 {
     m_has_link = true;
@@ -342,54 +342,54 @@ event::clear_link( )
     m_has_link = false;
 }
 
-void 
+void
 event::select( )
 {
     m_selected = true;
 }
 
-void 
+void
 event::unselect( )
 {
     m_selected = false;
 }
 
-bool 
+bool
 event::is_selected( )
 {
     return m_selected;
 }
-void 
+void
 event::paint( )
 {
     m_painted = true;
 }
 
-void 
+void
 event::unpaint( )
 {
     m_painted = false;
 }
 
-bool 
+bool
 event::is_painted( )
 {
     return m_painted;
 }
-    
-void 
+
+void
 event::mark( )
 {
     m_marked = true;
 }
 
-void 
+void
 event::unmark( )
 {
     m_marked = false;
 }
 
-bool 
+bool
 event::is_marked( )
 {
     return m_marked;
