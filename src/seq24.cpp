@@ -42,7 +42,6 @@
 static struct
 option long_options[] = {
 
-    {"file", required_argument, 0, 'f'},
     {"help", 0, 0, 'h'},
     {"showmidi", 0, 0, 's'},
     {"show_keys", 0, 0, 'k'},
@@ -123,7 +122,7 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "Cf:hi:jJmM:pPsSU:Vx:", long_options,
+        c = getopt_long(argc, argv, "C:hi:jJmM:pPsSU:Vx:", long_options,
                 &option_index);
 
         /* Detect the end of the options. */
@@ -135,11 +134,10 @@ main (int argc, char *argv[])
             case '?':
             case 'h':
 
-                printf( "Usage: seq24 [OPTIONS]\n\n" );
+                printf( "Usage: seq24 [OPTIONS] [FILENAME]\n\n" );
                 printf( "Options:\n" );
                 printf( "   -h, --help: show this message\n" );
                 printf( "   -v, --version: show program version information\n" );
-                printf( "   -f, --file <filename>: load midi file on startup\n" );
                 printf( "   -m, --manual_alsa_ports: seq24 won't attach alsa ports\n" );
                 printf( "   -s, --showmidi: dumps incoming midi events to screen\n" );
                 printf( "   -p, --priority: runs higher priority with FIFO scheduler (must be root)\n" );
@@ -150,7 +148,7 @@ main (int argc, char *argv[])
                 printf( "   -j, --jack_transport: seq24 will sync to jack transport\n" );
                 printf( "   -J, --jack_master: seq24 will try to be jack master\n" );
                 printf( "   -C, --jack_master_cond: jack master will fail if there is already a master\n" );
-                printf( "   -M, --jack_start_mode <x>: when seq24 is synced to jack, the following play\n" );
+                printf( "   -M, --jack_start_mode <mode>: when seq24 is synced to jack, the following play\n" );
                 printf( "                          modes are available (0 = live mode)\n");
                 printf( "                                              (1 = song mode) (default)\n" );
                 printf( "   -S, --stats: show statistics\n" );
@@ -205,10 +203,6 @@ main (int argc, char *argv[])
                 global_manual_alsa_ports = true;
                 break;
 
-            case 'f':
-                global_filename = Glib::ustring(optarg);
-                break;
-
             case 'i':
                 /* ignore alsa device */
                 global_device_ignore = true;
@@ -255,8 +249,8 @@ main (int argc, char *argv[])
     p_font_renderer = new font();
 
 
-    if ( getenv( HOME ) != NULL ){
-
+    if ( getenv( HOME ) != NULL )
+    {
         Glib::ustring home( getenv( HOME ));
         last_used_dir = home;
         Glib::ustring total_file = home + SLASH + config_filename;
@@ -277,24 +271,24 @@ main (int argc, char *argv[])
             printf( "Error Reading [%s]\n", total_file.c_str());
         }
 
-    } else {
-
-        printf( "Error calling getenv( \"%s\" )\n", HOME );
     }
+    else
+        printf( "Error calling getenv( \"%s\" )\n", HOME );
 
     p.init();
     p.launch_input_thread();
     p.launch_output_thread();
     p.init_jack();
 
-    if (global_filename != "") {
-        /* import that midi file */
-        midifile *f = new midifile(global_filename);
-        f->parse( &p, 0 );
-        delete f;
-    }
 
     mainwnd seq24_window( &p );
+    if (optind < argc)
+    {
+        if (Glib::file_test(argv[optind], Glib::FILE_TEST_EXISTS))
+            seq24_window.open_file(argv[optind]);
+        else
+            printf("File not found: %s", argv[optind]);
+    }
 
     /* connect to lash daemon and poll events*/
 #ifdef LASH_SUPPORT

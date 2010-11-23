@@ -116,7 +116,6 @@ class mainwnd : public Gtk::Window, public performcallback
     void file_save_as();
     void file_exit();
     void new_file();
-    void open_file(const Glib::ustring&);
     bool save_file();
     void choose_file();
     int query_save_changes();
@@ -130,6 +129,7 @@ class mainwnd : public Gtk::Window, public performcallback
     mainwnd(perform *a_p);
     ~mainwnd();
 
+    void open_file(const Glib::ustring&);
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);
     bool on_key_release_event(GdkEventKey* a_ev);
