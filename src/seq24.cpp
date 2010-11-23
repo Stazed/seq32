@@ -39,7 +39,7 @@
 #include "userfile.h"
 
 /* struct for command parsing */
-static struct 
+static struct
 option long_options[] = {
 
     {"file", required_argument, 0, 'f'},
@@ -62,7 +62,7 @@ option long_options[] = {
 
 };
 
-static const char versiontext[] = PACKAGE " " VERSION "\n"; 
+static const char versiontext[] = PACKAGE " " VERSION "\n";
 
 bool global_manual_alsa_ports = false;
 bool global_showmidi = false;
@@ -102,9 +102,18 @@ lash *lash_driver = NULL;
 #endif
 
 
-int 
+int
 main (int argc, char *argv[])
 {
+    /* Scan the argument vector and strip off all parameters known to
+     * GTK+. */
+    Gtk::Main kit(argc, argv);
+
+    /* Init the lash driver (strips lash specific command line
+     * arguments, but does not connect to daemon) */
+#ifdef LASH_SUPPORT
+    lash_driver = new lash(&argc, &argv);
+#endif
 
     /* parse parameters */
     int c;
@@ -114,7 +123,7 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "Cf:hi:jJmM:pPsSU:Vx:", long_options,
+        c = getopt_long(argc, argv, "Cf:hi:jJmM:pPsSU:Vx:", long_options,
                 &option_index);
 
         /* Detect the end of the options. */
@@ -240,18 +249,8 @@ main (int argc, char *argv[])
     }
 
 
-    /* init the lash driver (strips lash specific command line arguments) */
-#ifdef LASH_SUPPORT
-    lash_driver = new lash(&argc, &argv);
-#endif
-
-
     /* the main performance object */
-    perform p; 
-
-    /* all GTK applications must have a gtk_main(). Control ends here
-       and waits for an event to occur (like a key press or mouse event). */
-    Gtk::Main kit(argc, argv);
+    perform p;
 
     p_font_renderer = new font();
 
@@ -266,7 +265,7 @@ main (int argc, char *argv[])
         optionsfile options( total_file );
 
         if ( !options.parse( &p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());  
+            printf( "Error Reading [%s]\n", total_file.c_str());
         }
 
         total_file = home + SLASH + user_filename;
@@ -275,17 +274,15 @@ main (int argc, char *argv[])
         userfile user( total_file );
 
         if ( !user.parse( &p ) ){
-            printf( "Error Reading [%s]\n", total_file.c_str());  
+            printf( "Error Reading [%s]\n", total_file.c_str());
         }
 
     } else {
 
-        printf( "Error calling getenv( \"%s\" )\n", HOME );  
+        printf( "Error calling getenv( \"%s\" )\n", HOME );
     }
 
-
     p.init();
-
     p.launch_input_thread();
     p.launch_output_thread();
     p.init_jack();
@@ -299,8 +296,10 @@ main (int argc, char *argv[])
 
     mainwnd seq24_window( &p );
 
+    /* connect to lash daemon and poll events*/
 #ifdef LASH_SUPPORT
-    lash_driver->start( &p );
+    lash_driver->init(&p);
+    lash_driver->start();
 #endif
     kit.run(seq24_window);
 
@@ -315,11 +314,11 @@ main (int argc, char *argv[])
         optionsfile options( total_file );
 
         if (!options.write( &p))
-            printf( "Error writing [%s]\n", total_file.c_str());  
+            printf( "Error writing [%s]\n", total_file.c_str());
     }
     else
     {
-        printf( "Error calling getenv( \"%s\" )\n", HOME );  
+        printf( "Error calling getenv( \"%s\" )\n", HOME );
     }
 
 #ifdef LASH_SUPPORT
@@ -328,5 +327,4 @@ main (int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
-
 
