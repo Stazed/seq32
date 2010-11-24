@@ -15,8 +15,8 @@ New Features
 General Changes
   * Add mnemonics for bottom line widgets in main window and label for
     screen set name edit line
-  * Add missing command line parameters to help message, show also short
-    options
+  * Add missing command line parameters to help message, display short
+    options as well
   * Add command line option for program version
   * Add missing command line parameters to man page
   * Remove complaints about file read error if configuration files do not
