@@ -1,3 +1,162 @@
++++ Release 0.9.2 (2010-11-??) +++
+
+2010-11-24  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp, src/mainwnd.h: use initialization list for
+	members, close pipe on exit, use name label for sreen set name
+
+2010-11-23  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/seq24.cpp: read only existing configuration files
+
+2010-11-23  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/configfile.cpp, src/configfile.h, src/controllers.h,
+	src/event.cpp, src/event.h, src/font.cpp, src/font.h, src/globals.h,
+	src/maintime.cpp, src/maintime.h, src/mainwid.cpp, src/mainwid.h,
+	src/mainwnd.h, src/midibus.cpp, src/midibus.h,
+	src/midibus_portmidi.cpp, src/midibus_portmidi.h, src/midifile.cpp,
+	src/mutex.cpp, src/mutex.h, src/options.cpp, src/options.h,
+	src/optionsfile.cpp, src/optionsfile.h, src/perfedit.cpp,
+	src/perfedit.h, src/perfnames.cpp, src/perfnames.h, src/perform.cpp,
+	src/perform.h, src/perfroll.cpp, src/perfroll.h, src/seqdata.cpp,
+	src/seqdata.h, src/seqedit.cpp, src/seqedit.h, src/seqevent.cpp,
+	src/seqevent.h, src/seqkeys.cpp, src/seqkeys.h, src/seqmenu.cpp,
+	src/seqmenu.h, src/seqroll.cpp, src/seqroll.h, src/seqtime.cpp,
+	src/seqtime.h, src/sequence.cpp, src/sequence.h, src/userfile.cpp,
+	src/userfile.h: remove trailing whitespaces
+
+2010-11-23  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp, src/seq24.cpp: add missing line breaks
+
+2010-11-23  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* man/seq24.1, src/mainwnd.h, src/seq24.cpp: remove -f commandline
+	option to be replaced by a simple <filename> argument
+
+2010-11-23  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/lash.cpp, src/lash.h, src/seq24.cpp: fix lash connect to
+	start after command line parsing
+
+2010-11-22  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp, src/mainwnd.h: add interrupt handlers for
+	SIGINT and SIGUSR1 to enable LADISH level 1 support
+
+2010-11-22  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp: fix typo again
+
+2010-11-22  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/keybindentry.cpp, src/keybindentry.h, src/Makefile.am,
+	src/options.cpp: move keybindentry class to separate file
+
+2010-11-21  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp: fix typo
+
+2010-11-21  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/seq24.cpp: change short option for version to V, fix
+	compiler warning
+
+2010-11-20  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* man/seq24.1: add missing command line parameters to man page
+
+2010-11-20  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/seq24.cpp: add missing command line parameters to help
+	message, show also short options, add version option
+
+2010-11-20  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/lash.cpp, src/seq24.cpp: first parse command line before
+	anything else is done
+
+2010-11-20  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp: fix doubled key event for screen set name line
+	(notes edit line)
+
+2010-11-20  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp: rearrange bottom line item layout to get rid of
+	whitespace label spacing, add mnemonics for widgets
+
+2010-11-20  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp: rearrange bottom line item addition
+
+2010-11-14  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.cpp: rename box containers to make clear what they
+	are responsible for
+
+2010-11-11  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/mainwnd.h: remove doubled options header include
+
+2010-11-11  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/options.cpp: remove doubled "show_all()" call
+
+2010-11-11  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* INSTALL, configure.in, src/globals.h, src/perform.cpp,
+	src/perform.h, src/seq24.cpp: add support for jack session, patch
+	provided by Torben Hohn (slightly changed)
+
+2010-11-10  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/pixmaps/Makefile.am: add missing file
+
+2010-11-10  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/pixmaps, configure.in, src/Makefile.am, src/font.cpp,
+	src/mainwnd.cpp, src/perfedit.cpp, src/seqedit.cpp, src/bus.xpm,
+	src/pixmaps/bus.xpm, src/collapse.xpm, src/pixmaps/collapse.xpm,
+	src/copy.xpm, src/pixmaps/copy.xpm, src/down.xpm,
+	src/pixmaps/down.xpm, src/expand.xpm, src/pixmaps/expand.xpm,
+	src/font_b.xpm, src/pixmaps/font_b.xpm, src/font_w.xpm,
+	src/pixmaps/font_w.xpm, src/key.xpm, src/pixmaps/key.xpm,
+	src/learn.xpm, src/pixmaps/learn.xpm, src/learn2.xpm,
+	src/pixmaps/learn2.xpm, src/length.xpm, src/pixmaps/length.xpm,
+	src/loop.xpm, src/pixmaps/loop.xpm, src/menu_empty.xpm,
+	src/pixmaps/menu_empty.xpm, src/menu_full.xpm,
+	src/pixmaps/menu_full.xpm, src/midi.xpm, src/pixmaps/midi.xpm,
+	src/note_length.xpm, src/pixmaps/note_length.xpm, src/perfedit.xpm,
+	src/pixmaps/perfedit.xpm, src/play.xpm, src/pixmaps/play.xpm,
+	src/play2.xpm, src/pixmaps/play2.xpm, src/q_rec.xpm,
+	src/pixmaps/q_rec.xpm, src/quanize.xpm, src/pixmaps/quanize.xpm,
+	src/rec.xpm, src/pixmaps/rec.xpm, src/redo.xpm, src/pixmaps/redo.xpm,
+	src/scale.xpm, src/pixmaps/scale.xpm, src/seq-editor.xpm,
+	src/pixmaps/seq-editor.xpm, src/seq24.xpm, src/pixmaps/seq24.xpm,
+	src/seq24_32.xpm, src/pixmaps/seq24_32.xpm, src/sequences.xpm,
+	src/pixmaps/sequences.xpm, src/snap.xpm, src/pixmaps/snap.xpm,
+	src/song-editor.xpm, src/pixmaps/song-editor.xpm, src/stop.xpm,
+	src/pixmaps/stop.xpm, src/thru.xpm, src/pixmaps/thru.xpm,
+	src/tools.xpm, src/pixmaps/tools.xpm, src/undo.xpm,
+	src/pixmaps/undo.xpm, src/zoom.xpm, src/pixmaps/zoom.xpm: cleanup
+	pixmap files into separate directory
+
+2010-11-10  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/perform.cpp: fix sched_param memory leaks
+
+2010-11-10  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/options.cpp: fix typo
+
+2010-11-10  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/options.cpp, src/options.h: fix tooltip usage for older GTK
+	versions (GTK_MINOR_VERSION < 12)
+
+
 +++ Release 0.9.1 (2010-11-08) +++
 
 2010-11-08  Guido Scholz  <guido.scholz@bayernline.de>
