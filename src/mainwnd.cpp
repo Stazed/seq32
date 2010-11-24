@@ -46,12 +46,12 @@ bool is_pattern_playing = false;
 #   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
 #endif
 
-mainwnd::mainwnd(perform *a_p)
+mainwnd::mainwnd(perform *a_p):
+    m_mainperf(a_p),
+    m_modified(false),
+    m_options(NULL)
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq24_32_xpm));
-
-    /* set the performance */
-    m_mainperf = a_p;
 
     /* register for notification */
     m_mainperf->m_notify.push_back( this );
@@ -193,7 +193,7 @@ mainwnd::mainwnd(perform *a_p)
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
     add_tooltip( m_entry_notes, "Enter screen set name" );
-    Label* notelabel = manage(new Label("_Note", true));
+    Label* notelabel = manage(new Label("_Name", true));
     notelabel->set_mnemonic_widget(*m_entry_notes);
     notebox->pack_start(*notelabel, Gtk::PACK_SHRINK);
     notebox->pack_start(*m_entry_notes, Gtk::PACK_EXPAND_WIDGET);
@@ -250,10 +250,11 @@ mainwnd::mainwnd(perform *a_p)
     m_timeout_connect = Glib::signal_timeout().connect(
             mem_fun(*this, &mainwnd::timer_callback), 25);
 
-    m_modified = false;
 
     m_perf_edit = new perfedit( m_mainperf );
-    m_options = NULL;
+
+    m_sigpipe[0] = -1;
+    m_sigpipe[1] = -1;
     install_signal_handlers();
 }
 
@@ -262,6 +263,12 @@ mainwnd::~mainwnd()
 {
     delete m_perf_edit;
     delete m_options;
+
+    if (m_sigpipe[0] != -1)
+        close(m_sigpipe[0]);
+
+    if (m_sigpipe[1] != -1)
+        close(m_sigpipe[1]);
 }
 
 

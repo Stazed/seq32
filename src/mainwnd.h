@@ -53,6 +53,7 @@ class mainwnd : public Gtk::Window, public performcallback
 
  private:
 
+    perform  *m_mainperf;
     bool      m_modified;
     static int m_sigpipe[2];
 
@@ -64,7 +65,6 @@ class mainwnd : public Gtk::Window, public performcallback
     Menu     *m_menu_view;
     Menu     *m_menu_help;
 
-    perform  *m_mainperf;
 
     mainwid  *m_main_wid;
     maintime *m_main_time;
