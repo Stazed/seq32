@@ -1,4 +1,9 @@
-+++ Release 0.9.2 (2010-11-??) +++
++++ Release 0.9.2 (2010-11-27) +++
+
+2010-11-25  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* configure.in: remove unused variables, harmonize option
+	enabling/disabling
 
 2010-11-24  Guido Scholz  <guido.scholz@bayernline.de>
 
