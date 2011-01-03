@@ -1342,6 +1342,7 @@ void perform::output_func(void)
             stats_last_clock_us= (last.tv_sec * 1000000) + (last.tv_nsec / 1000);
 #else
         /* get start time position */
+        /* timeGetTime() returns a "DWORD" type (= unsigned long)*/
         last = timeGetTime();
 
         if ( global_stats )
