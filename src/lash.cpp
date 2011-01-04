@@ -29,6 +29,8 @@
 lash::lash(int *argc, char ***argv)
 {
 #ifdef LASH_SUPPORT
+   m_perform = NULL;
+   m_client = NULL;
    m_lash_args = lash_extract_args(argc, argv);
 #endif // LASH_SUPPORT
 }
