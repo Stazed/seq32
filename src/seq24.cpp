@@ -108,12 +108,6 @@ main (int argc, char *argv[])
      * GTK+. */
     Gtk::Main kit(argc, argv);
 
-    /* Init the lash driver (strips lash specific command line
-     * arguments, but does not connect to daemon) */
-#ifdef LASH_SUPPORT
-    lash_driver = new lash(&argc, &argv);
-#endif
-
     /*prepare global MIDI definitions*/
     for ( int i=0; i<c_maxBuses; i++ )
     {
@@ -128,7 +122,15 @@ main (int argc, char *argv[])
     }
 
 
+    /* Init the lash driver (strip lash specific command line
+     * arguments and connect to daemon) */
+#ifdef LASH_SUPPORT
+    lash_driver = new lash(&argc, &argv);
+#endif
+
     /* the main performance object */
+    /* lash must be initialized here because mastermidibus uses the global
+     * lash_driver variable*/
     perform p;
 
     /* read user preferences files */
@@ -300,8 +302,7 @@ main (int argc, char *argv[])
 
     /* connect to lash daemon and poll events*/
 #ifdef LASH_SUPPORT
-    lash_driver->init(&p);
-    lash_driver->start();
+    lash_driver->start(&p);
 #endif
     kit.run(seq24_window);
 

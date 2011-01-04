@@ -43,7 +43,6 @@ private:
 #ifdef LASH_SUPPORT
     perform       *m_perform;
     lash_client_t *m_client;
-    lash_args_t *m_lash_args;
 
     bool process_events();
     void handle_event(lash_event_t* conf);
@@ -54,13 +53,12 @@ private:
 public:
     lash(int *argc, char ***argv);
 
-    void init(perform* perform);
     void set_alsa_client_id(int id);
-    void start();
+    void start(perform* perform);
 };
 
 
-/* global lash driver, defined in seq24.cpp */
+/* global lash driver, defined in seq24.cpp and used in midibus.cpp*/
 extern lash *lash_driver;
 
 
