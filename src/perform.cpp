@@ -1524,14 +1524,12 @@ void perform::output_func(void)
                     /* printf( "current_tick[%lf] delta[%lf]\n", current_tick, jack_ticks_delta ); */
 
 
-                    long ptick, pbeat, pbar;
 
-                    pbar  = (long) ((long) m_jack_tick / (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
-
-                    pbeat = (long) ((long) m_jack_tick % (long) (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
+                    long pbeat = (long) ((long) m_jack_tick % (long) (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
                     pbeat = pbeat / (long) m_jack_pos.ticks_per_beat;
 
-                    ptick = (long) m_jack_tick % (long) m_jack_pos.ticks_per_beat;
+                    //long ptick = (long) m_jack_tick % (long) m_jack_pos.ticks_per_beat;
+                    //long pbar  = (long) ((long) m_jack_tick / (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
 
 
                     //printf( " bbb [%2d:%2d:%4d]", pbar+1, pbeat+1, ptick );
@@ -2213,7 +2211,7 @@ void jack_timebase_callback(jack_transport_state_t state,
         jack_position_t *pos, int new_pos, void *arg)
 {
     static double jack_tick;
-    static jack_nframes_t last_frame;
+    //static jack_nframes_t last_frame;
     static jack_nframes_t current_frame;
     static jack_transport_state_t state_current;
     static jack_transport_state_t state_last;
@@ -2249,7 +2247,7 @@ void jack_timebase_callback(jack_transport_state_t state,
             pos->beats_per_minute / (pos->frame_rate * 60.0);
 		
 		jack_tick = (jack_delta_tick < 0) ? -jack_delta_tick : jack_delta_tick;
-		last_frame = current_frame;
+		//last_frame = current_frame;
 		
 		long ptick = 0, pbeat = 0, pbar = 0;
 	
