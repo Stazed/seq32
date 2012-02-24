@@ -1,3 +1,10 @@
++++ Release 0.9.3 (2012-02-??) +++
+
+2012-02-24  Guido Scholz  <guido.scholz@bayernline.de>
+
+	* src/perform.*: Register empty process callback for JACK, patch
+	provided by Lieven Moors
+
 +++ Release 0.9.2 (2010-11-27) +++
 
 2010-11-25  Guido Scholz  <guido.scholz@bayernline.de>
