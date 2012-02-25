@@ -1219,7 +1219,7 @@ bool perform::jack_session_event()
     Glib::ustring fname( m_jsession_ev->session_dir );
     fname += "file.mid";
 
-    Glib::ustring cmd( "seq24 --file \"${SESSION_DIR}file.mid\" --jack_session_uuid " );
+    Glib::ustring cmd( "seq24 \"${SESSION_DIR}file.mid\" --jack_session_uuid " );
     cmd += m_jsession_ev->client_uuid;
 
     midifile f(fname);

@@ -1,5 +1,9 @@
 +++ Release 0.9.3 (2012-02-??) +++
 
+2012-02-25  Guido Scholz  <guido.scholz@bayernline.de>
+	* src/perform.*: Remove --file option from jack session
+	commandline, hint by Frank Kober
+
 2012-02-24  Guido Scholz  <guido.scholz@bayernline.de>
 	* src/perform.*: Register empty process callback for JACK, patch
 	provided by Lieven Moors

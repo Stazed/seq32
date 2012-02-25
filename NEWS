@@ -4,6 +4,7 @@ Fixed Bugs
   * Fix LASH support (crash on 64 Bit systems)
   * Fix broken JACK transport with newer jackd version
   * Fix clock tick drift
+  * Fix jack session commandline (obsolete --file option removed)
 
 
 seq24-0.9.2 (2010-11-27)
