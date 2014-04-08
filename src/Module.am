@@ -10,7 +10,8 @@ bin_PROGRAMS = %D%/seq24
 	%D%/configfile.cpp \
 	%D%/controllers.h \
 	%D%/event.cpp \
-	%D%/font.cpp font.h \
+	%D%/font.cpp \
+	%D%/font.h \
 	%D%/globals.h \
 	%D%/keybindentry.cpp \
 	%D%/lash.cpp \
