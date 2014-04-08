@@ -1,47 +1,73 @@
 # Makefile.am for seq24
 
-SUBDIRS = pixmaps
+SUBDIRS += %D%/pixmaps
 
 AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) -Wall
-seq24_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS)
+%C%_seq24_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS)
 
-bin_PROGRAMS = seq24
+bin_PROGRAMS = %D%/seq24
 
-seq24_SOURCES = \
-	configfile.cpp configfile.h \
-	controllers.h \
-	event.cpp event.h \
-	font.cpp font.h \
-	globals.h \
-	keybindentry.cpp keybindentry.h \
-	lash.cpp lash.h \
-	maintime.cpp maintime.h \
-	mainwid.cpp mainwid.h \
-	mainwnd.cpp mainwnd.h \
-	midibus.cpp midibus.h \
-	midibus_portmidi.cpp midibus_portmidi.h \
-	midifile.cpp midifile.h \
-	mutex.cpp mutex.h \
-	options.cpp options.h \
-	optionsfile.cpp optionsfile.h \
-	perfedit.cpp perfedit.h \
-	perfnames.cpp perfnames.h \
-	perform.cpp perform.h \
-	perfroll.cpp perfroll.h \
-	perfroll_input.cpp perfroll_input.h \
-	perftime.cpp perftime.h \
-	seq24.cpp \
-	seqdata.cpp seqdata.h \
-	seqedit.cpp seqedit.h \
-	seqevent.cpp seqevent.h \
-	seqkeys.cpp seqkeys.h \
-	seqmenu.cpp seqmenu.h \
-	seqroll.cpp seqroll.h \
-	seqtime.cpp seqtime.h \
-	sequence.cpp sequence.h \
-	userfile.cpp userfile.h
+%C%_seq24_SOURCES = \
+	%D%/configfile.cpp \
+	%D%/controllers.h \
+	%D%/event.cpp \
+	%D%/font.cpp font.h \
+	%D%/globals.h \
+	%D%/keybindentry.cpp \
+	%D%/lash.cpp \
+  %D%/configfile.h \
+  %D%/event.h \
+  %D%/keybindentry.h \
+  %D%/lash.h \
+  %D%/maintime.cpp \
+  %D%/maintime.h \
+  %D%/mainwid.cpp \
+  %D%/mainwid.h \
+  %D%/mainwnd.cpp \
+  %D%/mainwnd.h \
+  %D%/midibus.cpp \
+  %D%/midibus.h \
+  %D%/midibus_portmidi.cpp \
+  %D%/midibus_portmidi.h \
+  %D%/midifile.cpp \
+  %D%/midifile.h \
+  %D%/mutex.cpp \
+  %D%/mutex.h \
+  %D%/options.cpp \
+  %D%/options.h \
+  %D%/optionsfile.cpp \
+  %D%/optionsfile.h \
+  %D%/perfedit.cpp \
+  %D%/perfedit.h \
+  %D%/perfnames.cpp \
+  %D%/perfnames.h \
+  %D%/perform.cpp \
+  %D%/perform.h \
+  %D%/perfroll.cpp \
+  %D%/perfroll.h \
+  %D%/perfroll_input.cpp \
+  %D%/perfroll_input.h \
+  %D%/perftime.cpp \
+  %D%/perftime.h \
+  %D%/seq24.cpp \
+  %D%/seqdata.cpp \
+  %D%/seqdata.h \
+  %D%/seqedit.cpp \
+  %D%/seqedit.h \
+  %D%/seqevent.cpp \
+  %D%/seqevent.h \
+  %D%/seqkeys.cpp \
+  %D%/seqkeys.h \
+  %D%/seqmenu.cpp \
+  %D%/seqmenu.h \
+  %D%/seqroll.cpp \
+  %D%/seqroll.h \
+  %D%/seqtime.cpp \
+  %D%/seqtime.h \
+  %D%/sequence.cpp \
+  %D%/sequence.h \
+  %D%/userfile.cpp \
+  %D%/userfile.h
 
-EXTRA_DIST = configwin32.h
-
-MOSTLYCLEANFILES = *~
+EXTRA_DIST += %D%/configwin32.h
 
