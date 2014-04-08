@@ -968,7 +968,6 @@ bool FruitySeqEventInput::on_button_release_event(GdkEventButton* a_ev, seqevent
     long tick_f;
 
     int x,w;
-    int numsel;
 
     ths.grab_focus( );
 
@@ -1022,7 +1021,7 @@ bool FruitySeqEventInput::on_button_release_event(GdkEventButton* a_ev, seqevent
                 (a_ev->state & GDK_CONTROL_MASK))
             {
                 // deselect the event
-                numsel = ths.m_seq->select_events( t_s, t_f,
+                ths.m_seq->select_events( t_s, t_f,
                                                   ths.m_status, ths.m_cc,
                                                   sequence::e_deselect );
             }
@@ -1052,7 +1051,7 @@ bool FruitySeqEventInput::on_button_release_event(GdkEventButton* a_ev, seqevent
             ths.convert_x( x,   &tick_s );
             ths.convert_x( x+w, &tick_f );
 
-            numsel = ths.m_seq->select_events( tick_s, tick_f,
+            ths.m_seq->select_events( tick_s, tick_f,
                                             ths.m_status,
                                             ths.m_cc, sequence::e_toggle_selection );
         }
@@ -1292,7 +1291,6 @@ bool Seq24SeqEventInput::on_button_release_event(GdkEventButton* a_ev, seqevent&
     long tick_f;
 
     int x,w;
-    int numsel;
 
     ths.grab_focus( );
 
@@ -1314,7 +1312,7 @@ bool Seq24SeqEventInput::on_button_release_event(GdkEventButton* a_ev, seqevent&
             ths.convert_x( x,   &tick_s );
             ths.convert_x( x+w, &tick_f );
 
-            numsel = ths.m_seq->select_events( tick_s, tick_f,
+            ths.m_seq->select_events( tick_s, tick_f,
                     ths.m_status,
                     ths.m_cc, sequence::e_select );
         }

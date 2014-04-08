@@ -138,12 +138,10 @@ seqmenu::mute_all_tracks( void )
 void
 seqmenu::seq_edit(){
 
-    seqedit *seq_edit;
-
     if ( m_mainperf->is_active( m_current_seq )) {
         if ( !m_mainperf->get_sequence( m_current_seq )->get_editing())
         {
-            seq_edit = new seqedit( m_mainperf->get_sequence( m_current_seq ),
+            new seqedit( m_mainperf->get_sequence( m_current_seq ),
                     m_mainperf,
                     m_current_seq
                     );
@@ -154,7 +152,7 @@ seqmenu::seq_edit(){
     }
     else {
         this->seq_new();
-        seq_edit = new seqedit( m_mainperf->get_sequence( m_current_seq ),
+        new seqedit( m_mainperf->get_sequence( m_current_seq ),
                 m_mainperf,
                 m_current_seq
                 );

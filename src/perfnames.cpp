@@ -317,8 +317,6 @@ perfnames::on_size_allocate(Gtk::Allocation &a_r )
 void
 perfnames::redraw_dirty_sequences( void )
 {
-    bool draw = false;
-
     int y_s = 0;
     int y_f = m_window_y / c_names_y;
 
@@ -333,7 +331,6 @@ perfnames::redraw_dirty_sequences( void )
                 if (dirty)
                 {
                     draw_sequence( seq );
-                    draw = true;
                 }
         }
     }
