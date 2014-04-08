@@ -1,0 +1,38 @@
+# Makefile.am for seq24
+
+EXTRA_DIST += \
+	%D%/bus.xpm \
+  %D%/collapse.xpm \
+  %D%/copy.xpm \
+  %D%/down.xpm \
+  %D%/expand.xpm \
+  %D%/font_b.xpm \
+  %D%/font_w.xpm \
+  %D%/key.xpm \
+  %D%/learn2.xpm \
+  %D%/learn.xpm \
+  %D%/length.xpm \
+  %D%/loop.xpm \
+  %D%/menu_empty.xpm \
+  %D%/menu_full.xpm \
+  %D%/midi.xpm \
+  %D%/note_length.xpm \
+  %D%/perfedit.xpm \
+  %D%/play2.xpm \
+  %D%/play.xpm \
+  %D%/q_rec.xpm \
+  %D%/quanize.xpm \
+  %D%/rec.xpm \
+  %D%/redo.xpm \
+  %D%/scale.xpm \
+  %D%/seq24_32.xpm \
+  %D%/seq24.xpm \
+  %D%/seq-editor.xpm \
+  %D%/sequences.xpm \
+  %D%/snap.xpm \
+  %D%/song-editor.xpm \
+  %D%/stop.xpm \
+  %D%/thru.xpm \
+  %D%/tools.xpm \
+  %D%/undo.xpm \
+  %D%/zoom.xpm

@@ -4,10 +4,9 @@ AC_INIT(seq24, [0.9.2], [seq24-devel@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([src/event.cpp])
 AC_CONFIG_HEADER([src/config.h])
 
-AM_INIT_AUTOMAKE([dist-bzip2])
+AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects])
 
 AC_DEFINE(_GNU_SOURCE, 1, [gnu source])
-
 
 dnl Checks for programs.
 AC_PROG_AWK
@@ -140,5 +139,5 @@ else
 fi
 
 
-AC_OUTPUT(Makefile man/Makefile src/Makefile src/pixmaps/Makefile)
+AC_OUTPUT(Makefile)
 
