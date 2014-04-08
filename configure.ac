@@ -139,5 +139,5 @@ else
 fi
 
 
-AC_OUTPUT(Makefile man/Makefile)
+AC_OUTPUT(Makefile)
 
