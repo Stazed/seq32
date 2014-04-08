@@ -8,10 +8,6 @@ AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects])
 
 AC_DEFINE(_GNU_SOURCE, 1, [gnu source])
 
-dnl Declare shared variables
-AC_SUBST([EXTRA_DIST], [''])
-AC_SUBST([SUBDIRS], [''])
-
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
@@ -143,5 +139,5 @@ else
 fi
 
 
-AC_OUTPUT(Makefile man/Makefile src/Makefile src/pixmaps/Makefile)
+AC_OUTPUT(Makefile man/Makefile)
 

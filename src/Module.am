@@ -1,7 +1,6 @@
 # Makefile.am for seq24
 
-SUBDIRS += %D%/pixmaps
-
+include %D%/pixmaps/Module.am
 AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) -Wall
 %C%_seq24_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS)
 
