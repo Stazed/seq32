@@ -66,6 +66,8 @@ seqevent::seqevent(sequence *a_seq,
 
     set_size_request( 10, c_eventarea_y );
     set_double_buffered( false );
+
+    memset(&m_old, 0, sizeof m_old);
 }
 
 void

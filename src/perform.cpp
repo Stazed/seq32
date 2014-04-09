@@ -39,10 +39,16 @@ perform::perform()
 
         m_seqs[i] = NULL;
         m_seqs_active[i] = false;
+
+        m_was_active_main[i] = false;
+        m_was_active_edit[i] = false;
+        m_was_active_perf[i] = false;
+        m_was_active_names[i] = false;
     }
 
     m_mute_group_selected = 0;
     m_mode_group = true;
+    m_mode_group_learn = false;
     m_running = false;
     m_looping = false;
     m_inputing = true;
@@ -164,6 +170,8 @@ perform::perform()
 
     m_out_thread_launched = false;
     m_in_thread_launched = false;
+
+    m_playback_mode = false;
 }
 
 
