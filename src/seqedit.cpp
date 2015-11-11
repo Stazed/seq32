@@ -72,11 +72,19 @@ const int select_inverse_events = 4;
 const int quantize_notes    = 5;
 const int quantize_events   = 6;
 
+const int randomize_events   = 7;
+
 const int tighten_events   =  8;
 const int tighten_notes    =  9;
 
 const int transpose     = 10;
 const int transpose_h   = 12;
+
+const int expand_pattern   = 13;
+const int compress_pattern = 14;
+
+const int select_even_notes = 15;
+const int select_odd_notes  = 16;
 
 /* connects to a menu item, tells the performance
    to launch the timer thread */
@@ -529,6 +537,30 @@ seqedit::popup_tool_menu( void )
                 sigc::bind(mem_fun(*this, &seqedit::do_action),
                     select_inverse_notes, 0)));
 
+    holder->items().push_back( MenuElem( "Even 1/4 Note Beats",
+                sigc::bind(mem_fun(*this, &seqedit::do_action),
+                    select_even_notes, c_ppqn)));
+
+    holder->items().push_back( MenuElem( "Odd 1/4 Note Beats",
+                sigc::bind(mem_fun(*this, &seqedit::do_action),
+                    select_odd_notes, c_ppqn)));
+
+    holder->items().push_back( MenuElem( "Even 1/8 Note Beats",
+                sigc::bind(mem_fun(*this, &seqedit::do_action),
+                    select_even_notes, c_ppen)));
+
+    holder->items().push_back( MenuElem( "Odd 1/8 Note Beats",
+                sigc::bind(mem_fun(*this, &seqedit::do_action),
+                    select_odd_notes, c_ppen)));
+
+    holder->items().push_back( MenuElem( "Even 1/16 Note Beats",
+                sigc::bind(mem_fun(*this, &seqedit::do_action),
+                    select_even_notes, c_ppsn)));
+
+    holder->items().push_back( MenuElem( "Odd 1/16 Note Beats",
+                sigc::bind(mem_fun(*this, &seqedit::do_action),
+                    select_odd_notes, c_ppsn)));
+
     if ( m_editing_status !=  EVENT_NOTE_ON &&
          m_editing_status !=  EVENT_NOTE_OFF ){
 
@@ -566,6 +598,16 @@ seqedit::popup_tool_menu( void )
                         tighten_events,0 )));
 
     }
+
+    holder->items().push_back( SeparatorElem( ));
+    holder->items().push_back( MenuElem( "Expand Pattern (double)",
+                sigc::bind(mem_fun(*this, &seqedit::do_action),
+                    expand_pattern,0 )));
+
+    holder->items().push_back( MenuElem( "Compress Pattern (halve)",
+                sigc::bind(mem_fun(*this, &seqedit::do_action),
+                    compress_pattern,0 )));
+
     m_menu_tools->items().push_back( MenuElem( "Modify Time", *holder ));
 
 
@@ -603,6 +645,16 @@ seqedit::popup_tool_menu( void )
     }
 
     m_menu_tools->items().push_back( MenuElem( "Modify Pitch", *holder ));
+
+    holder = manage( new Menu());
+    for ( int i=1; i<17; ++i) {
+        snprintf(num, sizeof(num), "+/- %d", i);
+        holder->items().push_back( MenuElem( num,
+                    sigc::bind(mem_fun(*this,&seqedit::do_action),
+                        randomize_events, i )));
+    }
+    m_menu_tools->items().push_back( MenuElem( "Randomize Event Values", *holder ));
+
     m_menu_tools->popup(0,0);
 }
 
@@ -630,6 +682,19 @@ seqedit::do_action( int a_action, int a_var )
             m_seq->select_events(m_editing_status, m_editing_cc, true);
             break;
             // !!! m_seq->push_undo();
+
+        case select_even_notes:
+            m_seq->select_even_or_odd_notes(a_var, true);
+            break;
+
+        case select_odd_notes:
+            m_seq->select_even_or_odd_notes(a_var, false);
+            break;
+
+        case randomize_events:
+            m_seq->push_undo();
+            m_seq->randomize_selected(m_editing_status, m_editing_cc, a_var);
+            break;
 
         case quantize_notes:
             m_seq->push_undo();
@@ -659,6 +724,16 @@ seqedit::do_action( int a_action, int a_var )
         case transpose_h:
             m_seq->push_undo();
             m_seq->transpose_notes(a_var, m_scale);
+            break;
+
+        case expand_pattern:
+            m_seq->push_undo();
+            m_seq->multiply_pattern(2.0);
+            break;
+
+        case compress_pattern:
+            m_seq->push_undo();
+            m_seq->multiply_pattern(0.5);
             break;
 
         default:
@@ -1098,7 +1173,7 @@ seqedit::popup_event_menu( void )
         switch( status ){
             case EVENT_NOTE_OFF:
                 note_off = true;
-                break;	
+                break;
             case EVENT_NOTE_ON:
                 note_on = true;
                 break;
@@ -1398,7 +1473,7 @@ void
 seqedit::undo_callback( void )
 {
 	m_seq->pop_undo( );
- 	
+
 	m_seqroll_wid->redraw();
 	m_seqtime_wid->redraw();
 	m_seqdata_wid->redraw();
@@ -1410,7 +1485,7 @@ void
 seqedit::redo_callback( void )
 {
 	m_seq->pop_redo( );
- 	
+
 	m_seqroll_wid->redraw();
 	m_seqtime_wid->redraw();
 	m_seqdata_wid->redraw();

@@ -515,7 +515,7 @@ seqroll::update_pixmap()
 
 void
 seqroll::draw_progress_on_window()
-{	
+{
     m_window->draw_drawable(m_gc,
             m_pixmap,
             m_old_progress_x,
@@ -527,7 +527,7 @@ seqroll::draw_progress_on_window()
 
     m_old_progress_x = (m_seq->get_last_tick() / m_zoom) - m_scroll_offset_x;
 
-    if ( m_old_progress_x != 0 ){	
+    if ( m_old_progress_x != 0 ){
 
         m_gc->set_foreground(m_black);
         m_window->draw_line(m_gc,
@@ -929,7 +929,7 @@ seqroll::start_paste( )
      m_selected.x += m_drop_x;
      m_selected.y += (m_drop_y - m_selected.y);
 }
-	
+
 
 bool
 seqroll::on_button_press_event(GdkEventButton* a_ev)
@@ -1134,7 +1134,7 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
                 m_seq->select_all();
                 ret = true;
             }
-	
+
         }
     }
 
@@ -1312,7 +1312,7 @@ bool FruitySeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& th
                 {
                     /* add note, length = little less than snap */
                     ths.m_seq->push_undo();
-                    ths.m_seq->add_note( tick_s, ths.m_note_length - 2, note_h, true );
+                    ths.m_seq->add_note( tick_s, ths.m_note_length - c_note_off_margin, note_h, true );
 
                     needs_update = true;
                 }
@@ -1725,7 +1725,7 @@ bool FruitySeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& t
         ths.snap_x( &ths.m_current_x );
         ths.convert_xy( ths.m_current_x, ths.m_current_y, &tick, &note );
 
-        ths.m_seq->add_note( tick, ths.m_note_length - 2, note, true );
+        ths.m_seq->add_note( tick, ths.m_note_length - c_note_off_margin, note, true );
         return true;
     }
 
@@ -1840,7 +1840,7 @@ bool Seq24SeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths
 
                     /* add note, length = little less than snap */
                     ths.m_seq->push_undo();
-                    ths.m_seq->add_note( tick_s, ths.m_note_length - 2, note_h, true );
+                    ths.m_seq->add_note( tick_s, ths.m_note_length - c_note_off_margin, note_h, true );
 
                     needs_update = true;
                 }
@@ -2096,7 +2096,7 @@ bool Seq24SeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& th
         ths.snap_x( &ths.m_current_x );
         ths.convert_xy( ths.m_current_x, ths.m_current_y, &tick, &note );
 
-        ths.m_seq->add_note( tick, ths.m_note_length - 2, note, true );
+        ths.m_seq->add_note( tick, ths.m_note_length - c_note_off_margin, note, true );
         return true;
     }
 

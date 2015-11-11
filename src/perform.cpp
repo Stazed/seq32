@@ -650,7 +650,7 @@ bool perform::is_running( void )
 
 void perform::set_bpm(int a_bpm)
 {
-    if ( a_bpm < 20 )  a_bpm = 20;
+    if ( a_bpm < 5 )  a_bpm = 5;
     if ( a_bpm > 500 ) a_bpm = 500;
 
     if ( ! (m_jack_running && m_running )){
@@ -796,7 +796,7 @@ void perform::play( long a_tick )
 
     //printf( "play [%d]\n", a_tick );
 
-    m_tick = a_tick;	
+    m_tick = a_tick;
     for (int i=0; i< c_max_sequence; i++ ){
 
         if ( is_active(i) ){
@@ -1605,7 +1605,7 @@ void perform::output_func(void)
                 m_master_bus.clock( clock_tick );
 
 
-                if ( global_stats ){	
+                if ( global_stats ){
 
                     while ( stats_total_tick <= total_tick ){
 
@@ -1700,7 +1700,7 @@ void perform::output_func(void)
             }
 
             if ( global_stats ){
-#ifndef __WIN32__	
+#ifndef __WIN32__
                 clock_gettime(CLOCK_REALTIME, &stats_loop_finish);
 #else
                 stats_loop_finish = timeGetTime();
@@ -1729,7 +1729,7 @@ void perform::output_func(void)
                     stats_min = delta_us;
 
                 stats_avg += delta_us;
-                stats_loop_index++;	
+                stats_loop_index++;
 
                 if ( stats_loop_index > 200 ){
 
@@ -2112,7 +2112,7 @@ void perform::sequence_playing_toggle( int a_sequence )
         else {
 
             if (  m_control_status & c_status_replace ){
-                unset_sequence_control_status( c_status_replace );	
+                unset_sequence_control_status( c_status_replace );
                 off_sequences( );
             }
 
@@ -2257,12 +2257,12 @@ void jack_timebase_callback(jack_transport_state_t state,
             (current_frame) *
             pos->ticks_per_beat *
             pos->beats_per_minute / (pos->frame_rate * 60.0);
-		
+
 		jack_tick = (jack_delta_tick < 0) ? -jack_delta_tick : jack_delta_tick;
 		//last_frame = current_frame;
-		
+
 		long ptick = 0, pbeat = 0, pbar = 0;
-	
+
 		pbar  = (long) ((long) jack_tick / (pos->ticks_per_beat *  pos->beats_per_bar ));
 
 		pbeat = (long) ((long) jack_tick % (long) (pos->ticks_per_beat *  pos->beats_per_bar ));
@@ -2297,7 +2297,7 @@ void print_jack_pos( jack_position_t* jack_pos ){
     return;
     printf( "print_jack_pos()\n" );
     printf( "    bar  [%d]\n", jack_pos->bar  );
-    printf( "    beat [%d]\n", jack_pos->beat );		
+    printf( "    beat [%d]\n", jack_pos->beat );
     printf( "    tick [%d]\n", jack_pos->tick );
     printf( "    bar_start_tick   [%lf]\n", jack_pos->bar_start_tick );
     printf( "    beats_per_bar    [%f]\n", jack_pos->beats_per_bar );

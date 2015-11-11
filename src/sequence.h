@@ -359,6 +359,13 @@ class sequence
 
     void select_all (void);
 
+    /* given a note length (in ticks) and a boolean indicating even or odd,
+    select all notes where the note on even occurs exactly on an even (or odd)
+    multiple of note length.
+    Example use: select every note that starts on an even eighth note beat.
+    */
+    int select_even_or_odd_notes(int note_len, bool even);
+
     void copy_selected (void);
     void paste_selected (long a_tick, int a_note);
 
@@ -392,6 +399,8 @@ class sequence
     /* moves note off event */
     void increment_selected (unsigned char a_status, unsigned char a_control);
     void decrement_selected (unsigned char a_status, unsigned char a_control);
+
+    void randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus );
 
     /* moves note off event */
     void grow_selected (long a_delta_tick);
@@ -464,6 +473,7 @@ class sequence
 			 long a_snap_tick, int a_divide, bool a_linked =
 			 false);
     void transpose_notes (int a_steps, int a_scale);
+    void multiply_pattern( float a_multiplier );
 };
 
 #endif
