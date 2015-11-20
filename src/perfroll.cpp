@@ -89,7 +89,7 @@ void
 perfroll::change_horz( )
 {
     if ( m_4bar_offset != (int) m_hadjust->get_value() ){
-	
+
 	m_4bar_offset = (int) m_hadjust->get_value();
 	queue_draw();
     }
@@ -99,7 +99,7 @@ void
 perfroll::change_vert( )
 {
     if ( m_sequence_offset != (int) m_vadjust->get_value() ){
-	
+
 	m_sequence_offset = (int) m_vadjust->get_value();
 	queue_draw();
     }
@@ -206,7 +206,7 @@ perfroll::fill_background_pixmap()
     m_gc->set_foreground(m_grey);
 
     gint8 dash = 1;
-    m_gc->set_dashes( 0, &dash, 1 );  	
+    m_gc->set_dashes( 0, &dash, 1 );
 
     m_gc->set_line_attributes( 1,
                                Gdk::LINE_ON_OFF_DASH,
@@ -237,7 +237,7 @@ perfroll::fill_background_pixmap()
                                        Gdk::CAP_NOT_LAST,
                                        Gdk::JOIN_MITER );
         }
-	
+
         m_gc->set_foreground(m_grey);
 
  	/* solid line on every beat */
@@ -325,24 +325,24 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
 	if ( m_mainperf->is_active( a_sequence )){
 
             m_sequence_active[a_sequence] = true;
-	
+
 	    sequence *seq =  m_mainperf->get_sequence( a_sequence );
-	
+
 	    seq->reset_draw_trigger_marker();
-	
+
 	    a_sequence -= m_sequence_offset;
 
 	    long sequence_length = seq->get_length();
 	    int length_w = sequence_length / c_perf_scale_x;
-	
+
 	    while ( seq->get_next_trigger( &tick_on, &tick_off, &selected, &offset  )){
-	
+
                 if ( tick_off > 0 ){
 
 		    long x_on  = tick_on  / c_perf_scale_x;
 		    long x_off = tick_off / c_perf_scale_x;
 		    int  w     = x_off - x_on + 1;
-		
+
 		    int x = x_on;
 		    int y = c_names_y * a_sequence + 1;  // + 2
 		    int h = c_names_y - 2; // - 4
@@ -360,7 +360,7 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
 					   y,
 					   w,
 					   h );
-		
+
 		    m_gc->set_foreground(m_black);
 		    a_draw->draw_rectangle(m_gc,false,
 					   x,
@@ -413,7 +413,7 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
                         long tick_s;
                         long tick_f;
                         int note;
-	
+
                         bool selected;
 
                         int velocity;
@@ -424,7 +424,7 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
                         m_gc->set_foreground(m_black);
                         while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note,
                                                                 &selected, &velocity )) != DRAW_FIN ){
-	
+
                             int note_y = ((c_names_y-6) -
                                 ((c_names_y-6)  * (note - lowest_note)) / height) + 1;
 
@@ -528,7 +528,7 @@ perfroll::on_expose_event(GdkEventExpose* e)
 
         /*
 	for ( int x=x_s; x<=x_f; x++ ){
-	
+
 	    m_pixmap->draw_drawable(m_gc, m_background,
 				 0,
 				 0,

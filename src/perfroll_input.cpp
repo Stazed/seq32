@@ -71,16 +71,23 @@ bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
         on_right_button_pressed(a_ev, ths);
     }
 
-    /* left-ctrl, or middle: split */
+    /* middle: split or paste */
     if ( a_ev->button == 2 )
     {
+        long tick = ths.m_drop_tick;
+        tick = tick - tick % ths.m_snap; // grid snap
+
         if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
 
-            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( ths.m_drop_tick );
+            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state(tick);
 
-            if ( state )
+            if ( state )    // clicked on trigger - split trigger
             {
-                ths.split_trigger(ths.m_drop_sequence, ths.m_drop_tick);
+                ths.split_trigger(ths.m_drop_sequence, tick);
+            }
+            else    // clicked on track (off trigger) - paste
+            {
+                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_trigger_paste_tick(tick);
             }
         }
     }
@@ -91,15 +98,23 @@ bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 
 void FruityPerfInput::on_left_button_pressed(GdkEventButton* a_ev, perfroll& ths)
 {
+    /* left-ctrl: split or paste */
     if ( a_ev->state & GDK_CONTROL_MASK )
     {
+        long tick = ths.m_drop_tick;
+        tick = tick - tick % ths.m_snap; // grid snap
+
         if ( ths.m_mainperf->is_active( ths.m_drop_sequence ))
         {
-            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( ths.m_drop_tick );
+            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state(tick);
 
-            if ( state )
+            if ( state )    // clicked on trigger - split
             {
-                ths.split_trigger(ths.m_drop_sequence, ths.m_drop_tick);
+                ths.split_trigger(ths.m_drop_sequence, tick);
+            }
+            else // clicked off trigger for paste
+            {
+                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_trigger_paste_tick(tick);
             }
         }
     }
@@ -415,16 +430,25 @@ bool Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
         set_adding( true, ths );
     }
 
-    /* middle, split */
+    /* middle, split :or setting the paste location of copy/paste */
     if ( a_ev->button == 2 )
     {
+        long tick = ths.m_drop_tick;
+        tick = tick - tick % ths.m_snap; // grid snap
+
         if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
 
-            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state( ths.m_drop_tick );
+            ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_trigger_paste_tick(tick); // for paste
 
-            if ( state )
+            bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state(tick);
+
+            if ( state )     // clicked on trigger for split
             {
-                ths.split_trigger(ths.m_drop_sequence, ths.m_drop_tick);
+                ths.split_trigger(ths.m_drop_sequence, tick);
+            }
+            else    // clicked off trigger for paste
+            {
+                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_trigger_paste_tick(tick);
             }
         }
     }

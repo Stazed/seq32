@@ -54,6 +54,8 @@ sequence::sequence( ) :
 
     m_trigger_offset(0),
 
+    m_paste_tick(-1),
+
     m_length(4 * c_ppqn),
     m_snap_tick(c_ppqn / 4),
 
@@ -2310,8 +2312,8 @@ L       R
 
 #endif
 
-    void
-    sequence::copy_triggers( long a_start_tick,
+void
+sequence::copy_triggers( long a_start_tick,
                              long a_distance  )
 {
 
@@ -2382,13 +2384,14 @@ sequence::split_trigger( long a_tick )
         if ( (*i).m_tick_start <= a_tick &&
              (*i).m_tick_end >= a_tick )
         {
-            //printf( "split trigger %ld %ld\n", (*i).m_tick_start, (*i).m_tick_end );
+            //printf( "split trigger %ld %ld\n a_tick = %ld\n", (*i).m_tick_start, (*i).m_tick_end, a_tick);
             {
-                long tick = (*i).m_tick_end - (*i).m_tick_start;
-                tick += 1;
-                tick /= 2;
+                //long tick = (*i).m_tick_end - (*i).m_tick_start;    // finds the total distance to divide in middle
+                //tick += 1;
+                //tick /= 2;
 
-                split_trigger(*i, (*i).m_tick_start + tick);
+                //split_trigger(*i, (*i).m_tick_start + tick);
+                split_trigger(*i, a_tick);
                 break;
             }
         }
@@ -2784,6 +2787,7 @@ sequence::cut_selected_trigger( void )
 void
 sequence::copy_selected_trigger( void )
 {
+    set_trigger_paste_tick(-1); // clear any unpasted middle click
     lock();
 
     list<trigger>::iterator i;
@@ -2807,19 +2811,45 @@ sequence::paste_trigger( void )
     if ( m_trigger_copied ){
         long length =  m_trigger_clipboard.m_tick_end -
             m_trigger_clipboard.m_tick_start + 1;
-        // paste at copy end
-        add_trigger( m_trigger_clipboard.m_tick_end + 1,
+        // paste at copy end or get_trigger_paste_tick
+        if(get_trigger_paste_tick() < 0)    // < 0 means no paste tick set so use default
+        {
+            add_trigger( m_trigger_clipboard.m_tick_end + 1,
                      length,
                      m_trigger_clipboard.m_offset + length );
 
-        m_trigger_clipboard.m_tick_start = m_trigger_clipboard.m_tick_end +1;
-        m_trigger_clipboard.m_tick_end = m_trigger_clipboard.m_tick_start + length - 1;
+            m_trigger_clipboard.m_tick_start = m_trigger_clipboard.m_tick_end +1;
+            m_trigger_clipboard.m_tick_end = m_trigger_clipboard.m_tick_start + length - 1;
 
-        m_trigger_clipboard.m_offset += length;
-        m_trigger_clipboard.m_offset = adjust_offset(m_trigger_clipboard.m_offset);
+            m_trigger_clipboard.m_offset += length;
+            m_trigger_clipboard.m_offset = adjust_offset(m_trigger_clipboard.m_offset);
+        }else
+        {
+            long offset_adjust = get_trigger_paste_tick() - m_trigger_clipboard.m_tick_start;
+            add_trigger(get_trigger_paste_tick(),
+                     length,
+                     m_trigger_clipboard.m_offset + offset_adjust); // +/- distance to paste tick from start
+
+            m_trigger_clipboard.m_tick_start = get_trigger_paste_tick();
+            m_trigger_clipboard.m_tick_end = m_trigger_clipboard.m_tick_start + length - 1;
+            m_trigger_clipboard.m_offset += offset_adjust;
+            m_trigger_clipboard.m_offset = adjust_offset(m_trigger_clipboard.m_offset);
+            set_trigger_paste_tick(-1); // reset to default
+        }
     }
 }
 
+void
+sequence::set_trigger_paste_tick(long a_tick)
+{
+    m_paste_tick = a_tick;
+}
+
+long
+sequence::get_trigger_paste_tick(void)
+{
+    return m_paste_tick;
+}
 
 /* this refreshes the play marker to the LastTick */
 void

@@ -141,6 +141,8 @@ class sequence
 
     long m_trigger_offset;
 
+    long m_paste_tick;
+
     /* length of sequence in pulses
        should be powers of two in bars */
     long m_length;
@@ -313,6 +315,9 @@ class sequence
     void cut_selected_trigger( void );
     void copy_selected_trigger( void );
     void paste_trigger( void );
+
+    void set_trigger_paste_tick(long a_tick);
+    long get_trigger_paste_tick( void );
 
     void move_selected_triggers_to(long a_tick, bool a_adjust_offset, int a_which=2);
     long get_selected_trigger_start_tick( void );
