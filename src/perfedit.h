@@ -122,8 +122,6 @@ class perfedit:public Gtk::Window
     int m_bpm;
     int m_bw;
 
-    void set_bpm( int a_beats_per_measure );
-    void set_bw( int a_beat_width );
     void set_snap (int a_snap);
 
     void set_guides( void );
@@ -152,6 +150,10 @@ class perfedit:public Gtk::Window
   public:
 
     void init_before_show ();
+    void set_bpm( int a_beats_per_measure );
+    int get_bpm();
+    void set_bw( int a_beat_width );
+    int get_bw();
 
     perfedit (perform * a_perf);
     ~perfedit ();

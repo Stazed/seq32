@@ -172,6 +172,9 @@ perform::perform()
     m_in_thread_launched = false;
 
     m_playback_mode = false;
+
+    m_bp_measure = 4;
+    m_bw = 4;
 }
 
 
@@ -664,6 +667,25 @@ int  perform::get_bpm( )
     return  m_master_bus.get_bpm( );
 }
 
+void perform::set_bp_measure(int a_bp_mes)
+{
+    m_bp_measure = a_bp_mes;
+}
+
+int perform::get_bp_measure( )
+{
+    return m_bp_measure;
+}
+
+void perform::set_bw(int a_bw)
+{
+    m_bw = a_bw;
+}
+
+int perform::get_bw( )
+{
+    return m_bw;
+}
 
 void perform::delete_sequence( int a_num )
 {

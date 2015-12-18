@@ -535,17 +535,42 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         if (ID == c_mutegroups)
         {
             long length = read_long ();
-            if (c_gmute_tracks != length)
+
+            if(length != 0) // 0 means it came from SEQ42 so ignore
             {
-                printf( "corrupt data in mutegroup section\n" );
-            }
-            for (int i = 0; i < c_seqs_in_set; i++)
-            {
-                a_perf->select_group_mute(read_long ());
-                for (int k = 0; k < c_seqs_in_set; ++k) {
-                    a_perf->set_group_mute_state(k, read_long ());
+                if (c_gmute_tracks != length)
+                {
+                    printf( "corrupt data in mutegroup section\n" );
+                }
+                for (int i = 0; i < c_seqs_in_set; i++)
+                {
+                    a_perf->select_group_mute(read_long ());
+                    for (int k = 0; k < c_seqs_in_set; ++k) {
+                        a_perf->set_group_mute_state(k, read_long ());
+                    }
                 }
             }
+        }
+    }
+    if ((file_size - m_pos) > (int) sizeof (unsigned int))
+    {
+        /* Get ID + Length */
+        ID = read_long ();
+        if (ID == c_bp_measure)
+        {
+            long bp_mes = read_long ();
+            a_perf->set_bp_measure(bp_mes);
+        }
+    }
+
+    if ((file_size - m_pos) > (int) sizeof (unsigned int))
+    {
+        /* Get ID + Length */
+        ID = read_long ();
+        if (ID == c_beat_width)
+        {
+            long bw = read_long ();
+            a_perf->set_bw(bw);
         }
     }
 
@@ -670,6 +695,14 @@ bool midifile::write (perform * a_perf)
             write_long( a_perf->get_group_mute_state(i) );
         }
     }
+
+    /* write out the beats per measure */
+    write_long(c_bp_measure);
+    write_long(a_perf->get_bp_measure());
+
+    /* write out the beat width */
+    write_long(c_beat_width);
+    write_long(a_perf->get_bw());
 
     /* open binary file */
     ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);

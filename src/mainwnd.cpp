@@ -286,6 +286,15 @@ mainwnd::timer_callback(  )
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
     }
 
+    if ( m_perf_edit->get_bpm() != m_mainperf->get_bp_measure()){
+        m_perf_edit->set_bpm(m_mainperf->get_bp_measure());
+    }
+
+    if ( m_perf_edit->get_bw() != m_mainperf->get_bw()){
+        m_perf_edit->set_bw( m_mainperf->get_bw());
+    }
+
+
     if ( m_adjust_ss->get_value() !=  m_mainperf->get_screenset() )
     {
         m_main_wid->set_screenset(m_mainperf->get_screenset());

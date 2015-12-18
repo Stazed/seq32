@@ -373,6 +373,7 @@ perfedit::set_snap( int a_snap  )
 
 void perfedit::set_bpm( int a_beats_per_measure )
 {
+    m_mainperf->set_bp_measure(a_beats_per_measure);
     char b[10];
     snprintf(b, sizeof(b), "%d", a_beats_per_measure );
     m_entry_bpm->set_text(b);
@@ -381,9 +382,14 @@ void perfedit::set_bpm( int a_beats_per_measure )
     set_guides();
 }
 
+int perfedit::get_bpm()
+{
+    return m_bpm;
+}
 
 void perfedit::set_bw( int a_beat_width )
 {
+    m_mainperf->set_bw(a_beat_width);
     char b[10];
     snprintf(b, sizeof(b), "%d", a_beat_width );
     m_entry_bw->set_text(b);
@@ -392,6 +398,10 @@ void perfedit::set_bw( int a_beat_width )
     set_guides();
 }
 
+int perfedit::get_bw()
+{
+    return m_bw;
+}
 
 void
 perfedit::on_realize()

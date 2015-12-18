@@ -136,6 +136,9 @@ class perform
     int  m_midiclocktick;
     int  m_midiclockpos;
 
+    int m_bp_measure;
+    int m_bw;
+
     bool m_show_ui_sequence_key;
 
 
@@ -305,6 +308,12 @@ class perform
 
     void set_bpm(int a_bpm);
     int  get_bpm( );
+
+    void set_bp_measure(int a_bp_mes);
+    int get_bp_measure( );
+
+    void set_bw(int a_bw);
+    int get_bw( );
 
     void set_looping( bool a_looping ){ m_looping = a_looping; };
 
