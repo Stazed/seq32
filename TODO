@@ -1,3 +1,12 @@
+[song editor]
+
+[ ] fix beats per measure and beat width to work
+[ ] add beats per measure and beat width to midi file save & import
+[ ] fix undo/redo from sequence minor bug - not updating song triggers on change
+[ ] add redo to song editor
+[ ] set undo/redo inactive when empty
+[x] add ctrl-c copy trigger to middle button paste location
+[x] fix split-trigger to split on middle button mouse location
 
 <0.9.0>
 
