@@ -188,6 +188,8 @@ class sequence
       sequence ();
      ~sequence ();
 
+    bool m_have_undo;
+    bool m_have_redo;
 
     void push_undo (void);
     void pop_undo (void);
@@ -199,6 +201,9 @@ class sequence
     //
     //  Gets and Sets
     //
+
+    void set_have_undo( void );
+    void set_have_redo( void );
 
     /* name */
     void set_name (string a_name);

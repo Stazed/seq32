@@ -1478,6 +1478,7 @@ seqedit::undo_callback( void )
 	m_seqtime_wid->redraw();
 	m_seqdata_wid->redraw();
 	m_seqevent_wid->redraw();
+	m_seq->set_dirty();
 }
 
 
@@ -1490,6 +1491,7 @@ seqedit::redo_callback( void )
 	m_seqtime_wid->redraw();
 	m_seqdata_wid->redraw();
 	m_seqevent_wid->redraw();
+	m_seq->set_dirty();
 }
 
 
@@ -1582,6 +1584,16 @@ seqedit::timeout( void )
     }
 
     m_seqroll_wid->draw_progress_on_window();
+
+    if(m_seq->m_have_undo)
+        m_button_undo->set_sensitive(true);
+    else
+        m_button_undo->set_sensitive(false);
+
+    if(m_seq->m_have_redo)
+        m_button_redo->set_sensitive(true);
+    else
+        m_button_redo->set_sensitive(false);
 
     return true;
 }

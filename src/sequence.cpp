@@ -61,7 +61,10 @@ sequence::sequence( ) :
 
     m_time_beats_per_measure(4),
     m_time_beat_width(4),
-    m_rec_vol(0)
+    m_rec_vol(0),
+
+    m_have_undo(false),
+    m_have_redo(false)
 
     //m_tag(0),
 
@@ -78,6 +81,7 @@ sequence::push_undo( void )
     lock();
     m_list_undo.push( m_list_event );
     unlock();
+    set_have_undo();
 }
 
 
@@ -95,6 +99,8 @@ sequence::pop_undo( void )
     }
 
     unlock();
+    set_have_undo();
+    set_have_redo();
 }
 
 void
@@ -111,6 +117,26 @@ sequence::pop_redo( void )
     }
 
     unlock();
+    set_have_redo();
+    set_have_undo();
+}
+
+void
+sequence::set_have_undo( void )
+{
+    if(m_list_undo.size() > 0)
+        m_have_undo = true;
+    else
+        m_have_undo = false;
+}
+
+void
+sequence::set_have_redo( void )
+{
+    if(m_list_redo.size() > 0)
+        m_have_redo = true;
+    else
+        m_have_redo = false;
 }
 
 void
