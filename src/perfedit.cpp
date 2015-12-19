@@ -149,7 +149,6 @@ perfedit::perfedit( perform *a_perf )
     /* bw */
     m_menu_bw->items().push_back(MenuElem("1", sigc::bind(mem_fun(*this,&perfedit::set_bw), 1  )));
     m_menu_bw->items().push_back(MenuElem("2", sigc::bind(mem_fun(*this,&perfedit::set_bw), 2  )));
-    m_menu_bw->items().push_back(MenuElem("3", sigc::bind(mem_fun(*this,&perfedit::set_bw), 3  )));
     m_menu_bw->items().push_back(MenuElem("4", sigc::bind(mem_fun(*this,&perfedit::set_bw), 4  )));
     m_menu_bw->items().push_back(MenuElem("8", sigc::bind(mem_fun(*this,&perfedit::set_bw), 8  )));
     m_menu_bw->items().push_back(MenuElem("16", sigc::bind(mem_fun(*this,&perfedit::set_bw), 16 )));

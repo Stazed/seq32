@@ -1,7 +1,6 @@
 [song editor]
 
-[ ] fix beats per measure and beat width to work
-[ ] add beats per measure and beat width to midi file save & import
+[x] add beats per measure and beat width to midi file save & import
 [x] fix undo/redo from sequence minor bug - not updating song triggers on change
 [ ] add redo to song editor
 [x] set undo/redo inactive when empty
