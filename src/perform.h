@@ -253,6 +253,11 @@ class perform
 
     void push_trigger_undo( void );
     void pop_trigger_undo( void );
+    void pop_trigger_redo( void );
+    void set_have_undo(bool a_undo);
+    void set_have_redo(bool a_redo);
+    bool m_have_undo;
+    bool m_have_redo;
 
     void print();
 

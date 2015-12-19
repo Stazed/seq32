@@ -175,6 +175,9 @@ perform::perform()
 
     m_bp_measure = 4;
     m_bw = 4;
+
+    m_have_undo = false;
+    m_have_redo = false;
 }
 
 
@@ -888,18 +891,70 @@ void perform::push_trigger_undo( void )
             m_seqs[i]->push_trigger_undo( );
         }
     }
+    set_have_undo(true);
 }
 
 
 void perform::pop_trigger_undo( void )
 {
+    int undo_count = 0;
+    int redo_count = 0;
     for (int i=0; i< c_max_sequence; i++ ){
 
         if ( is_active(i) == true ){
             assert( m_seqs[i] );
             m_seqs[i]->pop_trigger_undo( );
+            if(m_seqs[i]->have_trigger_undo > 0)
+                undo_count++;
+            if(m_seqs[i]->have_trigger_redo > 0)
+                redo_count++;
         }
     }
+    if(undo_count == 0)
+        set_have_undo(false);
+    else
+        set_have_undo(true);
+
+    if(redo_count == 0)
+        set_have_redo(false);
+    else
+        set_have_redo(true);
+}
+
+void perform::pop_trigger_redo( void )
+{
+    int redo_count = 0;
+    int undo_count = 0;
+    for (int i=0; i< c_max_sequence; i++ ){
+
+        if ( is_active(i) == true ){
+            assert( m_seqs[i] );
+            m_seqs[i]->pop_trigger_redo( );
+            if(m_seqs[i]->have_trigger_redo > 0)
+                redo_count++;
+            if(m_seqs[i]->have_trigger_undo > 0)
+                undo_count++;
+        }
+    }
+    if(redo_count == 0)
+        set_have_redo(false);
+    else
+        set_have_redo(true);
+
+    if(undo_count == 0)
+        set_have_undo(false);
+    else
+        set_have_undo(true);
+}
+
+void perform::set_have_undo(bool a_undo)
+{
+    m_have_undo = a_undo;
+}
+
+void perform::set_have_redo(bool a_redo)
+{
+    m_have_redo = a_redo;
 }
 
 

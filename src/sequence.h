@@ -188,15 +188,19 @@ class sequence
       sequence ();
      ~sequence ();
 
-    bool m_have_undo;
-    bool m_have_redo;
+    bool have_undo;
+    bool have_redo;
 
     void push_undo (void);
     void pop_undo (void);
     void pop_redo (void);
 
+    bool have_trigger_undo;
+    bool have_trigger_redo;
+
     void push_trigger_undo (void);
     void pop_trigger_undo (void);
+    void pop_trigger_redo (void);
 
     //
     //  Gets and Sets

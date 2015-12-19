@@ -100,6 +100,7 @@ class perfedit:public Gtk::Window
 
     Button *m_button_grow;
     Button *m_button_undo;
+    Button *m_button_redo;
 
     Button      *m_button_bpm;
     Entry       *m_entry_bpm;
@@ -139,6 +140,7 @@ class perfedit:public Gtk::Window
     void collapse (void);
     void copy (void);
     void undo ( void );
+    void redo ( void );
 
     void popup_menu (Menu * a_menu);
 

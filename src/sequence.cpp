@@ -63,8 +63,10 @@ sequence::sequence( ) :
     m_time_beat_width(4),
     m_rec_vol(0),
 
-    m_have_undo(false),
-    m_have_redo(false)
+    have_undo(false),
+    have_redo(false),
+    have_trigger_undo(false),
+    have_trigger_redo(false)
 
     //m_tag(0),
 
@@ -125,18 +127,18 @@ void
 sequence::set_have_undo( void )
 {
     if(m_list_undo.size() > 0)
-        m_have_undo = true;
+        have_undo = true;
     else
-        m_have_undo = false;
+        have_undo = false;
 }
 
 void
 sequence::set_have_redo( void )
 {
     if(m_list_redo.size() > 0)
-        m_have_redo = true;
+        have_redo = true;
     else
-        m_have_redo = false;
+        have_redo = false;
 }
 
 void
@@ -152,7 +154,7 @@ sequence::push_trigger_undo( void )
       (*i).m_selected = false;
     }
 
-
+    have_trigger_undo = true;
     unlock();
 }
 
@@ -164,15 +166,35 @@ sequence::pop_trigger_undo( void )
 
     if (m_list_trigger_undo.size() > 0 ){
 
-    m_list_trigger_redo.push( m_list_trigger );
+        m_list_trigger_redo.push( m_list_trigger );
         m_list_trigger = m_list_trigger_undo.top();
         m_list_trigger_undo.pop();
+        have_trigger_redo = true;
     }
+
+    if (m_list_trigger_undo.size() == 0 )
+        have_trigger_undo = false;
 
     unlock();
 }
 
+void
+sequence::pop_trigger_redo( void )
+{
+    lock();
 
+    if (m_list_trigger_redo.size() > 0 ){
+        m_list_trigger_undo.push( m_list_trigger );
+        m_list_trigger = m_list_trigger_redo.top();
+        m_list_trigger_redo.pop();
+        have_trigger_undo = true;
+    }
+
+    if (m_list_trigger_redo.size() == 0 )
+        have_trigger_redo = false;
+
+    unlock();
+}
 
 void
 sequence::set_master_midi_bus( mastermidibus *a_mmb )

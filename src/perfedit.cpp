@@ -29,6 +29,7 @@
 #include "pixmaps/loop.xpm"
 #include "pixmaps/copy.xpm"
 #include "pixmaps/undo.xpm"
+#include "pixmaps/redo.xpm"
 #include "pixmaps/down.xpm"
 #include "pixmaps/perfedit.xpm"
 
@@ -185,12 +186,17 @@ perfedit::perfedit( perform *a_perf )
     m_entry_bw->set_width_chars(2);
     m_entry_bw->set_editable( false );
 
-/* undo */
+    /* undo */
     m_button_undo = manage( new Button());
     m_button_undo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( undo_xpm  ))));
     m_button_undo->signal_clicked().connect(  mem_fun( *this, &perfedit::undo));
     add_tooltip( m_button_undo, "Undo." );
 
+    /* redo */
+    m_button_redo = manage( new Button());
+    m_button_redo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( redo_xpm  ))));
+    m_button_redo->signal_clicked().connect(  mem_fun( *this, &perfedit::redo));
+    add_tooltip( m_button_redo, "Redo." );
 
     /* expand */
     m_button_expand = manage( new Button());
@@ -231,6 +237,7 @@ perfedit::perfedit( perform *a_perf )
     m_hlbox->pack_end( *m_button_copy , false, false );
     m_hlbox->pack_end( *m_button_expand , false, false );
     m_hlbox->pack_end( *m_button_collapse , false, false );
+    m_hlbox->pack_end( *m_button_redo , false, false );
     m_hlbox->pack_end( *m_button_undo , false, false );
 
 
@@ -310,6 +317,13 @@ void
 perfedit::undo( void )
 {
     m_mainperf->pop_trigger_undo();
+    m_perfroll->queue_draw();
+}
+
+void
+perfedit::redo( void )
+{
+    m_mainperf->pop_trigger_redo();
     m_perfroll->queue_draw();
 }
 
@@ -457,6 +471,16 @@ perfedit::timeout( void )
     m_perfroll->redraw_dirty_sequences();
     m_perfroll->draw_progress();
     m_perfnames->redraw_dirty_sequences();
+
+    if(m_mainperf->m_have_undo)
+        m_button_undo->set_sensitive(true);
+    else
+        m_button_undo->set_sensitive(false);
+
+    if(m_mainperf->m_have_redo)
+        m_button_redo->set_sensitive(true);
+    else
+        m_button_redo->set_sensitive(false);
 
     return true;
 }
