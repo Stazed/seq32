@@ -47,6 +47,8 @@
 #include "pixmaps/sequences.xpm"
 #include "pixmaps/tools.xpm"
 #include "pixmaps/seq-editor.xpm"
+#include "pixmaps/play2.xpm"
+#include "pixmaps/stop.xpm"
 
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
@@ -219,7 +221,17 @@ seqedit::seqedit( sequence *a_seq,
     /* exapand, cause rollview expands */
     m_vbox->pack_start(*m_table, true, true, 0);
 
+   /* Stop and play buttons */
+    m_button_stop = manage( new Button( ));
+    m_button_stop->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
+    m_button_stop->signal_clicked().connect( mem_fun(*this,&seqedit::stop_playing));
+    dhbox->pack_start(*m_button_stop, false, false);
 
+    m_button_play = manage( new Button() );
+    m_button_play->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( play2_xpm  ))));
+    m_button_play->signal_clicked().connect(  mem_fun( *this, &seqedit::start_playing));
+    dhbox->pack_start(*m_button_play, false, false);
+    dhbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
 
     /* data button */
@@ -1676,3 +1688,22 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
         return Gtk::Window::on_key_press_event(a_ev);
 }
 
+void
+seqedit::start_playing( void )
+{
+    //global_jack_start_mode = false;  // set live mode
+    //m_seq->set_playing( true );
+    //m_toggle_play->set_active( true );
+
+    m_mainperf->position_jack( true );
+    m_mainperf->start_jack( );
+    m_mainperf->start( true );
+}
+
+void
+seqedit::stop_playing( void )
+{
+
+    m_mainperf->stop_jack();
+    m_mainperf->stop();
+}

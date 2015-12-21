@@ -75,7 +75,7 @@ class seqedit : public Gtk::Window
 
     static const int c_min_zoom = 1;
     static const int c_max_zoom = 32;
- 	
+
     sequence   * const m_seq;
     perform    * const m_mainperf;
 
@@ -166,6 +166,9 @@ class seqedit : public Gtk::Window
 
     Button      *m_button_bw;
     Entry       *m_entry_bw;
+
+    Button      *m_button_stop;
+    Button      *m_button_play;
 
     Button	*m_button_rec_vol;
 
@@ -261,6 +264,8 @@ class seqedit : public Gtk::Window
     void do_action( int a_action, int a_var );
 
     void mouse_action( mouse_action_e a_action );
+    void start_playing( void );
+    void stop_playing( void );
 
  public:
 
