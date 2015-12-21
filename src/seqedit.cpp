@@ -143,6 +143,9 @@ seqedit::seqedit( sequence *a_seq,
                                            m_zoom,
                                            m_hadjust));
 
+    m_lfo_wnd = manage( new lfownd(        m_seq,
+                                           m_seqdata_wid));
+
     m_seqevent_wid = manage( new seqevent( m_seq,
                                            m_zoom,
                                            m_snap,
@@ -233,6 +236,9 @@ seqedit::seqedit( sequence *a_seq,
     dhbox->pack_start(*m_button_play, false, false);
     dhbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
+    m_button_lfo = manage (new Button("lfo") );
+    dhbox->pack_start(*m_button_lfo, false, false);
+    m_button_lfo->signal_clicked().connect ( mem_fun(m_lfo_wnd, &lfownd::toggle_visible));
 
     /* data button */
     m_button_data = manage( new Button( " Event " ));
@@ -1625,6 +1631,7 @@ seqedit::on_delete_event(GdkEventAny *a_event)
     m_mainperf->get_master_midi_bus()->set_sequence_input( false, NULL );
     m_seq->set_editing( false );
 
+    delete m_lfo_wnd;
     delete this;
 
     return false;

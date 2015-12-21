@@ -67,7 +67,9 @@ bin_PROGRAMS = %D%/seq24
   %D%/sequence.cpp \
   %D%/sequence.h \
   %D%/userfile.cpp \
-  %D%/userfile.h
+  %D%/userfile.h\
+  %D%/lfownd.cpp\
+  %D%/lfownd.h
 
 EXTRA_DIST += %D%/configwin32.h
 

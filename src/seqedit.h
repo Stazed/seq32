@@ -63,6 +63,7 @@
 
 #include "globals.h"
 #include "mainwid.h"
+#include "lfownd.h"
 
 using namespace Gtk;
 
@@ -169,6 +170,8 @@ class seqedit : public Gtk::Window
 
     Button      *m_button_stop;
     Button      *m_button_play;
+    Button	    *m_button_lfo;
+    lfownd      *m_lfo_wnd;
 
     Button	*m_button_rec_vol;
 
