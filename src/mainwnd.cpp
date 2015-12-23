@@ -113,6 +113,14 @@ mainwnd::mainwnd(perform *a_p):
                     Gdk::Pixbuf::create_from_xpm_data(seq24_xpm))),
             false, false);
 
+    m_button_mode = manage( new ToggleButton( "song mode" ) );
+    m_button_mode->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_song_mode ));
+    add_tooltip( m_button_mode, "Toggle song mode (or live/sequence mode)." );
+    if(global_jack_start_mode) {
+        m_button_mode->set_active( true );
+    }
+    tophbox->pack_start(*m_button_mode, false, false );
+
     // adjust placement...
     VBox *vbox_b = manage( new VBox() );
     HBox *hbox3 = manage( new HBox( false, 0 ) );
@@ -306,6 +314,18 @@ mainwnd::timer_callback(  )
     return true;
 }
 
+void
+mainwnd::set_song_mode( void )
+{
+    global_jack_start_mode = m_button_mode->get_active();
+}
+
+void
+mainwnd::toggle_song_mode( void )
+{
+    // Note that this will trigger the button signal callback.
+    m_button_mode->set_active( ! m_button_mode->get_active() );
+}
 
 void
 mainwnd::open_performance_edit( void )

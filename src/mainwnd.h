@@ -80,6 +80,8 @@ class mainwnd : public Gtk::Window, public performcallback
     Button      *m_button_play;
     Button      *m_button_perfedit;
 
+    ToggleButton *m_button_mode;
+
     SpinButton  *m_spinbutton_bpm;
     Adjustment  *m_adjust_bpm;
 
@@ -92,6 +94,10 @@ class mainwnd : public Gtk::Window, public performcallback
     Entry       *m_entry_notes;
 
     sigc::connection   m_timeout_connect;
+
+
+    void set_song_mode (void);
+    void toggle_song_mode (void);
 
     void file_import_dialog( void );
     void options_dialog( void );
