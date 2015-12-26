@@ -1304,6 +1304,8 @@ bool FruitySeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& th
                 ths.m_current_x = ths.m_drop_x = snapped_x;
                 ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &tick_s, &note_h );
 
+                ths.m_seqkeys_wid->set_listen_button_press(a_ev); // play note
+
                 // test if a note is already there
                 // fake select, if so, no add
                 if ( ! ths.m_seq->select_note_events( tick_s, note_h,
@@ -1393,6 +1395,8 @@ bool FruitySeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& th
                     if ( center_mouse_handle &&
                          a_ev->button == 1 && !(a_ev->state & GDK_CONTROL_MASK) )
                     {
+                        ths.m_seqkeys_wid->set_listen_button_press(a_ev); // play note
+
                         ths.m_moving_init = true;
                         needs_update = true;
 
@@ -1519,6 +1523,8 @@ bool FruitySeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& th
 
 bool FruitySeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& ths)
 {
+    ths.m_seqkeys_wid->set_listen_button_release(a_ev); // play note off
+
     long tick_s;
     long tick_f;
     int note_h;
@@ -1715,6 +1721,10 @@ bool FruitySeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& t
             ths.snap_x( &ths.m_current_x );
         }
 
+        if(ths.m_moving){
+            ths.m_seqkeys_wid->set_listen_motion_notify(a_ev);//  play note
+        }
+
         ths.draw_selection_on_window();
         return true;
 
@@ -1726,6 +1736,9 @@ bool FruitySeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& t
         ths.convert_xy( ths.m_current_x, ths.m_current_y, &tick, &note );
 
         ths.m_seq->add_note( tick, ths.m_note_length - c_note_off_margin, note, true );
+
+        ths.m_seqkeys_wid->set_listen_motion_notify(a_ev);//  play note
+
         return true;
     }
 
@@ -1831,6 +1844,8 @@ bool Seq24SeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths
                 ths.m_current_x = ths.m_drop_x = snapped_x;
                 ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &tick_s, &note_h );
 
+                ths.m_seqkeys_wid->set_listen_button_press(a_ev); // play note
+
                 // test if a note is already there
                 // fake select, if so, no add
                 if ( ! ths.m_seq->select_note_events( tick_s, note_h,
@@ -1881,6 +1896,8 @@ bool Seq24SeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths
                                                 tick_s, note_h,
                                                 sequence::e_is_selected ))
                 {
+                    ths.m_seqkeys_wid->set_listen_button_press(a_ev); // play note
+
                     // moving - left click only
                     if ( a_ev->button == 1 && !(a_ev->state & GDK_CONTROL_MASK) )
                     {
@@ -1954,6 +1971,8 @@ bool Seq24SeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths
 
 bool Seq24SeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& ths)
 {
+    ths.m_seqkeys_wid->set_listen_button_release(a_ev); // play note off
+
     long tick_s;
     long tick_f;
     int note_h;
@@ -2086,6 +2105,10 @@ bool Seq24SeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& th
             ths.snap_x( &ths.m_current_x );
         }
 
+        if(ths.m_moving){
+            ths.m_seqkeys_wid->set_listen_motion_notify(a_ev);//  play note
+        }
+
         ths.draw_selection_on_window();
         return true;
 
@@ -2097,6 +2120,9 @@ bool Seq24SeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& th
         ths.convert_xy( ths.m_current_x, ths.m_current_y, &tick, &note );
 
         ths.m_seq->add_note( tick, ths.m_note_length - c_note_off_margin, note, true );
+
+        ths.m_seqkeys_wid->set_listen_motion_notify(a_ev);//  play note
+
         return true;
     }
 

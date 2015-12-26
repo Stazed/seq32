@@ -95,6 +95,11 @@ class seqkeys : public Gtk::DrawingArea
 
 public:
 
+    /* listen to note on add or move */
+    void set_listen_button_press(GdkEventButton* a_ev);
+    void set_listen_button_release(GdkEventButton* a_ev);
+    void set_listen_motion_notify(GdkEventMotion* a_p0);
+
     /* sets key to grey */
     void set_hint_key( int a_key );
 

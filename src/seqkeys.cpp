@@ -245,7 +245,7 @@ seqkeys::on_button_press_event(GdkEventButton *a_e)
 	y = (int) a_e->y + m_scroll_offset_y;
 
 	if ( a_e->button == 1 ){
-	
+
 	    m_keying = true;
 
 	    convert_y( y,&note );
@@ -264,7 +264,7 @@ seqkeys::on_button_release_event(GdkEventButton* a_e)
     if ( a_e->type == GDK_BUTTON_RELEASE ){
 
 	if ( a_e->button == 1 && m_keying ){
-	
+
 	    m_keying = false;
 	    m_seq->play_note_off( m_keying_note );
 	}
@@ -433,4 +433,23 @@ seqkeys::on_scroll_event( GdkEventScroll* a_ev )
     return true;
 
 }
+
+void
+seqkeys::set_listen_button_press(GdkEventButton* a_ev)
+{
+    on_button_press_event(a_ev);
+}
+
+void
+seqkeys::set_listen_button_release(GdkEventButton* a_ev)
+{
+    on_button_release_event(a_ev);
+}
+
+void
+seqkeys::set_listen_motion_notify(GdkEventMotion* a_p0)
+{
+    on_motion_notify_event(a_p0);
+}
+
 
