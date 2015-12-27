@@ -221,6 +221,9 @@ class perform
     perform();
     ~perform();
 
+    void start_playing( void );
+    void stop_playing( void );
+
     void init( void );
 
     void clear_all( void );

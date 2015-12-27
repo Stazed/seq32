@@ -330,17 +330,13 @@ perfedit::redo( void )
 void
 perfedit::start_playing( void )
 {
-    m_mainperf->position_jack( true );
-    m_mainperf->start_jack( );
-    m_mainperf->start( true );
+    m_mainperf->start_playing();
 }
 
 void
 perfedit::stop_playing( void )
 {
-
-    m_mainperf->stop_jack();
-    m_mainperf->stop();
+    m_mainperf->stop_playing();
 }
 
 void

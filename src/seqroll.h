@@ -190,7 +190,7 @@ class seqroll : public Gtk::DrawingArea
 				 int a_note_h, int a_note_l,
 				 int *a_x, int *a_y,
 				 int *a_w, int *a_h );
-	
+
     void draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw );
 
 
@@ -243,6 +243,7 @@ class seqroll : public Gtk::DrawingArea
     void set_data_type( unsigned char a_status, unsigned char a_control  );
 
     ~seqroll( );
+
 };
 
 #endif

@@ -1698,19 +1698,11 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
 void
 seqedit::start_playing( void )
 {
-    //global_jack_start_mode = false;  // set live mode
-    //m_seq->set_playing( true );
-    //m_toggle_play->set_active( true );
-
-    m_mainperf->position_jack( true );
-    m_mainperf->start_jack( );
-    m_mainperf->start( true );
+    m_mainperf->start_playing();
 }
 
 void
 seqedit::stop_playing( void )
 {
-
-    m_mainperf->stop_jack();
-    m_mainperf->stop();
+    m_mainperf->stop_playing();
 }

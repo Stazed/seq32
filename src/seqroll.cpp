@@ -1059,14 +1059,11 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
     // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
     bool dont_toggle = m_perform->m_key_start != m_perform->m_key_stop;
     if ( a_p0->keyval ==  m_perform->m_key_start && (dont_toggle || !is_pattern_playing) ){
-        m_perform->position_jack( false );
-        m_perform->start( false );
-        m_perform->start_jack( );
+        m_perform->start_playing();
         is_pattern_playing=true;
     }
     else if ( a_p0->keyval ==  m_perform->m_key_stop && (dont_toggle || is_pattern_playing) ){
-        m_perform->stop_jack();
-        m_perform->stop();
+        m_perform->stop_playing();
         is_pattern_playing=false;
     }
 
@@ -1193,8 +1190,6 @@ seqroll::on_scroll_event( GdkEventScroll* a_ev )
     m_vadjust->clamp_page( val, val + m_vadjust->get_page_size() );
     return true;
 }
-
-
 
 //////////////////////////
 // interaction methods
