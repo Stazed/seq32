@@ -127,6 +127,7 @@ class perform
     int thread_trigger_width_ms;
 
     long m_left_tick;
+    uint32_t m_left_frame;
     long m_right_tick;
     long m_starting_tick;
 
@@ -291,6 +292,7 @@ class perform
 
     void start_jack();
     void stop_jack();
+    void set_left_frame( void ); // for jack master
     void position_jack( bool a_state );
 
     void off_sequences( void );

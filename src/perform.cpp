@@ -62,6 +62,7 @@ perform::perform()
     thread_trigger_width_ms = c_thread_trigger_width_ms;
 
     m_left_tick = 0;
+    m_left_frame = 0;
     m_right_tick = c_ppqn * 16;
     m_starting_tick = 0;
 
@@ -240,6 +241,9 @@ void perform::init_jack( void )
             }
             else {
                 printf("[JACK transport slave]\n");
+                // since slave mode did not work - just set to master in jack, then use m_jack_master to
+                // identify the mode and modify to work as slave later in the code
+                jack_set_timebase_callback(m_jack_client,false,jack_timebase_callback, this);
                 m_jack_master = false;
 
             }
@@ -476,6 +480,7 @@ void perform::set_left_tick( long a_tick )
     if ( m_left_tick >= m_right_tick )
         m_right_tick = m_left_tick + c_ppqn * 4;
 
+    set_left_frame();
 }
 
 
@@ -506,6 +511,7 @@ void perform::set_right_tick( long a_tick )
         if ( m_right_tick <= m_left_tick ){
             m_left_tick = m_right_tick - c_ppqn * 4;
             m_starting_tick = m_left_tick;
+            set_left_frame(); // since we just changed it
         }
     }
 }
@@ -1015,6 +1021,34 @@ void perform::stop_jack(  )
 #endif
 }
 
+void perform::set_left_frame( void )
+{
+#ifdef JACK_SUPPORT
+
+    if(!m_jack_running)
+        return;
+
+    long current_tick = 0;
+    jack_nframes_t rate = jack_get_sample_rate( m_jack_client ) ;
+
+    current_tick = m_left_tick;
+    current_tick *= 10;
+    long ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
+    long beats_per_minute =  m_master_bus.get_bpm();
+    uint64_t ctticks = ((uint64_t)rate * current_tick * 60.0);
+    long tpb_min = ticks_per_beat * beats_per_minute;
+    uint64_t frame = ctticks / tpb_min;
+
+    m_left_frame = (uint32_t) frame;
+
+
+    //printf("current_tick [%ld]", current_tick);
+    //printf("rate [%zu]", rate);
+    //printf("ctticks [%jd]\n", (uint64_t)ctticks);
+    //printf("tpb_min [%ld]\n", tpb_min);
+
+#endif // JACK_SUPPORT
+}
 
 void perform::position_jack( bool a_state )
 {
@@ -1022,6 +1056,25 @@ void perform::position_jack( bool a_state )
     //printf( "perform::position_jack()\n" );
 
 #ifdef JACK_SUPPORT
+
+    if(!m_jack_running) // disconnected from jack sync
+        return;
+
+    if ( !a_state ) //  master in live mode
+    {
+        jack_transport_locate( m_jack_client, 0);
+        return;
+    }
+
+    if(!m_jack_master && m_jack_running) // slave mode
+        return;
+
+    /*  following is only used when in jack master mode during song play */
+    set_left_frame(); // make sure it gets initial set if m_left_tick moved when !m_jack_running
+    jack_transport_locate( m_jack_client, m_left_frame);
+    return;
+
+    /*  following is NOT used  */
 
     if ( m_jack_running ){
         jack_transport_locate( m_jack_client, 0 );
@@ -1427,6 +1480,10 @@ void perform::output_func(void)
         double jack_ticks_converted = 0.0;
         double jack_ticks_converted_last = 0.0;
         double jack_ticks_delta = 0.0;
+        if(m_jack_running && m_jack_master && m_playback_mode) // song mode master start left tick marker
+            jack_transport_locate( m_jack_client, m_left_frame);
+        if(m_jack_running && m_jack_master && !m_playback_mode)// live mode master start at zero
+            jack_transport_locate( m_jack_client, 0);
 #endif
         for( int i=0; i<100; i++ ){
             stats_all[i] = 0;
@@ -1559,6 +1616,12 @@ void perform::output_func(void)
 
                         if ( current_tick >= get_right_tick() ){
 
+                            if(m_jack_master)
+                            {
+                                jack_transport_locate( m_jack_client, m_left_frame );
+                            }
+                            else
+                            {
                             while ( current_tick >= get_right_tick() ){
 
                                 double size = get_right_tick() - get_left_tick();
@@ -1568,6 +1631,7 @@ void perform::output_func(void)
                             }
                             reset_sequences();
                             set_orig_ticks( (long)current_tick );
+                            }
                         }
                     }
                 }
@@ -1684,6 +1748,12 @@ void perform::output_func(void)
                 {
                     if ( current_tick >= get_right_tick() )
                     {
+                        if(m_jack_running && m_jack_master)
+                        {
+                            jack_transport_locate( m_jack_client, m_left_frame );
+                        }
+                        else
+                        {
                         double leftover_tick = current_tick - (get_right_tick());
 
                         play( get_right_tick() - 1 );
@@ -1691,6 +1761,7 @@ void perform::output_func(void)
 
                         set_orig_ticks( get_left_tick() );
                         current_tick = (double) get_left_tick() + leftover_tick;
+                        }
                     }
                 }
 
