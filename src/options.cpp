@@ -470,6 +470,7 @@ options::add_jack_sync_page()
 
 
     /*Connetion buttons*/
+/*
     HButtonBox* buttonbox = manage(new HButtonBox());
     buttonbox->set_layout(Gtk::BUTTONBOX_START);
     buttonbox->set_spacing(6);
@@ -486,6 +487,7 @@ options::add_jack_sync_page()
     button->signal_clicked().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_disconnect, button));
     buttonbox->pack_start(*button, false, false);
+*/
 #endif
 }
 

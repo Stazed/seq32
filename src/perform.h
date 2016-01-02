@@ -191,6 +191,7 @@ class perform
 
  public:
     bool is_running();
+    bool is_jack_running();
     bool is_learn_mode() const { return m_mode_group_learn; }
 
     // can register here for events...

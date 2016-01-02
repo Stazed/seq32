@@ -121,6 +121,17 @@ mainwnd::mainwnd(perform *a_p):
     }
     tophbox->pack_start(*m_button_mode, false, false );
 
+#ifdef JACK_SUPPORT
+    m_button_jack = manage( new ToggleButton( "Jack sync" ) );
+    m_button_jack->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_jack_mode ));
+    add_tooltip( m_button_jack, "Toggle Jack sync connection" );
+    if(global_with_jack_transport) {
+        m_button_jack->set_active( true );
+    }
+    tophbox->pack_start(*m_button_jack, false, false );
+#endif
+
+
     // adjust placement...
     VBox *vbox_b = manage( new VBox() );
     HBox *hbox3 = manage( new HBox( false, 0 ) );
@@ -321,11 +332,20 @@ mainwnd::set_song_mode( void )
 }
 
 void
-mainwnd::toggle_song_mode( void )
+mainwnd::set_jack_mode ( void )
 {
-    // Note that this will trigger the button signal callback.
-    m_button_mode->set_active( ! m_button_mode->get_active() );
+    if(m_button_jack->get_active() && !m_mainperf->is_running())
+        m_mainperf->init_jack ();
+
+    if(!m_button_jack->get_active() && !m_mainperf->is_running())
+        m_mainperf->deinit_jack ();
+
+    if(m_mainperf->is_jack_running())
+        m_button_jack->set_active(true);
+    else
+        m_button_jack->set_active(false);
 }
+
 
 void
 mainwnd::open_performance_edit( void )
