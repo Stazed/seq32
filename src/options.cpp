@@ -436,6 +436,7 @@ options::add_jack_sync_page()
 
 
     /*Frame for jack start mode options*/
+/*
     Frame* modeframe = manage(new Frame("Jack start mode"));
     modeframe->set_border_width(4);
     vbox->pack_start(*modeframe, Gtk::PACK_SHRINK);
@@ -468,7 +469,7 @@ options::add_jack_sync_page()
     modebox->pack_start(*rb_live, false, false);
     modebox->pack_start(*rb_perform, false, false);
 
-
+*/
     /*Connetion buttons*/
 /*
     HButtonBox* buttonbox = manage(new HButtonBox());
