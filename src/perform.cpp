@@ -241,11 +241,7 @@ void perform::init_jack( void )
             }
             else {
                 printf("[JACK transport slave]\n");
-                // since slave mode did not work - just set to master in jack, then use m_jack_master to
-                // identify the mode and modify to work as slave later in the code
-                jack_set_timebase_callback(m_jack_client,false,jack_timebase_callback, this);
                 m_jack_master = false;
-
             }
             if (jack_activate(m_jack_client)) {
                 printf("Cannot register as JACK client\n");
@@ -456,11 +452,9 @@ perform::start_playing( void )
 {
     if(global_jack_start_mode) { // song mode
         set_left_frame();        // make sure it gets initial set if m_left_tick moved when !m_jack_running
-        position_jack( true );
         start_jack( );
         start( true );           // true for setting song m_playback_mode = true
     } else {                     // live mode
-        position_jack( false );
         start( false );
         start_jack( );
     }
@@ -1063,18 +1057,10 @@ void perform::position_jack( bool a_state )
 
 #ifdef JACK_SUPPORT
 
-    if(!m_jack_running) // disconnected from jack sync
-        return;
-
-    if(!m_jack_master && m_jack_running) // slave mode
-        return;
-
     if ( !a_state ) //  master in live mode
     {
         m_left_frame = 0;
     }
-
-    /*  following is only used when in jack master mode  */
 
     jack_nframes_t rate = jack_get_sample_rate( m_jack_client ) ;
 
@@ -1087,7 +1073,6 @@ void perform::position_jack( bool a_state )
     jack_position_t pos;
 
     pos.valid = JackPositionBBT;
-    //pos.beats_per_bar = 4;
     pos.beats_per_bar = m_bp_measure;
     pos.beat_type = 4;
     pos.ticks_per_beat = c_ppqn * 10;
@@ -2402,7 +2387,6 @@ void jack_timebase_callback(jack_transport_state_t state,
 
     pos->valid = JackPositionBBT;
     pos->beats_per_bar = p->m_bp_measure;
-    //pos->beats_per_bar = 4;
     pos->beat_type = 4;
     pos->ticks_per_beat = c_ppqn * 10;
     pos->beats_per_minute = p->get_bpm();
@@ -2423,7 +2407,7 @@ void jack_timebase_callback(jack_transport_state_t state,
         last_frame = current_frame;
     }
 
-    if ( current_frame > last_frame ){
+    if ( current_frame >= last_frame ){
 
 		 double jack_delta_tick =
             (current_frame) *
