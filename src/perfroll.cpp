@@ -305,6 +305,9 @@ perfroll::draw_progress()
 		       progress_x, m_window_y);
 
     m_old_progress_ticks = tick;
+
+    if(m_mainperf->is_running())
+        auto_scroll_horz((double)tick/c_perf_scale_x/c_ppen);
 }
 
 
@@ -631,6 +634,13 @@ bool
 perfroll::on_button_release_event(GdkEventButton* a_ev)
 {
     return m_interaction->on_button_release_event(a_ev, *this);
+}
+
+void
+perfroll::auto_scroll_horz(double progress)
+{
+    if((progress > (m_hadjust->get_page_size()/2)) || (m_hadjust->get_value() > progress))
+        m_hadjust->set_value(progress - (m_hadjust->get_page_size()/2));
 }
 
 bool
