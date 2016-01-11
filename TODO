@@ -1,5 +1,6 @@
 [song editor]
 
+[x] add auto scroll
 [x] add beats per measure and beat width to midi file save & import
 [x] fix undo/redo from sequence minor bug - not updating song triggers on change
 [x] add redo to song editor
@@ -11,6 +12,8 @@
 
 [sequence editor]
 
+[ ] Add ctrl-right/left shift-right/left & up/down shift up/down selected note move
+[ ] Add auto scroll 
 [X] Ctrl Z undo seq + perf
 [x] Ctrl + select = adds to selection (roll + event) m_seq->unselect
 [X] Window Raise on Edit 

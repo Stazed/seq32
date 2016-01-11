@@ -139,7 +139,7 @@ main (int argc, char *argv[])
         Glib::ustring home( getenv( HOME ));
         last_used_dir = home;
         Glib::ustring total_file = home + SLASH + config_filename;
-        
+
         if (Glib::file_test(total_file, Glib::FILE_TEST_EXISTS))
         {
             printf( "Reading [%s]\n", total_file.c_str());
@@ -176,7 +176,7 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "C:hi:jJmM:pPsSU:Vx:", long_options,
+        c = getopt_long(argc, argv, "Chi:jJkmM:pPsSU:Vx:", long_options,
                 &option_index);
 
         /* Detect the end of the options. */
