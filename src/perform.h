@@ -117,7 +117,6 @@ class perform
     bool m_out_thread_launched;
     bool m_in_thread_launched;
 
-    bool m_running;
     bool m_inputing;
     bool m_outputing;
     bool m_looping;
@@ -141,9 +140,6 @@ class perform
     int m_bw;
 
     bool m_show_ui_sequence_key;
-
-
-    void set_running( bool a_running );
 
     void set_playback_mode( bool a_playback_mode );
 
@@ -190,7 +186,6 @@ class perform
     void inner_stop();
 
  public:
-    bool is_running();
     bool is_jack_running();
     bool is_learn_mode() const { return m_mode_group_learn; }
 

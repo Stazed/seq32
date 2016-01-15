@@ -290,12 +290,12 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
         // the start/end key may be the same key (i.e. SPACE)
         // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
         bool dont_toggle = m_mainperf->m_key_start != m_mainperf->m_key_stop;
-        if ( a_ev->keyval == m_mainperf->m_key_start && (dont_toggle || !m_mainperf->is_running()) )
+        if ( a_ev->keyval == m_mainperf->m_key_start && (dont_toggle || !global_is_running) )
         {
             start_playing();
             return true;
         }
-        else if ( a_ev->keyval == m_mainperf->m_key_stop && (dont_toggle || m_mainperf->is_running()) )
+        else if ( a_ev->keyval == m_mainperf->m_key_stop && (dont_toggle || global_is_running) )
         {
             stop_playing();
             return true;

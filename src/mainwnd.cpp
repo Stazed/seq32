@@ -37,7 +37,7 @@
 #include "pixmaps/seq24.xpm"
 #include "pixmaps/seq24_32.xpm"
 
-bool is_pattern_playing = false;
+bool global_is_running = false;
 
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
@@ -334,10 +334,10 @@ mainwnd::set_song_mode( void )
 void
 mainwnd::set_jack_mode ( void )
 {
-    if(m_button_jack->get_active() && !m_mainperf->is_running())
+    if(m_button_jack->get_active() && !global_is_running)
         m_mainperf->init_jack ();
 
-    if(!m_button_jack->get_active() && !m_mainperf->is_running())
+    if(!m_button_jack->get_active() && !global_is_running)
         m_mainperf->deinit_jack ();
 
     if(m_mainperf->is_jack_running())
@@ -373,7 +373,6 @@ void
 mainwnd::start_playing( void )
 {
     m_mainperf->start_playing();
-    is_pattern_playing = true;
 }
 
 
@@ -382,7 +381,6 @@ mainwnd::stop_playing( void )
 {
     m_mainperf->stop_playing();
     m_main_wid->update_sequences_on_window();
-    is_pattern_playing = false;
 }
 
 void
@@ -737,7 +735,7 @@ mainwnd::file_import_dialog( void )
 void mainwnd::file_exit()
 {
     if (is_save()) {
-        if (is_pattern_playing)
+        if (global_is_running)
             stop_playing();
         hide();
     }
@@ -748,7 +746,7 @@ bool
 mainwnd::on_delete_event(GdkEventAny *a_e)
 {
     bool result = is_save();
-    if (result && is_pattern_playing)
+    if (result && global_is_running)
             stop_playing();
 
     return !result;
@@ -974,12 +972,12 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             != m_mainperf->m_key_stop;
 
         if ( a_ev->keyval == m_mainperf->m_key_start
-                && (dont_toggle || !is_pattern_playing))
+                && (dont_toggle || !global_is_running))
         {
             start_playing();
         }
         else if ( a_ev->keyval == m_mainperf->m_key_stop
-                && (dont_toggle || is_pattern_playing))
+                && (dont_toggle || global_is_running))
         {
             stop_playing();
         }

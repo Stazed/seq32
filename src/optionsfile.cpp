@@ -38,17 +38,11 @@ optionsfile::~optionsfile()
 bool
 optionsfile::parse( perform *a_perf )
 {
-
-    /* file size */
-    int file_size = 0;
-
     /* open binary file */
     ifstream file ( m_name.c_str(), ios::in | ios::ate );
 
     if( ! file.is_open() )
         return false;
-
-    file_size = file.tellg();
 
     /* run to start */
     file.seekg( 0, ios::beg );
@@ -279,7 +273,7 @@ optionsfile::write( perform *a_perf  )
         return false;
 
 
-	
+
     /* midi control */
 
     file << "#\n";

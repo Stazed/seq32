@@ -1942,7 +1942,7 @@ sequence::stream_event(  event *a_ev  )
 
     if ( m_recording )
 	{
-		if ( is_pattern_playing )
+		if ( global_is_running )
 		{
 			add_event( a_ev );
 			set_dirty();
@@ -1966,7 +1966,7 @@ sequence::stream_event(  event *a_ev  )
 
     link_new();
 
-    if ( m_quanized_rec && is_pattern_playing){
+    if ( m_quanized_rec && global_is_running){
         if (a_ev->is_note_off()) {
             select_note_events( a_ev->get_timestamp(), a_ev->get_note(),
             a_ev->get_timestamp(), a_ev->get_note(), e_select);
