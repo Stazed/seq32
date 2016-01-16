@@ -12,9 +12,9 @@
 
 [sequence editor]
 
-[ ] Adapt 'fruity' grid marking
-[ ] Fix unnecessary pushes to undo on empty mark_selected()/start_paste()
-[ ] Add ctrl-right/left shift-right/left & up/down shift up/down selected note move
+[X] Adapt 'fruity' grid marking
+[X] Fix unnecessary pushes to undo on empty mark_selected()/start_paste()
+[X] Add right/left shift-right/left & up/down shift up/down selected note move
 [ ] Add auto scroll 
 [X] Ctrl Z undo seq + perf
 [x] Ctrl + select = adds to selection (roll + event) m_seq->unselect
