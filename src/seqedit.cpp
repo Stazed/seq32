@@ -699,7 +699,6 @@ seqedit::do_action( int a_action, int a_var )
         case select_inverse_events:
             m_seq->select_events(m_editing_status, m_editing_cc, true);
             break;
-            // !!! m_seq->push_undo();
 
         case select_even_notes:
             m_seq->select_even_or_odd_notes(a_var, true);
@@ -708,6 +707,7 @@ seqedit::do_action( int a_action, int a_var )
         case select_odd_notes:
             m_seq->select_even_or_odd_notes(a_var, false);
             break;
+            // !!! m_seq->push_undo();
 
         case randomize_events:
             m_seq->push_undo();

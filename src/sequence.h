@@ -429,7 +429,7 @@ class sequence
 
     /* deletes events */
     void remove_marked();
-    void mark_selected();
+    bool mark_selected();
     void unpaint_all();
 
     /* unselects every event */
@@ -494,6 +494,7 @@ class sequence
 			 long a_snap_tick, int a_divide, bool a_linked =
 			 false);
     void transpose_notes (int a_steps, int a_scale);
+    void shift_notes (int a_ticks);  // move selected notes later/earlier in time
     void multiply_pattern( float a_multiplier );
 };
 

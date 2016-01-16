@@ -1069,9 +1069,11 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
 
         if ( a_p0->keyval ==  GDK_Delete || a_p0->keyval == GDK_BackSpace ){
 
-            m_seq->push_undo();
-            m_seq->mark_selected();
-            m_seq->remove_marked();
+            if(m_seq->mark_selected())
+            {
+                m_seq->push_undo();
+                m_seq->remove_marked();
+            }
             ret = true;
         }
 
@@ -1080,25 +1082,77 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
 				m_seq->set_orig_tick(0);
 				ret = true;
 			}
-			if ( a_p0->keyval == GDK_Left ){
+			if ( ( a_p0->keyval == GDK_Left) && (a_p0->state & GDK_CONTROL_MASK)){
 				m_seq->set_orig_tick(m_seq->get_last_tick()- m_snap);
 				ret = true;
 			}
-			if ( a_p0->keyval == GDK_Right ){
+			if ( (a_p0->keyval == GDK_Right) && (a_p0->state & GDK_CONTROL_MASK)){
 				m_seq->set_orig_tick(m_seq->get_last_tick() + m_snap);
 				ret = true;
 			}
 		}
+
+        if ( a_p0->keyval ==  GDK_Up ){
+
+            if ( a_p0->state & GDK_SHIFT_MASK ){
+                m_seq->transpose_notes(12, 0);
+            } else {
+                m_seq->transpose_notes(1, 0);
+            }
+            ret = true;
+        }
+        if ( a_p0->keyval ==  GDK_Down ){
+
+            if ( a_p0->state & GDK_SHIFT_MASK ){
+                m_seq->transpose_notes(-12, 0);
+            } else {
+                m_seq->transpose_notes(-1, 0);
+            }
+            ret = true;
+        }
+
+        if ( a_p0->keyval ==  GDK_Right )
+        {
+            if ( a_p0->state & GDK_SHIFT_MASK )
+            {
+                m_seq->shift_notes(1);
+            } else if(!(a_p0->state & GDK_CONTROL_MASK))
+            {
+                m_seq->shift_notes(m_snap);
+            }
+            ret = true;
+        }
+        if ( a_p0->keyval ==  GDK_Left )
+        {
+            if ( a_p0->state & GDK_SHIFT_MASK )
+            {
+                m_seq->shift_notes(-1);
+            } else if(!(a_p0->state & GDK_CONTROL_MASK))
+            {
+                m_seq->shift_notes(-m_snap);
+            }
+            ret = true;
+        }
+
+        if ( a_p0->state & GDK_MOD1_MASK ){ // Alt key
+
+            if ( a_p0->keyval ==  GDK_q ){
+                m_seq->quanize_events(EVENT_NOTE_ON, 0, m_snap, 1 , true);
+                ret = true;
+            }
+        }
 
         if ( a_p0->state & GDK_CONTROL_MASK ){
 
             /* cut */
             if ( a_p0->keyval == GDK_x || a_p0->keyval == GDK_X ){
 
-                m_seq->push_undo();
-                m_seq->copy_selected();
-                m_seq->mark_selected();
-                m_seq->remove_marked();
+                if(m_seq->mark_selected())
+                {
+                    m_seq->push_undo();
+                    m_seq->copy_selected();
+                    m_seq->remove_marked();
+                }
 
                 ret = true;
             }
@@ -1468,9 +1522,11 @@ bool FruitySeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& th
                     ths.m_seq->select_note_events( tick_s, note_h,
                                                 tick_s, note_h,
                                                 sequence::e_select_one );
-                    ths.m_seq->push_undo();
-                    ths.m_seq->mark_selected();
-                    ths.m_seq->remove_marked();
+                    if(ths.m_seq->mark_selected())
+                    {
+                        ths.m_seq->push_undo();
+                        ths.m_seq->remove_marked();
+                    }
                 }
                 /* right click: remove only the note under the cursor,
                    leave the selection intact */

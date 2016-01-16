@@ -724,25 +724,29 @@ sequence::remove_marked()
 
 
 
-void
-sequence::mark_selected( )
+bool
+sequence::mark_selected()
 {
-    list<event>::iterator i, t;
+    list<event>::iterator i;
+    bool have_selected = false;
 
     lock();
 
     i = m_list_event.begin();
     while( i != m_list_event.end() ){
 
-    if ((*i).is_selected()){
-
+    if ((*i).is_selected())
+    {
         (*i).mark();
+        have_selected = true;
     }
     ++i;
     }
     reset_draw_marker();
 
     unlock();
+
+    return have_selected;
 }
 
 void
@@ -1194,12 +1198,16 @@ sequence::unselect( void )
 void
 sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
 {
+    if(!mark_selected())
+        return;
+
+    push_undo();
     event e;
     bool noteon=false;
     long timestamp=0;
 
     lock();
-    mark_selected();
+
     list<event>::iterator i;
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
@@ -1378,13 +1386,16 @@ sequence::stretch_selected( long a_delta_tick )
 void
 sequence::grow_selected( long a_delta_tick )
 {
+    if(!mark_selected())
+        return;
+
+    push_undo();
+
     event *on, *off, e;
 
     lock();
 
     list<event>::iterator i;
-
-    mark_selected();
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
 
@@ -3589,13 +3600,15 @@ sequence::select_events( unsigned char a_status, unsigned char a_cc, bool a_inve
 void
 sequence::transpose_notes( int a_steps, int a_scale )
 {
-    event e;
+    if(!mark_selected())
+        return;
 
+    push_undo();
+
+    event e;
     list<event> transposed_events;
 
     lock();
-
-    mark_selected();
 
     list<event>::iterator i;
 
@@ -3652,6 +3665,56 @@ sequence::transpose_notes( int a_steps, int a_scale )
 
 }
 
+void
+sequence::shift_notes( int a_ticks )
+{
+    if(!mark_selected())
+        return;
+
+    push_undo();
+
+    event e;
+    list<event> shifted_events;
+
+    lock();
+
+    list<event>::iterator i;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
+
+    /* is it being moved ? */
+    if ( ((*i).get_status() ==  EVENT_NOTE_ON ||
+              (*i).get_status() ==  EVENT_NOTE_OFF) &&
+             (*i).is_marked() ){
+
+            e = (*i);
+            e.unmark();
+
+            long timestamp = e.get_timestamp();
+            timestamp += a_ticks;
+            if(timestamp < 0L) {
+                /* wraparound */
+                timestamp = m_length - ( (-timestamp) % m_length);
+            } else {
+                timestamp %= m_length;
+            }
+            //printf("in shift_notes; a_ticks=%d  timestamp=%06ld  shift_timestamp=%06ld (mlength=%ld)\n", a_ticks, e.get_timestamp(), timestamp, m_length);
+            e.set_timestamp(timestamp);
+            shifted_events.push_front(e);
+
+    }
+    }
+
+    remove_marked();
+    shifted_events.sort();
+    m_list_event.merge( shifted_events);
+
+
+    verify_and_link();
+
+    unlock();
+
+}
 
 
 // NOT DELETING THE ENDS, NOT SELECTED.
@@ -3659,16 +3722,18 @@ void
 sequence::quanize_events( unsigned char a_status, unsigned char a_cc,
                           long a_snap_tick,  int a_divide, bool a_linked )
 {
+    if(!mark_selected())
+        return;
+
+    push_undo();
+
     event e,f;
 
     lock();
 
     unsigned char d0, d1;
     list<event>::iterator i;
-
     list<event> quantized_events;
-
-    mark_selected();
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ ){
 
