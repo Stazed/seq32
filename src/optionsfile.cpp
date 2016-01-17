@@ -198,8 +198,8 @@ optionsfile::parse( perform *a_perf )
     next_data_line( &file );
 
     sscanf( m_line, "%u", &a_perf->m_key_stop );
-    next_data_line( &file );
 
+    line_after( &file, "[New-keys]" );
     sscanf( m_line, "%u", &a_perf->m_key_song );
 
 #ifdef JACK_SUPPORT
@@ -499,6 +499,9 @@ optionsfile::write( perform *a_perf  )
     file << a_perf->m_key_stop << "        # "
          << gdk_keyval_name( a_perf->m_key_stop )
          << " stop sequencer\n";
+
+    file << "\n\n\n[New-keys]\n";
+
     file << a_perf->m_key_song << "        # "
          << gdk_keyval_name( a_perf->m_key_song )
          << " Song mode\n";
