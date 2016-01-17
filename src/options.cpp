@@ -213,6 +213,18 @@ options::add_keyboard_page()
     controltable->attach(*label, 0, 1, 1, 2);
     controltable->attach(*entry, 1, 2, 1, 2);
 
+    label = manage(new Label("Song", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_song));
+    controltable->attach(*label, 0, 1, 2, 3);
+    controltable->attach(*entry, 1, 2, 2, 3);
+#ifdef JACK_SUPPORT
+    label = manage(new Label("Jack", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_jack));
+    controltable->attach(*label, 0, 1, 3, 4);
+    controltable->attach(*entry, 1, 2, 3, 4);
+#endif // JACK_SUPPORT
 
     label = manage(new Label("Snapshot 1", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
@@ -257,7 +269,6 @@ options::add_keyboard_page()
                 &m_perf->m_key_keep_queue));
     controltable->attach(*label, 4, 5, 2, 3);
     controltable->attach(*entry, 5, 6, 2, 3);
-
 
     label = manage(new Label("Screenset up", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,

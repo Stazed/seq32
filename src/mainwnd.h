@@ -97,8 +97,10 @@ class mainwnd : public Gtk::Window, public performcallback
     sigc::connection   m_timeout_connect;
 
 
-    void set_song_mode ( void );
+    void set_song_mode( void );
+    void toggle_song_mode( void );
     void set_jack_mode( void );
+    void toggle_jack( void );
 
     void file_import_dialog( void );
     void options_dialog( void );

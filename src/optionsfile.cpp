@@ -198,6 +198,14 @@ optionsfile::parse( perform *a_perf )
     next_data_line( &file );
 
     sscanf( m_line, "%u", &a_perf->m_key_stop );
+    next_data_line( &file );
+
+    sscanf( m_line, "%u", &a_perf->m_key_song );
+
+#ifdef JACK_SUPPORT
+    next_data_line( &file );
+    sscanf( m_line, "%u", &a_perf->m_key_jack );
+#endif // JACK_SUPPORT
 
     line_after( &file, "[jack-transport]" );
     long flag = 0;
@@ -216,7 +224,6 @@ optionsfile::parse( perform *a_perf )
     next_data_line( &file );
     sscanf( m_line, "%ld", &flag );
     global_jack_start_mode = (bool) flag;
-
 
     line_after( &file, "[midi-input]" );
     buses = 0;
@@ -492,6 +499,14 @@ optionsfile::write( perform *a_perf  )
     file << a_perf->m_key_stop << "        # "
          << gdk_keyval_name( a_perf->m_key_stop )
          << " stop sequencer\n";
+    file << a_perf->m_key_song << "        # "
+         << gdk_keyval_name( a_perf->m_key_song )
+         << " Song mode\n";
+#ifdef JACK_SUPPORT
+    file << a_perf->m_key_jack << "        # "
+         << gdk_keyval_name( a_perf->m_key_jack )
+         << " jack sync\n";
+#endif // JACK_SUPPORT
 
     file << "\n\n\n[jack-transport]\n\n"
 

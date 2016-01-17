@@ -212,6 +212,8 @@ class perform
 
     unsigned int m_key_start;
     unsigned int m_key_stop;
+    unsigned int m_key_song;
+    unsigned int m_key_jack;
 
     bool show_ui_sequence_key() const { return m_show_ui_sequence_key; }
 

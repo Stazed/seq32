@@ -160,6 +160,8 @@ perform::perform()
 
     m_key_start  = GDK_space;
     m_key_stop   = GDK_Escape;
+    m_key_song   = GDK_F1;
+    m_key_jack   = GDK_F2;
 
     m_offset = 0;
     m_control_status = 0;

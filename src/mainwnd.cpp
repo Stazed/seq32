@@ -332,6 +332,13 @@ mainwnd::set_song_mode( void )
 }
 
 void
+mainwnd::toggle_song_mode( void )
+{
+    // Note that this will trigger the button signal callback.
+    m_button_mode->set_active( ! m_button_mode->get_active() );
+}
+
+void
 mainwnd::set_jack_mode ( void )
 {
     if(m_button_jack->get_active() && !global_is_running)
@@ -346,6 +353,12 @@ mainwnd::set_jack_mode ( void )
         m_button_jack->set_active(false);
 }
 
+void
+mainwnd::toggle_jack( void )
+{
+    // Note that this will trigger the button signal callback.
+    m_button_jack->set_active( ! m_button_jack->get_active() );
+}
 
 void
 mainwnd::open_performance_edit( void )
@@ -965,6 +978,17 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             }
         }
 
+        if ( a_ev->keyval ==  m_mainperf->m_key_song ){
+            toggle_song_mode();
+            return true;
+        }
+#ifdef JACK_SUPPORT
+        if ( a_ev->keyval ==  m_mainperf->m_key_jack ){
+            toggle_jack();
+            return true;
+        }
+#endif // JACK_SUPPORT
+
         // the start/end key may be the same key (i.e. SPACE)
         // allow toggling when the same key is mapped to both
         // triggers (i.e. SPACEBAR)
@@ -981,6 +1005,8 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         {
             stop_playing();
         }
+
+
 
         /* toggle sequence mute/unmute using keyboard keys... */
         if (m_mainperf->get_key_events()->count( a_ev->keyval) != 0)
