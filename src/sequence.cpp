@@ -244,7 +244,7 @@ sequence::set_bw( long a_beat_width )
 }
 
 void
-sequence::set_rec_vol( long a_rec_vol )
+sequence::set_rec_vol( int a_rec_vol )
 {
     lock();
     m_rec_vol = a_rec_vol;
@@ -1868,14 +1868,18 @@ sequence::add_note( long a_tick, long a_length, int a_note, bool a_paint)
         if ( a_paint )
             e.paint();
 
+        int velocity = 100; // default
+        if(m_rec_vol != 0)
+            velocity = m_rec_vol;
+
         e.set_status( EVENT_NOTE_ON );
-        e.set_data( a_note, 100 );
+        e.set_data( a_note, velocity );
         e.set_timestamp( a_tick );
 
         add_event( &e );
 
         e.set_status( EVENT_NOTE_OFF );
-        e.set_data( a_note, 100 );
+        e.set_data( a_note, velocity );
         e.set_timestamp( a_tick + a_length );
 
         add_event( &e );
@@ -1955,6 +1959,9 @@ sequence::stream_event(  event *a_ev  )
 	{
 		if ( global_is_running )
 		{
+            if(m_rec_vol != 0)
+                a_ev->set_note_velocity(m_rec_vol);
+
 			add_event( a_ev );
 			set_dirty();
 		} else {

@@ -155,7 +155,7 @@ class sequence
     //long m_length_measures;
     long m_time_beats_per_measure;
     long m_time_beat_width;
-    long m_rec_vol;
+    int m_rec_vol;
 
     /* locking */
     mutex m_mutex;
@@ -223,7 +223,7 @@ class sequence
 
     void set_bw (long a_beat_width);
     long get_bw (void);
-    void set_rec_vol (long a_rec_vol);
+    void set_rec_vol (int a_rec_vol);
 
     void set_song_mute (bool a_mute);
     bool get_song_mute (void);
