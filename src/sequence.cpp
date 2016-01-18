@@ -2068,7 +2068,7 @@ sequence::is_dirty_edit( )
 }
 
 
-/* plays a note from the paino roll */
+/* plays a note from the piano roll */
 void
 sequence::play_note_on( int a_note )
 {
@@ -2077,7 +2077,12 @@ sequence::play_note_on( int a_note )
     event e;
 
     e.set_status( EVENT_NOTE_ON );
-    e.set_data( a_note, 127 );
+
+    int velocity = 100;
+    if(m_rec_vol != 0)
+        velocity = m_rec_vol;
+
+    e.set_data( a_note, velocity );
     m_masterbus->play( m_bus, &e, m_midi_channel );
 
     m_masterbus->flush();
@@ -2086,7 +2091,7 @@ sequence::play_note_on( int a_note )
 }
 
 
-/* plays a note from the paino roll */
+/* plays a note from the piano roll */
 void
 sequence::play_note_off( int a_note )
 {
@@ -2095,7 +2100,12 @@ sequence::play_note_off( int a_note )
     event e;
 
     e.set_status( EVENT_NOTE_OFF );
-    e.set_data( a_note, 127 );
+
+    int velocity = 100;
+    if(m_rec_vol != 0)
+        velocity = m_rec_vol;
+
+    e.set_data( a_note, velocity );
     m_masterbus->play( m_bus, &e, m_midi_channel );
 
     m_masterbus->flush();
@@ -3551,14 +3561,6 @@ sequence::off_playing_notes()
 
     unlock();
 }
-
-
-
-
-
-
-
-
 
 
 /* change */

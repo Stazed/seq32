@@ -275,7 +275,7 @@ seqedit::seqedit( sequence *a_seq,
     m_button_rec_vol->add( *manage( new Label("Vol")));
     m_button_rec_vol->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu), m_menu_rec_vol  ));
-    add_tooltip( m_button_rec_vol, "Select recording volume" );
+    add_tooltip( m_button_rec_vol, "Select volume" );
 
     m_toggle_thru = manage( new ToggleButton(  ));
     m_toggle_thru->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( thru_xpm ))));
@@ -481,7 +481,7 @@ seqedit::create_menus( void )
     m_menu_bw->items().push_back(MenuElem("16",
                 sigc::bind(mem_fun(*this, &seqedit::set_bw), 16 )));
 
-    /* record volume */
+    /* note volume */
     m_menu_rec_vol->items().push_back(MenuElem("Free",
                 sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 0)));
     m_menu_rec_vol->items().push_back(MenuElem("Fixed 8",
