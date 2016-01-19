@@ -445,61 +445,6 @@ options::add_jack_sync_page()
 
     transportbox->pack_start(*check, false, false);
 
-
-    /*Frame for jack start mode options*/
-/*
-    Frame* modeframe = manage(new Frame("Jack start mode"));
-    modeframe->set_border_width(4);
-    vbox->pack_start(*modeframe, Gtk::PACK_SHRINK);
-
-    VBox *modebox = manage(new VBox());
-    modebox->set_border_width(4);
-    modeframe->add(*modebox);
-
-    Gtk::RadioButton * rb_live = manage(
-            new RadioButton("_Live Mode", true));
-    add_tooltip(rb_live, "Playback will be in live mode.  Use this to "
-            "allow muting and unmuting of loops.");
-
-    Gtk::RadioButton * rb_perform = manage(
-            new RadioButton("_Song Mode", true));
-    add_tooltip( rb_perform, "Playback will use the song editors data.");
-
-    Gtk::RadioButton::Group group = rb_live->get_group ();
-    rb_perform->set_group (group);
-
-    if (global_jack_start_mode)
-        rb_perform->set_active(true);
-    else
-        rb_live->set_active(true);
-
-    rb_perform->signal_toggled().connect(bind(mem_fun(*this,
-                    &options::transport_callback), e_jack_start_mode_song,
-                rb_perform));
-
-    modebox->pack_start(*rb_live, false, false);
-    modebox->pack_start(*rb_perform, false, false);
-
-*/
-    /*Connetion buttons*/
-/*
-    HButtonBox* buttonbox = manage(new HButtonBox());
-    buttonbox->set_layout(Gtk::BUTTONBOX_START);
-    buttonbox->set_spacing(6);
-    vbox->pack_start(*buttonbox, false, false);
-
-    Gtk::Button * button = manage(new Button("Co_nnect", true));
-    add_tooltip(button, "Connect to Jack.");
-    button->signal_clicked().connect(bind(mem_fun(*this,
-                    &options::transport_callback), e_jack_connect, button));
-    buttonbox->pack_start(*button, false, false);
-
-    button = manage(new Button("_Disconnect", true));
-    add_tooltip(button, "Disconnect Jack.");
-    button->signal_clicked().connect(bind(mem_fun(*this,
-                    &options::transport_callback), e_jack_disconnect, button));
-    buttonbox->pack_start(*button, false, false);
-*/
 #endif
 }
 
@@ -579,18 +524,6 @@ options::transport_callback(button a_type, Button *a_check)
 
         case e_jack_master_cond:
             global_with_jack_master_cond = check->get_active();
-            break;
-
-        case e_jack_start_mode_song:
-            global_jack_start_mode = check->get_active();
-            break;
-
-        case e_jack_connect:
-            m_perf->init_jack();
-            break;
-
-        case e_jack_disconnect:
-            m_perf->deinit_jack();
             break;
 
         default:
