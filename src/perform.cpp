@@ -174,6 +174,7 @@ perform::perform()
     m_in_thread_launched = false;
 
     m_playback_mode = false;
+    m_start_from_perfedit = false;
 
     m_bp_measure = 4;
     m_bw = 4;
@@ -450,7 +451,8 @@ perform::~perform()
 void
 perform::start_playing( void )
 {
-    if(global_jack_start_mode) { // song mode
+    if(global_song_start_mode || m_start_from_perfedit)
+    { // song mode
         if(m_jack_master)
         {
             set_left_frame();        // make sure it gets initial set if m_left_tick moved when !m_jack_running
@@ -458,7 +460,8 @@ perform::start_playing( void )
         }
         start_jack( );
         start( true );           // true for setting song m_playback_mode = true
-    } else {                     // live mode
+    } else
+    { // live mode
         if(m_jack_master)
             position_jack(false);   // for cosmetic reasons - to stop transport line flicker on start
         start( false );
@@ -471,6 +474,11 @@ perform::stop_playing( void )
 {
     stop_jack();
     stop();
+}
+
+void perform::set_start_from_perfedit( bool a_start )
+{
+    m_start_from_perfedit = a_start;
 }
 
 void perform::set_left_tick( long a_tick )
@@ -1048,6 +1056,8 @@ void perform::set_left_frame( void )
 void perform::position_jack( bool a_state )
 {
 
+    if(!m_jack_running)
+        return;
     //printf( "perform::position_jack()\n" );
 
 #ifdef JACK_SUPPORT
@@ -1151,6 +1161,7 @@ void perform::inner_start(bool a_state)
 
 void perform::inner_stop()
 {
+    set_start_from_perfedit(false);
     global_is_running = false;
     //off_sequences();
     reset_sequences();
@@ -1330,7 +1341,10 @@ int jack_sync_callback(jack_transport_state_t state,
 
         case JackTransportStarting:
             //printf( "[JackTransportStarting]\n" );
-            p->inner_start( global_jack_start_mode );
+            if(p->m_start_from_perfedit)
+                p->inner_start( p->m_start_from_perfedit );
+            else
+                p->inner_start( global_song_start_mode );
             break;
 
         case JackTransportLooping:

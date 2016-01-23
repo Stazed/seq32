@@ -52,7 +52,7 @@ option long_options[] = {
     {"jack_transport",0, 0, 'j'},
     {"jack_master",0, 0, 'J'},
     {"jack_master_cond", 0, 0, 'C'},
-    {"jack_start_mode", required_argument, 0, 'M'},
+    {"song_start_mode", required_argument, 0, 'M'},
     {"jack_session_uuid", required_argument, 0, 'U'},
     {"manual_alsa_ports", 0, 0, 'm'},
     {"pass_sysex", 0, 0, 'P'},
@@ -80,7 +80,7 @@ interaction_method_e global_interactionmethod = e_seq24_interaction;
 bool global_with_jack_transport = false;
 bool global_with_jack_master = false;
 bool global_with_jack_master_cond = false;
-bool global_jack_start_mode = true;
+bool global_song_start_mode = true;
 Glib::ustring global_jack_session_uuid = "";
 
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
@@ -202,7 +202,7 @@ main (int argc, char *argv[])
                 printf( "   -j, --jack_transport: seq24 will sync to jack transport\n" );
                 printf( "   -J, --jack_master: seq24 will try to be jack master\n" );
                 printf( "   -C, --jack_master_cond: jack master will fail if there is already a master\n" );
-                printf( "   -M, --jack_start_mode <mode>: when seq24 is synced to jack, the following play\n" );
+                printf( "   -M, --song_start_mode <mode>: The following play\n" );
                 printf( "                          modes are available (0 = live mode)\n");
                 printf( "                                              (1 = song mode) (default)\n" );
                 printf( "   -S, --stats: show statistics\n" );
@@ -246,10 +246,10 @@ main (int argc, char *argv[])
 
             case 'M':
                 if (atoi( optarg ) > 0) {
-                    global_jack_start_mode = true;
+                    global_song_start_mode = true;
                 }
                 else {
-                    global_jack_start_mode = false;
+                    global_song_start_mode = false;
                 }
                 break;
 

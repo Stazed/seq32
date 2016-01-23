@@ -260,7 +260,7 @@ userfile::parse( perform *a_perf )
 
     next_data_line( &file );
     sscanf( m_line, "%ld", &flag );
-    global_jack_start_mode = (bool) flag;
+    global_song_start_mode = (bool) flag;
 
 
     line_after( &file, "[midi-input]" );

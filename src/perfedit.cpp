@@ -330,6 +330,7 @@ perfedit::redo( void )
 void
 perfedit::start_playing( void )
 {
+    m_mainperf->set_start_from_perfedit(true);
     m_mainperf->start_playing();
 }
 

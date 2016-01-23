@@ -122,6 +122,7 @@ class perform
     bool m_looping;
 
     bool m_playback_mode;
+    bool m_start_from_perfedit;
 
     int thread_trigger_width_ms;
 
@@ -222,6 +223,7 @@ class perform
 
     void start_playing( void );
     void stop_playing( void );
+    void set_start_from_perfedit(bool a_start);
 
     void init( void );
 

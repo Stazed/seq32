@@ -116,7 +116,7 @@ mainwnd::mainwnd(perform *a_p):
     m_button_mode = manage( new ToggleButton( "song mode" ) );
     m_button_mode->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_song_mode ));
     add_tooltip( m_button_mode, "Toggle song mode (or live/sequence mode)." );
-    if(global_jack_start_mode) {
+    if(global_song_start_mode) {
         m_button_mode->set_active( true );
     }
     tophbox->pack_start(*m_button_mode, false, false );
@@ -328,7 +328,8 @@ mainwnd::timer_callback(  )
 void
 mainwnd::set_song_mode( void )
 {
-    global_jack_start_mode = m_button_mode->get_active();
+    global_song_start_mode = m_button_mode->get_active();
+    m_mainperf->set_left_frame();
 }
 
 void
@@ -336,6 +337,7 @@ mainwnd::toggle_song_mode( void )
 {
     // Note that this will trigger the button signal callback.
     m_button_mode->set_active( ! m_button_mode->get_active() );
+    m_mainperf->set_left_frame();
 }
 
 void
