@@ -157,10 +157,6 @@ mainwnd::mainwnd(perform *a_p):
             "and the corresponding hotkey for the 'L' button)" );
     hbox3->pack_end( *m_button_learn, false, false );
 
-    /*this seems to be a dirty hack:*/
-    Button w;
-    hbox3->set_focus_child( w ); // clear the focus not to trigger L via keys
-
 
     /* bottom line items */
     HBox *bottomhbox = manage( new HBox(false, 10));
@@ -859,8 +855,6 @@ mainwnd::edit_callback_notepad( )
 bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
-    Gtk::Window::on_key_press_event(a_ev);
-
     // control and modifier key combinations matching
     if ( a_ev->type == GDK_KEY_PRESS ){
 
@@ -1001,14 +995,16 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 && (dont_toggle || !global_is_running))
         {
             start_playing();
+            if(a_ev->keyval == GDK_space)
+                return true;
         }
         else if ( a_ev->keyval == m_mainperf->m_key_stop
                 && (dont_toggle || global_is_running))
         {
             stop_playing();
+            if(a_ev->keyval == GDK_space)
+                return true;
         }
-
-
 
         /* toggle sequence mute/unmute using keyboard keys... */
         if (m_mainperf->get_key_events()->count( a_ev->keyval) != 0)
@@ -1016,7 +1012,8 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             sequence_key(m_mainperf->lookup_keyevent_seq( a_ev->keyval));
         }
     }
-    return false;
+
+    return Gtk::Window::on_key_press_event(a_ev);
 }
 
 
