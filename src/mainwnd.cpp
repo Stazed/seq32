@@ -855,8 +855,22 @@ mainwnd::edit_callback_notepad( )
 bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
-    // control and modifier key combinations matching
     if ( a_ev->type == GDK_KEY_PRESS ){
+        if ( a_ev->state & GDK_MOD1_MASK ) // alt key
+        {
+            if (((a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) ||
+                (a_ev->keyval == GDK_v || a_ev->keyval == GDK_V) ||
+                (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H)) && !global_is_running) // only allow menu when not running
+            {
+                return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
+            }
+        }
+
+
+        if(get_focus()->get_name() == "gtkmm__GtkEntry") // if focus is screen name
+            return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
+
+        // control and modifier key combinations matching
 
         if ( global_print_keys ){
             printf( "key_press[%d]\n", a_ev->keyval );
@@ -995,15 +1009,11 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                 && (dont_toggle || !global_is_running))
         {
             start_playing();
-            if(a_ev->keyval == GDK_space)
-                return true;
         }
         else if ( a_ev->keyval == m_mainperf->m_key_stop
                 && (dont_toggle || global_is_running))
         {
             stop_playing();
-            if(a_ev->keyval == GDK_space)
-                return true;
         }
 
         /* toggle sequence mute/unmute using keyboard keys... */
@@ -1013,7 +1023,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         }
     }
 
-    return Gtk::Window::on_key_press_event(a_ev);
+    return false;
 }
 
 
