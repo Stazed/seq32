@@ -164,6 +164,7 @@ extern bool global_with_jack_master;
 extern bool global_with_jack_master_cond;
 extern bool global_song_start_mode;
 extern bool global_manual_alsa_ports;
+extern bool global_menu_mode;
 
 /*
     global_is_running:

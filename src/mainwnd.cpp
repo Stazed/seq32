@@ -131,6 +131,14 @@ mainwnd::mainwnd(perform *a_p):
     tophbox->pack_start(*m_button_jack, false, false );
 #endif
 
+    m_button_menu = manage( new ToggleButton( "Menu" ) );
+    m_button_menu->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_menu_mode ));
+    add_tooltip( m_button_menu, "Toggle to disable/enable menu when sequencer is NOT running.\n\n"
+                                "The menu is disabled when the sequencer IS running.");
+    if(global_menu_mode) {
+        m_button_menu->set_active( true );
+    }
+    tophbox->pack_start(*m_button_menu, false, false );
 
     // adjust placement...
     VBox *vbox_b = manage( new VBox() );
@@ -356,6 +364,20 @@ mainwnd::toggle_jack( void )
 {
     // Note that this will trigger the button signal callback.
     m_button_jack->set_active( ! m_button_jack->get_active() );
+}
+
+
+void
+mainwnd::set_menu_mode( void )
+{
+    global_menu_mode = m_button_menu->get_active();
+}
+
+void
+mainwnd::toggle_menu_mode( void )
+{
+    // Note that this will trigger the button signal callback.
+    m_button_menu->set_active( ! m_button_menu->get_active() );
 }
 
 void
@@ -856,19 +878,59 @@ bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
     if ( a_ev->type == GDK_KEY_PRESS ){
-        if ( a_ev->state & GDK_MOD1_MASK ) // alt key
+        if(!global_is_running && global_menu_mode) // only allow menu when not running
         {
-            if (((a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) ||
-                (a_ev->keyval == GDK_v || a_ev->keyval == GDK_V) ||
-                (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H)) && !global_is_running) // only allow menu when not running
+            if ( a_ev->state & GDK_MOD1_MASK ) // alt key
             {
-                return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
+                if ((a_ev->keyval == GDK_b || a_ev->keyval == GDK_B) || // bpm
+                    (a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) || // file
+                    (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H) || // help
+                    (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // name
+                    (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) || // set
+                    (a_ev->keyval == GDK_v || a_ev->keyval == GDK_V))   // view
+                {
+                    return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+                }
+            }
+
+            if ( a_ev->state & GDK_CONTROL_MASK ) // ctrl key
+            {
+                if ((a_ev->keyval == GDK_e || a_ev->keyval == GDK_E) || // song editor
+                    (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // new file
+                    (a_ev->keyval == GDK_o || a_ev->keyval == GDK_O) || // open file
+                    (a_ev->keyval == GDK_q || a_ev->keyval == GDK_Q) || // quit
+                    (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) )  // save
+                {
+                    return Gtk::Window::on_key_press_event(a_ev); // return =  don't do anything else
+                }
             }
         }
 
+        std::string widget_type = get_focus()->get_name();
 
-        if(get_focus()->get_name() == "gtkmm__GtkEntry") // if focus is screen name
+        // stop, start, song, jack, menu, edit ,L
+        if(widget_type == "gtkmm__GtkButton" || widget_type == "gtkmm__GtkToggleButton")
+        {
+            if(a_ev->keyval == GDK_Tab || a_ev->keyval == GDK_Return)
+                return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
+
+            if (a_ev->state & GDK_SHIFT_MASK ) // use it for reverse tab
+                Gtk::Window::on_key_press_event(a_ev); // then let others use it for caps (mute groups)
+        }
+
+        // screen name
+        if(widget_type == "gtkmm__GtkEntry")
             return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
+
+        // bpm, screen set
+        if(widget_type == "gtkmm__GtkSpinButton")
+        {
+            if(a_ev->keyval == GDK_Up || a_ev->keyval == GDK_Down || a_ev->keyval == GDK_Tab) // use it
+                return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
+
+            if ( a_ev->state & GDK_SHIFT_MASK ) // use it for reverse tab
+                Gtk::Window::on_key_press_event(a_ev); // then let others use it for caps (mute groups)
+        }
 
         // control and modifier key combinations matching
 

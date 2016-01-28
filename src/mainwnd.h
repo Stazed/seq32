@@ -82,6 +82,7 @@ class mainwnd : public Gtk::Window, public performcallback
 
     ToggleButton *m_button_mode;
     ToggleButton *m_button_jack;
+    ToggleButton *m_button_menu;
 
     SpinButton  *m_spinbutton_bpm;
     Adjustment  *m_adjust_bpm;
@@ -101,6 +102,8 @@ class mainwnd : public Gtk::Window, public performcallback
     void toggle_song_mode( void );
     void set_jack_mode( void );
     void toggle_jack( void );
+    void set_menu_mode( void );
+    void toggle_menu_mode( void );
 
     void file_import_dialog( void );
     void options_dialog( void );
