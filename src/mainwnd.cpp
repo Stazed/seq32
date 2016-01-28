@@ -878,7 +878,7 @@ bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
     if ( a_ev->type == GDK_KEY_PRESS ){
-        if(!global_is_running && global_menu_mode) // only allow menu when not running
+        if(!global_is_running && global_menu_mode) // only allow menu when not running & menu button pressed
         {
             if ( a_ev->state & GDK_MOD1_MASK ) // alt key
             {
@@ -906,31 +906,22 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             }
         }
 
-        std::string widget_type = get_focus()->get_name();
+        // screen name - this must go before the shift_mask & tab below
+        // or we get duplicate entries on caps and reverse tab
+        if(get_focus()->get_name() == "gtkmm__GtkEntry")  // if we are on the screen name
+            return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
         // stop, start, song, jack, menu, edit ,L
-        if(widget_type == "gtkmm__GtkButton" || widget_type == "gtkmm__GtkToggleButton")
-        {
-            if(a_ev->keyval == GDK_Tab || a_ev->keyval == GDK_Return)
-                return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
-
-            if (a_ev->state & GDK_SHIFT_MASK ) // use it for reverse tab
-                Gtk::Window::on_key_press_event(a_ev); // then let others use it for caps (mute groups)
-        }
-
-        // screen name
-        if(widget_type == "gtkmm__GtkEntry")
-            return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
+        if(a_ev->keyval == GDK_Tab || a_ev->keyval == GDK_Return) // use it for buttons only
+            return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
         // bpm, screen set
-        if(widget_type == "gtkmm__GtkSpinButton")
-        {
-            if(a_ev->keyval == GDK_Up || a_ev->keyval == GDK_Down || a_ev->keyval == GDK_Tab) // use it
-                return Gtk::Window::on_key_press_event(a_ev); // then don't do anything else
+        if(a_ev->keyval == GDK_Up || a_ev->keyval == GDK_Down) // use it for spin buttons only
+            return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
-            if ( a_ev->state & GDK_SHIFT_MASK ) // use it for reverse tab
-                Gtk::Window::on_key_press_event(a_ev); // then let others use it for caps (mute groups)
-        }
+        if (a_ev->state & GDK_SHIFT_MASK ) // use it for reverse tab
+            Gtk::Window::on_key_press_event(a_ev); // no return = let others use it for caps (mute groups)
+
 
         // control and modifier key combinations matching
 
@@ -1060,6 +1051,11 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 #endif // JACK_SUPPORT
+
+        if ( a_ev->keyval ==  m_mainperf->m_key_menu ){
+            toggle_menu_mode();
+            return true;
+        }
 
         // the start/end key may be the same key (i.e. SPACE)
         // allow toggling when the same key is mapped to both

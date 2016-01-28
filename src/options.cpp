@@ -270,6 +270,12 @@ options::add_keyboard_page()
     controltable->attach(*label, 4, 5, 2, 3);
     controltable->attach(*entry, 5, 6, 2, 3);
 
+    label = manage(new Label("Menu mode", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                &m_perf->m_key_menu));
+    controltable->attach(*label, 4, 5, 3, 4);
+    controltable->attach(*entry, 5, 6, 3, 4);
+
     label = manage(new Label("Screenset up", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_screenset_up));
