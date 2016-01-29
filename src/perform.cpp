@@ -482,6 +482,18 @@ void perform::set_start_from_perfedit( bool a_start )
     m_start_from_perfedit = a_start;
 }
 
+void perform::toggle_song_mode( void )
+{
+    if(global_song_start_mode)
+        global_song_start_mode = false;
+    else
+    {
+        global_song_start_mode = true;
+        set_left_frame();
+    }
+}
+
+
 void perform::set_left_tick( long a_tick )
 {
     m_left_tick = a_tick;

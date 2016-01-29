@@ -326,6 +326,9 @@ mainwnd::timer_callback(  )
                     m_mainperf->get_screenset()));
     }
 
+    if (m_button_mode->get_active() != global_song_start_mode)
+        m_button_mode->set_active(global_song_start_mode);
+
     return true;
 }
 

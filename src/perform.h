@@ -225,6 +225,7 @@ class perform
     void start_playing( void );
     void stop_playing( void );
     void set_start_from_perfedit(bool a_start);
+    void toggle_song_mode( void );
 
     void init( void );
 
