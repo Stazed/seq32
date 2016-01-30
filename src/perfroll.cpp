@@ -41,7 +41,9 @@ perfroll::perfroll( perform *a_perf,
     m_hadjust(a_hadjust),
 
     m_moving(false),
-    m_growing(false)
+    m_growing(false),
+
+    have_button_press(false)
 {
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color( m_black );

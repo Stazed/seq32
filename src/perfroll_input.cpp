@@ -137,7 +137,8 @@ void FruityPerfInput::on_left_button_pressed(GdkEventButton* a_ev, perfroll& ths
                 {
                     //m_adding = false;
                     m_adding_pressed = false;
-                    ths.m_mainperf->push_trigger_undo();
+                    ths.have_button_press = true; // flag to tell motion notify to push_trigger_undo
+
                     ths.m_mainperf->get_sequence( ths.m_drop_sequence )->select_trigger( tick );
 
                     long start_tick = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_selected_trigger_start_tick();
@@ -275,6 +276,12 @@ bool FruityPerfInput::on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths
     {
         if ( ths.m_mainperf->is_active( ths.m_drop_sequence))
         {
+            if(ths.have_button_press)
+            {   // this is necessary to ensure no push unless we have motion notify
+                ths.m_mainperf->push_trigger_undo();
+                ths.have_button_press = false;
+            }
+
             ths.convert_x( x, &tick );
             tick -= ths.m_drop_tick_trigger_offset;
 
@@ -382,7 +389,7 @@ bool Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 
             if ( ths.m_mainperf->is_active( ths.m_drop_sequence )){
 
-                ths.m_mainperf->push_trigger_undo();
+                ths.have_button_press = true; // flag to tell motion notify to push_trigger_undo
                 ths.m_mainperf->get_sequence( ths.m_drop_sequence )->select_trigger( tick );
 
                 long start_tick = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_selected_trigger_start_tick();
@@ -510,6 +517,12 @@ bool Seq24PerfInput::on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths)
     else if ( ths.m_moving || ths.m_growing ){
 
         if ( ths.m_mainperf->is_active( ths.m_drop_sequence)){
+
+            if(ths.have_button_press)
+            {   // this is necessary to ensure no push unless we have motion notify
+                ths.m_mainperf->push_trigger_undo();
+                ths.have_button_press = false;
+            }
 
             ths.convert_x( x, &tick );
             tick -= ths.m_drop_tick_trigger_offset;

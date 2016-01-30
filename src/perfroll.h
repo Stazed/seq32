@@ -132,7 +132,7 @@ class perfroll : public Gtk::DrawingArea
 
     void split_trigger( int a_sequence, long a_tick );
 
-
+    bool have_button_press;
 
  public:
     void set_guides( int a_snap, int a_measure, int a_beat );
