@@ -3896,7 +3896,6 @@ sequence::fill_list( list<char> *a_list, int a_pos )
 
     int num_triggers = m_list_trigger.size();
     list<trigger>::iterator t = m_list_trigger.begin();
-    list<trigger>::iterator p;
 
     addListVar( a_list, 0 );
     a_list->push_front( 0xFF );
@@ -3908,7 +3907,6 @@ sequence::fill_list( list<char> *a_list, int a_pos )
 
     for ( int i=0; i<num_triggers; i++ ){
 
-        p = t;
         //printf( "> start[%d] end[%d] offset[%d]\n",
         //        (*t).m_tick_start, (*t).m_tick_end, (*t).m_offset );
 
