@@ -152,6 +152,8 @@ seqedit::seqedit( sequence *a_seq,
                                            m_seqdata_wid,
                                            m_hadjust));
 
+    m_toggle_play = manage( new ToggleButton() );
+
     m_seqroll_wid  = manage( new seqroll(  m_mainperf,
                                            m_seq,
                                            m_zoom,
@@ -161,7 +163,8 @@ seqedit::seqedit( sequence *a_seq,
                                            m_seqkeys_wid,
                                            m_pos,
                                            m_hadjust,
-                                           m_vadjust ));
+                                           m_vadjust,
+                                           m_toggle_play));
 
 
 
@@ -253,7 +256,7 @@ seqedit::seqedit( sequence *a_seq,
     dhbox->pack_start( *m_entry_data, true, true );
 
     /* play, rec, thru */
-    m_toggle_play = manage( new ToggleButton() );
+    //m_toggle_play = manage( new ToggleButton() ); // this is added previously for seqroll
     m_toggle_play->add(  *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( play_xpm ))));
     m_toggle_play->signal_clicked().connect(
             mem_fun( *this, &seqedit::play_change_callback));
@@ -1698,6 +1701,9 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
 void
 seqedit::start_playing( void )
 {
+    if(!global_song_start_mode)
+        m_seq->set_playing( m_toggle_play->get_active());
+
     m_mainperf->start_playing();
 }
 

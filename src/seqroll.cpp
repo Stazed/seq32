@@ -38,7 +38,8 @@ seqroll::seqroll(perform *a_perf,
                  seqkeys *a_seqkeys_wid,
                  int a_pos,
                  Adjustment *a_hadjust,
-                 Adjustment *a_vadjust ) :
+                 Adjustment *a_vadjust,
+                 ToggleButton *a_toggle_play) :
     m_black(Gdk::Color("black")),
     m_white(Gdk::Color("white")),
     m_grey(Gdk::Color("gray")),
@@ -97,6 +98,7 @@ seqroll::seqroll(perform *a_perf,
     colormap->alloc_color( m_dk_grey );
     colormap->alloc_color( m_red );
 
+    m_toggle_play = a_toggle_play;
     m_clipboard = new sequence( );
 
     add_events( Gdk::BUTTON_PRESS_MASK |
@@ -1065,6 +1067,9 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
     // allow toggling when the same key is mapped to both triggers (i.e. SPACEBAR)
     bool dont_toggle = m_perform->m_key_start != m_perform->m_key_stop;
     if ( a_p0->keyval ==  m_perform->m_key_start && (dont_toggle || !global_is_running) ){
+        if(!global_song_start_mode)
+            m_seq->set_playing( m_toggle_play->get_active());
+
         m_perform->start_playing();
     }
     else if ( a_p0->keyval ==  m_perform->m_key_stop && (dont_toggle || global_is_running) ){

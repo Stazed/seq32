@@ -108,6 +108,8 @@ class seqroll : public Gtk::DrawingArea
     seqevent     * const m_seqevent_wid;
     seqkeys      * const m_seqkeys_wid;
 
+    ToggleButton *m_toggle_play;
+
     int m_pos;
 
     /* one pixel == m_zoom ticks */
@@ -240,7 +242,8 @@ class seqroll : public Gtk::DrawingArea
              seqkeys *a_seqkeys_wid,
              int a_pos,
              Adjustment *a_hadjust,
-             Adjustment *a_vadjust );
+             Adjustment *a_vadjust,
+             ToggleButton *a_toggle_play);
 
     void set_data_type( unsigned char a_status, unsigned char a_control  );
 
