@@ -8,11 +8,13 @@ EXTRA_DIST += \
   %D%/expand.xpm \
   %D%/font_b.xpm \
   %D%/font_w.xpm \
+  %D%/jack.xpm\
   %D%/key.xpm \
   %D%/learn2.xpm \
   %D%/learn.xpm \
   %D%/length.xpm \
   %D%/loop.xpm \
+  %D%/menu.xpm\
   %D%/menu_empty.xpm \
   %D%/menu_full.xpm \
   %D%/midi.xpm \

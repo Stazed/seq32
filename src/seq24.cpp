@@ -81,7 +81,7 @@ bool global_with_jack_transport = false;
 bool global_with_jack_master = false;
 bool global_with_jack_master_cond = false;
 bool global_song_start_mode = true;
-bool global_menu_mode = true;
+
 Glib::ustring global_jack_session_uuid = "";
 
 user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];

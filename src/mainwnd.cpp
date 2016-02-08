@@ -36,6 +36,8 @@
 #include "pixmaps/perfedit.xpm"
 #include "pixmaps/seq24.xpm"
 #include "pixmaps/seq24_32.xpm"
+#include "pixmaps/jack.xpm"
+#include "pixmaps/menu.xpm"
 
 bool global_is_running = false;
 
@@ -49,6 +51,7 @@ bool global_is_running = false;
 mainwnd::mainwnd(perform *a_p):
     m_mainperf(a_p),
     m_modified(false),
+    m_menu_mode(false),
     m_options(NULL)
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq24_32_xpm));
@@ -122,7 +125,9 @@ mainwnd::mainwnd(perform *a_p):
     tophbox->pack_start(*m_button_mode, false, false );
 
 #ifdef JACK_SUPPORT
-    m_button_jack = manage( new ToggleButton( "Jack sync" ) );
+    //m_button_jack = manage( new ToggleButton( "Jack sync" ) );
+    m_button_jack = manage( new ToggleButton() );
+    m_button_jack->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( jack_xpm ))));
     m_button_jack->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_jack_mode ));
     add_tooltip( m_button_jack, "Toggle Jack sync connection" );
     if(global_with_jack_transport) {
@@ -131,13 +136,12 @@ mainwnd::mainwnd(perform *a_p):
     tophbox->pack_start(*m_button_jack, false, false );
 #endif
 
-    m_button_menu = manage( new ToggleButton( "Menu" ) );
+    //m_button_menu = manage( new ToggleButton( "Menu" ) );
+    m_button_menu = manage( new ToggleButton() );
+    m_button_menu->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( menu_xpm ))));
     m_button_menu->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_menu_mode ));
     add_tooltip( m_button_menu, "Toggle to disable/enable menu when sequencer is NOT running.\n\n"
                                 "The menu is disabled when the sequencer IS running.");
-    if(global_menu_mode) {
-        m_button_menu->set_active( true );
-    }
     tophbox->pack_start(*m_button_menu, false, false );
 
     // adjust placement...
@@ -373,7 +377,7 @@ mainwnd::toggle_jack( void )
 void
 mainwnd::set_menu_mode( void )
 {
-    global_menu_mode = m_button_menu->get_active();
+    m_menu_mode = m_button_menu->get_active();
 }
 
 void
@@ -881,7 +885,7 @@ bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
     if ( a_ev->type == GDK_KEY_PRESS ){
-        if(!global_is_running && global_menu_mode) // only allow menu when not running & menu button pressed
+        if(!global_is_running && !m_menu_mode) // only allow menu when not running & menu button not pressed
         {
             if ( a_ev->state & GDK_MOD1_MASK ) // alt key
             {

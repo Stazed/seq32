@@ -55,6 +55,7 @@ class mainwnd : public Gtk::Window, public performcallback
 
     perform  *m_mainperf;
     bool      m_modified;
+    bool      m_menu_mode;
     static int m_sigpipe[2];
 
 #if GTK_MINOR_VERSION < 12
