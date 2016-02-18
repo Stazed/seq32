@@ -163,6 +163,7 @@ perform::perform()
     m_key_song   = GDK_F1;
     m_key_jack   = GDK_F2;
     m_key_menu   = GDK_F3;
+    m_key_follow_trans  = GDK_F4;
 
     m_offset = 0;
     m_control_status = 0;
@@ -175,6 +176,7 @@ perform::perform()
     m_in_thread_launched = false;
 
     m_playback_mode = false;
+    m_follow_transport = true;
     m_start_from_perfedit = false;
 
     m_bp_measure = 4;
@@ -493,6 +495,20 @@ void perform::toggle_song_mode( void )
     }
 }
 
+void perform::set_follow_transport(bool a_set)
+{
+    m_follow_transport = a_set;
+}
+
+bool perform::get_follow_transport(void)
+{
+    return m_follow_transport;
+}
+
+void perform::toggle_follow_transport(void)
+{
+    set_follow_transport(!m_follow_transport);
+}
 
 void perform::set_left_tick( long a_tick )
 {

@@ -122,6 +122,7 @@ class perform
     bool m_looping;
 
     bool m_playback_mode;
+    bool m_follow_transport;
     bool m_start_from_perfedit;
 
     int thread_trigger_width_ms;
@@ -216,6 +217,7 @@ class perform
     unsigned int m_key_song;
     unsigned int m_key_jack;
     unsigned int m_key_menu;
+    unsigned int m_key_follow_trans;
 
     bool show_ui_sequence_key() const { return m_show_ui_sequence_key; }
 
@@ -226,6 +228,10 @@ class perform
     void stop_playing( void );
     void set_start_from_perfedit(bool a_start);
     void toggle_song_mode( void );
+
+    void set_follow_transport(bool a_set);
+    bool get_follow_transport(void);
+    void toggle_follow_transport( void );
 
     void init( void );
 

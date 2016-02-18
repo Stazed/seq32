@@ -93,6 +93,7 @@ class perfedit:public Gtk::Window
     Button *m_button_stop;
     Button *m_button_play;
     ToggleButton *m_button_loop;
+    ToggleButton *m_button_follow;
 
     Button *m_button_expand;
     Button *m_button_collapse;
@@ -156,6 +157,9 @@ class perfedit:public Gtk::Window
     int get_bpm();
     void set_bw( int a_beat_width );
     int get_bw();
+
+    void set_follow_transport (void);
+    void toggle_follow_transport(void);
 
     perfedit (perform * a_perf);
     ~perfedit ();

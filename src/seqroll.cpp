@@ -539,7 +539,7 @@ seqroll::draw_progress_on_window()
                 m_window_y);
     }
 
-    if(global_is_running)
+    if(global_is_running && m_perform->get_follow_transport())
     {
         auto_scroll_horz(m_seq->get_last_tick());
     }
@@ -1086,6 +1086,11 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
                 m_seq->remove_marked();
                 ret = true;
             }
+        }
+
+        if ( a_p0->keyval ==  m_perform->m_key_follow_trans ){
+            m_perform->toggle_follow_transport();
+            return true;
         }
 
 		if (!global_is_running) {
