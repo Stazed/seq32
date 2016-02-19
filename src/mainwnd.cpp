@@ -36,7 +36,6 @@
 #include "pixmaps/perfedit.xpm"
 #include "pixmaps/seq24.xpm"
 #include "pixmaps/seq24_32.xpm"
-#include "pixmaps/jack.xpm"
 #include "pixmaps/menu.xpm"
 
 bool global_is_running = false;
@@ -123,18 +122,6 @@ mainwnd::mainwnd(perform *a_p):
         m_button_mode->set_active( true );
     }
     tophbox->pack_start(*m_button_mode, false, false );
-
-#ifdef JACK_SUPPORT
-    //m_button_jack = manage( new ToggleButton( "Jack sync" ) );
-    m_button_jack = manage( new ToggleButton() );
-    m_button_jack->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( jack_xpm ))));
-    m_button_jack->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_jack_mode ));
-    add_tooltip( m_button_jack, "Toggle Jack sync connection" );
-    if(global_with_jack_transport) {
-        m_button_jack->set_active( true );
-    }
-    tophbox->pack_start(*m_button_jack, false, false );
-#endif
 
     //m_button_menu = manage( new ToggleButton( "Menu" ) );
     m_button_menu = manage( new ToggleButton() );
@@ -350,29 +337,6 @@ mainwnd::toggle_song_mode( void )
     m_button_mode->set_active( ! m_button_mode->get_active() );
     m_mainperf->set_left_frame();
 }
-
-void
-mainwnd::set_jack_mode ( void )
-{
-    if(m_button_jack->get_active() && !global_is_running)
-        m_mainperf->init_jack ();
-
-    if(!m_button_jack->get_active() && !global_is_running)
-        m_mainperf->deinit_jack ();
-
-    if(m_mainperf->is_jack_running())
-        m_button_jack->set_active(true);
-    else
-        m_button_jack->set_active(false);
-}
-
-void
-mainwnd::toggle_jack( void )
-{
-    // Note that this will trigger the button signal callback.
-    m_button_jack->set_active( ! m_button_jack->get_active() );
-}
-
 
 void
 mainwnd::set_menu_mode( void )
@@ -1052,12 +1016,6 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             toggle_song_mode();
             return true;
         }
-#ifdef JACK_SUPPORT
-        if ( a_ev->keyval ==  m_mainperf->m_key_jack ){
-            toggle_jack();
-            return true;
-        }
-#endif // JACK_SUPPORT
 
         if ( a_ev->keyval ==  m_mainperf->m_key_menu ){
             toggle_menu_mode();

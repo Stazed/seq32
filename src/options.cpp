@@ -294,7 +294,7 @@ options::add_keyboard_page()
     controltable->attach(*label, 6, 7, 2, 3);
     controltable->attach(*entry, 7, 8, 2, 3);
 
-    label = manage(new Label("transport", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Follow transport", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                 &m_perf->m_key_follow_trans));
     controltable->attach(*label, 6, 7, 3, 4);

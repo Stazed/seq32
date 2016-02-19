@@ -182,13 +182,13 @@ class perform
 #endif
 
     bool m_jack_running;
+    bool m_toggle_jack;
     bool m_jack_master;
 
     void inner_start( bool a_state );
     void inner_stop();
 
  public:
-    bool is_jack_running();
     bool is_learn_mode() const { return m_mode_group_learn; }
 
     // can register here for events...
@@ -228,6 +228,11 @@ class perform
     void stop_playing( void );
     void set_start_from_perfedit(bool a_start);
     void toggle_song_mode( void );
+
+    void toggle_jack_mode( void );
+    void set_jack_mode(bool a_mode);
+    bool get_toggle_jack( void );
+    bool is_jack_running();
 
     void set_follow_transport(bool a_set);
     bool get_follow_transport(void);

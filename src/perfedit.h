@@ -93,6 +93,7 @@ class perfedit:public Gtk::Window
     Button *m_button_stop;
     Button *m_button_play;
     ToggleButton *m_button_loop;
+    ToggleButton *m_button_jack;
     ToggleButton *m_button_follow;
 
     Button *m_button_expand;
@@ -136,6 +137,8 @@ class perfedit:public Gtk::Window
     void stop_playing (void);
 
     void set_looped (void);
+    void set_jack_mode( void );
+    void toggle_jack( void );
 
     void expand (void);
     void collapse (void);

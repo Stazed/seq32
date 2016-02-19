@@ -32,6 +32,7 @@
 #include "pixmaps/redo.xpm"
 #include "pixmaps/down.xpm"
 #include "pixmaps/perfedit.xpm"
+#include "pixmaps/jack.xpm"
 #include "pixmaps/transportFollow.xpm"
 
 using namespace sigc;
@@ -234,6 +235,17 @@ perfedit::perfedit( perform *a_perf )
     m_button_play->signal_clicked().connect(  mem_fun( *this, &perfedit::start_playing));
     add_tooltip( m_button_play, "Begin playing at L marker." );
 
+
+#ifdef JACK_SUPPORT
+    m_button_jack = manage( new ToggleButton() );
+    m_button_jack->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( jack_xpm ))));
+    m_button_jack->signal_toggled().connect(  mem_fun( *this, &perfedit::set_jack_mode ));
+    add_tooltip( m_button_jack, "Toggle Jack sync connection" );
+    if(global_with_jack_transport) {
+        m_button_jack->set_active( true );
+    }
+#endif // JACK_SUPPORT
+
     m_button_follow = manage( new ToggleButton() );
     m_button_follow->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( transportFollow_xpm ))));
     m_button_follow->signal_clicked().connect(  mem_fun( *this, &perfedit::set_follow_transport ));
@@ -269,6 +281,10 @@ perfedit::perfedit( perform *a_perf )
     m_hlbox->pack_start( *m_entry_snap , false, false );
 
     m_hlbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
+
+#ifdef JACK_SUPPORT
+    m_hlbox->pack_start( *m_button_jack , false, false );
+#endif // JACK_SUPPORT
 
     m_hlbox->pack_start( *m_button_follow , false, false );
 
@@ -318,6 +334,13 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             toggle_follow_transport();
             return true;
         }
+
+#ifdef JACK_SUPPORT
+        if ( a_ev->keyval ==  m_mainperf->m_key_jack ){
+            toggle_jack();
+            return true;
+        }
+#endif // JACK_SUPPORT
     }
 
     if(!event_was_handled)
@@ -383,6 +406,30 @@ void
 perfedit::set_looped( void )
 {
     m_mainperf->set_looping( m_button_loop->get_active());
+}
+
+void
+perfedit::set_jack_mode ( void )
+{
+    if(m_button_jack->get_active() && !global_is_running)
+        m_mainperf->init_jack ();
+
+    if(!m_button_jack->get_active() && !global_is_running)
+        m_mainperf->deinit_jack ();
+
+    if(m_mainperf->is_jack_running())
+        m_button_jack->set_active(true);
+    else
+        m_button_jack->set_active(false);
+
+    m_mainperf->set_jack_mode(m_mainperf->is_jack_running()); // for seqroll keybinding
+}
+
+void
+perfedit::toggle_jack( void )
+{
+    // Note that this will trigger the button signal callback.
+    m_button_jack->set_active( ! m_button_jack->get_active() );
 }
 
 
@@ -497,6 +544,9 @@ perfedit::timeout( void )
     m_perfroll->redraw_dirty_sequences();
     m_perfroll->draw_progress();
     m_perfnames->redraw_dirty_sequences();
+
+    if (m_button_jack->get_active() != m_mainperf->get_toggle_jack()) // for seqroll keybinding
+        toggle_jack();
 
     if (m_button_follow->get_active() != m_mainperf->get_follow_transport())
         m_button_follow->set_active(m_mainperf->get_follow_transport());
