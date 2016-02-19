@@ -138,7 +138,7 @@ class perfedit:public Gtk::Window
 
     void set_looped (void);
     void set_jack_mode( void );
-    void toggle_jack( void );
+//    void toggle_jack( void );
 
     void expand (void);
     void collapse (void);
@@ -161,6 +161,7 @@ class perfedit:public Gtk::Window
     void set_bw( int a_beat_width );
     int get_bw();
 
+    void toggle_jack( void );
     void set_follow_transport (void);
     void toggle_follow_transport(void);
 

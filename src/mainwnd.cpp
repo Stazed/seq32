@@ -1022,6 +1022,13 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 
+#ifdef JACK_SUPPORT
+        if ( a_ev->keyval ==  m_mainperf->m_key_jack ){
+            m_perf_edit->toggle_jack();
+            return true;
+        }
+#endif // JACK_SUPPORT
+
         // the start/end key may be the same key (i.e. SPACE)
         // allow toggling when the same key is mapped to both
         // triggers (i.e. SPACEBAR)
