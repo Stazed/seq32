@@ -317,6 +317,9 @@ mainwnd::timer_callback(  )
                     m_mainperf->get_screenset()));
     }
 
+    if (m_perf_edit->get_toggle_jack() != m_mainperf->get_toggle_jack()) /* for seqroll keybinding, this is needed here instead of */
+        m_perf_edit->toggle_jack();                                      /* perfedit timeout() since perfedit may not be open */
+
     if (m_button_mode->get_active() != global_song_start_mode)
         m_button_mode->set_active(global_song_start_mode);
 

@@ -425,6 +425,12 @@ perfedit::set_jack_mode ( void )
     m_mainperf->set_jack_mode(m_mainperf->is_jack_running()); // for seqroll keybinding
 }
 
+bool
+perfedit::get_toggle_jack(void)
+{
+    return m_button_jack->get_active();
+}
+
 void
 perfedit::toggle_jack( void )
 {
@@ -544,9 +550,6 @@ perfedit::timeout( void )
     m_perfroll->redraw_dirty_sequences();
     m_perfroll->draw_progress();
     m_perfnames->redraw_dirty_sequences();
-
-    if (m_button_jack->get_active() != m_mainperf->get_toggle_jack()) // for seqroll keybinding
-        toggle_jack();
 
     if (m_button_follow->get_active() != m_mainperf->get_follow_transport())
         m_button_follow->set_active(m_mainperf->get_follow_transport());
