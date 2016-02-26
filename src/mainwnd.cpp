@@ -469,8 +469,6 @@ void mainwnd::file_save_as()
     switch (result) {
         case Gtk::RESPONSE_OK:
         {
-            bool result = false;
-
             std::string fname = dialog.get_filename();
             Gtk::FileFilter* current_filter = dialog.get_filter();
 
@@ -717,8 +715,6 @@ mainwnd::file_import_dialog( void )
                 errdialog.run();
            }
 
-           global_filename = std::string(dialog.get_filename());
-           update_window_title();
            m_modified = true;
 
            m_main_wid->reset();
