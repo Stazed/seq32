@@ -300,6 +300,11 @@ seqedit::seqedit( sequence *a_seq,
 
     fill_top_bar();
 
+    if(0 != strcmp(m_seq->get_name(), "Untitled") )
+    {
+        m_seqroll_wid->set_can_focus();
+        m_seqroll_wid->grab_focus();
+    }
 
     /* add table */
     this->add( *m_vbox );
