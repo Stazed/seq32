@@ -1,3 +1,194 @@
+
+2016-02-27 Stazed <Stazed@mapson.com>
+	* src/seqedit.cpp:
+	set focus on sequence open to seqroll when not "Untitled"
+
+2016-02-26 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp:
+  	fix incorrect save on file exist overwrite Gtk::RESPONSE_NO:
+	stop changing global file name on import
+
+2016-02-19 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/perfedit.cpp, src/perfedit.h:
+	move timeout seqroll keybind for jack toggle to mainwnd
+	since perfedit may not have been opened
+
+2016-02-18 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/mainwnd.h
+	src/options.cpp, src/optionsfile.cpp, src/perfedit.cpp,
+	src/perfedit.h, src/perform.cpp, src/perform.h,
+	src/perfroll.cpp, src/pixmaps/Module.am, src/pixmaps/transportFollow.xpm,
+	src/seqroll.cpp: add transport follow toggle button with keybinding:
+ 	move jack sync button to perfedit & add keybinding to seqroll
+
+2016-02-16 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/mainwnd.h, src/pixmaps/Module.am,
+	src/pixmaps/jack.xpm, src/pixmaps/menu.xpm:
+	add pixmaps for menu and jack buttons
+
+2016-02-02 Stazed <Stazed@mapson.com>
+	* src/seqedit.cpp, src/seqroll.cpp, src/seqroll.h:
+	fix seqedit toggle play to work with song/live toggle
+
+2016-01-30 Stazed <Stazed@mapson.com>
+	* src/perfroll_input.cpp:
+	stop pushing to undo when nothing selected on motion notify
+
+2016-01-29 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/perform.cpp, src/perform.h,
+	src/perfroll.cpp, src/perfroll.h, src/perfroll_input.cpp
+	src/seqroll.cpp: add song toggle to seqroll:
+	fix unnecessary pushes to undo - perfroll
+
+2016-01-27 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/options.cpp, src/optionsfile.cpp,
+	src/perform.cpp, src/perform.h, src/seq24.cpp:
+	add menu stop button to mainwnd.cpp and keybinding:
+	refactor mainwnd on_key_press_event() for menu to
+	auto shut off menu when sequence is running
+
+2016-01-25 Stazed <Stazed@mapson.com>
+	* src/seqevent.cpp, src/seqroll.cpp:
+	optimize code for !mark_selected() to stop unnecessary redraw
+
+2016-01-23 Stazed <Stazed@mapson.com>
+	* src/globals.h, src/mainwnd.cpp, src/optionsfile.cpp,
+	src/perfedit.cpp, src/perform.cpp, src/perform.h,
+	src/perfroll.cpp, src/perfroll.h, src/seq24.cpp,
+	src/userfile.cpp:  fix start from perfedit to always start in song mode:
+	rename global_jack_start_mode to global_song_start_mode:
+	change command line message for renaming
+
+2016-01-18 Stazed <Stazed@mapson.com>
+	* src/seqedit.cpp, src/sequence.cpp:
+	add note velocity to play notes:
+	change tooltip
+
+2016-01-17 Stazed <Stazed@mapson.com>
+	* src/sequence.cpp, src/sequence.h: 
+	fix note volume button in sequence,
+	now applies to all notes - off == default 100
+	velocity for painted notes and step edit
+
+2016-01-17 Stazed <Stazed@mapson.com>
+	* src/seqroll.cpp, src/seqroll.h: 
+	add seqroll follow tranport
+
+2016-01-16 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/mainwnd.h, src/options.cpp, src/optionsfile.cpp,
+	src/perform.cpp, src/perform.h: add keybinding for song mode
+	and jack sync buttons:
+	add "New-keys" to optionsfile for backward compatibility
+
+2016-01-15 Stazed <Stazed@mapson.com>
+	* src/seqevent.cpp, src/seqroll.cpp:
+	add redo & select all events to seqevent:
+	add grid marker - formerly only 'fruity' to all
+
+2016-01-15 Stazed <Stazed@mapson.com>
+	* src/seqedit.cpp, src/seqevent.cpp, src/seqroll.cpp,
+	src/sequence.cpp, src/sequence.h: add move notes with cursor keys:
+	left/right move to snap: shift left/right move to tick :
+	ctrl left/right move transport line to grid:
+	fix unnecessary pushes to undo when nothing selected in mark_selected()
+	
+2016-01-15 Stazed <Stazed@mapson.com>
+	* src/globals.h, src/mainwnd.cpp, src/optinsfile.cpp,
+	src/perfedit.cpp, src/perform.cpp, src/perform.h,
+	src/perfroll.cpp, src/seqroll.cpp, src/sequence.cpp:
+	refactor to use global_is_running in place of 
+	perform::is_running() & is_pattern_playing to make things
+	consistant: fix compiler warning
+
+2016-01-11 Stazed <Stazed@mapson.com>
+	* src/seq24.cpp: fix command line args
+
+2016-01-06 Stazed <Stazed@mapson.com>
+	* src/perform.cpp, src/perform.h, src/perfroll.h:
+	add follow transport to song editor
+
+2016-01-04 Stazed <Stazed@mapson.com>
+	* src/perform.cpp: fix slave mode with no master(bbt)
+
+2016-01-03 Stazed <Stazed@mapson.com>
+	* src/options.cpp, src/perform.cpp:
+	fix bbt jack calc, remove song mode buttons from options
+
+2016-01-02 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/mainwnd.h, src/options.cpp,
+	src/perform.cpp, src/perform.h: 
+	add jack sync toggle to mainwnd and remove from options window
+
+2016-01-01 Stazed <Stazed@mapson.com>
+	* src/perform.cpp, src/perform.h:
+	fix jack master mode
+
+2016-01-01 Stazed <Stazed@mapson.com>
+	* src/lfownd.cpp: set lfownd to raise
+
+2015-12-26 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/perfedit.cpp, src/perform.cpp,
+	src/perform.h, src/perfroll.cpp, src/seqedit.cpp,
+	src/seqroll.cpp, src/seqroll.h:
+	move start_playing & stop_playing to perform.cpp
+
+2015-12-26 Stazed <Stazed@mapson.com>
+	* src/seqkeys.cpp, src/seqkeys.h, src/seqroll.cpp:
+	add note listen on draw/move seqroll
+
+2015-12-23 Stazed <Stazed@mapson.com>
+	* src/mainwnd.cpp, src/mainwnd.h:
+	add song mode toggle button to main window
+	
+2015-12-21 Stazed <Stazed@mapson.com>
+	* src/Module.am, src/lfownd.cpp, src/lfownd.h,
+	src/seqdata.h, src/seqedit.cpp, src/seqedit.h,
+	src/sequence.cpp, src/sequence.h:
+	add lfo-window: add lfo window to seq undo
+
+2015-12-20 Stazed <Stazed@mapson.com>
+	* src/seqedit.cpp, src/seqedit.h:
+	add play/stop buttons to seqedit
+
+2015-12-18 Stazed <Stazed@mapson.com>
+	* src/perfedit.cpp, src/perfedit.h, src/perform.cpp, src/perform.h,
+	src/seqedit.cpp, src/sequence.cpp, src/sequence.h:
+	add redo button to perfedit:
+	make perfedit undo/redo sensitive
+
+2015-12-18 Stazed <Stazed@mapson.com>
+	* src/perfedit.cpp, src/seqedit.cpp:
+	add add'l grid snap items to match beats per measure:
+	set default grid snap according to beats per measure
+
+2015-12-17 Stazed <Stazed@mapson.com>
+	* src/globals.h, src/mainwnd.cpp, src/midifile.cpp,
+	src/perfedit.cpp, src/perfedit.h, src/perform.cpp,
+	src/perform.h: add beat per measure and beat width to file write and read
+
+2015-12-17 Stazed <Stazed@mapson.com>
+	* src/seqedit.cpp, src/sequence.cpp, src/sequence.h:
+	add set sensitive to sequence undo/redo:
+	fix song triggers not drawing on sequence undo/redo - set dirty
+
+2015-11-19 Stazed <Stazed@mapson.com>
+	* src/perfroll.cpp, src/perfroll_input.cpp, src/sequence.cpp,
+	src/sequence.h: Song editor enhancements,    
+	add trigger split to split on mouse click location - grid snap:
+	add CTRL-V paste of trigger to middle mouse click on open track
+
+
+2015-11-10 Stazed <Stazed@mapson.com>
+	* src/globals.h, src/mainwnd.cpp,src/perform.cpp
+	src/seqedit.cpp, src/seqroll.cpp, src/sequence.cpp,
+	src/sequence.h : new functions to expand or compress patterns 
+	(doubling or halving timing of selected pattern):
+	new actions to select notes on even or odd beats (1/4, 1/8 or 1/16):
+	new event value randomize function:
+	lower bpm minimum from 20 to 5:
+	got rid of a few magic numbers for consistency:
+
+
 +++ Release 0.9.3 (2012-02-??) +++
 
 2012-02-25  Guido Scholz  <guido.scholz@bayernline.de>
