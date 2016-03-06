@@ -24,8 +24,7 @@
  *      Author: mattias
  */
 
-#ifndef LFOWND_H_
-#define LFOWND_H_
+#pragma once
 
 #include <gtkmm.h>
 #include <sigc++/bind.h>
@@ -62,4 +61,3 @@ public:
 	virtual ~lfownd();
 };
 
-#endif /* LFOWND_H_ */

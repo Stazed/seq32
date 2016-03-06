@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_SEQDATA
-#define SEQ24_SEQDATA
+#pragma once
 
 #include "sequence.h"
 #include "seqkeys.h"
@@ -126,5 +125,3 @@ class seqdata : public Gtk::DrawingArea
     friend class seqevent;
     friend class lfownd;
 };
-
-#endif

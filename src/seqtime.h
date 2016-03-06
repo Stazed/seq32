@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_SEQTIME
-#define SEQ24_SEQTIME
+#pragma once
 
 #include "sequence.h"
 #include "seqtime.h"
@@ -95,4 +94,3 @@ class seqtime: public Gtk::DrawingArea
 
 };
 
-#endif

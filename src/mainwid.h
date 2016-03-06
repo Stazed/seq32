@@ -26,8 +26,7 @@
 
 class seqedit;
 
-#ifndef SEQ24_MAINWID
-#define SEQ24_MAINWID
+#pragma once
 
 
 #include <gtkmm/button.h>
@@ -135,4 +134,3 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
 
 };
 
-#endif

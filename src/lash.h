@@ -18,8 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_LASH
-#define SEQ24_LASH
+#pragma once
 
 #ifdef __WIN32__
 #include "configwin32.h"
@@ -60,6 +59,3 @@ public:
 
 /* global lash driver, defined in seq24.cpp and used in midibus.cpp*/
 extern lash *lash_driver;
-
-
-#endif // SEQ24_LASH

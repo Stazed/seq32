@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_PERFNAME
-#define SEQ24_PERFNAME
+#pragma once
 
 #include "perform.h"
 #include "sequence.h"
@@ -92,5 +91,3 @@ class perfnames : public virtual Gtk::DrawingArea, public virtual seqmenu
 
 
 };
-
-#endif

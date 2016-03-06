@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_SEQKEYS
-#define SEQ24_SEQKEYS
+#pragma once
 
 #include "sequence.h"
 
@@ -115,5 +114,3 @@ public:
 
 
 };
-
-#endif

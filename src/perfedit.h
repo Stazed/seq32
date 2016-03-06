@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_PERFEDIT
-#define SEQ24_PERFEDIT
+#pragma once
 
 #include "sequence.h"
 #include "perform.h"
@@ -169,5 +168,3 @@ class perfedit:public Gtk::Window
     ~perfedit ();
 };
 
-
-#endif

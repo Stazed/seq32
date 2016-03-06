@@ -28,9 +28,7 @@
 #include "options.h"
 
 
-
-#ifndef SEQ24_MAINWINDOW
-#define SEQ24_MAINWINDOW
+#pragma once
 
 #include <map>
 #include <gtkmm.h>
@@ -147,5 +145,3 @@ class mainwnd : public Gtk::Window, public performcallback
 
 };
 
-
-#endif

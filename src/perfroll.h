@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_PERFROLL
-#define SEQ24_PERFROLL
+#pragma once
 
 #include <gtkmm/button.h>
 #include <gtkmm/window.h>
@@ -154,4 +153,3 @@ class perfroll : public Gtk::DrawingArea
     ~perfroll( );
 };
 
-#endif

@@ -18,8 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_PERFORM
-#define SEQ24_PERFORM
+#pragma once
 
 class perform;
 
@@ -411,7 +410,4 @@ int jack_process_callback(jack_nframes_t nframes, void* arg);
 #ifdef JACK_SESSION
 void jack_session_callback(jack_session_event_t *ev, void *arg);
 #endif
-#endif
-
-
 #endif

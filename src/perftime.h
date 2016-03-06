@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_PERFTIME
-#define SEQ24_PERFTIME
+#pragma once
 
 #include "perform.h"
 #include "seqtime.h"
@@ -92,4 +91,3 @@ class perftime: public Gtk::DrawingArea
     void increment_size();
 };
 
-#endif

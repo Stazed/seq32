@@ -18,8 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_CONFIGFILE
-#define SEQ24_CONFIGFILE
+#pragma once
 
 #include "perform.h"
 #include <fstream>
@@ -56,5 +55,3 @@ class configfile
 
 };
 
-
-#endif

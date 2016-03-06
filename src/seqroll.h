@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_SEQROLL
-#define SEQ24_SEQROLL
+#pragma once
 
 #include "sequence.h"
 #include "seqkeys.h"
@@ -251,4 +250,3 @@ class seqroll : public Gtk::DrawingArea
 
 };
 
-#endif

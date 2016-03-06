@@ -18,8 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_MIDIFILE
-#define SEQ24_MIDIFILE
+#pragma once
 
 #include "perform.h"
 #include <fstream>
@@ -27,17 +26,17 @@
 #include <list>
 #include <vector>
 
-class midifile 
+class midifile
 {
 
  private:
-    
+
     int m_pos;
     const std::string m_name;
 
     /* holds our data */
 	std::vector<unsigned char> m_d;
-    
+
     list<unsigned char> m_l;
 
     unsigned long read_long();
@@ -52,13 +51,10 @@ class midifile
  public:
 
     midifile(const Glib::ustring&);
- 
+
     ~midifile();
 
     bool parse( perform *a_perf, int a_screen_set );
     bool write( perform *a_perf );
 
 };
-
-
-#endif 

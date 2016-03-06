@@ -18,8 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_EVENT
-#define SEQ24_EVENT
+#pragma once
 
 #include <stdio.h>
 
@@ -153,5 +152,3 @@ class event
 
     friend class sequence;
 };
-
-#endif

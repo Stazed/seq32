@@ -18,8 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_OPTIONSFILE
-#define SEQ24_OPTIONSFILE
+#pragma once
 
 #include "perform.h"
 #include "configfile.h"
@@ -36,5 +35,3 @@ class optionsfile : public configfile
 
 };
 
-
-#endif

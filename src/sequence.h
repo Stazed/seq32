@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_SEQUENCE
-#define SEQ24_SEQUENCE
+#pragma once
 
 class sequence;
 
@@ -498,4 +497,3 @@ class sequence
     void multiply_pattern( float a_multiplier );
 };
 
-#endif

@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef SEQ24_SEQEVENT
-#define SEQ24_SEQEVENT
+#pragma once
 
 #include "sequence.h"
 #include "seqkeys.h"
@@ -179,5 +178,3 @@ class seqevent : public Gtk::DrawingArea
 
     int idle_redraw();
 };
-
-#endif

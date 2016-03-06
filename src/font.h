@@ -18,8 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 
-#ifndef SEQ24_FONT
-#define SEQ24_FONT
+#pragma once
 
 #include <gtkmm/image.h>
 #include <gtkmm/widget.h>
@@ -62,5 +61,3 @@ public:
 };
 
 extern font *p_font_renderer;
-
-#endif
