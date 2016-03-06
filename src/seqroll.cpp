@@ -830,7 +830,7 @@ seqroll::on_expose_event(GdkEventExpose* e)
 
 
 void
-seqroll::force_draw(void )
+seqroll::force_draw()
 {
     m_window->draw_drawable(m_gc,
                             m_pixmap,

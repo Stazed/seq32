@@ -88,7 +88,7 @@ perfroll::~perfroll( )
 
 
 void
-perfroll::change_horz( )
+perfroll::change_horz()
 {
     if ( m_4bar_offset != (int) m_hadjust->get_value() ){
 
@@ -98,7 +98,7 @@ perfroll::change_horz( )
 }
 
 void
-perfroll::change_vert( )
+perfroll::change_vert()
 {
     if ( m_sequence_offset != (int) m_vadjust->get_value() ){
 
@@ -561,7 +561,7 @@ perfroll::on_expose_event(GdkEventExpose* e)
 
 
 void
-perfroll::redraw_dirty_sequences( void )
+perfroll::redraw_dirty_sequences()
 {
     bool draw = false;
 

@@ -327,14 +327,14 @@ mainwnd::timer_callback(  )
 }
 
 void
-mainwnd::set_song_mode( void )
+mainwnd::set_song_mode()
 {
     global_song_start_mode = m_button_mode->get_active();
     m_mainperf->set_left_frame();
 }
 
 void
-mainwnd::toggle_song_mode( void )
+mainwnd::toggle_song_mode()
 {
     // Note that this will trigger the button signal callback.
     m_button_mode->set_active( ! m_button_mode->get_active() );
@@ -342,20 +342,20 @@ mainwnd::toggle_song_mode( void )
 }
 
 void
-mainwnd::set_menu_mode( void )
+mainwnd::set_menu_mode()
 {
     m_menu_mode = m_button_menu->get_active();
 }
 
 void
-mainwnd::toggle_menu_mode( void )
+mainwnd::toggle_menu_mode()
 {
     // Note that this will trigger the button signal callback.
     m_button_menu->set_active( ! m_button_menu->get_active() );
 }
 
 void
-mainwnd::open_performance_edit( void )
+mainwnd::open_performance_edit()
 {
     if (m_perf_edit->is_visible())
         m_perf_edit->hide();
@@ -368,7 +368,7 @@ mainwnd::open_performance_edit( void )
 
 
 void
-mainwnd::options_dialog( void )
+mainwnd::options_dialog()
 {
     delete m_options;
     m_options = new options( *this,  m_mainperf );
@@ -377,14 +377,14 @@ mainwnd::options_dialog( void )
 
 
 void
-mainwnd::start_playing( void )
+mainwnd::start_playing()
 {
     m_mainperf->start_playing();
 }
 
 
 void
-mainwnd::stop_playing( void )
+mainwnd::stop_playing()
 {
     m_mainperf->stop_playing();
     m_main_wid->update_sequences_on_window();
@@ -660,7 +660,7 @@ mainwnd::toLower(basic_string<char>& s)
 
 
 void
-mainwnd::file_import_dialog( void )
+mainwnd::file_import_dialog()
 {
     Gtk::FileChooserDialog dialog("Import MIDI file",
             Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -757,7 +757,7 @@ mainwnd::on_delete_event(GdkEventAny *a_e)
 
 
 void
-mainwnd::about_dialog( void )
+mainwnd::about_dialog()
 {
     Gtk::AboutDialog dialog;
     dialog.set_transient_for(*this);

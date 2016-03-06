@@ -105,7 +105,7 @@ void
 mainwid::draw_sequences_on_pixmap()
 {
     for ( int i=0; i< c_mainwnd_rows *  c_mainwnd_cols; i++ ){
-	
+
 	draw_sequence_on_pixmap( i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ));
 	m_last_tick_x[ i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols)  ] = 0;
     }
@@ -127,7 +127,7 @@ mainwid::fill_background_window()
 }
 
 int
-mainwid::timeout( void )
+mainwid::timeout()
 {
     return true;
 }
@@ -159,17 +159,17 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 				c_seqarea_y );
 
 	if ( m_mainperf->is_active( a_seq )){
-	
+
 	    sequence *seq = m_mainperf->get_sequence( a_seq );
-	
+
 	    if ( seq->get_playing() ){
-	
+
 	      m_last_playing[a_seq] = true;
 	      m_background = m_black;
 	      m_foreground = m_white;
-	
+
 	    } else {
-	
+
 	      m_last_playing[a_seq] = false;
 	      m_background = m_white;
 	      m_foreground = m_black;
@@ -181,8 +181,8 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 				    base_y + 1,
 				    c_seqarea_x - 2,
 				    c_seqarea_y - 2 );
-	
-	
+
+
 	    m_gc->set_foreground(m_foreground);
 	    char name[20];
 	    snprintf( name, sizeof name, "%.13s", seq->get_name() );
@@ -201,7 +201,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
                                                     base_x + c_text_x,
                                                     base_y + 4,
                                                     m_pixmap, name, col);
-	
+
 	    /* midi channel + key + timesig */
 
 		/*char key =  m_seq_to_char[local_seq];*/
@@ -268,7 +268,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 	    long tick_s;
 	    long tick_f;
 	    int note;
-	
+
 	    bool selected;
 
 	    int velocity;
@@ -279,7 +279,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 
 	    while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note,
 					      &selected, &velocity )) != DRAW_FIN ){
-	
+
 		int note_y = c_seqarea_seq_y -
 			     (c_seqarea_seq_y  * (note + 1 - lowest_note)) / height ;
 
@@ -299,7 +299,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 
 
 	    }
-	
+
 	} else {
 
 	    /* not active */
@@ -340,7 +340,7 @@ mainwid::draw_sequence_pixmap_on_window( int a_seq )
                                 base_y,
                                 c_seqarea_x,
                                 c_seqarea_y );    }
-	
+
 
 
 }
@@ -390,7 +390,7 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 
 	long tick_x = a_tick * c_seqarea_seq_x / length;
 
-	
+
         m_window->draw_drawable(m_gc,
     			 m_pixmap,
     			 rectangle_x + m_last_tick_x[a_seq],
@@ -418,7 +418,7 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 			   rectangle_y + 1,
 			   rectangle_x + tick_x,
 			   rectangle_y + c_seqarea_seq_y );
-	
+
 	//if ( seq->get_playing() ){
 	//
 	//}
@@ -475,7 +475,7 @@ mainwid::seq_from_xy( int a_x, int a_y )
 	 || x >= ((c_seqarea_x + c_mainwid_spacing ) * c_mainwnd_cols )
 	 || y < 0
 	 || y >= ((c_seqarea_y + c_mainwid_spacing ) * c_mainwnd_rows )){
-	
+
 	return -1;
     }
 

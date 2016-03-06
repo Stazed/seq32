@@ -34,7 +34,7 @@ perfnames::perfnames( perform *a_perf, Adjustment *a_vadjust ):
 		Gdk::BUTTON_RELEASE_MASK |
 		Gdk::SCROLL_MASK );
 
-    /* set default size */	
+    /* set default size */
     set_size_request( c_names_x, 100 );
 
     // in the construor you can only allocate colors,
@@ -71,7 +71,7 @@ perfnames::on_realize()
 
 
 void
-perfnames::change_vert( )
+perfnames::change_vert()
 {
     if ( m_sequence_offset != (int) m_vadjust->get_value() ){
 
@@ -114,12 +114,12 @@ perfnames::draw_sequence( int sequence )
                                  (c_names_y * i) ,
                                  c_names_x,
                                  c_names_y + 1 );
-	
+
         if ( sequence % c_seqs_in_set == 0 ){
-		
+
             char ss[3];
             snprintf(ss, sizeof(ss), "%2d", sequence / c_seqs_in_set );
-		
+
             m_gc->set_foreground(m_white);
 
             p_font_renderer->render_string_on_drawable(m_gc,
@@ -127,9 +127,9 @@ perfnames::draw_sequence( int sequence )
                                                        c_names_y * i + 2,
                                                        m_window, ss, font::WHITE );
         }
-	
+
         else {
-		
+
             m_gc->set_foreground(m_white);
             m_window->draw_rectangle(m_gc,true,
                                      1,
@@ -137,23 +137,23 @@ perfnames::draw_sequence( int sequence )
                                      (6*2) + 1,
                                      c_names_y );
         }
-	
-	
+
+
         if ( m_mainperf->is_active( sequence ))
             m_gc->set_foreground(m_white);
         else
             m_gc->set_foreground(m_grey);
-	
+
         m_window->draw_rectangle(m_gc,true,
                                  6 * 2 + 3,
                                  (c_names_y * i) + 1,
                                  c_names_x - 3 - (6*2),
                                  c_names_y - 1  );
-	
+
         if ( m_mainperf->is_active( sequence )){
 
             m_sequence_active[sequence]=true;
-		
+
             /* names */
             char name[50];
             snprintf(name, sizeof(name), "%-14.14s   %2d",
@@ -315,7 +315,7 @@ perfnames::on_size_allocate(Gtk::Allocation &a_r )
 
 
 void
-perfnames::redraw_dirty_sequences( void )
+perfnames::redraw_dirty_sequences()
 {
     int y_s = 0;
     int y_f = m_window_y / c_names_y;

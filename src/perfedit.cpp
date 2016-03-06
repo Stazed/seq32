@@ -352,34 +352,34 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
 }
 
 void
-perfedit::undo( void )
+perfedit::undo()
 {
     m_mainperf->pop_trigger_undo();
     m_perfroll->queue_draw();
 }
 
 void
-perfedit::redo( void )
+perfedit::redo()
 {
     m_mainperf->pop_trigger_redo();
     m_perfroll->queue_draw();
 }
 
 void
-perfedit::start_playing( void )
+perfedit::start_playing()
 {
     m_mainperf->set_start_from_perfedit(true);
     m_mainperf->start_playing();
 }
 
 void
-perfedit::stop_playing( void )
+perfedit::stop_playing()
 {
     m_mainperf->stop_playing();
 }
 
 void
-perfedit::collapse( void )
+perfedit::collapse()
 {
     m_mainperf->push_trigger_undo();
     m_mainperf->move_triggers( false );
@@ -387,7 +387,7 @@ perfedit::collapse( void )
 }
 
 void
-perfedit::copy( void )
+perfedit::copy()
 {
     m_mainperf->push_trigger_undo();
     m_mainperf->copy_triggers(  );
@@ -395,7 +395,7 @@ perfedit::copy( void )
 }
 
 void
-perfedit::expand( void )
+perfedit::expand()
 {
     m_mainperf->push_trigger_undo();
     m_mainperf->move_triggers( true );
@@ -403,13 +403,13 @@ perfedit::expand( void )
 }
 
 void
-perfedit::set_looped( void )
+perfedit::set_looped()
 {
     m_mainperf->set_looping( m_button_loop->get_active());
 }
 
 void
-perfedit::set_jack_mode ( void )
+perfedit::set_jack_mode ()
 {
     if(m_button_jack->get_active() && !global_is_running)
         m_mainperf->init_jack ();
@@ -426,13 +426,13 @@ perfedit::set_jack_mode ( void )
 }
 
 bool
-perfedit::get_toggle_jack(void)
+perfedit::get_toggle_jack()
 {
     return m_button_jack->get_active();
 }
 
 void
-perfedit::toggle_jack( void )
+perfedit::toggle_jack()
 {
     // Note that this will trigger the button signal callback.
     m_button_jack->set_active( ! m_button_jack->get_active() );
@@ -446,7 +446,7 @@ perfedit::popup_menu(Menu *a_menu)
 }
 
 void
-perfedit::set_guides( void )
+perfedit::set_guides()
 {
     long measure_ticks = (c_ppqn * 4) * m_bpm / m_bw;
     long snap_ticks =  measure_ticks / m_snap;
@@ -506,13 +506,13 @@ int perfedit::get_bw()
 }
 
 void
-perfedit::set_follow_transport(void)
+perfedit::set_follow_transport()
 {
     m_mainperf->set_follow_transport(m_button_follow->get_active());
 }
 
 void
-perfedit::toggle_follow_transport( void )
+perfedit::toggle_follow_transport()
 {
    // Note that this will trigger the button signal callback.
     m_button_follow->set_active( ! m_button_follow->get_active() );
@@ -544,7 +544,7 @@ perfedit::init_before_show()
 }
 
 bool
-perfedit::timeout( void )
+perfedit::timeout()
 {
 
     m_perfroll->redraw_dirty_sequences();

@@ -101,7 +101,7 @@ class midibus
 
  public:
 
-#if HAVE_LIBASOUND	
+#if HAVE_LIBASOUND
     /* constructor, client#, port#, sequencer,
        name of client, name of port */
     midibus( int a_localclient,
@@ -160,13 +160,13 @@ class midibus
     friend class mastermidibus;
 
 	/* address of client */
-#if HAVE_LIBASOUND	
-    int get_client( void ) {  return m_dest_addr_client; };
-    int get_port( void ) { return m_dest_addr_port; };
+#if HAVE_LIBASOUND
+    int get_client(void) {  return m_dest_addr_client; };
+    int get_port(void) { return m_dest_addr_port; };
 #endif
 
     static void set_clock_mod( int a_clock_mod );
-    static int get_clock_mod( void );
+    static int get_clock_mod();
 
 };
 
@@ -175,7 +175,7 @@ class mastermidibus
  private:
 
     /* sequencer client handle */
-#if HAVE_LIBASOUND	
+#if HAVE_LIBASOUND
     snd_seq_t *m_alsa_seq;
 #endif
 
@@ -225,7 +225,7 @@ class mastermidibus
 
     void init();
 
-#if HAVE_LIBASOUND	
+#if HAVE_LIBASOUND
     snd_seq_t* get_alsa_seq( ) { return m_alsa_seq; };
 #endif
 

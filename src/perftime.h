@@ -37,7 +37,7 @@
 #include <gtkmm/table.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/widget.h>
-#include <gtkmm/adjustment.h> 
+#include <gtkmm/adjustment.h>
 
 #include "globals.h"
 
@@ -47,7 +47,7 @@ using namespace Gtk;
 class perftime: public Gtk::DrawingArea
 {
 
- private: 
+ private:
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;
@@ -68,7 +68,7 @@ class perftime: public Gtk::DrawingArea
 
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);
-    bool on_button_press_event(GdkEventButton* a_ev); 
+    bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     void on_size_allocate(Gtk::Allocation &a_r );
 
@@ -79,7 +79,7 @@ class perftime: public Gtk::DrawingArea
 
     int idle_progress();
 
-    void change_horz( void );
+    void change_horz();
 
  public:
 

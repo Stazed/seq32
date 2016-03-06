@@ -311,7 +311,7 @@ seqdata::on_scroll_event( GdkEventScroll* a_ev )
     }
 
     update_pixmap();
-    queue_draw();	
+    queue_draw();
 
     return true;
 }
@@ -368,7 +368,7 @@ seqdata::on_button_release_event(GdkEventButton* a_p0)
     }
 
     update_pixmap();
-    queue_draw();	
+    queue_draw();
     return true;
 }
 
@@ -436,10 +436,10 @@ seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 					m_cc,
 					c_dataarea_y - adj_y_min -1,
 					c_dataarea_y - adj_y_max -1 );
-	
+
 	/* convert x,y to ticks, then set events in range */
 	update_pixmap();
-	
+
 
 	draw_events_on( m_window );
 
@@ -455,7 +455,7 @@ seqdata::on_leave_notify_event(GdkEventCrossing* p0)
 {
     // m_dragging = false;
     update_pixmap();
-    queue_draw();	
+    queue_draw();
     return true;
 }
 
@@ -463,7 +463,7 @@ seqdata::on_leave_notify_event(GdkEventCrossing* p0)
 
 
 void
-seqdata::draw_line_on_window( void )
+seqdata::draw_line_on_window()
 {
     int x,y,w,h;
     m_gc->set_foreground( m_black );
@@ -508,7 +508,7 @@ seqdata::draw_line_on_window( void )
 
 
 void
-seqdata::change_horz( )
+seqdata::change_horz()
 {
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
@@ -532,7 +532,7 @@ seqdata::on_size_allocate(Gtk::Allocation& a_r )
 
 
 void
-seqdata::force_draw(void )
+seqdata::force_draw()
 {
     m_window->draw_drawable(m_gc,
                             m_pixmap,

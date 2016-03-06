@@ -98,14 +98,14 @@ class mainwnd : public Gtk::Window, public performcallback
     sigc::connection   m_timeout_connect;
 
 
-    void set_song_mode( void );
-    void toggle_song_mode( void );
-    void set_menu_mode( void );
-    void toggle_menu_mode( void );
+    void set_song_mode();
+    void toggle_song_mode();
+    void set_menu_mode();
+    void toggle_menu_mode();
 
-    void file_import_dialog( void );
-    void options_dialog( void );
-    void about_dialog( void );
+    void file_import_dialog();
+    void options_dialog();
+    void about_dialog();
 
     void adj_callback_ss( );
     void adj_callback_bpm( );
@@ -115,7 +115,7 @@ class mainwnd : public Gtk::Window, public performcallback
     void start_playing();
     void stop_playing();
     void learn_toggle();
-    void open_performance_edit( );
+    void open_performance_edit();
     void sequence_key( int a_seq );
     void update_window_title();
     void toLower(basic_string<char>&);

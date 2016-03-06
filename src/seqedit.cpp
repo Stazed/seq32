@@ -91,7 +91,7 @@ const int select_odd_notes  = 16;
 /* connects to a menu item, tells the performance
    to launch the timer thread */
 void
-seqedit::menu_action_quantise( void )
+seqedit::menu_action_quantise()
 {
 }
 
@@ -339,7 +339,7 @@ seqedit::seqedit( sequence *a_seq,
 
 
 void
-seqedit::create_menus( void )
+seqedit::create_menus()
 {
     using namespace Menu_Helpers;
 
@@ -543,7 +543,7 @@ seqedit::create_menus( void )
 
 
 void
-seqedit::popup_tool_menu( void )
+seqedit::popup_tool_menu()
 {
 
     using namespace Menu_Helpers;
@@ -774,7 +774,7 @@ seqedit::do_action( int a_action, int a_var )
 
 
 void
-seqedit::fill_top_bar( void )
+seqedit::fill_top_bar()
 {
      /* name */
     m_entry_name = manage( new Entry(  ));
@@ -1043,7 +1043,7 @@ seqedit::popup_menu(Menu *a_menu)
 
 
 void
-seqedit::popup_midibus_menu( void )
+seqedit::popup_midibus_menu()
 {
     using namespace Menu_Helpers;
 
@@ -1061,7 +1061,7 @@ seqedit::popup_midibus_menu( void )
 }
 
 void
-seqedit::popup_midich_menu( void )
+seqedit::popup_midich_menu()
 {
     using namespace Menu_Helpers;
 
@@ -1093,7 +1093,7 @@ seqedit::popup_midich_menu( void )
 
 
 void
-seqedit::popup_sequence_menu( void )
+seqedit::popup_sequence_menu()
 {
     using namespace Menu_Helpers;
 
@@ -1173,7 +1173,7 @@ seqedit::create_menu_image( bool a_state )
 
 
 void
-seqedit::popup_event_menu( void )
+seqedit::popup_event_menu()
 {
     using namespace Menu_Helpers;
 
@@ -1397,7 +1397,7 @@ seqedit::apply_length( int a_bpm, int a_bw, int a_measures )
 
 
 long
-seqedit::get_measures( void )
+seqedit::get_measures()
 {
     long units = ((m_seq->get_bpm() * (c_ppqn * 4)) /  m_seq->get_bw() );
 
@@ -1465,7 +1465,7 @@ seqedit::set_rec_vol( int a_rec_vol  )
 
 
 void
-seqedit::name_change_callback( void )
+seqedit::name_change_callback()
 {
     m_seq->set_name( m_entry_name->get_text());
     // m_mainwid->update_sequence_on_window( m_pos );
@@ -1473,7 +1473,7 @@ seqedit::name_change_callback( void )
 
 
 void
-seqedit::play_change_callback( void )
+seqedit::play_change_callback()
 {
     m_seq->set_playing( m_toggle_play->get_active() );
     // m_mainwid->update_sequence_on_window( m_pos );
@@ -1481,7 +1481,7 @@ seqedit::play_change_callback( void )
 
 
 void
-seqedit::record_change_callback( void )
+seqedit::record_change_callback()
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
     m_seq->set_recording( m_toggle_record->get_active() );
@@ -1489,14 +1489,14 @@ seqedit::record_change_callback( void )
 
 
 void
-seqedit::q_rec_change_callback( void )
+seqedit::q_rec_change_callback()
 {
     m_seq->set_quanized_rec( m_toggle_q_rec->get_active() );
 }
 
 
 void
-seqedit::undo_callback( void )
+seqedit::undo_callback()
 {
 	m_seq->pop_undo( );
 
@@ -1509,7 +1509,7 @@ seqedit::undo_callback( void )
 
 
 void
-seqedit::redo_callback( void )
+seqedit::redo_callback()
 {
 	m_seq->pop_redo( );
 
@@ -1522,7 +1522,7 @@ seqedit::redo_callback( void )
 
 
 void
-seqedit::thru_change_callback( void )
+seqedit::thru_change_callback()
 {
     m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
     m_seq->set_thru( m_toggle_thru->get_active() );
@@ -1593,7 +1593,7 @@ seqedit::on_realize()
 
 
 bool
-seqedit::timeout( void )
+seqedit::timeout()
 {
 
     if (m_seq->get_raise())
@@ -1704,7 +1704,7 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
 }
 
 void
-seqedit::start_playing( void )
+seqedit::start_playing()
 {
     if(!global_song_start_mode)
         m_seq->set_playing( m_toggle_play->get_active());
@@ -1713,7 +1713,7 @@ seqedit::start_playing( void )
 }
 
 void
-seqedit::stop_playing( void )
+seqedit::stop_playing()
 {
     m_mainperf->stop_playing();
 }

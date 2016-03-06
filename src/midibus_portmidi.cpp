@@ -146,7 +146,7 @@ midibus::play( event *a_e24, unsigned char a_channel )
 
     /* temp for midi data */
 	unsigned char buffer[3];
-		
+
 	/* fill buffer and set midi channel */
 	buffer[0] = a_e24->get_status();
 	buffer[0] += (a_channel & 0x0F);
@@ -315,8 +315,8 @@ midibus::stop()
 	    PmEvent event;
         event.timestamp = 0;
         event.message = Pm_Message( EVENT_MIDI_STOP, 0,0 );
-        Pm_Write( m_pms, &event, 1 );	
-	
+        Pm_Write( m_pms, &event, 1 );
+
     }
 
 }
@@ -332,27 +332,27 @@ midibus::clock( long a_tick )
     if ( m_clock_type != e_clock_off ){
 
     	bool done = false;
-    	
+
     	long uptotick = a_tick;
-    	
+
     	if ( m_lasttick >= uptotick )
     	    done = true;
-    	
+
     	while ( !done ){
-    	
+
     	    m_lasttick++;
-    	
+
     	    if ( m_lasttick >= uptotick )
     		done = true;
-    	
+
     	    /* tick time? */
     	    if ( m_lasttick % ( c_ppqn / 24 ) == 0 )
             {
-    		
+
     	    PmEvent event;
             event.timestamp = 0;
             event.message = Pm_Message( EVENT_MIDI_CLOCK, 0,0 );
-            Pm_Write( m_pms, &event, 1 );	
+            Pm_Write( m_pms, &event, 1 );
 
 
             }
@@ -481,9 +481,9 @@ mastermidibus::mastermidibus()
     m_num_in_buses = 0;
 
     for( int i=0; i<c_maxBuses; ++i ){
-        m_buses_in_active[i] = false;	
+        m_buses_in_active[i] = false;
         m_buses_out_active[i] = false;
-        m_buses_in_init[i] = false;	
+        m_buses_in_init[i] = false;
         m_buses_out_init[i] = false;
 
         m_init_clock[i] = e_clock_off;
@@ -517,7 +517,7 @@ mastermidibus::init( )
 
             if ( m_buses_out[m_num_out_buses]->init_out() )
             {
-                m_buses_out_active[m_num_out_buses] = true;		
+                m_buses_out_active[m_num_out_buses] = true;
                 m_buses_out_init[m_num_out_buses] = true;
 
                 m_num_out_buses++;
@@ -526,7 +526,7 @@ mastermidibus::init( )
             {
                 delete m_buses_out[m_num_out_buses];
             }
-        }	
+        }
 
         if ( dev_info->input )
         {
@@ -536,7 +536,7 @@ mastermidibus::init( )
             if ( m_buses_in[m_num_in_buses]->init_in())
             {
 
-                m_buses_in_active[m_num_in_buses] = true;		
+                m_buses_in_active[m_num_in_buses] = true;
                 m_buses_in_init[m_num_in_buses] = true;
 
                 m_num_in_buses++;
@@ -545,7 +545,7 @@ mastermidibus::init( )
             {
                 delete  m_buses_in[m_num_in_buses];
             }
-        }	
+        }
     }
 
 
@@ -571,7 +571,7 @@ mastermidibus::~mastermidibus()
 	    delete m_buses_out[i];
     for ( int i=0; i<m_num_in_buses; i++ )
 	    delete m_buses_in[i];
-        	
+
     Pm_Terminate();
 
 }
@@ -633,7 +633,7 @@ midibus::set_clock_mod( int a_clock_mod )
 }
 
 int
-midibus::get_clock_mod( void )
+midibus::get_clock_mod()
 {
     return m_clock_mod;
 }

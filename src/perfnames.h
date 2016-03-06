@@ -79,13 +79,13 @@ class perfnames : public virtual Gtk::DrawingArea, public virtual seqmenu
 
     void draw_sequence( int a_sequence );
 
-    void change_vert( void );
+    void change_vert();
 
     void redraw( int a_sequence );
 
  public:
 
-    void redraw_dirty_sequences( void );
+    void redraw_dirty_sequences();
 
     perfnames( perform *a_perf,
 	       Adjustment *a_vadjust   );

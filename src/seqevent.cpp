@@ -91,7 +91,7 @@ seqevent::on_realize()
 
 
 void
-seqevent::change_horz( )
+seqevent::change_horz()
 {
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
@@ -475,7 +475,7 @@ seqevent::on_expose_event(GdkEventExpose* e)
 }
 
 void
-seqevent::force_draw(void )
+seqevent::force_draw()
 {
     m_window->draw_drawable(m_gc,
                             m_pixmap,
@@ -491,7 +491,7 @@ seqevent::force_draw(void )
 
 
 void
-seqevent::start_paste( )
+seqevent::start_paste()
 {
      long tick_s;
      long tick_f;
