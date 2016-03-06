@@ -191,6 +191,10 @@
 
 +++ Release 0.9.3 (2012-02-??) +++
 
+2016-01-22  Wolfgang Illmeyer <wolfgang@illmeyer.com>
+	* configure.ac, src/perfedit.cpp, m4/*: Make the build work with
+	C++11, as required by recent versions of gtkmm
+
 2012-02-25  Guido Scholz  <guido.scholz@bayernline.de>
 	* src/perform.*: Remove --file option from jack session
 	commandline, hint by Frank Kober

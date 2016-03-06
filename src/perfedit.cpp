@@ -139,7 +139,7 @@ perfedit::perfedit( perform *a_perf )
     /* snap */
     m_button_snap = manage( new Button());
     m_button_snap->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( snap_xpm ))));
-    m_button_snap->signal_clicked().connect(  bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_snap  ));
+    m_button_snap->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_snap  ));
     add_tooltip( m_button_snap, "Grid snap. (Fraction of Measure Length)" );
     m_entry_snap = manage( new Entry());
     m_entry_snap->set_size_request( 40, -1 );
@@ -172,7 +172,7 @@ perfedit::perfedit( perform *a_perf )
     /* beats per measure */
     m_button_bpm = manage( new Button());
     m_button_bpm->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
-    m_button_bpm->signal_clicked().connect(  bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bpm  ));
+    m_button_bpm->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bpm  ));
     add_tooltip( m_button_bpm, "Time Signature. Beats per Measure" );
     m_entry_bpm = manage( new Entry());
     m_entry_bpm->set_width_chars(2);
@@ -182,7 +182,7 @@ perfedit::perfedit( perform *a_perf )
     /* beat width */
     m_button_bw = manage( new Button());
     m_button_bw->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
-    m_button_bw->signal_clicked().connect(  bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bw  ));
+    m_button_bw->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bw  ));
     add_tooltip( m_button_bw, "Time Signature.  Length of Beat" );
     m_entry_bw = manage( new Entry());
     m_entry_bw->set_width_chars(2);
