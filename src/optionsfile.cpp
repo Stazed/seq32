@@ -19,6 +19,8 @@
 //-----------------------------------------------------------------------------
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 #include "optionsfile.h"
 
@@ -28,11 +30,6 @@ optionsfile::optionsfile(const Glib::ustring& a_name) :
     configfile( a_name )
 {
 }
-
-optionsfile::~optionsfile()
-{
-}
-
 
 
 bool
