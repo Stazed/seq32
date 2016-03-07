@@ -189,7 +189,7 @@
 	got rid of a few magic numbers for consistency:
 
 
-+++ Release 0.9.3 (2012-02-??) +++
++++ Release 0.9.3 (2016-02-24) +++
 
 2016-01-22  Wolfgang Illmeyer <wolfgang@illmeyer.com>
 	* configure.ac, src/perfedit.cpp, m4/*: Make the build work with

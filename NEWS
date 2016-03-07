@@ -1,4 +1,4 @@
-seq24-0.9.3 (2016-02-??)
+seq24-0.9.3 (2016-01-24)
 
 Fixed Bugs
   * Fix LASH support (crash on 64 Bit systems)
