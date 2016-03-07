@@ -1,41 +1,41 @@
 # Makefile.am for seq24
 
 EXTRA_DIST += \
-	%D%/bus.xpm \
-  %D%/collapse.xpm \
-  %D%/copy.xpm \
-  %D%/down.xpm \
-  %D%/expand.xpm \
-  %D%/font_b.xpm \
-  %D%/font_w.xpm \
-  %D%/jack.xpm\
-  %D%/key.xpm \
-  %D%/learn2.xpm \
-  %D%/learn.xpm \
-  %D%/length.xpm \
-  %D%/loop.xpm \
-  %D%/menu.xpm\
-  %D%/menu_empty.xpm \
-  %D%/menu_full.xpm \
-  %D%/midi.xpm \
-  %D%/note_length.xpm \
-  %D%/perfedit.xpm \
-  %D%/play2.xpm \
-  %D%/play.xpm \
-  %D%/q_rec.xpm \
-  %D%/quanize.xpm \
-  %D%/rec.xpm \
-  %D%/redo.xpm \
-  %D%/scale.xpm \
-  %D%/seq24_32.xpm \
-  %D%/seq24.xpm \
-  %D%/seq-editor.xpm \
-  %D%/sequences.xpm \
-  %D%/snap.xpm \
-  %D%/song-editor.xpm \
-  %D%/stop.xpm \
-  %D%/thru.xpm \
-  %D%/tools.xpm \
-  %D%/transportFollow.xpm \
-  %D%/undo.xpm \
-  %D%/zoom.xpm
+	src/bus.xpm \
+  src/collapse.xpm \
+  src/copy.xpm \
+  src/down.xpm \
+  src/expand.xpm \
+  src/font_b.xpm \
+  src/font_w.xpm \
+  src/jack.xpm\
+  src/key.xpm \
+  src/learn2.xpm \
+  src/learn.xpm \
+  src/length.xpm \
+  src/loop.xpm \
+  src/menu.xpm\
+  src/menu_empty.xpm \
+  src/menu_full.xpm \
+  src/midi.xpm \
+  src/note_length.xpm \
+  src/perfedit.xpm \
+  src/play2.xpm \
+  src/play.xpm \
+  src/q_rec.xpm \
+  src/quanize.xpm \
+  src/rec.xpm \
+  src/redo.xpm \
+  src/scale.xpm \
+  src/seq24_32.xpm \
+  src/seq24.xpm \
+  src/seq-editor.xpm \
+  src/sequences.xpm \
+  src/snap.xpm \
+  src/song-editor.xpm \
+  src/stop.xpm \
+  src/thru.xpm \
+  src/tools.xpm \
+  src/transportFollow.xpm \
+  src/undo.xpm \
+  src/zoom.xpm
