@@ -489,7 +489,7 @@ void mainwnd::file_save_as()
                         "Do you want to overwrite it?",
                         false,
                         Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
-                result = warning.run();
+                auto result = warning.run();
 
                 if (result == Gtk::RESPONSE_NO)
                     return;
