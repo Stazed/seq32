@@ -554,6 +554,11 @@ perfedit::timeout()
     if (m_button_follow->get_active() != m_mainperf->get_follow_transport())
         m_button_follow->set_active(m_mainperf->get_follow_transport());
 
+    if(global_is_running)
+        m_button_jack->set_sensitive(false);
+    else
+        m_button_jack->set_sensitive(true);
+
     if(m_mainperf->m_have_undo)
         m_button_undo->set_sensitive(true);
     else

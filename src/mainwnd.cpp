@@ -123,12 +123,13 @@ mainwnd::mainwnd(perform *a_p):
     }
     tophbox->pack_start(*m_button_mode, false, false );
 
-    //m_button_menu = manage( new ToggleButton( "Menu" ) );
     m_button_menu = manage( new ToggleButton() );
     m_button_menu->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( menu_xpm ))));
     m_button_menu->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_menu_mode ));
-    add_tooltip( m_button_menu, "Toggle to disable/enable menu when sequencer is NOT running.\n\n"
-                                "The menu is disabled when the sequencer IS running.");
+    add_tooltip( m_button_menu, "Toggle to disable/enable menu\n"
+                                "when sequencer is NOT running.\n\n"
+                                "The menu is disabled when the\n"
+                                "sequencer IS running.");
     tophbox->pack_start(*m_button_menu, false, false );
 
     // adjust placement...
@@ -316,9 +317,10 @@ mainwnd::timer_callback(  )
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                     m_mainperf->get_screenset()));
     }
-
-    if (m_perf_edit->get_toggle_jack() != m_mainperf->get_toggle_jack()) /* for seqroll keybinding, this is needed here instead of */
-        m_perf_edit->toggle_jack();                                      /* perfedit timeout() since perfedit may not be open */
+    /* for seqroll keybinding, this is needed here instead of */
+    /* perfedit timeout() since perfedit may not be open */
+    if (m_perf_edit->get_toggle_jack() != m_mainperf->get_toggle_jack())
+        m_perf_edit->toggle_jack();
 
     if (m_button_mode->get_active() != global_song_start_mode)
         m_button_mode->set_active(global_song_start_mode);
