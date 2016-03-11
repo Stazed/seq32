@@ -83,6 +83,7 @@ seqroll::seqroll(perform *a_perf,
 
     m_scroll_offset_x(0),
     m_scroll_offset_y(0),
+    m_scroll_page(0),
 
     m_background_sequence(0),
     m_drawing_background_seq(false),
@@ -538,12 +539,28 @@ seqroll::draw_progress_on_window()
                 m_old_progress_x,
                 m_window_y);
     }
+}
 
-    if(global_is_running && m_perform->get_follow_transport())
+void
+seqroll::follow_progress()
+{
+    long progress_tick = m_seq->get_last_tick();
+
+    if (progress_tick > 0)
     {
-        auto_scroll_horz(m_seq->get_last_tick());
-    }
+        int progress_x = progress_tick / m_zoom + 10;
+        int page = progress_x / m_window_x;
+        if (page != m_scroll_page)
+        {
+            long left_tick = page * m_window_x * m_zoom;
+            m_scroll_page = page;
 
+            if((left_tick + m_hadjust->get_page_size()) >= m_hadjust->get_upper()) // don't scroll past upper
+                m_hadjust->set_value(m_hadjust->get_upper() - m_hadjust->get_page_size());
+            else
+                m_hadjust->set_value(double(left_tick));
+        }
+    }
 }
 
 
@@ -1240,49 +1257,6 @@ seqroll::on_size_allocate(Gtk::Allocation& a_r )
 
     update_sizes();
 
-}
-
-void
-seqroll::auto_scroll_horz(long progress)
-{
-    //printf("progress[%ld]: get_upper[%f]: get_value[%f]: page_size[%f]\n",progress,m_hadjust->get_upper(),m_hadjust->get_value(),m_hadjust->get_page_size());
-
-    if(m_hadjust->get_upper() <= (c_ppqn * 16) )// don't scroll on seq <= 4 bars(at 4 X 4)
-        return;
-
-    int zoom_adjust = m_zoom / 2;
-    if(m_zoom < 2)
-        zoom_adjust = m_zoom;
-
-    zoom_adjust *= (c_ppqn * 4); // bar
-    long rnd_progress = progress /  zoom_adjust; //  to avoid redraw every tick mark
-    rnd_progress *=  zoom_adjust ;
-
-    static bool set_progress = true; // to prevent multiple set_value() settings
-
-    if(progress > ((m_hadjust->get_page_size()/2) + zoom_adjust/2) || // offset for reading easier
-         ((m_hadjust->get_value() + m_hadjust->get_page_size()) <= m_hadjust->get_upper()))
-    {
-
-        if(progress - rnd_progress >= zoom_adjust/2 ) // 1/2 of zoom_adjust for middle set_value()
-        {
-            if((m_hadjust->get_value() + m_hadjust->get_page_size()) <= m_hadjust->get_upper())
-            {
-                long calc_value = progress - (m_hadjust->get_page_size()/2) + zoom_adjust/2;
-                if((calc_value + m_hadjust->get_page_size()) >= m_hadjust->get_upper() && set_progress) // don't scroll past upper
-                   m_hadjust->set_value(m_hadjust->get_upper() - m_hadjust->get_page_size());
-                else if(set_progress)
-                    m_hadjust->set_value(calc_value);
-                //printf("calc_value [%ld]: set_value [%f]\n",calc_value,m_hadjust->get_value());
-
-                set_progress = false; // since we just set_value() - now shut off
-            }
-        } else
-            set_progress = true;  //  <  this means we are on the next set of ticks so turn on until we set_value() again
-    }
-
-    if(progress >= m_hadjust->get_upper()-30) // -30 (magic guess) because progress will never reach get_upper since we limit above
-        m_hadjust->set_value(0);
 }
 
 bool

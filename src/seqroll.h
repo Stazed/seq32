@@ -157,6 +157,8 @@ class seqroll : public Gtk::DrawingArea
     int m_scroll_offset_x;
     int m_scroll_offset_y;
 
+    int m_scroll_page;
+
     int m_background_sequence;
     bool m_drawing_background_seq;
 
@@ -171,8 +173,6 @@ class seqroll : public Gtk::DrawingArea
     bool on_focus_in_event(GdkEventFocus*);
     bool on_focus_out_event(GdkEventFocus*);
     bool on_scroll_event( GdkEventScroll* a_ev);
-
-    void auto_scroll_horz(long progress);
 
     bool on_leave_notify_event	(GdkEventCrossing* a_p0);
     bool on_enter_notify_event	(GdkEventCrossing* a_p0);
@@ -229,6 +229,7 @@ class seqroll : public Gtk::DrawingArea
     int idle_redraw();
 
     void draw_progress_on_window();
+    void follow_progress();
 
     void start_paste( );
 

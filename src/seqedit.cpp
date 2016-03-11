@@ -1611,6 +1611,12 @@ seqedit::timeout()
 
     m_seqroll_wid->draw_progress_on_window();
 
+    if(global_is_running && m_mainperf->get_follow_transport())
+    {
+       m_seqroll_wid->follow_progress();
+    }
+
+
     if(m_seq->have_undo)
         m_button_undo->set_sensitive(true);
     else
