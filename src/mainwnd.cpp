@@ -866,31 +866,33 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
     if ( a_ev->type == GDK_KEY_PRESS ){
 
-        if ( a_ev->state & GDK_MOD1_MASK ) // alt key
+        if(!global_is_running && !m_menu_mode) // only allow menu when not running & menu button not pressed
         {
-            if ((a_ev->keyval == GDK_b || a_ev->keyval == GDK_B) || // bpm
-                (a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) || // file
-                (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H) || // help
-                (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // name
-                (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) || // set
-                (a_ev->keyval == GDK_v || a_ev->keyval == GDK_V))   // view
+            if ( a_ev->state & GDK_MOD1_MASK ) // alt key
             {
-                return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+                if ((a_ev->keyval == GDK_b || a_ev->keyval == GDK_B) || // bpm
+                    (a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) || // file
+                    (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H) || // help
+                    (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // name
+                    (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) || // set
+                    (a_ev->keyval == GDK_v || a_ev->keyval == GDK_V))   // view
+                {
+                    return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+                }
+            }
+
+            if ( a_ev->state & GDK_CONTROL_MASK ) // ctrl key
+            {
+                if ((a_ev->keyval == GDK_e || a_ev->keyval == GDK_E) || // song editor
+                    (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // new file
+                    (a_ev->keyval == GDK_o || a_ev->keyval == GDK_O) || // open file
+                    (a_ev->keyval == GDK_q || a_ev->keyval == GDK_Q) || // quit
+                    (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) )  // save
+                {
+                    return Gtk::Window::on_key_press_event(a_ev); // return =  don't do anything else
+                }
             }
         }
-
-        if ( a_ev->state & GDK_CONTROL_MASK ) // ctrl key
-        {
-            if ((a_ev->keyval == GDK_e || a_ev->keyval == GDK_E) || // song editor
-                (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // new file
-                (a_ev->keyval == GDK_o || a_ev->keyval == GDK_O) || // open file
-                (a_ev->keyval == GDK_q || a_ev->keyval == GDK_Q) || // quit
-                (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) )  // save
-            {
-                return Gtk::Window::on_key_press_event(a_ev); // return =  don't do anything else
-            }
-        }
-
         // screen name - this must go before the shift_mask & tab below
         // or we get duplicate entries on caps and reverse tab
         if(get_focus()->get_name() == "gtkmm__GtkEntry")  // if we are on the screen name
