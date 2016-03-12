@@ -254,6 +254,9 @@ mainwnd::mainwnd(perform *a_p):
     mainvbox->pack_start(*m_menubar, false, false );
     mainvbox->pack_start( *contentvbox );
 
+    m_main_wid->set_can_focus();
+    m_main_wid->grab_focus();
+
     /* add main layout box */
     this->add (*mainvbox);
 
@@ -309,7 +312,6 @@ mainwnd::timer_callback(  )
         m_perf_edit->set_bw( m_mainperf->get_bw());
     }
 
-
     if ( m_adjust_ss->get_value() !=  m_mainperf->get_screenset() )
     {
         m_main_wid->set_screenset(m_mainperf->get_screenset());
@@ -324,6 +326,19 @@ mainwnd::timer_callback(  )
 
     if (m_button_mode->get_active() != global_song_start_mode)
         m_button_mode->set_active(global_song_start_mode);
+
+    if(global_is_running)
+    {
+        if(m_button_mode->has_focus()) // needed to avoid segfault on get_focus() from on_key_press_event()
+            m_main_wid->grab_focus();  // when the focus is on non-sensitive m_button_mode
+        m_button_mode->set_sensitive(false);
+        m_menubar->set_sensitive(false);
+    }
+    else
+    {
+        m_button_mode->set_sensitive(true);
+        m_menubar->set_sensitive(!m_menu_mode);
+    }
 
     return true;
 }
@@ -850,31 +865,29 @@ bool
 mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
     if ( a_ev->type == GDK_KEY_PRESS ){
-        if(!global_is_running && !m_menu_mode) // only allow menu when not running & menu button not pressed
-        {
-            if ( a_ev->state & GDK_MOD1_MASK ) // alt key
-            {
-                if ((a_ev->keyval == GDK_b || a_ev->keyval == GDK_B) || // bpm
-                    (a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) || // file
-                    (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H) || // help
-                    (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // name
-                    (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) || // set
-                    (a_ev->keyval == GDK_v || a_ev->keyval == GDK_V))   // view
-                {
-                    return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
-                }
-            }
 
-            if ( a_ev->state & GDK_CONTROL_MASK ) // ctrl key
+        if ( a_ev->state & GDK_MOD1_MASK ) // alt key
+        {
+            if ((a_ev->keyval == GDK_b || a_ev->keyval == GDK_B) || // bpm
+                (a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) || // file
+                (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H) || // help
+                (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // name
+                (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) || // set
+                (a_ev->keyval == GDK_v || a_ev->keyval == GDK_V))   // view
             {
-                if ((a_ev->keyval == GDK_e || a_ev->keyval == GDK_E) || // song editor
-                    (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // new file
-                    (a_ev->keyval == GDK_o || a_ev->keyval == GDK_O) || // open file
-                    (a_ev->keyval == GDK_q || a_ev->keyval == GDK_Q) || // quit
-                    (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) )  // save
-                {
-                    return Gtk::Window::on_key_press_event(a_ev); // return =  don't do anything else
-                }
+                return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+            }
+        }
+
+        if ( a_ev->state & GDK_CONTROL_MASK ) // ctrl key
+        {
+            if ((a_ev->keyval == GDK_e || a_ev->keyval == GDK_E) || // song editor
+                (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // new file
+                (a_ev->keyval == GDK_o || a_ev->keyval == GDK_O) || // open file
+                (a_ev->keyval == GDK_q || a_ev->keyval == GDK_Q) || // quit
+                (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) )  // save
+            {
+                return Gtk::Window::on_key_press_event(a_ev); // return =  don't do anything else
             }
         }
 

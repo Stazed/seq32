@@ -438,9 +438,6 @@ options::add_jack_sync_page()
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_transport, check));
 
-    if(global_is_running)
-        check->set_sensitive(false);
-
     transportbox->pack_start(*check, false, false);
 
     check = manage(new CheckButton("Trans_port Master", true));
@@ -448,9 +445,6 @@ options::add_jack_sync_page()
     add_tooltip( check, "Seq24 will attempt to serve as JACK Master.");
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_master, check));
-
-    if(global_is_running)
-        check->set_sensitive(false);
 
     transportbox->pack_start(*check, false, false);
 
@@ -460,9 +454,6 @@ options::add_jack_sync_page()
             "Seq24 will fail to be master if there is already a master set.");
     check->signal_toggled().connect(bind(mem_fun(*this,
                     &options::transport_callback), e_jack_master_cond, check));
-
-    if(global_is_running)
-        check->set_sensitive(false);
 
     transportbox->pack_start(*check, false, false);
 
