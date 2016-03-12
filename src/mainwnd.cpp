@@ -319,10 +319,12 @@ mainwnd::timer_callback(  )
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                     m_mainperf->get_screenset()));
     }
+#ifdef JACK_SUPPORT
     /* for seqroll keybinding, this is needed here instead of */
     /* perfedit timeout() since perfedit may not be open */
     if (m_perf_edit->get_toggle_jack() != m_mainperf->get_toggle_jack())
         m_perf_edit->toggle_jack();
+#endif // JACK_SUPPORT
 
     if (m_button_mode->get_active() != global_song_start_mode)
         m_button_mode->set_active(global_song_start_mode);
@@ -354,9 +356,13 @@ void
 mainwnd::toggle_song_mode()
 {
     // Note that this will trigger the button signal callback.
-    m_button_mode->set_active( ! m_button_mode->get_active() );
-    m_mainperf->set_left_frame();
+    if(!global_is_running)
+    {
+        m_button_mode->set_active( ! m_button_mode->get_active() );
+        m_mainperf->set_left_frame();
+    }
 }
+
 
 void
 mainwnd::set_menu_mode()

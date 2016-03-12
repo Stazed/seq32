@@ -408,6 +408,7 @@ perfedit::set_looped()
     m_mainperf->set_looping( m_button_loop->get_active());
 }
 
+#ifdef JACK_SUPPORT
 void
 perfedit::set_jack_mode ()
 {
@@ -437,7 +438,7 @@ perfedit::toggle_jack()
     // Note that this will trigger the button signal callback.
     m_button_jack->set_active( ! m_button_jack->get_active() );
 }
-
+#endif // JACK_SUPPORT
 
 void
 perfedit::popup_menu(Menu *a_menu)
@@ -554,10 +555,12 @@ perfedit::timeout()
     if (m_button_follow->get_active() != m_mainperf->get_follow_transport())
         m_button_follow->set_active(m_mainperf->get_follow_transport());
 
+#ifdef JACK_SUPPORT
     if(global_is_running)
         m_button_jack->set_sensitive(false);
     else
         m_button_jack->set_sensitive(true);
+#endif // JACK_SUPPORT
 
     if(m_mainperf->m_have_undo)
         m_button_undo->set_sensitive(true);
