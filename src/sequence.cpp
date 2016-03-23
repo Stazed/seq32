@@ -470,17 +470,12 @@ sequence::play( long a_tick, bool a_playback_mode )
 }
 
 
-
-
-
-
-
 void
 sequence::zero_markers()
 {
     lock();
 
-    m_last_tick = 0;
+    m_last_tick = 0;  // this clears the progress line on stop
 
     //m_masterbus->flush( );
 

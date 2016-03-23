@@ -1091,9 +1091,11 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
             m_seq->set_playing( m_toggle_play->get_active());
 
         m_perform->start_playing();
+        return true;
     }
     else if ( a_p0->keyval ==  m_perform->m_key_stop && (dont_toggle || global_is_running) ){
         m_perform->stop_playing();
+        return true;
     }
 
     if ( a_p0->type == GDK_KEY_PRESS ){

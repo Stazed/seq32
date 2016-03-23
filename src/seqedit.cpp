@@ -1704,8 +1704,14 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
 
     if ((a_ev->state & modifiers) == GDK_CONTROL_MASK && a_ev->keyval == 'w')
         return on_delete_event((GdkEventAny*)a_ev);
-    else
+
+    if(get_focus()->get_name() == "gtkmm__GtkEntry")  // if we are on the sequence name
+        return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+
+    if(! m_seqroll_wid->on_key_press_event(a_ev))     // seqroll has precedence - no duplicates
         return Gtk::Window::on_key_press_event(a_ev);
+
+    return false;
 }
 
 void

@@ -1981,7 +1981,7 @@ void perform::output_func()
             }
         }
 
-        m_tick = 0;
+        m_tick = 0;  // This clears the progress line on song editor and mainwnd on stop
         m_master_bus.flush();
         m_master_bus.stop();
     }
