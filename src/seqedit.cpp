@@ -300,7 +300,7 @@ seqedit::seqedit( sequence *a_seq,
 
     fill_top_bar();
 
-    if(0 != strcmp(m_seq->get_name(), "Untitled") )
+    if (m_seq->get_name() != std::string("Untitled"))
     {
         m_seqroll_wid->set_can_focus();
         m_seqroll_wid->grab_focus();
@@ -777,6 +777,7 @@ seqedit::fill_top_bar()
 {
      /* name */
     m_entry_name = manage( new Entry(  ));
+    m_entry_name->set_name("Sequence Name");
     m_entry_name->set_max_length(26);
     m_entry_name->set_width_chars(26);
     m_entry_name->set_text( m_seq->get_name());
@@ -1705,7 +1706,7 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
     if ((a_ev->state & modifiers) == GDK_CONTROL_MASK && a_ev->keyval == 'w')
         return on_delete_event((GdkEventAny*)a_ev);
 
-    if(get_focus()->get_name() == "gtkmm__GtkEntry")  // if we are on the sequence name
+    if(get_focus()->get_name() == "Sequence Name")    // if we are on the sequence name
         return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
     if(! m_seqroll_wid->on_key_press_event(a_ev))     // seqroll has precedence - no duplicates

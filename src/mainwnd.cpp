@@ -203,6 +203,7 @@ mainwnd::mainwnd(perform *a_p):
     bottomhbox->pack_start(*notebox, Gtk::PACK_EXPAND_WIDGET);
 
     m_entry_notes = manage( new Entry());
+    m_entry_notes->set_name( "Screen Name" );
     m_entry_notes->signal_changed().connect(
             mem_fun(*this, &mainwnd::edit_callback_notepad));
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
@@ -901,7 +902,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         }
         // screen name - this must go before the shift_mask & tab below
         // or we get duplicate entries on caps and reverse tab
-        if(get_focus()->get_name() == "gtkmm__GtkEntry")  // if we are on the screen name
+        if(get_focus()->get_name() == "Screen Name")      // if we are on the screen name
             return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
         // stop, start, song, jack, menu, edit ,L
