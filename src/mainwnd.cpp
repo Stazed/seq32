@@ -330,18 +330,20 @@ mainwnd::timer_callback(  )
     if (m_button_mode->get_active() != global_song_start_mode)
         m_button_mode->set_active(global_song_start_mode);
 
-    if(global_is_running)
+    if(global_is_running && m_button_mode->get_sensitive())
     {
         if(m_button_mode->has_focus()) // needed to avoid segfault on get_focus() from on_key_press_event()
             m_main_wid->grab_focus();  // when the focus is on non-sensitive m_button_mode
+
         m_button_mode->set_sensitive(false);
-        m_menubar->set_sensitive(false);
     }
-    else
-    {
+    else if(!global_is_running && !m_button_mode->get_sensitive())
         m_button_mode->set_sensitive(true);
+
+    if(global_is_running && m_menubar->get_sensitive())
+        m_menubar->set_sensitive(false);
+    else if(!global_is_running && (m_menubar->get_sensitive() == m_menu_mode ))
         m_menubar->set_sensitive(!m_menu_mode);
-    }
 
     return true;
 }

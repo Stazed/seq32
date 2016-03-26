@@ -189,8 +189,8 @@ class sequence
       sequence ();
      ~sequence ();
 
-    bool have_undo;
-    bool have_redo;
+    bool m_have_undo;
+    bool m_have_redo;
 
     void push_undo ();
     void pop_undo ();

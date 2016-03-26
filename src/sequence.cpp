@@ -63,8 +63,8 @@ sequence::sequence( ) :
     m_time_beat_width(4),
     m_rec_vol(0),
 
-    have_undo(false),
-    have_redo(false),
+    m_have_undo(false),
+    m_have_redo(false),
     have_trigger_undo(false),
     have_trigger_redo(false)
 
@@ -127,18 +127,18 @@ void
 sequence::set_have_undo()
 {
     if(m_list_undo.size() > 0)
-        have_undo = true;
+        m_have_undo = true;
     else
-        have_undo = false;
+        m_have_undo = false;
 }
 
 void
 sequence::set_have_redo()
 {
     if(m_list_redo.size() > 0)
-        have_redo = true;
+        m_have_redo = true;
     else
-        have_redo = false;
+        m_have_redo = false;
 }
 
 void
