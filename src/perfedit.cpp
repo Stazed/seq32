@@ -308,6 +308,24 @@ bool
 perfedit::on_key_press_event(GdkEventKey* a_ev)
 {
     bool event_was_handled = false;
+
+    // control and modifier key combinations matching
+    if ( a_ev->state & GDK_CONTROL_MASK )
+    {
+        /* Ctrl-Z: Undo */
+        if ( a_ev->keyval == GDK_z || a_ev->keyval == GDK_Z )
+        {
+            undo();
+            return true;
+        }
+        /* Ctrl-R: Redo */
+        if ( a_ev->keyval == GDK_r || a_ev->keyval == GDK_R )
+        {
+            redo();
+            return true;
+        }
+    }
+
     if ( a_ev->type == GDK_KEY_PRESS ){
 
         if ( global_print_keys ){
