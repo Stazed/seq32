@@ -146,15 +146,15 @@ perfedit::perfedit( perform *a_perf )
     m_entry_snap->set_editable( false );
 
 
-    m_menu_bpm = manage( new Menu() );
+    m_menu_bp_measure = manage( new Menu() );
     m_menu_bw = manage( new Menu() );
 
     /* bw */
-    m_menu_bw->items().push_back(MenuElem("1", sigc::bind(mem_fun(*this,&perfedit::set_bw), 1  )));
-    m_menu_bw->items().push_back(MenuElem("2", sigc::bind(mem_fun(*this,&perfedit::set_bw), 2  )));
-    m_menu_bw->items().push_back(MenuElem("4", sigc::bind(mem_fun(*this,&perfedit::set_bw), 4  )));
-    m_menu_bw->items().push_back(MenuElem("8", sigc::bind(mem_fun(*this,&perfedit::set_bw), 8  )));
-    m_menu_bw->items().push_back(MenuElem("16", sigc::bind(mem_fun(*this,&perfedit::set_bw), 16 )));
+    m_menu_bw->items().push_back(MenuElem("1", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 1  )));
+    m_menu_bw->items().push_back(MenuElem("2", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 2  )));
+    m_menu_bw->items().push_back(MenuElem("4", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 4  )));
+    m_menu_bw->items().push_back(MenuElem("8", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 8  )));
+    m_menu_bw->items().push_back(MenuElem("16", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 16 )));
 
     char b[20];
 
@@ -163,20 +163,20 @@ perfedit::perfedit( perform *a_perf )
         snprintf( b, sizeof(b), "%d", i+1 );
 
         /* length */
-        m_menu_bpm->items().push_back(MenuElem(b,
-                                               sigc::bind(mem_fun(*this,&perfedit::set_bpm),
+        m_menu_bp_measure->items().push_back(MenuElem(b,
+                                               sigc::bind(mem_fun(*this,&perfedit::bp_measure_button_callback),
                                                     i+1 )));
     }
 
 
     /* beats per measure */
-    m_button_bpm = manage( new Button());
-    m_button_bpm->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
-    m_button_bpm->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bpm  ));
-    add_tooltip( m_button_bpm, "Time Signature. Beats per Measure" );
-    m_entry_bpm = manage( new Entry());
-    m_entry_bpm->set_width_chars(2);
-    m_entry_bpm->set_editable( false );
+    m_button_bp_measure = manage( new Button());
+    m_button_bp_measure->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
+    m_button_bp_measure->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_bp_measure  ));
+    add_tooltip( m_button_bp_measure, "Time Signature. Beats per Measure" );
+    m_entry_bp_measure = manage( new Entry());
+    m_entry_bp_measure->set_width_chars(2);
+    m_entry_bp_measure->set_editable( false );
 
 
     /* beat width */
@@ -266,8 +266,8 @@ perfedit::perfedit( perform *a_perf )
 
     m_hlbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
-    m_hlbox->pack_start( *m_button_bpm , false, false );
-    m_hlbox->pack_start( *m_entry_bpm , false, false );
+    m_hlbox->pack_start( *m_button_bp_measure , false, false );
+    m_hlbox->pack_start( *m_entry_bp_measure , false, false );
 
     m_hlbox->pack_start( *(manage(new Label( "/" ))), false, false, 4);
 
@@ -293,11 +293,11 @@ perfedit::perfedit( perform *a_perf )
     this->add( *m_table );
 
     m_snap = 8;
-    m_bpm = 4;
+    m_bp_measure = 4;
     m_bw = 4;
 
     set_snap( 8 );
-    set_bpm( 4 );
+    set_bp_measure( 4 );
     set_bw( 4 );
 
     add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );
@@ -467,7 +467,7 @@ perfedit::popup_menu(Menu *a_menu)
 void
 perfedit::set_guides()
 {
-    long measure_ticks = (c_ppqn * 4) * m_bpm / m_bw;
+    long measure_ticks = (c_ppqn * 4) * m_bp_measure / m_bw;
     long snap_ticks =  measure_ticks / m_snap;
     long beat_ticks = (c_ppqn * 4) / m_bw;
     m_perfroll->set_guides( snap_ticks, measure_ticks, beat_ticks );
@@ -486,7 +486,16 @@ perfedit::set_snap( int a_snap  )
     set_guides();
 }
 
-void perfedit::set_bpm( int a_beats_per_measure )
+void perfedit::bp_measure_button_callback(int a_beats_per_measure)
+{
+    if(m_bp_measure != a_beats_per_measure )
+    {
+        set_bp_measure(a_beats_per_measure);
+        global_is_modified = true;
+    }
+}
+
+void perfedit::set_bp_measure( int a_beats_per_measure )
 {
     m_mainperf->set_bp_measure(a_beats_per_measure);
 
@@ -497,15 +506,24 @@ void perfedit::set_bpm( int a_beats_per_measure )
 
     char b[10];
     snprintf(b, sizeof(b), "%d", a_beats_per_measure );
-    m_entry_bpm->set_text(b);
+    m_entry_bp_measure->set_text(b);
 
-    m_bpm = a_beats_per_measure;
+    m_bp_measure = a_beats_per_measure;
     set_guides();
 }
 
-int perfedit::get_bpm()
+int perfedit::get_bp_measure()
 {
-    return m_bpm;
+    return m_bp_measure;
+}
+
+void perfedit::bw_button_callback(int a_beat_width)
+{
+    if(m_bw != a_beat_width )
+    {
+        set_bw(a_beat_width);
+        global_is_modified = true;
+    }
 }
 
 void perfedit::set_bw( int a_beat_width )

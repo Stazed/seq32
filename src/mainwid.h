@@ -19,7 +19,6 @@
 //-----------------------------------------------------------------------------
 
 
-
 #include "globals.h"
 #include "perform.h"
 #include "seqmenu.h"
@@ -27,7 +26,6 @@
 class seqedit;
 
 #pragma once
-
 
 #include <gtkmm/button.h>
 #include <gtkmm/window.h>

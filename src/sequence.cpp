@@ -130,6 +130,8 @@ sequence::set_have_undo()
         m_have_undo = true;
     else
         m_have_undo = false;
+
+    global_is_modified = true; // once set, always set unless cleared by file save
 }
 
 void

@@ -103,8 +103,8 @@ class perfedit:public Gtk::Window
     Button *m_button_undo;
     Button *m_button_redo;
 
-    Button      *m_button_bpm;
-    Entry       *m_entry_bpm;
+    Button      *m_button_bp_measure;
+    Entry       *m_entry_bp_measure;
 
     Button      *m_button_bw;
     Entry       *m_entry_bw;
@@ -115,14 +115,17 @@ class perfedit:public Gtk::Window
     Tooltips *m_tooltips;
 
     /* time signature, beats per measure, beat width */
-    Menu       *m_menu_bpm;
+    Menu       *m_menu_bp_measure;
     Menu       *m_menu_bw;
 
 
     /* set snap to in pulses */
     int m_snap;
-    int m_bpm;
+    int m_bp_measure;
     int m_bw;
+
+    void bp_measure_button_callback(int a_beats_per_measure);
+    void bw_button_callback(int a_beat_width);
 
     void set_snap (int a_snap);
 
@@ -154,8 +157,8 @@ class perfedit:public Gtk::Window
   public:
 
     void init_before_show ();
-    void set_bpm( int a_beats_per_measure );
-    int get_bpm();
+    void set_bp_measure( int a_beats_per_measure );
+    int get_bp_measure();
     void set_bw( int a_beat_width );
     int get_bw();
 

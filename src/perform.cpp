@@ -734,7 +734,8 @@ void perform::set_bpm(int a_bpm)
     if ( a_bpm < 5 )  a_bpm = 5;
     if ( a_bpm > 500 ) a_bpm = 500;
 
-    if ( ! (m_jack_running && global_is_running )){
+    if ( ! (m_jack_running && global_is_running ))
+    {
         m_master_bus.set_bpm( a_bpm );
     }
 }
@@ -774,6 +775,7 @@ void perform::delete_sequence( int a_num )
 
         m_seqs[a_num]->set_playing( false );
         delete m_seqs[a_num];
+        global_is_modified = true;
     }
 }
 
@@ -791,7 +793,7 @@ void perform::new_sequence( int a_sequence )
     m_seqs[ a_sequence ] = new sequence();
     m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
     set_active(a_sequence, true);
-
+    global_is_modified = true;
 }
 
 
@@ -1025,6 +1027,7 @@ void perform::pop_trigger_redo()
 void perform::set_have_undo(bool a_undo)
 {
     m_have_undo = a_undo;
+    global_is_modified = true; // once set always set - unless cleared by save file
 }
 
 void perform::set_have_redo(bool a_redo)

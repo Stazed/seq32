@@ -175,7 +175,7 @@ seqedit::seqedit( sequence *a_seq,
     m_menu_snap =   manage( new Menu());
     m_menu_note_length = manage( new Menu());
     m_menu_length = manage( new Menu());
-    m_menu_bpm = manage( new Menu() );
+    m_menu_bp_measure = manage( new Menu() );
     m_menu_bw = manage( new Menu() );
     m_menu_rec_vol = manage( new Menu() );
 
@@ -322,7 +322,7 @@ seqedit::seqedit( sequence *a_seq,
     set_background_sequence( m_sequence );
 
 
-    set_bpm( m_seq->get_bpm() );
+    set_bp_measure( m_seq->get_bpm() );
     set_bw( m_seq->get_bw() );
     set_measures( get_measures() );
 
@@ -526,16 +526,16 @@ seqedit::create_menus()
 
         /* length */
         m_menu_length->items().push_back(MenuElem(b,
-                    sigc::bind(mem_fun(*this, &seqedit::set_measures), i+1 )));
+                    sigc::bind(mem_fun(*this, &seqedit::measures_button_callback), i+1 )));
         /* length */
-        m_menu_bpm->items().push_back(MenuElem(b,
-                    sigc::bind(mem_fun(*this, &seqedit::set_bpm), i+1 )));
+        m_menu_bp_measure->items().push_back(MenuElem(b,
+                    sigc::bind(mem_fun(*this, &seqedit::set_bp_measure), i+1 )));
     }
 
     m_menu_length->items().push_back(MenuElem("32",
-                sigc::bind(mem_fun(*this, &seqedit::set_measures), 32 )));
+                sigc::bind(mem_fun(*this, &seqedit::measures_button_callback), 32 )));
     m_menu_length->items().push_back(MenuElem("64",
-                sigc::bind(mem_fun(*this, &seqedit::set_measures), 64 )));
+                sigc::bind(mem_fun(*this, &seqedit::measures_button_callback), 64 )));
 
   //m_menu_tools->items().push_back( SeparatorElem( ));
 }
@@ -790,18 +790,18 @@ seqedit::fill_top_bar()
     m_hbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
     /* beats per measure */
-    m_button_bpm = manage( new Button());
-    m_button_bpm->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
-    m_button_bpm->signal_clicked().connect(
+    m_button_bp_measure = manage( new Button());
+    m_button_bp_measure->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( down_xpm  ))));
+    m_button_bp_measure->signal_clicked().connect(
             sigc::bind<Menu *>( mem_fun( *this, &seqedit::popup_menu),
-                m_menu_bpm  ));
-    add_tooltip( m_button_bpm, "Time Signature. Beats per Measure" );
-    m_entry_bpm = manage( new Entry());
-    m_entry_bpm->set_width_chars(2);
-    m_entry_bpm->set_editable( false );
+                m_menu_bp_measure  ));
+    add_tooltip( m_button_bp_measure, "Time Signature. Beats per Measure" );
+    m_entry_bp_measure = manage( new Entry());
+    m_entry_bp_measure->set_width_chars(2);
+    m_entry_bp_measure->set_editable( false );
 
-    m_hbox->pack_start( *m_button_bpm , false, false );
-    m_hbox->pack_start( *m_entry_bpm , false, false );
+    m_hbox->pack_start( *m_button_bp_measure , false, false );
+    m_hbox->pack_start( *m_entry_bp_measure , false, false );
 
     m_hbox->pack_start( *(manage(new Label( "/" ))), false, false, 4);
 
@@ -1054,7 +1054,7 @@ seqedit::popup_midibus_menu()
     for ( int i=0; i< masterbus->get_num_out_buses(); i++ ){
         m_menu_midibus->items().push_back(MenuElem(
                     masterbus->get_midi_out_bus_name(i),
-                    sigc::bind(mem_fun(*this,&seqedit::set_midi_bus), i)));
+                    sigc::bind(mem_fun(*this,&seqedit::midi_bus_button_callback), i)));
     }
 
     m_menu_midibus->popup(0,0);
@@ -1084,7 +1084,7 @@ seqedit::popup_midich_menu()
                            string(")") );
         }
         m_menu_midich->items().push_back(MenuElem(name,
-                    sigc::bind(mem_fun(*this,&seqedit::set_midi_channel),
+                    sigc::bind(mem_fun(*this,&seqedit::midi_channel_button_callback),
                                                        i )));
     }
 
@@ -1289,6 +1289,16 @@ seqedit::popup_event_menu()
     //m_option_midibus->set_history( m_seq->getMidiBus()->getID() );
 
 void
+seqedit::midi_channel_button_callback( int a_midichannel )
+{
+    if(m_seq->get_midi_channel() != a_midichannel)
+    {
+        set_midi_channel(a_midichannel);
+        global_is_modified = true;
+    }
+}
+
+void
 seqedit::set_midi_channel( int a_midichannel  )
 {
     char b[10];
@@ -1299,6 +1309,15 @@ seqedit::set_midi_channel( int a_midichannel  )
     // m_mainwid->update_sequence_on_window( m_pos );
 }
 
+void
+seqedit::midi_bus_button_callback( int a_midibus )
+{
+    if(m_seq->get_midi_bus() != a_midibus)
+    {
+        set_midi_bus(a_midibus);
+        global_is_modified = true;
+    }
+}
 
 void
 seqedit::set_midi_bus( int a_midibus )
@@ -1384,9 +1403,9 @@ seqedit::set_key( int a_note )
 
 
 void
-seqedit::apply_length( int a_bpm, int a_bw, int a_measures )
+seqedit::apply_length( int a_bp_measure, int a_bw, int a_measures )
 {
-  m_seq->set_length( a_measures * a_bpm * ((c_ppqn * 4) / a_bw) );
+  m_seq->set_length( a_measures * a_bp_measure * ((c_ppqn * 4) / a_bw) );
 
   m_seqroll_wid->reset();
   m_seqtime_wid->reset();
@@ -1409,6 +1428,15 @@ seqedit::get_measures()
     return measures;
 }
 
+void
+seqedit::measures_button_callback( int a_length_measures )
+{
+    if(m_measures != a_length_measures)
+    {
+        set_measures(a_length_measures);
+        global_is_modified = true;
+    }
+}
 
 void
 seqedit::set_measures( int a_length_measures  )
@@ -1424,18 +1452,19 @@ seqedit::set_measures( int a_length_measures  )
 
 
 void
-seqedit::set_bpm( int a_beats_per_measure )
+seqedit::set_bp_measure( int a_beats_per_measure )
 {
     char b[4];
 
     snprintf(b, sizeof(b), "%d", a_beats_per_measure);
-    m_entry_bpm->set_text(b);
+    m_entry_bp_measure->set_text(b);
 
     if ( a_beats_per_measure != m_seq->get_bpm() ){
 
         long length = get_measures();
         m_seq->set_bpm( a_beats_per_measure );
         apply_length( a_beats_per_measure, m_seq->get_bw(), length );
+        global_is_modified = true;
     }
 }
 
@@ -1453,6 +1482,7 @@ seqedit::set_bw( int a_beat_width  )
         long length = get_measures();
         m_seq->set_bw( a_beat_width );
         apply_length( m_seq->get_bpm(), a_beat_width, length );
+        global_is_modified = true;
     }
 }
 
@@ -1468,6 +1498,7 @@ void
 seqedit::name_change_callback()
 {
     m_seq->set_name( m_entry_name->get_text());
+    global_is_modified = true;
     // m_mainwid->update_sequence_on_window( m_pos );
 }
 

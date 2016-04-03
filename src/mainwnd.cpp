@@ -39,6 +39,7 @@
 #include "pixmaps/menu.xpm"
 
 bool global_is_running = false;
+bool global_is_modified = false;
 
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
@@ -49,7 +50,6 @@ bool global_is_running = false;
 
 mainwnd::mainwnd(perform *a_p):
     m_mainperf(a_p),
-    m_modified(false),
     m_menu_mode(false),
     m_options(NULL)
 {
@@ -305,8 +305,8 @@ mainwnd::timer_callback(  )
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
     }
 
-    if ( m_perf_edit->get_bpm() != m_mainperf->get_bp_measure()){
-        m_perf_edit->set_bpm(m_mainperf->get_bp_measure());
+    if ( m_perf_edit->get_bp_measure() != m_mainperf->get_bp_measure()){
+        m_perf_edit->set_bp_measure(m_mainperf->get_bp_measure());
     }
 
     if ( m_perf_edit->get_bw() != m_mainperf->get_bw()){
@@ -388,7 +388,6 @@ mainwnd::open_performance_edit()
     else {
         m_perf_edit->init_before_show();
         m_perf_edit->show_all();
-        m_modified = true;
     }
 }
 
@@ -457,7 +456,7 @@ void mainwnd::new_file()
 
     global_filename = "";
     update_window_title();
-    m_modified = false;
+    global_is_modified = false;
 }
 
 
@@ -540,7 +539,8 @@ void mainwnd::open_file(const Glib::ustring& fn)
 
     midifile f(fn);
     result = f.parse(m_mainperf, 0);
-    m_modified = !result;
+
+    global_is_modified = !result; /* this means good file = NOT modified and bad = modified?? */
 
     if (!result) {
         Gtk::MessageDialog errdialog(*this,
@@ -621,7 +621,8 @@ bool mainwnd::save_file()
                 Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
         errdialog.run();
     }
-    m_modified = !result;
+    global_is_modified = !result; /* means if file is saved then clear the modified flag */
+
     return result;
 }
 
@@ -652,7 +653,7 @@ bool mainwnd::is_save()
 {
     bool result = false;
 
-    if (is_modified()) {
+    if (global_is_modified) {
         int choice = query_save_changes();
         switch (choice) {
             case Gtk::RESPONSE_YES:
@@ -741,7 +742,7 @@ mainwnd::file_import_dialog()
                 errdialog.run();
            }
 
-           m_modified = true;
+           global_is_modified = true; // OK
 
            m_main_wid->reset();
            m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
@@ -827,15 +828,17 @@ mainwnd::adj_callback_ss( )
     m_main_wid->set_screenset( m_mainperf->get_screenset());
     m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                 m_mainperf->get_screenset()));
-    m_modified = true;
 }
 
 
 void
 mainwnd::adj_callback_bpm( )
 {
-    m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
-    m_modified = true;
+    if(m_mainperf->get_bpm() != (int) m_adjust_bpm->get_value())
+    {
+        m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
+        global_is_modified = true;
+    }
 }
 
 
@@ -866,7 +869,7 @@ mainwnd::edit_callback_notepad( )
     string text = m_entry_notes->get_text();
     m_mainperf->set_screen_set_notepad( m_mainperf->get_screenset(),
 				        &text );
-    m_modified = true;
+    global_is_modified = true; // OK
 }
 
 
@@ -1108,13 +1111,6 @@ mainwnd::update_window_title()
             + string( "]" );
 
     set_title ( title.c_str());
-}
-
-
-bool
-mainwnd::is_modified()
-{
-    return m_modified;
 }
 
 

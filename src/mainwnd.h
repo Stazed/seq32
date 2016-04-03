@@ -52,7 +52,6 @@ class mainwnd : public Gtk::Window, public performcallback
  private:
 
     perform  *m_mainperf;
-    bool      m_modified;
     bool      m_menu_mode;
     static int m_sigpipe[2];
 
@@ -117,7 +116,6 @@ class mainwnd : public Gtk::Window, public performcallback
     void sequence_key( int a_seq );
     void update_window_title();
     void toLower(basic_string<char>&);
-    bool is_modified();
     void file_new();
     void file_open();
     void file_save();

@@ -96,7 +96,7 @@ class seqedit : public Gtk::Window
     Menu       *m_menu_sequences;
 
     /* time signature, beats per measure, beat width */
-    Menu       *m_menu_bpm;
+    Menu       *m_menu_bp_measure;
     Menu       *m_menu_bw;
     Menu       *m_menu_rec_vol;
 
@@ -161,8 +161,8 @@ class seqedit : public Gtk::Window
     Button       *m_button_data;
     Entry        *m_entry_data;
 
-    Button      *m_button_bpm;
-    Entry       *m_entry_bpm;
+    Button      *m_button_bp_measure;
+    Entry       *m_entry_bp_measure;
 
     Button      *m_button_bw;
     Entry       *m_entry_bw;
@@ -217,11 +217,11 @@ class seqedit : public Gtk::Window
     void set_snap( int a_snap );
     void set_note_length( int a_note_length );
 
-    void set_bpm( int a_beats_per_measure );
+    void set_bp_measure( int a_beats_per_measure );
     void set_bw( int a_beat_width );
     void set_rec_vol( int a_rec_vol );
     void set_measures( int a_length_measures  );
-    void apply_length( int a_bpm, int a_bw, int a_measures );
+    void apply_length( int a_bp_measure, int a_bw, int a_measures );
     long get_measures();
 
     void set_midi_channel( int a_midichannel );
@@ -232,6 +232,9 @@ class seqedit : public Gtk::Window
 
     void set_background_sequence( int a_seq );
 
+    void measures_button_callback( int a_length_measures );
+    void midi_channel_button_callback( int a_midichannel );
+    void midi_bus_button_callback( int a_midibus );
     void name_change_callback();
     void play_change_callback();
     void record_change_callback();

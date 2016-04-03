@@ -37,7 +37,7 @@ seqmenu::seqmenu( perform *a_p  ) :
 }
 
 
-    void
+void
 seqmenu::popup_menu()
 {
 
@@ -117,13 +117,14 @@ seqmenu::popup_menu()
 
 }
 
-    void
+void
 seqmenu::set_bus_and_midi_channel( int a_bus, int a_ch )
 {
     if ( m_mainperf->is_active( m_current_seq )) {
         m_mainperf->get_sequence( m_current_seq )->set_midi_bus( a_bus );
         m_mainperf->get_sequence( m_current_seq )->set_midi_channel( a_ch );
         m_mainperf->get_sequence( m_current_seq )->set_dirty();
+        global_is_modified = true;
     }
 }
 
