@@ -222,7 +222,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 		     "%d-%d %ld/%ld",
 		     seq->get_midi_bus(),
 		     seq->get_midi_channel()+1,
-		     seq->get_bpm(), seq->get_bw() );
+		     seq->get_bp_measure(), seq->get_bw() );
 
 	    p_font_renderer->render_string_on_drawable(m_gc,
                                                    base_x + c_text_x,

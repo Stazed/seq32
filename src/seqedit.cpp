@@ -322,7 +322,7 @@ seqedit::seqedit( sequence *a_seq,
     set_background_sequence( m_sequence );
 
 
-    set_bp_measure( m_seq->get_bpm() );
+    set_bp_measure( m_seq->get_bp_measure() );
     set_bw( m_seq->get_bw() );
     set_measures( get_measures() );
 
@@ -1418,7 +1418,7 @@ seqedit::apply_length( int a_bp_measure, int a_bw, int a_measures )
 long
 seqedit::get_measures()
 {
-    long units = ((m_seq->get_bpm() * (c_ppqn * 4)) /  m_seq->get_bw() );
+    long units = ((m_seq->get_bp_measure() * (c_ppqn * 4)) /  m_seq->get_bw() );
 
     long measures = (m_seq->get_length() / units);
 
@@ -1447,7 +1447,7 @@ seqedit::set_measures( int a_length_measures  )
     m_entry_length->set_text(b);
 
     m_measures = a_length_measures;
-    apply_length( m_seq->get_bpm(), m_seq->get_bw(), a_length_measures );
+    apply_length( m_seq->get_bp_measure(), m_seq->get_bw(), a_length_measures );
 }
 
 
@@ -1459,10 +1459,10 @@ seqedit::set_bp_measure( int a_beats_per_measure )
     snprintf(b, sizeof(b), "%d", a_beats_per_measure);
     m_entry_bp_measure->set_text(b);
 
-    if ( a_beats_per_measure != m_seq->get_bpm() ){
+    if ( a_beats_per_measure != m_seq->get_bp_measure() ){
 
         long length = get_measures();
-        m_seq->set_bpm( a_beats_per_measure );
+        m_seq->set_bp_measure( a_beats_per_measure );
         apply_length( a_beats_per_measure, m_seq->get_bw(), length );
         global_is_modified = true;
     }
@@ -1481,7 +1481,7 @@ seqedit::set_bw( int a_beat_width  )
 
         long length = get_measures();
         m_seq->set_bw( a_beat_width );
-        apply_length( m_seq->get_bpm(), a_beat_width, length );
+        apply_length( m_seq->get_bp_measure(), a_beat_width, length );
         global_is_modified = true;
     }
 }

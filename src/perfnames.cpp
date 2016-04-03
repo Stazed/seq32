@@ -170,7 +170,7 @@ perfnames::draw_sequence( int sequence )
                      "%d-%d %ld/%ld",
                      m_mainperf->get_sequence(sequence)->get_midi_bus(),
                      m_mainperf->get_sequence(sequence)->get_midi_channel()+1,
-                     m_mainperf->get_sequence(sequence)->get_bpm(),
+                     m_mainperf->get_sequence(sequence)->get_bp_measure(),
                      m_mainperf->get_sequence(sequence)->get_bw() );
 
             p_font_renderer->render_string_on_drawable(m_gc,

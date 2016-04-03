@@ -165,7 +165,7 @@ seqroll::on_realize()
 
 use m_zoom and
 
-i % m_seq->get_bpm() == 0
+i % m_seq->get_bp_measure() == 0
 
  int numberLines = 128 / m_seq->get_bw() / m_zoom;
     int distance = c_ppqn / 32;
@@ -184,7 +184,7 @@ seqroll::update_sizes()
 
     /* The page increment is always one bar */
     int page_increment = int( double(c_ppqn) *
-                        double(m_seq->get_bpm()) *
+                        double(m_seq->get_bp_measure()) *
                         (4.0 / double(m_seq->get_bw())) );
     m_hadjust->set_page_increment(page_increment);
 
@@ -382,7 +382,7 @@ seqroll::update_background()
     }
 
 
-    /*int measure_length_64ths =  m_seq->get_bpm() * 64 /
+    /*int measure_length_64ths =  m_seq->get_bp_measure() * 64 /
         m_seq->get_bw();*/
 
     //printf ( "measure_length_64ths[%d]\n", measure_length_64ths );
@@ -391,7 +391,7 @@ seqroll::update_background()
     //if ( measures_per_line <= 0
     int measures_per_line = 1;
 
-    int ticks_per_measure =  m_seq->get_bpm() * (4 * c_ppqn) / m_seq->get_bw();
+    int ticks_per_measure =  m_seq->get_bp_measure() * (4 * c_ppqn) / m_seq->get_bw();
     int ticks_per_beat =  (4 * c_ppqn) / m_seq->get_bw();
     int ticks_per_step = 6 * m_zoom;
     int ticks_per_m_line =  ticks_per_measure * measures_per_line;
@@ -1224,7 +1224,7 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
                 m_seq->pop_undo();
                 ret = true;
             }
-            
+
             /* Redo */
             if ( a_p0->keyval == GDK_r || a_p0->keyval == GDK_R ){
 
