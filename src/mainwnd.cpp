@@ -116,6 +116,7 @@ mainwnd::mainwnd(perform *a_p):
             false, false);
 
     m_button_mode = manage( new ToggleButton( "song mode" ) );
+    m_button_mode->set_can_focus(false);
     m_button_mode->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_song_mode ));
     add_tooltip( m_button_mode, "Toggle song mode (or live/sequence mode)." );
     if(global_song_start_mode) {
@@ -331,12 +332,7 @@ mainwnd::timer_callback(  )
         m_button_mode->set_active(global_song_start_mode);
 
     if(global_is_running && m_button_mode->get_sensitive())
-    {
-        if(m_button_mode->has_focus()) // needed to avoid segfault on get_focus() from on_key_press_event()
-            m_main_wid->grab_focus();  // when the focus is on non-sensitive m_button_mode
-
         m_button_mode->set_sensitive(false);
-    }
     else if(!global_is_running && !m_button_mode->get_sensitive())
         m_button_mode->set_sensitive(true);
 

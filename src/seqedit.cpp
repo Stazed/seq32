@@ -867,6 +867,7 @@ seqedit::fill_top_bar()
 
     /* undo */
     m_button_undo = manage( new Button());
+    m_button_undo->set_can_focus(false);
     m_button_undo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( undo_xpm  ))));
     m_button_undo->signal_clicked().connect(
             mem_fun( *this, &seqedit::undo_callback));
@@ -876,6 +877,7 @@ seqedit::fill_top_bar()
 
     /* redo */
     m_button_redo = manage( new Button());
+    m_button_redo->set_can_focus(false);
     m_button_redo->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( redo_xpm  ))));
     m_button_redo->signal_clicked().connect(
             mem_fun( *this, &seqedit::redo_callback));
@@ -1626,7 +1628,6 @@ seqedit::on_realize()
 bool
 seqedit::timeout()
 {
-
     if (m_seq->get_raise())
     {
         m_seq->set_raise(false);
@@ -1647,26 +1648,15 @@ seqedit::timeout()
        m_seqroll_wid->follow_progress();
     }
 
-
     if(m_seq->m_have_undo && !m_button_undo->get_sensitive())
         m_button_undo->set_sensitive(true);
     else if(!m_seq->m_have_undo && m_button_undo->get_sensitive())
-    {
-        if(m_button_undo->has_focus())   // must change focus on insensitive button or get_focus() from
-            m_seqroll_wid->grab_focus(); // on_key_press_event() will segfault
-
         m_button_undo->set_sensitive(false);
-    }
 
     if(m_seq->m_have_redo && !m_button_redo->get_sensitive())
         m_button_redo->set_sensitive(true);
     else if(!m_seq->m_have_redo && m_button_redo->get_sensitive())
-    {
-        if(m_button_redo->has_focus())   // must change focus on insensitive button or get_focus() from
-            m_seqroll_wid->grab_focus(); // on_key_press_event() will segfault
-
         m_button_redo->set_sensitive(false);
-    }
 
     return true;
 }
