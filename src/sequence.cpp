@@ -1258,6 +1258,11 @@ sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
 void
 sequence::stretch_selected( long a_delta_tick )
 {
+    if(!mark_selected())
+        return;
+
+    push_undo();
+
     event *e, new_e;
 
     lock();
