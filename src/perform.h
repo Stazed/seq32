@@ -382,6 +382,8 @@ class perform
     friend class optionsfile;
     friend class options;
 
+    void apply_song_transpose ();
+
 #ifdef JACK_SUPPORT
 
     friend int jack_sync_callback(jack_transport_state_t state,

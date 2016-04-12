@@ -126,6 +126,7 @@ class seqedit : public Gtk::Window
     Button      *m_button_undo;
     Button      *m_button_redo;
     Button      *m_button_quanize;
+    CheckButton *m_check_transposable;
 
     Button      *m_button_tools;
 
@@ -233,6 +234,7 @@ class seqedit : public Gtk::Window
     void set_background_sequence( int a_seq );
 
     void measures_button_callback( int a_length_measures );
+    void transposable_change_callback(CheckButton *a_button);
     void midi_channel_button_callback( int a_midichannel );
     void midi_bus_button_callback( int a_midibus );
     void name_change_callback();

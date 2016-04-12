@@ -316,6 +316,12 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                         len -= 2;
                                     }
 
+                                    else if (proprietary == c_transpose)
+                                    {
+                                        seq->set_transposable (read_byte ());
+                                        len--;
+                                    }
+
                                     else if (proprietary == c_triggers)
                                     {
                                         int num_triggers = len / 4;

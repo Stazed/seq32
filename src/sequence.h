@@ -102,6 +102,8 @@ class sequence
     /* song playback mode mute */
     bool m_song_mute;
 
+    bool m_transposable;
+
     /* polyphonic step edit note counter */
     int m_notes_on;
 
@@ -226,6 +228,9 @@ class sequence
 
     void set_song_mute (bool a_mute);
     bool get_song_mute ();
+
+    void set_transposable (bool a_xpose);
+    bool get_transposable ();
 
     /* returns string of name */
     const char *get_name ();
@@ -493,6 +498,7 @@ class sequence
 			 long a_snap_tick, int a_divide, bool a_linked =
 			 false);
     void transpose_notes (int a_steps, int a_scale);
+    void apply_song_transpose ();
     void shift_notes (int a_ticks);  // move selected notes later/earlier in time
     void multiply_pattern( float a_multiplier );
 };

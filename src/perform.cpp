@@ -2593,3 +2593,14 @@ int main ()
 
 
 #endif
+
+void
+perform::apply_song_transpose()
+{
+    for (int i=0; i< c_max_sequence; i++ ){
+        if ( is_active(i) )
+        {
+            get_sequence(i)->apply_song_transpose();
+        }
+    }
+}

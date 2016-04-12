@@ -72,8 +72,8 @@ mainwnd::mainwnd(perform *a_p):
     m_menu_file = manage(new Menu());
     m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
 
-    m_menu_view = manage( new Menu());
-    m_menubar->items().push_back(MenuElem("_View", *m_menu_view));
+    m_menu_edit = manage( new Menu());
+    m_menubar->items().push_back(MenuElem("_Edit", *m_menu_edit));
 
     m_menu_help = manage( new Menu());
     m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
@@ -100,10 +100,13 @@ mainwnd::mainwnd(perform *a_p):
                 Gtk::AccelKey("<control>Q"),
                 mem_fun(*this, &mainwnd::file_exit)));
 
-    /* view menu items */
-    m_menu_view->items().push_back(MenuElem("_Song Editor...",
+    /* Edit menu items */
+    m_menu_edit->items().push_back(MenuElem("_Song Editor...",
                 Gtk::AccelKey("<control>E"),
                 mem_fun(*this, &mainwnd::open_performance_edit)));
+
+    m_menu_edit->items().push_back(MenuElem("_Apply song transpose",
+                mem_fun(*this, &mainwnd::apply_song_transpose)));
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -132,6 +135,31 @@ mainwnd::mainwnd(perform *a_p):
                                 "The menu is disabled when the\n"
                                 "sequencer IS running.");
     tophbox->pack_start(*m_button_menu, false, false );
+
+    m_menu_xpose =   manage( new Menu());
+    char num[11];
+    for ( int i=-12; i<=12; ++i) {
+
+        if (i){
+            snprintf(num, sizeof(num), "%+d [%s]", i, c_interval_text[abs(i)]);
+        } else {
+            snprintf(num, sizeof(num), "0 [normal]");
+        }
+        m_menu_xpose->items().push_front( MenuElem( num,
+                    sigc::bind(mem_fun(*this,&mainwnd::xpose_button_callback),
+                        i )));
+    }
+
+    m_button_xpose = manage( new Button("transpose"));
+    //m_button_xpose->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( xpose_xpm ))));
+    m_button_xpose->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &mainwnd::popup_menu), m_menu_xpose  ));
+    add_tooltip( m_button_xpose, "Song transpose" );
+    m_entry_xpose = manage( new Entry());
+    m_entry_xpose->set_size_request( 40, -1 );
+    m_entry_xpose->set_editable( false );
+
+    tophbox->pack_start(*m_button_xpose, false, false );
+    tophbox->pack_start(*m_entry_xpose, false, false );
 
     // adjust placement...
     VBox *vbox_b = manage( new VBox() );
@@ -258,6 +286,7 @@ mainwnd::mainwnd(perform *a_p):
 
     m_main_wid->set_can_focus();
     m_main_wid->grab_focus();
+    set_xpose( 0 );
 
     /* add main layout box */
     this->add (*mainvbox);
@@ -816,6 +845,41 @@ mainwnd::about_dialog()
     dialog.run();
 }
 
+void
+mainwnd::popup_menu(Menu *a_menu)
+{
+    a_menu->popup(0,0);
+}
+
+void
+mainwnd::xpose_button_callback( int a_xpose)
+{
+    if(m_mainperf->get_master_midi_bus()->get_transpose() != a_xpose)
+    {
+        set_xpose(a_xpose);
+    }
+}
+
+void
+mainwnd::set_xpose( int a_xpose  )
+{
+    char b[11];
+    snprintf( b, sizeof(b), "%+d", a_xpose );
+    m_entry_xpose->set_text(b);
+
+    m_mainperf->all_notes_off();
+    m_mainperf->get_master_midi_bus()->set_transpose(a_xpose);
+}
+
+void
+mainwnd::apply_song_transpose()
+{
+    if(m_mainperf->get_master_midi_bus()->get_transpose() != 0)
+    {
+        m_mainperf->apply_song_transpose();
+        set_xpose(0);
+    }
+}
 
 void
 mainwnd::adj_callback_ss( )

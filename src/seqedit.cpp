@@ -833,6 +833,15 @@ seqedit::fill_top_bar()
     m_hbox->pack_start( *m_button_length , false, false );
     m_hbox->pack_start( *m_entry_length , false, false );
 
+    m_hbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
+
+    m_check_transposable = manage( new CheckButton( "Transposable" ));
+    m_check_transposable->set_active(m_seq->get_transposable());
+    m_check_transposable->signal_toggled ().
+        connect (bind
+                (mem_fun (*this, &seqedit::transposable_change_callback),
+                 m_check_transposable));
+    m_hbox->pack_start( *m_check_transposable, false, false );
 
     m_hbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
@@ -844,8 +853,8 @@ seqedit::fill_top_bar()
     add_tooltip( m_button_bus, "Select Output Bus." );
 
     m_entry_bus = manage( new Entry());
-    m_entry_bus->set_max_length(60);
-    m_entry_bus->set_width_chars(60);
+    m_entry_bus->set_max_length(50);
+    m_entry_bus->set_width_chars(22);
     m_entry_bus->set_editable( false );
 
     m_hbox->pack_start( *m_button_bus , false, false );
@@ -1286,6 +1295,13 @@ seqedit::popup_event_menu()
     m_menu_data->popup(0,0);
 }
 
+
+void
+seqedit::transposable_change_callback(CheckButton *a_button)
+{
+    m_seq->set_transposable(a_button->get_active());
+    global_is_modified = true;
+}
 
     //m_option_midich->set_history( m_seq->getMidiChannel() );
     //m_option_midibus->set_history( m_seq->getMidiBus()->getID() );
