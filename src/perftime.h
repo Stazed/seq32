@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "perfedit.h"
 #include "perform.h"
 #include "seqtime.h"
 
@@ -42,6 +43,8 @@
 
 using namespace Gtk;
 
+class perfedit;
+
 /* piano time*/
 class perftime: public Gtk::DrawingArea
 {
@@ -56,10 +59,11 @@ class perftime: public Gtk::DrawingArea
 
 
     perform      * const m_mainperf;
-
+    perfedit     * const m_perfedit;
     Adjustment   * const m_hadjust;
 
     int m_window_x, m_window_y;
+    int m_perf_scale_x;
 
     int m_4bar_offset;
 
@@ -71,6 +75,7 @@ class perftime: public Gtk::DrawingArea
     bool on_button_release_event(GdkEventButton* a_ev);
     void on_size_allocate(Gtk::Allocation &a_r );
 
+    void draw_background();
     void update_sizes();
     void draw_pixmap_on_window();
     void draw_progress_on_window();
@@ -82,7 +87,9 @@ class perftime: public Gtk::DrawingArea
 
  public:
 
-    perftime( perform *a_perf, Adjustment *a_hadjust );
+    perftime( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust );
+
+    void set_zoom (int a_zoom);
 
     void reset();
     void set_scale( int a_scale );

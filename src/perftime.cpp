@@ -22,13 +22,16 @@
 #include "font.h"
 
 
-perftime::perftime( perform *a_perf, Adjustment *a_hadjust ) :
+perftime::perftime( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust ) :
     m_black(Gdk::Color("black")),
     m_white(Gdk::Color("white")),
     m_grey(Gdk::Color("grey")),
 
     m_mainperf(a_perf),
+    m_perfedit(a_perf_edit),
     m_hadjust(a_hadjust),
+
+    m_perf_scale_x(c_perf_scale_x),
 
     m_4bar_offset(0),
 
@@ -60,6 +63,16 @@ void
 perftime::update_sizes()
 {
 
+}
+
+void
+perftime::set_zoom (int a_zoom)
+{
+    if (m_perfedit->zoom_check(a_zoom))
+    {
+        m_perf_scale_x = a_zoom;
+        draw_background();
+    }
 }
 
 void
@@ -110,9 +123,6 @@ perftime::update_pixmap()
 
 }
 
-
-
-
 void
 perftime::draw_pixmap_on_window()
 {
@@ -120,7 +130,15 @@ perftime::draw_pixmap_on_window()
 }
 
 bool
-perftime::on_expose_event(GdkEventExpose* a_e)
+perftime::on_expose_event (GdkEventExpose * /* ev */ )
+{
+    draw_background();
+    return true;
+}
+
+
+void
+perftime::draw_background()
 {
     /* clear background */
     m_gc->set_foreground(m_white);
@@ -154,9 +172,9 @@ perftime::on_expose_event(GdkEventExpose* a_e)
 #endif
 
     for ( int i=first_measure;
-              i<first_measure+(m_window_x * c_perf_scale_x / (m_measure_length)) + 1; i++ )
+              i<first_measure+(m_window_x * m_perf_scale_x / (m_measure_length)) + 1; i++ )
     {
-        int x_pos = ((i * m_measure_length) - tick_offset) / c_perf_scale_x;
+        int x_pos = ((i * m_measure_length) - tick_offset) / m_perf_scale_x;
 
 	/* beat */
 	m_window->draw_line(m_gc,
@@ -180,9 +198,9 @@ perftime::on_expose_event(GdkEventExpose* a_e)
     long right = m_mainperf->get_right_tick( );
 
     left -= (m_4bar_offset * 16 * c_ppqn);
-    left /= c_perf_scale_x;
+    left /= m_perf_scale_x;
     right -= (m_4bar_offset * 16 * c_ppqn);
-    right /= c_perf_scale_x;
+    right /= m_perf_scale_x;
 
     if ( left >=0 && left <= m_window_x ){
 
@@ -214,15 +232,13 @@ perftime::on_expose_event(GdkEventExpose* a_e)
                                                m_window, "R", font::WHITE );
 
     }
-
-    return true;
 }
 
 bool
 perftime::on_button_press_event(GdkEventButton* p0)
 {
     long tick = (long) p0->x;
-    tick *= c_perf_scale_x;
+    tick *= m_perf_scale_x;
     //tick = tick - (tick % (c_ppqn * 4));
     tick += (m_4bar_offset * 16 * c_ppqn);
 

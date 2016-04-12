@@ -72,10 +72,11 @@ perfedit::perfedit( perform *a_perf )
     m_perfnames = manage( new perfnames( m_mainperf, m_vadjust ));
 
     m_perfroll = manage( new perfroll( m_mainperf,
+                       this,
 				       m_hadjust,
 				       m_vadjust ));
 
-    m_perftime = manage( new perftime( m_mainperf, m_hadjust ));
+    m_perftime = manage( new perftime( m_mainperf, this, m_hadjust ));
 
     /* init table, viewports and scroll bars */
     m_table     = manage( new Table( 6, 3, false));
@@ -326,6 +327,22 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
         }
     }
 
+    if (a_ev->keyval == GDK_Z)         /* zoom in              */
+    {
+        set_zoom(m_perfroll->m_zoom / 2);
+        return true;
+    }
+    else if (a_ev->keyval == GDK_0)         /* reset to normal zoom */
+    {
+        set_zoom(c_perf_scale_x);
+        return true;
+    }
+    else if (a_ev->keyval == GDK_z)         /* zoom out             */
+    {
+        set_zoom(m_perfroll->m_zoom * 2);
+        return true;
+    }
+
     if ( a_ev->type == GDK_KEY_PRESS ){
 
         if ( global_print_keys ){
@@ -537,10 +554,19 @@ void perfedit::set_bw( int a_beat_width )
     set_guides();
 }
 
-int perfedit::get_bw()
+int
+perfedit::get_bw()
 {
     return m_bw;
 }
+
+void
+perfedit::set_zoom (int z)
+{
+    m_perfroll->set_zoom(z);
+    m_perftime->set_zoom(z);
+}
+
 
 void
 perfedit::set_follow_transport()

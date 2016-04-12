@@ -64,13 +64,16 @@
 
 using namespace Gtk;
 
+class perfroll;
+class perftime;
+
 /* has a seqroll and paino roll */
 class perfedit:public Gtk::Window
 {
 
   private:
 
-    perform * m_mainperf;
+    perform *m_mainperf;
 
     Table *m_table;
 
@@ -156,11 +159,17 @@ class perfedit:public Gtk::Window
 
   public:
 
+    static bool zoom_check (int z)
+    {
+        return z > 7 && z <= (4 * c_perf_scale_x);
+    }
+
     void init_before_show ();
     void set_bp_measure( int a_beats_per_measure );
     int get_bp_measure();
     void set_bw( int a_beat_width );
     int get_bw();
+    void set_zoom (int z);
 
     bool get_toggle_jack();
     void toggle_jack();

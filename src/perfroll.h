@@ -40,6 +40,7 @@
 #include "globals.h"
 #include "perform.h"
 #include "mutex.h"
+#include "perfedit.h"
 
 
 using namespace Gtk;
@@ -49,6 +50,8 @@ using namespace Gtk;
 const int c_perfroll_background_x = (c_ppqn * 4 * 16) / c_perf_scale_x;
 const int c_perfroll_size_box_w = 3;
 const int c_perfroll_size_box_click_w = c_perfroll_size_box_w+1 ;
+
+class perfedit;
 
 /* performance roll */
 class perfroll : public Gtk::DrawingArea
@@ -69,11 +72,14 @@ class perfroll : public Gtk::DrawingArea
     Glib::RefPtr<Gdk::Pixmap> m_background;
 
 
-    perform        *m_mainperf;
+    perform        * const m_mainperf;
+    perfedit       * const m_perfedit;
 
     int          m_snap;
     int          m_measure_length;
     int          m_beat_length;
+
+    int          m_perf_scale_x; // for zoom - replace c_perf_scale_x
 
     int          m_window_x, m_window_y;
 
@@ -106,7 +112,7 @@ class perfroll : public Gtk::DrawingArea
     bool on_motion_notify_event(GdkEventMotion* a_ev);
     bool on_scroll_event( GdkEventScroll* a_ev ) ;
 
-    void auto_scroll_horz(double progress);
+    void auto_scroll_horz();
 
     bool on_focus_in_event(GdkEventFocus*);
     bool on_focus_out_event(GdkEventFocus*);
@@ -136,6 +142,9 @@ class perfroll : public Gtk::DrawingArea
     bool trans_button_press;
 
  public:
+
+    int  m_zoom;
+    void set_zoom (int a_zoom);
     void set_guides( int a_snap, int a_measure, int a_beat );
 
     void update_sizes();
@@ -149,6 +158,7 @@ class perfroll : public Gtk::DrawingArea
     void redraw_dirty_sequences();
 
     perfroll( perform *a_perf,
+          perfedit *a_perf_edit,
 	      Adjustment *a_hadjust,
 	      Adjustment *a_vadjust );
 

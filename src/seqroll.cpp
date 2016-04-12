@@ -2137,7 +2137,7 @@ bool Seq24SeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& t
             /* convert deltas into screen corridinates */
             ths.convert_xy( delta_x, delta_y, &delta_tick, &delta_note );
 
-            /* since delta_note was from delta_y, it will be filpped
+            /* since delta_note was from delta_y, it will be flipped
                ( delta_y[0] = note[127], etc.,so we have to adjust */
             delta_note = delta_note - (c_num_keys-1);
 

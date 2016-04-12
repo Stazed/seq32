@@ -21,6 +21,7 @@
 #include "perfroll.h"
 
 perfroll::perfroll( perform *a_perf,
+            perfedit * a_perf_edit,
 		    Adjustment * a_hadjust,
 		    Adjustment * a_vadjust  ) :
     m_black(Gdk::Color("black")),
@@ -29,6 +30,9 @@ perfroll::perfroll( perform *a_perf,
     m_lt_grey(Gdk::Color("light grey")),
 
     m_mainperf(a_perf),
+    m_perfedit(a_perf_edit),
+
+    m_perf_scale_x(c_perf_scale_x),       // 32 ticks per pixel
 
     m_old_progress_ticks(0),
 
@@ -45,7 +49,8 @@ perfroll::perfroll( perform *a_perf,
 
     have_button_press(false),
     transport_follow(true),
-    trans_button_press(false)
+    trans_button_press(false),
+    m_zoom(c_perf_scale_x)
 {
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color( m_black );
@@ -151,7 +156,7 @@ void
 perfroll::update_sizes()
 {
     int h_bars         = m_roll_length_ticks / (c_ppqn * 16);
-    int h_bars_visable = (m_window_x * c_perf_scale_x) / (c_ppqn * 16);
+    int h_bars_visable = (m_window_x * m_perf_scale_x) / (c_ppqn * 16);
 
     m_hadjust->set_lower( 0 );
     m_hadjust->set_upper( h_bars );
@@ -246,9 +251,9 @@ perfroll::fill_background_pixmap()
 
  	/* solid line on every beat */
  	m_background->draw_line(m_gc,
- 			       i * m_beat_length / c_perf_scale_x,
+ 			       i * m_beat_length / m_perf_scale_x,
  			       0,
- 			       i * m_beat_length / c_perf_scale_x,
+ 			       i * m_beat_length / m_perf_scale_x,
  			       c_names_y );
 
         // jump 2 if 16th notes
@@ -293,8 +298,8 @@ perfroll::draw_progress()
     long tick = m_mainperf->get_tick();
     long tick_offset = m_4bar_offset * c_ppqn * 16;
 
-    int progress_x =     ( tick - tick_offset ) / c_perf_scale_x ;
-    int old_progress_x = ( m_old_progress_ticks - tick_offset ) / c_perf_scale_x ;
+    int progress_x =     ( tick - tick_offset ) / m_perf_scale_x ;
+    int old_progress_x = ( m_old_progress_ticks - tick_offset ) / m_perf_scale_x ;
 
     /* draw old */
     m_window->draw_drawable(m_gc,
@@ -311,7 +316,7 @@ perfroll::draw_progress()
     m_old_progress_ticks = tick;
 
     if(global_is_running && m_mainperf->get_follow_transport())
-        auto_scroll_horz((double)tick/c_perf_scale_x/c_ppen);
+        auto_scroll_horz();
 }
 
 
@@ -325,7 +330,7 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
     bool selected;
 
     long tick_offset = m_4bar_offset * c_ppqn * 16;
-    long x_offset = tick_offset / c_perf_scale_x;
+    long x_offset = tick_offset / m_perf_scale_x;
 
     if ( a_sequence < c_total_seqs ){
 
@@ -340,14 +345,14 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
 	    a_sequence -= m_sequence_offset;
 
 	    long sequence_length = seq->get_length();
-	    int length_w = sequence_length / c_perf_scale_x;
+	    int length_w = sequence_length / m_perf_scale_x;
 
 	    while ( seq->get_next_trigger( &tick_on, &tick_off, &selected, &offset  )){
 
                 if ( tick_off > 0 ){
 
-		    long x_on  = tick_on  / c_perf_scale_x;
-		    long x_off = tick_off / c_perf_scale_x;
+		    long x_on  = tick_on  / m_perf_scale_x;
+		    long x_off = tick_off / m_perf_scale_x;
 		    int  w     = x_off - x_on + 1;
 
 		    int x = x_on;
@@ -397,7 +402,7 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
 
                     while ( tick_marker < tick_off ){
 
-                        long tick_marker_x = (tick_marker / c_perf_scale_x) - x_offset;
+                        long tick_marker_x = (tick_marker / m_perf_scale_x) - x_offset;
 
                         if ( tick_marker > tick_on ){
 
@@ -500,12 +505,12 @@ void perfroll::draw_background_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seq
     m_gc->set_foreground(m_black);
     for ( int i = first_measure;
               i < first_measure +
-                  (m_window_x * c_perf_scale_x /
+                  (m_window_x * m_perf_scale_x /
                    (m_measure_length)) + 1;
 
               i++ )
     {
-        int x_pos = ((i * m_measure_length) - tick_offset) / c_perf_scale_x;
+        int x_pos = ((i * m_measure_length) - tick_offset) / m_perf_scale_x;
 
 
            a_draw->draw_drawable(m_gc, m_background,
@@ -639,10 +644,34 @@ perfroll::on_button_release_event(GdkEventButton* a_ev)
 }
 
 void
-perfroll::auto_scroll_horz(double progress)
+perfroll::auto_scroll_horz()
 {
-    if((progress > (m_hadjust->get_page_size()/2)) || (m_hadjust->get_value() > progress))
-        m_hadjust->set_value(progress - (m_hadjust->get_page_size()/2) + 1);
+    long progress_tick = m_mainperf->get_tick();
+    long tick_offset = m_4bar_offset * c_ppqn * 16;
+
+    int progress_x =     ( progress_tick - tick_offset ) / m_zoom  + 100;
+    int page = progress_x / m_window_x;
+
+    if (page != 0 || progress_x < 0)
+    {
+        double left_tick = (double) progress_tick /m_zoom/c_ppen;
+
+        switch(m_zoom)
+        {
+            case 8: m_hadjust->set_value(left_tick / 4);
+            break;
+            case 16: m_hadjust->set_value(left_tick / 2 );
+            break;
+            case 32: m_hadjust->set_value(left_tick );
+            break;
+            case 64: m_hadjust->set_value(left_tick * 2 );
+            break;
+            case 128: m_hadjust->set_value(left_tick * 4 );
+            break;
+            default:
+            break;
+        }
+    }
 }
 
 bool
@@ -650,6 +679,19 @@ perfroll::on_scroll_event( GdkEventScroll* a_ev )
 {
     guint modifiers;    // Used to filter out caps/num lock etc.
     modifiers = gtk_accelerator_get_default_mod_mask ();
+
+    if ((a_ev->state & modifiers) == GDK_CONTROL_MASK)
+    {
+        if (a_ev->direction == GDK_SCROLL_DOWN)
+        {
+            m_perfedit->set_zoom(m_zoom*2);
+        }
+        else if (a_ev->direction == GDK_SCROLL_UP)
+        {
+            m_perfedit->set_zoom(m_zoom/2);
+        }
+        return true;
+    }
 
     if ((a_ev->state & modifiers) == GDK_SHIFT_MASK)
     {
@@ -679,7 +721,6 @@ perfroll::on_scroll_event( GdkEventScroll* a_ev )
     }
     return true;
 }
-
 
 
 bool
@@ -752,7 +793,7 @@ perfroll::snap_x( int *a_x )
     // m_scale = number of pulses per pixel
     //	so snap / m_scale  = number pixels to snap to
 
-    int mod = (m_snap / c_perf_scale_x );
+    int mod = (m_snap / m_perf_scale_x );
 
     if ( mod <= 0 )
  	mod = 1;
@@ -766,7 +807,7 @@ perfroll::convert_x( int a_x, long *a_tick )
 {
 
     long tick_offset = m_4bar_offset * c_ppqn * 16;
-    *a_tick = a_x * c_perf_scale_x;
+    *a_tick = a_x * m_perf_scale_x;
     *a_tick += tick_offset;
 }
 
@@ -777,7 +818,7 @@ perfroll::convert_xy( int a_x, int a_y, long *a_tick, int *a_seq)
 
     long tick_offset = m_4bar_offset * c_ppqn * 16;
 
-    *a_tick = a_x * c_perf_scale_x;
+    *a_tick = a_x * m_perf_scale_x;
     *a_seq = a_y / c_names_y;
 
     *a_tick += tick_offset;
@@ -835,3 +876,18 @@ perfroll::split_trigger( int a_sequence, long a_tick )
     draw_drawable_row( m_window, m_pixmap, m_drop_y);
 }
 
+void
+perfroll::set_zoom (int a_zoom)
+{
+    if (m_perfedit->zoom_check(a_zoom))
+    {
+        m_zoom = a_zoom;
+        m_perf_scale_x = m_zoom;
+
+        if (m_perf_scale_x == 0)
+            m_perf_scale_x = 1;
+
+        fill_background_pixmap();
+        update_sizes();
+    }
+}
