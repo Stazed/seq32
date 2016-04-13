@@ -36,6 +36,7 @@ EXTRA_DIST += \
   src/stop.xpm \
   src/thru.xpm \
   src/tools.xpm \
+  src/transpose.xpm\
   src/transportFollow.xpm \
   src/undo.xpm \
   src/zoom.xpm

@@ -49,6 +49,7 @@
 #include "pixmaps/seq-editor.xpm"
 #include "pixmaps/play2.xpm"
 #include "pixmaps/stop.xpm"
+#include "pixmaps/transpose.xpm"
 
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
@@ -835,12 +836,15 @@ seqedit::fill_top_bar()
 
     m_hbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
-    m_check_transposable = manage( new CheckButton( "Transposable" ));
+    m_check_transposable = manage( new CheckButton());
+    m_check_transposable->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( transpose_xpm ))));
     m_check_transposable->set_active(m_seq->get_transposable());
     m_check_transposable->signal_toggled ().
         connect (bind
                 (mem_fun (*this, &seqedit::transposable_change_callback),
                  m_check_transposable));
+    add_tooltip( m_check_transposable, "Remove check if sequence should NOT apply song transpose.");
+
     m_hbox->pack_start( *m_check_transposable, false, false );
 
     m_hbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);

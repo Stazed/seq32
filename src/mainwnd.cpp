@@ -37,6 +37,7 @@
 #include "pixmaps/seq24.xpm"
 #include "pixmaps/seq24_32.xpm"
 #include "pixmaps/menu.xpm"
+#include "pixmaps/transpose.xpm"
 
 bool global_is_running = false;
 bool global_is_modified = false;
@@ -150,12 +151,12 @@ mainwnd::mainwnd(perform *a_p):
                         i )));
     }
 
-    m_button_xpose = manage( new Button("transpose"));
-    //m_button_xpose->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( xpose_xpm ))));
+    m_button_xpose = manage( new Button());
+    m_button_xpose->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( transpose_xpm ))));
     m_button_xpose->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &mainwnd::popup_menu), m_menu_xpose  ));
     add_tooltip( m_button_xpose, "Song transpose" );
     m_entry_xpose = manage( new Entry());
-    m_entry_xpose->set_size_request( 40, -1 );
+    m_entry_xpose->set_size_request( 30, 20 );
     m_entry_xpose->set_editable( false );
 
     tophbox->pack_start(*m_button_xpose, false, false );
