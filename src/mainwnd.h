@@ -62,7 +62,6 @@ class mainwnd : public Gtk::Window, public performcallback
     Menu     *m_menu_file;
     Menu     *m_menu_edit;
     Menu     *m_menu_help;
-    Menu     *m_menu_xpose;
 
     mainwid  *m_main_wid;
     maintime *m_main_time;
@@ -80,9 +79,6 @@ class mainwnd : public Gtk::Window, public performcallback
 
     ToggleButton *m_button_mode;
     ToggleButton *m_button_menu;
-
-    Button *m_button_xpose;
-    Entry *m_entry_xpose;
 
     SpinButton  *m_spinbutton_bpm;
     Adjustment  *m_adjust_bpm;
@@ -107,7 +103,6 @@ class mainwnd : public Gtk::Window, public performcallback
     void options_dialog();
     void about_dialog();
 
-    void xpose_button_callback( int a_xpose);
     void adj_callback_ss( );
     void adj_callback_bpm( );
     void edit_callback_notepad( );
@@ -135,7 +130,6 @@ class mainwnd : public Gtk::Window, public performcallback
     bool signal_action(Glib::IOCondition condition);
 
     void popup_menu (Menu * a_menu);
-    void set_xpose (int a_xpose);
     void apply_song_transpose ();
 
  public:

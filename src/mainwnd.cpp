@@ -37,7 +37,6 @@
 #include "pixmaps/seq24.xpm"
 #include "pixmaps/seq24_32.xpm"
 #include "pixmaps/menu.xpm"
-#include "pixmaps/transpose.xpm"
 
 bool global_is_running = false;
 bool global_is_modified = false;
@@ -136,31 +135,6 @@ mainwnd::mainwnd(perform *a_p):
                                 "The menu is disabled when the\n"
                                 "sequencer IS running.");
     tophbox->pack_start(*m_button_menu, false, false );
-
-    m_menu_xpose =   manage( new Menu());
-    char num[11];
-    for ( int i=-12; i<=12; ++i) {
-
-        if (i){
-            snprintf(num, sizeof(num), "%+d [%s]", i, c_interval_text[abs(i)]);
-        } else {
-            snprintf(num, sizeof(num), "0 [normal]");
-        }
-        m_menu_xpose->items().push_front( MenuElem( num,
-                    sigc::bind(mem_fun(*this,&mainwnd::xpose_button_callback),
-                        i )));
-    }
-
-    m_button_xpose = manage( new Button());
-    m_button_xpose->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( transpose_xpm ))));
-    m_button_xpose->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &mainwnd::popup_menu), m_menu_xpose  ));
-    add_tooltip( m_button_xpose, "Song transpose" );
-    m_entry_xpose = manage( new Entry());
-    m_entry_xpose->set_size_request( 30, 20 );
-    m_entry_xpose->set_editable( false );
-
-    tophbox->pack_start(*m_button_xpose, false, false );
-    tophbox->pack_start(*m_entry_xpose, false, false );
 
     // adjust placement...
     VBox *vbox_b = manage( new VBox() );
@@ -287,7 +261,6 @@ mainwnd::mainwnd(perform *a_p):
 
     m_main_wid->set_can_focus();
     m_main_wid->grab_focus();
-    set_xpose( 0 );
 
     /* add main layout box */
     this->add (*mainvbox);
@@ -852,25 +825,6 @@ mainwnd::popup_menu(Menu *a_menu)
     a_menu->popup(0,0);
 }
 
-void
-mainwnd::xpose_button_callback( int a_xpose)
-{
-    if(m_mainperf->get_master_midi_bus()->get_transpose() != a_xpose)
-    {
-        set_xpose(a_xpose);
-    }
-}
-
-void
-mainwnd::set_xpose( int a_xpose  )
-{
-    char b[11];
-    snprintf( b, sizeof(b), "%+d", a_xpose );
-    m_entry_xpose->set_text(b);
-
-    m_mainperf->all_notes_off();
-    m_mainperf->get_master_midi_bus()->set_transpose(a_xpose);
-}
 
 void
 mainwnd::apply_song_transpose()
@@ -878,7 +832,7 @@ mainwnd::apply_song_transpose()
     if(m_mainperf->get_master_midi_bus()->get_transpose() != 0)
     {
         m_mainperf->apply_song_transpose();
-        set_xpose(0);
+        m_perf_edit->set_xpose(0);
     }
 }
 

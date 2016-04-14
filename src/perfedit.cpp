@@ -34,6 +34,7 @@
 #include "pixmaps/perfedit.xpm"
 #include "pixmaps/jack.xpm"
 #include "pixmaps/transportFollow.xpm"
+#include "pixmaps/transpose.xpm"
 
 using namespace sigc;
 
@@ -146,6 +147,27 @@ perfedit::perfedit( perform *a_perf )
     m_entry_snap->set_size_request( 40, -1 );
     m_entry_snap->set_editable( false );
 
+    m_menu_xpose =   manage( new Menu());
+    char num[11];
+    for ( int i=-12; i<=12; ++i) {
+
+        if (i){
+            snprintf(num, sizeof(num), "%+d [%s]", i, c_interval_text[abs(i)]);
+        } else {
+            snprintf(num, sizeof(num), "0 [normal]");
+        }
+        m_menu_xpose->items().push_front( MenuElem( num,
+                    sigc::bind(mem_fun(*this,&perfedit::xpose_button_callback),
+                        i )));
+    }
+
+    m_button_xpose = manage( new Button());
+    m_button_xpose->add( *manage( new Image(Gdk::Pixbuf::create_from_xpm_data( transpose_xpm ))));
+    m_button_xpose->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_xpose  ));
+    add_tooltip( m_button_xpose, "Song transpose" );
+    m_entry_xpose = manage( new Entry());
+    m_entry_xpose->set_size_request( 30, -1 );
+    m_entry_xpose->set_editable( false );
 
     m_menu_bp_measure = manage( new Menu() );
     m_menu_bw = manage( new Menu() );
@@ -281,6 +303,9 @@ perfedit::perfedit( perform *a_perf )
     m_hlbox->pack_start( *m_button_snap , false, false );
     m_hlbox->pack_start( *m_entry_snap , false, false );
 
+    m_hlbox->pack_start(*m_button_xpose, false, false );
+    m_hlbox->pack_start(*m_entry_xpose, false, false );
+
     m_hlbox->pack_start( *(manage(new VSeparator( ))), false, false, 4);
 
 #ifdef JACK_SUPPORT
@@ -300,6 +325,7 @@ perfedit::perfedit( perform *a_perf )
     set_snap( 8 );
     set_bp_measure( 4 );
     set_bw( 4 );
+    set_xpose( 0 );
 
     add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );
 }
@@ -474,6 +500,27 @@ perfedit::toggle_jack()
     m_button_jack->set_active( ! m_button_jack->get_active() );
 }
 #endif // JACK_SUPPORT
+
+void
+perfedit::xpose_button_callback( int a_xpose)
+{
+    if(m_mainperf->get_master_midi_bus()->get_transpose() != a_xpose)
+    {
+        set_xpose(a_xpose);
+    }
+}
+
+void
+perfedit::set_xpose( int a_xpose  )
+{
+    char b[11];
+    snprintf( b, sizeof(b), "%+d", a_xpose );
+    m_entry_xpose->set_text(b);
+
+    m_mainperf->all_notes_off();
+    m_mainperf->get_master_midi_bus()->set_transpose(a_xpose);
+}
+
 
 void
 perfedit::popup_menu(Menu *a_menu)

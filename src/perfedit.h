@@ -88,23 +88,33 @@ class perfedit:public Gtk::Window
     perfroll *m_perfroll;
     perftime *m_perftime;
 
-    Menu *m_menu_snap;
-    Button *m_button_snap;
-    Entry *m_entry_snap;
+    /* time signature, beats per measure, beat width */
+    Menu        *m_menu_bp_measure;
+    Menu        *m_menu_bw;
 
-    Button *m_button_stop;
-    Button *m_button_play;
+    Menu        *m_menu_snap;
+    Menu        *m_menu_xpose;
+
+    Button      *m_button_snap;
+    Entry       *m_entry_snap;
+
+    Button      *m_button_xpose;
+    Entry       *m_entry_xpose;
+
+    Button      *m_button_stop;
+    Button      *m_button_play;
+
     ToggleButton *m_button_loop;
     ToggleButton *m_button_jack;
     ToggleButton *m_button_follow;
 
-    Button *m_button_expand;
-    Button *m_button_collapse;
-    Button *m_button_copy;
+    Button      *m_button_expand;
+    Button      *m_button_collapse;
+    Button      *m_button_copy;
 
-    Button *m_button_grow;
-    Button *m_button_undo;
-    Button *m_button_redo;
+    Button      *m_button_grow;
+    Button      *m_button_undo;
+    Button      *m_button_redo;
 
     Button      *m_button_bp_measure;
     Entry       *m_entry_bp_measure;
@@ -116,11 +126,6 @@ class perfedit:public Gtk::Window
     HBox *m_hlbox;
 
     Tooltips *m_tooltips;
-
-    /* time signature, beats per measure, beat width */
-    Menu       *m_menu_bp_measure;
-    Menu       *m_menu_bw;
-
 
     /* set snap to in pulses */
     int m_snap;
@@ -143,6 +148,8 @@ class perfedit:public Gtk::Window
 
     void set_looped ();
     void set_jack_mode();
+
+    void xpose_button_callback( int a_xpose);
 
     void expand ();
     void collapse ();
@@ -169,6 +176,8 @@ class perfedit:public Gtk::Window
     int get_bp_measure();
     void set_bw( int a_beat_width );
     int get_bw();
+
+    void set_xpose (int a_xpose);
     void set_zoom (int z);
 
     bool get_toggle_jack();
