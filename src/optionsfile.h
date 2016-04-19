@@ -26,7 +26,7 @@
 class optionsfile : public configfile
 {
 
- public:
+public:
 
     optionsfile(const Glib::ustring& a_name);
 
@@ -34,4 +34,3 @@ class optionsfile : public configfile
     bool write( perform *a_perf );
 
 };
-

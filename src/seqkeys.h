@@ -42,7 +42,7 @@
 /* holds the left side piano */
 class seqkeys : public Gtk::DrawingArea
 {
- private:
+private:
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
@@ -108,9 +108,7 @@ public:
     seqkeys( sequence *a_seq,
              Gtk::Adjustment *a_vadjust );
 
-
     void set_scale( int a_scale );
     void set_key( int a_key );
-
 
 };

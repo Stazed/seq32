@@ -41,7 +41,8 @@ private:
 
 public:
 
-    enum Color {
+    enum Color
+    {
         BLACK = 0,
         WHITE = 1
     };

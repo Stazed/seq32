@@ -41,10 +41,7 @@ class seqedit;
 #include <gtkmm/widget.h>
 #include <gtkmm/style.h>
 
-
-
 using namespace Gtk;
-
 
 const int c_seqarea_seq_x = c_text_x * 13;
 const int c_seqarea_seq_y = c_text_y * 2;
@@ -53,7 +50,7 @@ const int c_seqarea_seq_y = c_text_y * 2;
 class mainwid : public Gtk::DrawingArea, public seqmenu
 {
 
- private:
+private:
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
@@ -114,7 +111,7 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
 
     void redraw( int a_seq );
 
- public:
+public:
 
     mainwid( perform *a_p );
     ~mainwid( );
@@ -131,4 +128,3 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
     void draw_marker_on_sequence( int a_seq, int a_tick );
 
 };
-

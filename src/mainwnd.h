@@ -18,7 +18,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #include "mainwid.h"
 #include "perform.h"
 #include "sequence.h"
@@ -26,7 +25,6 @@
 #include "maintime.h"
 #include "perfedit.h"
 #include "options.h"
-
 
 #pragma once
 
@@ -36,20 +34,16 @@
 
 #include "globals.h"
 
-
-
 using namespace Gtk;
 
-
 using namespace Menu_Helpers;
-
 
 class mainwnd : public Gtk::Window, public performcallback
 {
     /* notification handler for learn mode toggle */
     virtual void on_grouplearnchange(bool state);
 
- private:
+private:
 
     perform  *m_mainperf;
     bool      m_menu_mode;
@@ -93,7 +87,6 @@ class mainwnd : public Gtk::Window, public performcallback
 
     sigc::connection   m_timeout_connect;
 
-
     void set_song_mode();
     void toggle_song_mode();
     void set_menu_mode();
@@ -132,7 +125,7 @@ class mainwnd : public Gtk::Window, public performcallback
     void popup_menu (Menu * a_menu);
     void apply_song_transpose ();
 
- public:
+public:
 
     mainwnd(perform *a_p);
     ~mainwnd();
@@ -142,6 +135,4 @@ class mainwnd : public Gtk::Window, public performcallback
     bool on_key_press_event(GdkEventKey* a_ev);
     bool on_key_release_event(GdkEventKey* a_ev);
 
-
 };
-

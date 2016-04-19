@@ -18,7 +18,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #pragma once
 
 #include "perfedit.h"
@@ -49,14 +48,13 @@ class perfedit;
 class perftime: public Gtk::DrawingArea
 {
 
- private:
+private:
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;
     Gdk::Color    m_black, m_white, m_grey;
 
     Glib::RefPtr<Gdk::Pixmap> m_pixmap;
-
 
     perform      * const m_mainperf;
     perfedit     * const m_perfedit;
@@ -85,7 +83,7 @@ class perftime: public Gtk::DrawingArea
 
     void change_horz();
 
- public:
+public:
 
     perftime( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust );
 
@@ -97,4 +95,3 @@ class perftime: public Gtk::DrawingArea
 
     void increment_size();
 };
-

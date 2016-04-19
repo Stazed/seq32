@@ -24,8 +24,8 @@
 
 #include <pthread.h>
 
-class mutex {
-
+class mutex
+{
 private:
 
     static const pthread_mutex_t recmutex;
@@ -60,4 +60,3 @@ public:
     void signal();
 
 };
-

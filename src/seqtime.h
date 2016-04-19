@@ -44,7 +44,7 @@
 class seqtime: public Gtk::DrawingArea
 {
 
- private:
+private:
 
     Glib::RefPtr<Gdk::GC>     m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;
@@ -82,8 +82,7 @@ class seqtime: public Gtk::DrawingArea
 
     void force_draw();
 
-
- public:
+public:
 
     seqtime( sequence *a_seq, int a_zoom,
              Gtk::Adjustment   *a_hadjust );
@@ -93,4 +92,3 @@ class seqtime: public Gtk::DrawingArea
     void set_zoom( int a_zoom );
 
 };
-

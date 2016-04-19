@@ -32,8 +32,6 @@
 //For keys
 #include <gtkmm/accelkey.h>
 
-
-
 using namespace std;
 
 /* 16 per screen */
@@ -47,7 +45,6 @@ const int c_total_seqs = c_seqs_in_set * c_max_sets;
 /* number of sequences */
 /* 32 screen sets */
 const int c_max_sequence =  c_mainwnd_rows *  c_mainwnd_cols * c_max_sets;
-
 
 const int c_ppqn         = 192;  /* default - dosnt change */
 const int c_ppwn         = c_ppqn * 4;  // whole note
@@ -74,15 +71,13 @@ const int c_mainwid_spacing = 2;
 
 const int c_control_height = 0;
 
-
 const int c_mainwid_x = ((c_seqarea_x + c_mainwid_spacing )
-			 * c_mainwnd_cols - c_mainwid_spacing
-			 +  c_mainwid_border * 2 );
+                         * c_mainwnd_cols - c_mainwid_spacing
+                         +  c_mainwid_border * 2 );
 const int c_mainwid_y = ((c_seqarea_y  + c_mainwid_spacing )
-			 * c_mainwnd_rows
-			 +  c_mainwid_border * 2
-			 +  c_control_height );
-
+                         * c_mainwnd_rows
+                         +  c_mainwid_border * 2
+                         +  c_control_height );
 
 
 /* data entry area (velocity, aftertouch, etc ) */
@@ -97,7 +92,6 @@ const int c_num_keys = 128;
 const int c_keyarea_y = c_key_y * c_num_keys + 1;
 const int c_keyarea_x = 36;
 const int c_keyoffset_x = c_keyarea_x - c_key_x;
-
 
 /* paino roll */
 const int c_rollarea_y = c_keyarea_y;
@@ -117,7 +111,6 @@ const std::string c_dummy( "Untitled" );
 /* maximum size of sequence, default size */
 const int c_maxbeats     = 0xFFFF;   /* max number of beats in a sequence */
 
-
 /* midifile tags */
 const unsigned long c_midibus      = 0x24240001;
 const unsigned long c_midich       = 0x24240002;
@@ -136,7 +129,6 @@ const unsigned long c_transpose    = 0x24240013;
 const char c_font_6_12[] = "-*-fixed-medium-r-*--12-*-*-*-*-*-*";
 const char c_font_8_13[] = "-*-fixed-medium-r-*--13-*-*-*-*-*-*";
 const char c_font_5_7[]  = "-*-fixed-medium-r-*--7-*-*-*-*-*-*";
-
 
 /* used in menu to tell setState what to do */
 const int c_adding = 0;
@@ -269,12 +261,10 @@ const int c_scales_symbol[c_scale_size][12] =
 
     /* minor */
     { 32,32,32,32,32,32,32,32,129,128,129,128},
-
 };
 
 // up 128
 // down 129
-
 
 const char c_scales_text[c_scale_size][32] =
 {
@@ -363,4 +353,3 @@ const char* const c_interaction_method_descs[] =
 };
 
 extern interaction_method_e global_interactionmethod;
-

@@ -28,14 +28,13 @@
 
 class midifile
 {
-
- private:
+private:
 
     int m_pos;
     const std::string m_name;
 
     /* holds our data */
-	std::vector<unsigned char> m_d;
+    std::vector<unsigned char> m_d;
 
     list<unsigned char> m_l;
 
@@ -48,7 +47,7 @@ class midifile
     void write_short( unsigned short );
     void write_byte( unsigned char );
 
- public:
+public:
 
     midifile(const Glib::ustring&);
 

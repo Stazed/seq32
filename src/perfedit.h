@@ -71,7 +71,7 @@ class perftime;
 class perfedit:public Gtk::Window
 {
 
-  private:
+private:
 
     perform *m_mainperf;
 
@@ -82,7 +82,6 @@ class perfedit:public Gtk::Window
 
     Adjustment *m_vadjust;
     Adjustment *m_hadjust;
-
 
     perfnames *m_perfnames;
     perfroll *m_perfroll;
@@ -164,7 +163,7 @@ class perfedit:public Gtk::Window
     bool on_delete_event (GdkEventAny * a_event);
     bool on_key_press_event(GdkEventKey* a_ev);
 
-  public:
+public:
 
     static bool zoom_check (int z)
     {
@@ -188,4 +187,3 @@ class perfedit:public Gtk::Window
     perfedit (perform * a_perf);
     ~perfedit ();
 };
-

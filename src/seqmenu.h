@@ -19,14 +19,12 @@
 //-----------------------------------------------------------------------------
 
 
-
 #include "globals.h"
 #include "perform.h"
 
 class seqedit;
 
 #pragma once
-
 
 #include <gtkmm/button.h>
 #include <gtkmm/window.h>
@@ -42,15 +40,12 @@ class seqedit;
 #include <gtkmm/widget.h>
 #include <gtkmm/style.h>
 
-
-
 using namespace Gtk;
-
 
 class seqmenu : public virtual Glib::ObjectBase
 {
 
- private:
+private:
 
     Menu         *m_menu;
     perform      *m_mainperf;
@@ -72,14 +67,13 @@ class seqmenu : public virtual Glib::ObjectBase
 
     virtual void redraw( int a_sequence ) = 0;
 
- protected:
+protected:
 
     int m_current_seq;
     void popup_menu();
 
- public:
+public:
 
     seqmenu( perform *a_p );
-    virtual ~seqmenu( ){ };
+    virtual ~seqmenu( ) { };
 };
-

@@ -54,15 +54,16 @@ public:
 
     long m_offset;
 
-    trigger (){
+    trigger ()
+    {
         m_tick_start = 0;
         m_tick_end = 0;
         m_offset = 0;
         m_selected = false;
     };
 
-    bool operator< (trigger rhs){
-
+    bool operator< (trigger rhs)
+    {
         if (m_tick_start < rhs.m_tick_start)
             return true;
 
@@ -73,7 +74,7 @@ public:
 class sequence
 {
 
-  private:
+private:
 
     /* holds the events */
     list < event > m_list_event;
@@ -97,7 +98,6 @@ class sequence
     /* contains the proper midi channel */
     char m_midi_channel;
     char m_bus;
-
 
     /* song playback mode mute */
     bool m_song_mute;
@@ -185,11 +185,10 @@ class sequence
     void remove( list<event>::iterator i );
     void remove( event* e );
 
+public:
 
-  public:
-
-      sequence ();
-     ~sequence ();
+    sequence ();
+    ~sequence ();
 
     bool m_have_undo;
     bool m_have_redo;
@@ -237,21 +236,20 @@ class sequence
 
     void set_editing (bool a_edit)
     {
-	m_editing = a_edit;
+        m_editing = a_edit;
     };
     bool get_editing ()
     {
-	return m_editing;
+        return m_editing;
     };
     void set_raise (bool a_edit)
     {
-	m_raise = a_edit;
+        m_raise = a_edit;
     };
     bool get_raise ()
     {
-	return m_raise;
+        return m_raise;
     };
-
 
     /* length in ticks */
     void set_length (long a_len, bool a_adjust_triggers = true);
@@ -289,7 +287,6 @@ class sequence
     bool is_dirty_perf ();
     bool is_dirty_names ();
 
-
     void set_dirty_mp();
     void set_dirty();
 
@@ -325,7 +322,6 @@ class sequence
     bool intersectNotes( long position, long position_note, long& start, long& end, long& note );
     bool intersectEvents( long posstart, long posend, long status, long& start );
 
-
     void del_selected_trigger();
     void cut_selected_trigger();
     void copy_selected_trigger();
@@ -343,7 +339,6 @@ class sequence
     void move_triggers (long a_start_tick, long a_distance, bool a_direction);
     void copy_triggers (long a_start_tick, long a_distance);
     void clear_triggers ();
-
 
     long get_trigger_offset ();
 
@@ -367,12 +362,12 @@ class sequence
     /* select note events in range, returns number
        selected */
     int select_note_events (long a_tick_s, int a_note_h,
-			    long a_tick_f, int a_note_l, select_action_e a_action );
+                            long a_tick_f, int a_note_l, select_action_e a_action );
 
     /* select events in range, returns number
        selected */
     int select_events (long a_tick_s, long a_tick_f,
-		       unsigned char a_status, unsigned char a_cc, select_action_e a_action);
+                       unsigned char a_status, unsigned char a_cc, select_action_e a_action);
 
     int get_num_selected_notes ();
     int get_num_selected_events (unsigned char a_status, unsigned char a_cc);
@@ -391,11 +386,11 @@ class sequence
 
     /* returns the 'box' of selected items */
     void get_selected_box (long *a_tick_s, int *a_note_h,
-			   long *a_tick_f, int *a_note_l);
+                           long *a_tick_f, int *a_note_l);
 
     /* returns the 'box' of selected items */
     void get_clipboard_box (long *a_tick_s, int *a_note_h,
-			    long *a_tick_f, int *a_note_l);
+                            long *a_tick_f, int *a_note_l);
 
     /* removes and adds readds selected in position */
     void move_selected_notes (long a_delta_tick, int a_delta_note);
@@ -404,22 +399,22 @@ class sequence
     void add_note (long a_tick, long a_length, int a_note, bool a_paint = false);
 
     void add_event (long a_tick,
-		    unsigned char a_status,
-		    unsigned char a_d0, unsigned char a_d1, bool a_paint = false);
+                    unsigned char a_status,
+                    unsigned char a_d0, unsigned char a_d1, bool a_paint = false);
 
     void stream_event (event * a_ev);
 
     /* changes velocities in a ramping way from vel_s to vel_f  */
     void change_event_data_range (long a_tick_s, long a_tick_f,
-				  unsigned char a_status,
-				  unsigned char a_cc,
-				  int a_d_s, int a_d_f);
-				  //unsigned char a_d_s, unsigned char a_d_f);
+                                  unsigned char a_status,
+                                  unsigned char a_cc,
+                                  int a_d_s, int a_d_f);
+    //unsigned char a_d_s, unsigned char a_d_f);
 
-   /* lfo tool */
+    /* lfo tool */
     void change_event_data_lfo(double a_value, double a_range,
-    		double a_speed, double a_phase, int a_wave,
-    		unsigned char a_status, unsigned char a_cc);
+                               double a_speed, double a_phase, int a_wave,
+                               unsigned char a_status, unsigned char a_cc);
 
     /* moves note off event */
     void increment_selected (unsigned char a_status, unsigned char a_control);
@@ -469,37 +464,36 @@ class sequence
        events elements, and returns true.  When it
        has no more events, returns a false */
     draw_type get_next_note_event (long *a_tick_s,
-				   long *a_tick_f,
-				   int *a_note,
-				   bool * a_selected, int *a_velocity);
+                                   long *a_tick_f,
+                                   int *a_note,
+                                   bool * a_selected, int *a_velocity);
 
     int get_lowest_note_event ();
     int get_highest_note_event ();
 
     bool get_next_event (unsigned char a_status,
-			 unsigned char a_cc,
-			 long *a_tick,
-			 unsigned char *a_D0,
-			 unsigned char *a_D1, bool * a_selected);
+                         unsigned char a_cc,
+                         long *a_tick,
+                         unsigned char *a_D0,
+                         unsigned char *a_D1, bool * a_selected);
 
     bool get_next_event (unsigned char *a_status, unsigned char *a_cc);
 
     bool get_next_trigger (long *a_tick_on,
-			   long *a_tick_off,
-			   bool * a_selected, long *a_tick_offset);
+                           long *a_tick_off,
+                           bool * a_selected, long *a_tick_offset);
 
     sequence & operator= (const sequence & a_rhs);
 
     void fill_list (list < char >*a_list, int a_pos);
 
     void select_events (unsigned char a_status, unsigned char a_cc,
-			bool a_inverse = false);
+                        bool a_inverse = false);
     void quanize_events (unsigned char a_status, unsigned char a_cc,
-			 long a_snap_tick, int a_divide, bool a_linked =
-			 false);
+                         long a_snap_tick, int a_divide, bool a_linked =
+                             false);
     void transpose_notes (int a_steps, int a_scale);
     void apply_song_transpose ();
     void shift_notes (int a_ticks);  // move selected notes later/earlier in time
     void multiply_pattern( float a_multiplier );
 };
-

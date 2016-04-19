@@ -27,7 +27,7 @@
 class userfile  : public configfile
 {
 
- public:
+public:
 
     userfile( string a_name );
     ~userfile( );

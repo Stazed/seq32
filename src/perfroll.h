@@ -42,7 +42,6 @@
 #include "mutex.h"
 #include "perfedit.h"
 
-
 using namespace Gtk;
 
 #include "perfroll_input.h"
@@ -57,12 +56,11 @@ class perfedit;
 class perfroll : public Gtk::DrawingArea
 {
 
- private:
+private:
     friend class FruityPerfInput;
     friend class Seq24PerfInput;
 
     AbstractPerfInput* m_interaction;
-
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
@@ -70,7 +68,6 @@ class perfroll : public Gtk::DrawingArea
 
     Glib::RefPtr<Gdk::Pixmap> m_pixmap;
     Glib::RefPtr<Gdk::Pixmap> m_background;
-
 
     perform        * const m_mainperf;
     perfedit       * const m_perfedit;
@@ -131,7 +128,6 @@ class perfroll : public Gtk::DrawingArea
 
     void draw_drawable_row( Glib::RefPtr<Gdk::Drawable> a_dest, Glib::RefPtr<Gdk::Drawable> a_src,  long a_y );
 
-
     void change_horz();
     void change_vert();
 
@@ -141,7 +137,7 @@ class perfroll : public Gtk::DrawingArea
     bool transport_follow;
     bool trans_button_press;
 
- public:
+public:
 
     int  m_zoom;
     void set_zoom (int a_zoom);
@@ -158,10 +154,9 @@ class perfroll : public Gtk::DrawingArea
     void redraw_dirty_sequences();
 
     perfroll( perform *a_perf,
-          perfedit *a_perf_edit,
-	      Adjustment *a_hadjust,
-	      Adjustment *a_vadjust );
+              perfedit *a_perf_edit,
+              Adjustment *a_hadjust,
+              Adjustment *a_vadjust );
 
     ~perfroll( );
 };
-
