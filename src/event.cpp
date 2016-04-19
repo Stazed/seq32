@@ -54,11 +54,11 @@ event::mod_timestamp( unsigned long a_mod )
 void
 event::set_status( const char a_status  )
 {
-   /* bitwise AND to clear the channel portion of the status */
+    /* bitwise AND to clear the channel portion of the status */
     if ( (unsigned char) a_status >= 0xF0 )
-      m_status = (char) a_status;
+        m_status = (char) a_status;
     else
-      m_status = (char) (a_status & EVENT_CLEAR_CHAN_MASK);
+        m_status = (char) (a_status & EVENT_CLEAR_CHAN_MASK);
 }
 
 void
@@ -83,29 +83,26 @@ event::set_data( char a_D1, char a_D2 )
 void
 event::increment_data2()
 {
-	m_data[1] = (m_data[1]+1) & 0x7F;
+    m_data[1] = (m_data[1]+1) & 0x7F;
 }
 
 void
 event::decrement_data2()
 {
-	m_data[1] = (m_data[1]-1) & 0x7F;
+    m_data[1] = (m_data[1]-1) & 0x7F;
 }
-
-
 
 void
 event::increment_data1()
 {
-	m_data[0] = (m_data[0]+1) & 0x7F;
+    m_data[0] = (m_data[0]+1) & 0x7F;
 }
 
 void
 event::decrement_data1()
 {
-	m_data[0] = (m_data[0]-1) & 0x7F;
+    m_data[0] = (m_data[0]-1) & 0x7F;
 }
-
 
 void
 event::get_data( unsigned char *D0, unsigned char *D1 )
@@ -120,7 +117,6 @@ event::get_status( )
     return m_status;
 }
 
-
 void
 event::start_sysex()
 {
@@ -130,17 +126,16 @@ event::start_sysex()
 bool
 event::append_sysex( unsigned char *a_data, long a_size )
 {
-  bool ret = true;
+    bool ret = true;
 
-  for ( int i=0; i<a_size; i++ ){
+    for ( int i=0; i<a_size; i++ )
+    {
+        m_sysex.push_back( a_data[i] );
+        if ( a_data[i] == EVENT_SYSEX_END )
+            ret = false;
+    }
 
-    m_sysex.push_back( a_data[i] );
-    if ( a_data[i] == EVENT_SYSEX_END )
-      ret = false;
-  }
-
-  return ret;
-
+    return ret;
 }
 
 
@@ -149,8 +144,6 @@ event::get_sysex()
 {
     return m_sysex.data();
 }
-
-
 
 void
 event::set_size( long a_size )
@@ -200,19 +193,18 @@ event::get_note_velocity()
     return m_data[1];
 }
 
-
 void
 event::print()
 {
     printf( "[%06ld] [%04X] %02X ",
-	    m_timestamp,
-	    m_sysex.size(),
-	    m_status );
+            m_timestamp,
+            m_sysex.size(),
+            m_status );
 
-    if ( m_status == EVENT_SYSEX ){
-
-        for( size_t i=0; i<m_sysex.size(); i++ ){
-
+    if ( m_status == EVENT_SYSEX )
+    {
+        for( size_t i=0; i<m_sysex.size(); i++ )
+        {
             if ( i%16 == 0 )
                 printf( "\n    " );
 
@@ -221,11 +213,11 @@ event::print()
 
         printf( "\n" );
     }
-    else {
-
+    else
+    {
         printf( "%02X %02X\n",
-            m_data[0],
-            m_data[1] );
+                m_data[0],
+                m_data[1] );
     }
 }
 
@@ -234,22 +226,22 @@ event::get_rank(void) const
 {
     switch ( m_status )
     {
-        case EVENT_NOTE_OFF:
-            return 0x100;
-        case EVENT_NOTE_ON:
-            return 0x090;
+    case EVENT_NOTE_OFF:
+        return 0x100;
+    case EVENT_NOTE_ON:
+        return 0x090;
 
-        case EVENT_AFTERTOUCH:
-        case EVENT_CHANNEL_PRESSURE:
-        case EVENT_PITCH_WHEEL:
-            return 0x050;
+    case EVENT_AFTERTOUCH:
+    case EVENT_CHANNEL_PRESSURE:
+    case EVENT_PITCH_WHEEL:
+        return 0x050;
 
-        case EVENT_CONTROL_CHANGE:
-            return 0x010;
-        case EVENT_PROGRAM_CHANGE:
-            return 0x000;
-        default:
-            return 0;
+    case EVENT_CONTROL_CHANGE:
+        return 0x010;
+    case EVENT_PROGRAM_CHANGE:
+        return 0x000;
+    default:
+        return 0;
     }
 }
 
@@ -265,7 +257,6 @@ event::operator>( const event &a_rhsevent )
         return (m_timestamp > a_rhsevent.m_timestamp);
     }
 }
-
 
 bool
 event::operator<( const event &a_rhsevent )
@@ -285,8 +276,6 @@ event::operator<=( const unsigned long &a_rhslong )
 {
     return (m_timestamp <= a_rhslong);
 }
-
-
 
 bool
 event::operator>( const unsigned long &a_rhslong )

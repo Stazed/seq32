@@ -40,7 +40,8 @@
 
 /* struct for command parsing */
 static struct
-option long_options[] = {
+    option long_options[] =
+{
 
     {"help", 0, 0, 'h'},
     {"showmidi", 0, 0, 's'},
@@ -101,7 +102,6 @@ lash *lash_driver = NULL;
 #   define SLASH "/"
 #endif
 
-
 int
 main (int argc, char *argv[])
 {
@@ -121,7 +121,6 @@ main (int argc, char *argv[])
         for ( int j=0; j<128; j++ )
             global_user_instrument_definitions[i].controllers_active[j] = false;
     }
-
 
     /* Init the lash driver (strip lash specific command line
      * arguments and connect to daemon) */
@@ -147,7 +146,8 @@ main (int argc, char *argv[])
 
             optionsfile options( total_file );
 
-            if ( !options.parse( &p ) ){
+            if ( !options.parse( &p ) )
+            {
                 printf( "Error Reading [%s]\n", total_file.c_str());
             }
         }
@@ -159,7 +159,8 @@ main (int argc, char *argv[])
 
             userfile user( total_file );
 
-            if ( !user.parse( &p ) ){
+            if ( !user.parse( &p ) )
+            {
                 printf( "Error Reading [%s]\n", total_file.c_str());
             }
         }
@@ -168,127 +169,127 @@ main (int argc, char *argv[])
     else
         printf( "Error calling getenv( \"%s\" )\n", HOME );
 
-
     /* parse parameters */
     int c;
 
-    while (true) {
-
+    while (true)
+    {
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
         c = getopt_long(argc, argv, "Chi:jJkmM:pPsSU:vx:", long_options,
-                &option_index);
+                        &option_index);
 
         /* Detect the end of the options. */
         if (c == -1)
             break;
 
-        switch (c){
+        switch (c)
+        {
 
-            case '?':
-            case 'h':
+        case '?':
+        case 'h':
 
-                printf( "Usage: seq24 [OPTIONS] [FILENAME]\n\n" );
-                printf( "Options:\n" );
-                printf( "   -h, --help: show this message\n" );
-                printf( "   -v, --version: show program version information\n" );
-                printf( "   -m, --manual_alsa_ports: seq24 won't attach alsa ports\n" );
-                printf( "   -s, --showmidi: dumps incoming midi events to screen\n" );
-                printf( "   -p, --priority: runs higher priority with FIFO scheduler (must be root)\n" );
-                printf( "   -P, --pass_sysex: passes any incoming sysex messages to all outputs \n" );
-                printf( "   -i, --ignore <number>: ignore ALSA device\n" );
-                printf( "   -k, --show_keys: prints pressed key value\n" );
-                printf( "   -x, --interaction_method <number>: see .seq24rc for methods to use\n" );
-                printf( "   -j, --jack_transport: seq24 will sync to jack transport\n" );
-                printf( "   -J, --jack_master: seq24 will try to be jack master\n" );
-                printf( "   -C, --jack_master_cond: jack master will fail if there is already a master\n" );
-                printf( "   -M, --song_start_mode <mode>: The following play\n" );
-                printf( "                          modes are available (0 = live mode)\n");
-                printf( "                                              (1 = song mode) (default)\n" );
-                printf( "   -S, --stats: show statistics\n" );
-                printf( "   -U, --jack_session_uuid <uuid>: set uuid for jack session\n" );
-                printf( "\n\n\n" );
+            printf( "Usage: seq24 [OPTIONS] [FILENAME]\n\n" );
+            printf( "Options:\n" );
+            printf( "   -h, --help: show this message\n" );
+            printf( "   -v, --version: show program version information\n" );
+            printf( "   -m, --manual_alsa_ports: seq24 won't attach alsa ports\n" );
+            printf( "   -s, --showmidi: dumps incoming midi events to screen\n" );
+            printf( "   -p, --priority: runs higher priority with FIFO scheduler (must be root)\n" );
+            printf( "   -P, --pass_sysex: passes any incoming sysex messages to all outputs \n" );
+            printf( "   -i, --ignore <number>: ignore ALSA device\n" );
+            printf( "   -k, --show_keys: prints pressed key value\n" );
+            printf( "   -x, --interaction_method <number>: see .seq24rc for methods to use\n" );
+            printf( "   -j, --jack_transport: seq24 will sync to jack transport\n" );
+            printf( "   -J, --jack_master: seq24 will try to be jack master\n" );
+            printf( "   -C, --jack_master_cond: jack master will fail if there is already a master\n" );
+            printf( "   -M, --song_start_mode <mode>: The following play\n" );
+            printf( "                          modes are available (0 = live mode)\n");
+            printf( "                                              (1 = song mode) (default)\n" );
+            printf( "   -S, --stats: show statistics\n" );
+            printf( "   -U, --jack_session_uuid <uuid>: set uuid for jack session\n" );
+            printf( "\n\n\n" );
 
-                return EXIT_SUCCESS;
-                break;
+            return EXIT_SUCCESS;
+            break;
 
-            case 'S':
-                global_stats = true;
-                break;
+        case 'S':
+            global_stats = true;
+            break;
 
-            case 's':
-                global_showmidi = true;
-                break;
+        case 's':
+            global_showmidi = true;
+            break;
 
-            case 'p':
-                global_priority = true;
-                break;
+        case 'p':
+            global_priority = true;
+            break;
 
-            case 'P':
-                global_pass_sysex = true;
-                break;
+        case 'P':
+            global_pass_sysex = true;
+            break;
 
-            case 'k':
-                global_print_keys = true;
-                break;
+        case 'k':
+            global_print_keys = true;
+            break;
 
-            case 'j':
-                global_with_jack_transport = true;
-                break;
+        case 'j':
+            global_with_jack_transport = true;
+            break;
 
-            case 'J':
-                global_with_jack_master = true;
-                break;
+        case 'J':
+            global_with_jack_master = true;
+            break;
 
-            case 'C':
-                global_with_jack_master_cond = true;
-                break;
+        case 'C':
+            global_with_jack_master_cond = true;
+            break;
 
-            case 'M':
-                if (atoi( optarg ) > 0) {
-                    global_song_start_mode = true;
-                }
-                else {
-                    global_song_start_mode = false;
-                }
-                break;
+        case 'M':
+            if (atoi( optarg ) > 0)
+            {
+                global_song_start_mode = true;
+            }
+            else
+            {
+                global_song_start_mode = false;
+            }
+            break;
 
-            case 'm':
-                global_manual_alsa_ports = true;
-                break;
+        case 'm':
+            global_manual_alsa_ports = true;
+            break;
 
-            case 'i':
-                /* ignore alsa device */
-                global_device_ignore = true;
-                global_device_ignore_num = atoi( optarg );
-                break;
+        case 'i':
+            /* ignore alsa device */
+            global_device_ignore = true;
+            global_device_ignore_num = atoi( optarg );
+            break;
 
-            case 'v':
-                printf("%s", versiontext);
-                return EXIT_SUCCESS;
-                break;
+        case 'v':
+            printf("%s", versiontext);
+            return EXIT_SUCCESS;
+            break;
 
-            case 'U':
-                global_jack_session_uuid = Glib::ustring(optarg);
-                break;
+        case 'U':
+            global_jack_session_uuid = Glib::ustring(optarg);
+            break;
 
-            case 'x':
-                global_interactionmethod = (interaction_method_e)atoi(optarg);
-                break;
+        case 'x':
+            global_interactionmethod = (interaction_method_e)atoi(optarg);
+            break;
 
-            default:
-                break;
+        default:
+            break;
         }
 
     } /* end while */
-
 
     p.init();
     p.launch_input_thread();
     p.launch_output_thread();
     p.init_jack();
-
 
     p_font_renderer = new font();
 
@@ -331,4 +332,3 @@ main (int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
-

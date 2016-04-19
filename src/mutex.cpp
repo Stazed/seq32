@@ -34,7 +34,6 @@ mutex::lock( )
     pthread_mutex_lock( &m_mutex_lock );
 }
 
-
 void
 mutex::unlock( )
 {
@@ -45,7 +44,6 @@ condition_var::condition_var( )
 {
     m_cond = cond;
 }
-
 
 void
 condition_var::signal( )
@@ -58,5 +56,3 @@ condition_var::wait( )
 {
     pthread_cond_wait( &m_cond, &m_mutex_lock );
 }
-
-

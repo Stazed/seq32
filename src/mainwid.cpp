@@ -63,14 +63,13 @@ mainwid::mainwid( perform *a_p  ):
     set_size_request( c_mainwid_x, c_mainwid_y );
 
     add_events( Gdk::BUTTON_PRESS_MASK |
-		Gdk::BUTTON_RELEASE_MASK |
-		Gdk::KEY_PRESS_MASK |
-		Gdk::BUTTON_MOTION_MASK |
-		Gdk::FOCUS_CHANGE_MASK  );
+                Gdk::BUTTON_RELEASE_MASK |
+                Gdk::KEY_PRESS_MASK |
+                Gdk::BUTTON_MOTION_MASK |
+                Gdk::FOCUS_CHANGE_MASK  );
 
     set_double_buffered( false );
 }
-
 
 // GTK, on realize of window, init shiz
 void
@@ -95,22 +94,18 @@ mainwid::on_realize()
 
     fill_background_window();
     draw_sequences_on_pixmap();
-
-
-
 }
 
 // Fills Pixmap
 void
 mainwid::draw_sequences_on_pixmap()
 {
-    for ( int i=0; i< c_mainwnd_rows *  c_mainwnd_cols; i++ ){
-
-	draw_sequence_on_pixmap( i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ));
-	m_last_tick_x[ i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols)  ] = 0;
+    for ( int i=0; i< c_mainwnd_rows *  c_mainwnd_cols; i++ )
+    {
+        draw_sequence_on_pixmap( i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ));
+        m_last_tick_x[ i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols)  ] = 0;
     }
 }
-
 
 // updates background
 void
@@ -119,11 +114,11 @@ mainwid::fill_background_window()
     /* clear background */
 
     m_pixmap->draw_rectangle(this->get_style()->get_bg_gc(Gtk::STATE_NORMAL),
-    		    true,
-    		    0,
-    		    0,
-    		    m_window_x,
-    		    m_window_y );
+                             true,
+                             0,
+                             0,
+                             m_window_x,
+                             m_window_y );
 }
 
 int
@@ -132,111 +127,106 @@ mainwid::timeout()
     return true;
 }
 
-
 // Draws a specific sequence on the Pixmap
 void
 mainwid::draw_sequence_on_pixmap( int a_seq )
 {
-
     if ( a_seq >= (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ) &&
-         a_seq <  ((m_screenset+1)  * c_mainwnd_rows * c_mainwnd_cols )){
+            a_seq <  ((m_screenset+1)  * c_mainwnd_rows * c_mainwnd_cols ))
+    {
+        int i =  (a_seq / c_mainwnd_rows) % c_mainwnd_cols;
+        int j =  a_seq % c_mainwnd_rows;
 
-	int i =  (a_seq / c_mainwnd_rows) % c_mainwnd_cols;
-	int j =  a_seq % c_mainwnd_rows;
+        int base_x = (c_mainwid_border +
+                      (c_seqarea_x + c_mainwid_spacing) * i);
+        int base_y = (c_mainwid_border +
+                      (c_seqarea_y + c_mainwid_spacing) * j);
 
-	int base_x = (c_mainwid_border +
-		      (c_seqarea_x + c_mainwid_spacing) * i);
-	int base_y = (c_mainwid_border +
-		      (c_seqarea_y + c_mainwid_spacing) * j);
+        /*int local_seq = a_seq % c_seqs_in_set;*/
 
-	/*int local_seq = a_seq % c_seqs_in_set;*/
+        m_gc->set_foreground(m_black);
+        m_pixmap->draw_rectangle(m_gc, true,
+                                 base_x,
+                                 base_y,
+                                 c_seqarea_x,
+                                 c_seqarea_y );
 
-	m_gc->set_foreground(m_black);
-	m_pixmap->draw_rectangle(m_gc, true,
-				base_x,
-				base_y,
-				c_seqarea_x,
-				c_seqarea_y );
+        if ( m_mainperf->is_active( a_seq ))
+        {
+            sequence *seq = m_mainperf->get_sequence( a_seq );
 
-	if ( m_mainperf->is_active( a_seq )){
-
-	    sequence *seq = m_mainperf->get_sequence( a_seq );
-
-	    if ( seq->get_playing() ){
-
-	      m_last_playing[a_seq] = true;
-	      m_background = m_black;
-	      m_foreground = m_white;
-
-	    } else {
-
-	      m_last_playing[a_seq] = false;
-	      m_background = m_white;
-	      m_foreground = m_black;
-	    }
+            if ( seq->get_playing() )
+            {
+                m_last_playing[a_seq] = true;
+                m_background = m_black;
+                m_foreground = m_white;
+            }
+            else
+            {
+                m_last_playing[a_seq] = false;
+                m_background = m_white;
+                m_foreground = m_black;
+            }
 
             m_gc->set_foreground(m_background);
-	    m_pixmap->draw_rectangle(m_gc,true,
-				    base_x + 1,
-				    base_y + 1,
-				    c_seqarea_x - 2,
-				    c_seqarea_y - 2 );
+            m_pixmap->draw_rectangle(m_gc,true,
+                                     base_x + 1,
+                                     base_y + 1,
+                                     c_seqarea_x - 2,
+                                     c_seqarea_y - 2 );
 
+            m_gc->set_foreground(m_foreground);
+            char name[20];
+            snprintf( name, sizeof name, "%.13s", seq->get_name() );
 
-	    m_gc->set_foreground(m_foreground);
-	    char name[20];
-	    snprintf( name, sizeof name, "%.13s", seq->get_name() );
+            font::Color col = font::BLACK;;
 
+            if ( m_foreground == m_black )
+            {
+                col = font::BLACK;
+            }
+            if ( m_foreground == m_white )
+            {
+                col = font::WHITE;
+            }
 
-        font::Color col = font::BLACK;;
+            p_font_renderer->render_string_on_drawable( m_gc,
+                    base_x + c_text_x,
+                    base_y + 4,
+                    m_pixmap, name, col);
 
-        if ( m_foreground == m_black ){
-            col = font::BLACK;
-        }
-        if ( m_foreground == m_white ){
-            col = font::WHITE;
-        }
+            /* midi channel + key + timesig */
 
-        p_font_renderer->render_string_on_drawable( m_gc,
-                                                    base_x + c_text_x,
-                                                    base_y + 4,
-                                                    m_pixmap, name, col);
+            /*char key =  m_seq_to_char[local_seq];*/
 
-	    /* midi channel + key + timesig */
+            char str[20];
 
-		/*char key =  m_seq_to_char[local_seq];*/
+            if (m_mainperf->show_ui_sequence_key())
+            {
+                snprintf( str, sizeof str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
 
-	    char str[20];
+                p_font_renderer->render_string_on_drawable(m_gc,
+                        base_x + c_seqarea_x - 7,
+                        base_y + c_text_y * 4 - 2,
+                        m_pixmap, str, col );
+            }
 
-        if (m_mainperf->show_ui_sequence_key())
-        {
-    	    snprintf( str, sizeof str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
+            snprintf( str, sizeof str,
+                      "%d-%d %ld/%ld",
+                      seq->get_midi_bus(),
+                      seq->get_midi_channel()+1,
+                      seq->get_bp_measure(), seq->get_bw() );
 
-    	    p_font_renderer->render_string_on_drawable(m_gc,
-                                                       base_x + c_seqarea_x - 7,
-                                                       base_y + c_text_y * 4 - 2,
-                                                       m_pixmap, str, col );
-        }
+            p_font_renderer->render_string_on_drawable(m_gc,
+                    base_x + c_text_x,
+                    base_y + c_text_y * 4 - 2,
+                    m_pixmap, str, col );
 
-	    snprintf( str, sizeof str,
-		     "%d-%d %ld/%ld",
-		     seq->get_midi_bus(),
-		     seq->get_midi_channel()+1,
-		     seq->get_bp_measure(), seq->get_bw() );
+            int rectangle_x = base_x + c_text_x - 1;
+            int rectangle_y = base_y + c_text_y + c_text_x - 1;
 
-	    p_font_renderer->render_string_on_drawable(m_gc,
-                                                   base_x + c_text_x,
-                                                   base_y + c_text_y * 4 - 2,
-                                                   m_pixmap, str, col );
-
-
-
-
-	    int rectangle_x = base_x + c_text_x - 1;
-	    int rectangle_y = base_y + c_text_y + c_text_x - 1;
-
-            if ( seq->get_queued() ){
-
+            if ( seq->get_queued() )
+            {
                 m_gc->set_foreground(m_grey);
                 m_pixmap->draw_rectangle(m_gc,true,
                                          rectangle_x - 2,
@@ -244,77 +234,71 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
                                          c_seqarea_seq_x + 3,
                                          c_seqarea_seq_y + 3 );
 
-                 m_foreground = m_black;
-
+                m_foreground = m_black;
             }
 
-
-
-	    m_gc->set_foreground(m_foreground);
-	    m_pixmap->draw_rectangle(m_gc,false,
+            m_gc->set_foreground(m_foreground);
+            m_pixmap->draw_rectangle(m_gc,false,
                                      rectangle_x - 2,
                                      rectangle_y - 1,
                                      c_seqarea_seq_x + 3,
                                      c_seqarea_seq_y + 3 );
 
-	    int lowest_note = seq->get_lowest_note_event( );
-	    int highest_note = seq->get_highest_note_event( );
+            int lowest_note = seq->get_lowest_note_event( );
+            int highest_note = seq->get_highest_note_event( );
 
-	    int height = highest_note - lowest_note;
-	    height += 2;
+            int height = highest_note - lowest_note;
+            height += 2;
 
-	    int length = seq->get_length( );
+            int length = seq->get_length( );
 
-	    long tick_s;
-	    long tick_f;
-	    int note;
+            long tick_s;
+            long tick_f;
+            int note;
 
-	    bool selected;
+            bool selected;
 
-	    int velocity;
-	    draw_type dt;
+            int velocity;
+            draw_type dt;
 
-	    seq->reset_draw_marker();
+            seq->reset_draw_marker();
 
+            while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note,
+                                                    &selected, &velocity )) != DRAW_FIN )
+            {
+                int note_y = c_seqarea_seq_y -
+                             (c_seqarea_seq_y  * (note + 1 - lowest_note)) / height ;
 
-	    while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note,
-					      &selected, &velocity )) != DRAW_FIN ){
+                int tick_s_x = (tick_s * c_seqarea_seq_x)  / length;
+                int tick_f_x = (tick_f * c_seqarea_seq_x)  / length;
 
-		int note_y = c_seqarea_seq_y -
-			     (c_seqarea_seq_y  * (note + 1 - lowest_note)) / height ;
+                if ( dt == DRAW_NOTE_ON || dt == DRAW_NOTE_OFF )
+                    tick_f_x = tick_s_x + 1;
+                if ( tick_f_x <= tick_s_x )
+                    tick_f_x = tick_s_x + 1;
 
-		int tick_s_x = (tick_s * c_seqarea_seq_x)  / length;
-		int tick_f_x = (tick_f * c_seqarea_seq_x)  / length;
+                m_gc->set_foreground(m_foreground);
+                m_pixmap->draw_line(m_gc, rectangle_x + tick_s_x,
+                                    rectangle_y + note_y,
+                                    rectangle_x + tick_f_x,
+                                    rectangle_y + note_y );
+            }
+        }
+        else
+        {
+            /* not active */
 
-		if ( dt == DRAW_NOTE_ON || dt == DRAW_NOTE_OFF )
-		    tick_f_x = tick_s_x + 1;
-		if ( tick_f_x <= tick_s_x )
-		    tick_f_x = tick_s_x + 1;
+            m_gc->set_foreground(m_grey);
+            m_pixmap->draw_rectangle( this->get_style()->get_bg_gc(Gtk::STATE_NORMAL),
+                                      true,
+                                      base_x + 4,       base_y,
+                                      c_seqarea_x - 8,  c_seqarea_y );
 
-		m_gc->set_foreground(m_foreground);
-		m_pixmap->draw_line(m_gc, rectangle_x + tick_s_x,
-					 rectangle_y + note_y,
-					 rectangle_x + tick_f_x,
-					 rectangle_y + note_y );
-
-
-	    }
-
-	} else {
-
-	    /* not active */
-
-	    m_gc->set_foreground(m_grey);
-	    m_pixmap->draw_rectangle( this->get_style()->get_bg_gc(Gtk::STATE_NORMAL),
-				    true,
-				    base_x + 4,       base_y,
-				    c_seqarea_x - 8,  c_seqarea_y );
-
-	    m_pixmap->draw_rectangle( this->get_style()->get_bg_gc(Gtk::STATE_NORMAL),
-				    true,
-				    base_x + 1,       base_y + 1,
-				    c_seqarea_x - 2,  c_seqarea_y - 2 );
-	}
+            m_pixmap->draw_rectangle( this->get_style()->get_bg_gc(Gtk::STATE_NORMAL),
+                                      true,
+                                      base_x + 1,       base_y + 1,
+                                      c_seqarea_x - 2,  c_seqarea_y - 2 );
+        }
     }
 }
 
@@ -322,8 +306,8 @@ void
 mainwid::draw_sequence_pixmap_on_window( int a_seq )
 {
     if ( a_seq >= (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ) &&
-         a_seq <  ((m_screenset+1)  * c_mainwnd_rows * c_mainwnd_cols )){
-
+            a_seq <  ((m_screenset+1)  * c_mainwnd_rows * c_mainwnd_cols ))
+    {
         int i =  (a_seq / c_mainwnd_rows) % c_mainwnd_cols;
         int j =  a_seq % c_mainwnd_rows;
 
@@ -339,10 +323,8 @@ mainwid::draw_sequence_pixmap_on_window( int a_seq )
                                 base_x,
                                 base_y,
                                 c_seqarea_x,
-                                c_seqarea_y );    }
-
-
-
+                                c_seqarea_y );
+    }
 }
 
 void
@@ -356,72 +338,72 @@ void
 mainwid::update_markers( int a_ticks )
 {
     for ( int i=0; i< c_mainwnd_rows *  c_mainwnd_cols; i++ )
-	draw_marker_on_sequence( i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ), a_ticks);
+        draw_marker_on_sequence( i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ), a_ticks);
 }
-
 
 void
 mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 {
+    if ( m_mainperf->is_dirty_main(a_seq ) )
+    {
+        update_sequence_on_window( a_seq );
+    }
 
-   	if ( m_mainperf->is_dirty_main(a_seq ) ){
-		update_sequence_on_window( a_seq );
-	}
+    if ( m_mainperf->is_active( a_seq ))
+    {
+        sequence *seq = m_mainperf->get_sequence( a_seq );
 
+        int i =  (a_seq / c_mainwnd_rows) % c_mainwnd_cols;
+        int j =  a_seq % c_mainwnd_rows;
 
-    if ( m_mainperf->is_active( a_seq )){
+        int base_x = (c_mainwid_border +
+                      (c_seqarea_x + c_mainwid_spacing) * i);
+        int base_y = (c_mainwid_border +
+                      (c_seqarea_y + c_mainwid_spacing) * j);
 
-	sequence *seq = m_mainperf->get_sequence( a_seq );
+        int rectangle_x = base_x + c_text_x - 1;
+        int rectangle_y = base_y + c_text_y + c_text_x - 1;
 
-	int i =  (a_seq / c_mainwnd_rows) % c_mainwnd_cols;
-	int j =  a_seq % c_mainwnd_rows;
-
-	int base_x = (c_mainwid_border +
-		  (c_seqarea_x + c_mainwid_spacing) * i);
-	int base_y = (c_mainwid_border +
-		  (c_seqarea_y + c_mainwid_spacing) * j);
-
-	int rectangle_x = base_x + c_text_x - 1;
-	int rectangle_y = base_y + c_text_y + c_text_x - 1;
-
-	int length = seq->get_length( );
+        int length = seq->get_length( );
         a_tick += (length - seq->get_trigger_offset( ));
-	a_tick %= length;
+        a_tick %= length;
 
-	long tick_x = a_tick * c_seqarea_seq_x / length;
-
+        long tick_x = a_tick * c_seqarea_seq_x / length;
 
         m_window->draw_drawable(m_gc,
-    			 m_pixmap,
-    			 rectangle_x + m_last_tick_x[a_seq],
-			 rectangle_y + 1,
-			 rectangle_x + m_last_tick_x[a_seq],
-			 rectangle_y + 1,
-			 1,
-			 c_seqarea_seq_y );
+                                m_pixmap,
+                                rectangle_x + m_last_tick_x[a_seq],
+                                rectangle_y + 1,
+                                rectangle_x + m_last_tick_x[a_seq],
+                                rectangle_y + 1,
+                                1,
+                                c_seqarea_seq_y );
 
-	m_last_tick_x[a_seq] = tick_x;
+        m_last_tick_x[a_seq] = tick_x;
 
-	if ( seq->get_playing() ){
-		m_gc->set_foreground(m_white);
-	} else {
-		m_gc->set_foreground(m_black);
-	}
+        if ( seq->get_playing() )
+        {
+            m_gc->set_foreground(m_white);
+        }
+        else
+        {
+            m_gc->set_foreground(m_black);
+        }
 
-	if ( seq->get_queued()){
-		m_gc->set_foreground(m_black);
-	}
+        if ( seq->get_queued())
+        {
+            m_gc->set_foreground(m_black);
+        }
 
+        m_window->draw_line(m_gc,
+                            rectangle_x + tick_x,
+                            rectangle_y + 1,
+                            rectangle_x + tick_x,
+                            rectangle_y + c_seqarea_seq_y );
 
-	m_window->draw_line(m_gc,
-			   rectangle_x + tick_x,
-			   rectangle_y + 1,
-			   rectangle_x + tick_x,
-			   rectangle_y + c_seqarea_seq_y );
-
-	//if ( seq->get_playing() ){
-	//
-	//}
+        //if ( seq->get_playing() ){
+        //
+        //}
     }
 }
 
@@ -446,19 +428,18 @@ mainwid::draw_pixmap_on_window()
     queue_draw();
 }
 
-
 // GTK expose event
 bool
 mainwid::on_expose_event(GdkEventExpose* a_e)
 {
     m_window->draw_drawable(m_gc,
-    			 m_pixmap,
-    			 a_e->area.x,
-			 a_e->area.y,
-			 a_e->area.x,
-			 a_e->area.y,
-			 a_e->area.width,
-			 a_e->area.height );
+                            m_pixmap,
+                            a_e->area.x,
+                            a_e->area.y,
+                            a_e->area.x,
+                            a_e->area.y,
+                            a_e->area.width,
+                            a_e->area.height );
     return true;
 }
 
@@ -472,11 +453,11 @@ mainwid::seq_from_xy( int a_x, int a_y )
 
     /* is it in the box ? */
     if ( x < 0
-	 || x >= ((c_seqarea_x + c_mainwid_spacing ) * c_mainwnd_cols )
-	 || y < 0
-	 || y >= ((c_seqarea_y + c_mainwid_spacing ) * c_mainwnd_rows )){
-
-	return -1;
+            || x >= ((c_seqarea_x + c_mainwid_spacing ) * c_mainwnd_cols )
+            || y < 0
+            || y >= ((c_seqarea_y + c_mainwid_spacing ) * c_mainwnd_rows ))
+    {
+        return -1;
     }
 
     /* gives us in box corrdinates */
@@ -485,22 +466,19 @@ mainwid::seq_from_xy( int a_x, int a_y )
 
     /* right inactive side of area */
     if ( box_test_x > c_seqarea_x
-	 || box_test_y > c_seqarea_y ){
-
-	return -1;
+            || box_test_y > c_seqarea_y )
+    {
+        return -1;
     }
 
     x /= (c_seqarea_x + c_mainwid_spacing);
     y /= (c_seqarea_y + c_mainwid_spacing);
 
     int sequence =  ( (x * c_mainwnd_rows + y)
-		      + ( m_screenset * c_mainwnd_rows * c_mainwnd_cols ));
+                      + ( m_screenset * c_mainwnd_rows * c_mainwnd_cols ));
 
     return sequence;
-
 }
-
-
 
 // press a mouse button
 bool
@@ -510,19 +488,17 @@ mainwid::on_button_press_event(GdkEventButton* a_p0)
 
     m_current_seq = seq_from_xy( (int) a_p0->x, (int) a_p0->y );
 
-    if ( m_current_seq != -1  && a_p0->button == 1 ){
-
-	m_button_down = true;
+    if ( m_current_seq != -1  && a_p0->button == 1 )
+    {
+        m_button_down = true;
     }
 
     return true;
 }
 
-
 bool
 mainwid::on_button_release_event(GdkEventButton* a_p0)
 {
-
     m_current_seq = seq_from_xy( (int) a_p0->x, (int) a_p0->y );
 
     m_button_down = false;
@@ -530,10 +506,10 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
     /* it hit a sequence ? */
     // toggle play mode of sequence (left button)
 
-    if ( m_current_seq != -1  && a_p0->button == 1 && !m_moving ){
-
-        if ( m_mainperf->is_active( m_current_seq )){
-
+    if ( m_current_seq != -1  && a_p0->button == 1 && !m_moving )
+    {
+        if ( m_mainperf->is_active( m_current_seq ))
+        {
             //sequence *seq = m_mainperf->get_sequence(  m_current_seq );
             //seq->set_playing( !seq->get_playing() );
 
@@ -544,35 +520,33 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
         }
     }
 
-    if ( a_p0->button == 1 && m_moving ){
-
+    if ( a_p0->button == 1 && m_moving )
+    {
         m_moving = false;
 
         if ( ! m_mainperf->is_active( m_current_seq ) && m_current_seq != -1
-                && !m_mainperf->is_sequence_in_edit( m_current_seq )  ){
-
+                && !m_mainperf->is_sequence_in_edit( m_current_seq )  )
+        {
             m_mainperf->new_sequence( m_current_seq  );
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;
 
             draw_sequence_on_pixmap( m_current_seq  );
             draw_sequence_pixmap_on_window( m_current_seq );
-
-        } else {
-
+        }
+        else
+        {
             m_mainperf->new_sequence( m_old_seq  );
             *(m_mainperf->get_sequence( m_old_seq )) = m_moving_seq;
 
             draw_sequence_on_pixmap( m_old_seq  );
             draw_sequence_pixmap_on_window( m_old_seq );
         }
-
-
     }
     // launch menu (right button)
-    if (  m_current_seq != -1 && a_p0->button == 3  ){
+    if (  m_current_seq != -1 && a_p0->button == 3  )
+    {
         popup_menu();
     }
-
 
     return true;
 }
@@ -582,28 +556,26 @@ mainwid::on_motion_notify_event(GdkEventMotion* a_p0)
 {
     int seq = seq_from_xy( (int) a_p0->x, (int) a_p0->y );
 
-    if ( m_button_down ){
+    if ( m_button_down )
+    {
+        if ( seq != m_current_seq && !m_moving &&
+                !m_mainperf->is_sequence_in_edit( m_current_seq ) )
+        {
+            if ( m_mainperf->is_active( m_current_seq ))
+            {
+                m_old_seq = m_current_seq;
+                m_moving = true;
 
-	if ( seq != m_current_seq && !m_moving &&
-		 !m_mainperf->is_sequence_in_edit( m_current_seq ) ){
-
-	    if ( m_mainperf->is_active( m_current_seq )){
-
-		m_old_seq = m_current_seq;
-		m_moving = true;
-
-		m_moving_seq = *(m_mainperf->get_sequence( m_current_seq ));
-		m_mainperf->delete_sequence( m_current_seq );
-		draw_sequence_on_pixmap( m_current_seq  );
-		draw_sequence_pixmap_on_window( m_current_seq );
-	    }
-	}
+                m_moving_seq = *(m_mainperf->get_sequence( m_current_seq ));
+                m_mainperf->delete_sequence( m_current_seq );
+                draw_sequence_on_pixmap( m_current_seq  );
+                draw_sequence_pixmap_on_window( m_current_seq );
+            }
+        }
     }
 
     return true;
 }
-
-
 
 // redraws everything, queues redraw
 void
@@ -612,7 +584,6 @@ mainwid::reset( )
     draw_sequences_on_pixmap();
     draw_pixmap_on_window();
 }
-
 
 //int
 //mainwid::get_screenset( )
@@ -626,25 +597,20 @@ mainwid::set_screenset( int a_ss )
     m_screenset = a_ss;
 
     if ( m_screenset < 0 )
-	m_screenset = c_max_sets - 1;
+        m_screenset = c_max_sets - 1;
 
     if ( m_screenset >= c_max_sets )
-	m_screenset = 0;
+        m_screenset = 0;
 
-	m_mainperf->set_offset(m_screenset);
+    m_mainperf->set_offset(m_screenset);
 
     reset();
 }
-
-
-
 
 mainwid::~mainwid( )
 {
 
 }
-
-
 
 bool
 mainwid::on_focus_in_event(GdkEventFocus*)

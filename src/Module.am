@@ -19,6 +19,8 @@ bin_PROGRAMS = %D%/seq24
   %D%/event.h \
   %D%/keybindentry.h \
   %D%/lash.h \
+  %D%/lfownd.cpp\
+  %D%/lfownd.h\
   %D%/maintime.cpp \
   %D%/maintime.h \
   %D%/mainwid.cpp \
@@ -67,9 +69,7 @@ bin_PROGRAMS = %D%/seq24
   %D%/sequence.cpp \
   %D%/sequence.h \
   %D%/userfile.cpp \
-  %D%/userfile.h\
-  %D%/lfownd.cpp\
-  %D%/lfownd.h
+  %D%/userfile.h
 
 EXTRA_DIST += %D%/configwin32.h
 

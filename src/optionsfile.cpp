@@ -31,7 +31,6 @@ optionsfile::optionsfile(const Glib::ustring& a_name) :
 {
 }
 
-
 bool
 optionsfile::parse( perform *a_perf )
 {
@@ -50,36 +49,36 @@ optionsfile::parse( perform *a_perf )
     sscanf( m_line, "%u", &sequences );
     next_data_line( &file );
 
-    for (unsigned int i = 0; i < sequences; ++i) {
-
+    for (unsigned int i = 0; i < sequences; ++i)
+    {
         int sequence = 0;
 
         sscanf(m_line, "%d [ %d %d %ld %ld %ld %ld ]"
-                " [ %d %d %ld %ld %ld %ld ]"
-                " [ %d %d %ld %ld %ld %ld ]",
+               " [ %d %d %ld %ld %ld %ld ]"
+               " [ %d %d %ld %ld %ld %ld ]",
 
-                &sequence,
+               &sequence,
 
-                &a_perf->get_midi_control_toggle(i)->m_active,
-                &a_perf->get_midi_control_toggle(i)->m_inverse_active,
-                &a_perf->get_midi_control_toggle(i)->m_status,
-                &a_perf->get_midi_control_toggle(i)->m_data,
-                &a_perf->get_midi_control_toggle(i)->m_min_value,
-                &a_perf->get_midi_control_toggle(i)->m_max_value,
+               &a_perf->get_midi_control_toggle(i)->m_active,
+               &a_perf->get_midi_control_toggle(i)->m_inverse_active,
+               &a_perf->get_midi_control_toggle(i)->m_status,
+               &a_perf->get_midi_control_toggle(i)->m_data,
+               &a_perf->get_midi_control_toggle(i)->m_min_value,
+               &a_perf->get_midi_control_toggle(i)->m_max_value,
 
-                &a_perf->get_midi_control_on(i)->m_active,
-                &a_perf->get_midi_control_on(i)->m_inverse_active,
-                &a_perf->get_midi_control_on(i)->m_status,
-                &a_perf->get_midi_control_on(i)->m_data,
-                &a_perf->get_midi_control_on(i)->m_min_value,
-                &a_perf->get_midi_control_on(i)->m_max_value,
+               &a_perf->get_midi_control_on(i)->m_active,
+               &a_perf->get_midi_control_on(i)->m_inverse_active,
+               &a_perf->get_midi_control_on(i)->m_status,
+               &a_perf->get_midi_control_on(i)->m_data,
+               &a_perf->get_midi_control_on(i)->m_min_value,
+               &a_perf->get_midi_control_on(i)->m_max_value,
 
-                &a_perf->get_midi_control_off(i)->m_active,
-                &a_perf->get_midi_control_off(i)->m_inverse_active,
-                &a_perf->get_midi_control_off(i)->m_status,
-                &a_perf->get_midi_control_off(i)->m_data,
-                &a_perf->get_midi_control_off(i)->m_min_value,
-                &a_perf->get_midi_control_off(i)->m_max_value);
+               &a_perf->get_midi_control_off(i)->m_active,
+               &a_perf->get_midi_control_off(i)->m_inverse_active,
+               &a_perf->get_midi_control_off(i)->m_status,
+               &a_perf->get_midi_control_off(i)->m_data,
+               &a_perf->get_midi_control_off(i)->m_min_value,
+               &a_perf->get_midi_control_off(i)->m_max_value);
 
         next_data_line(&file);
     }
@@ -91,25 +90,27 @@ optionsfile::parse( perform *a_perf )
     next_data_line( &file );
 
     int mtx[c_seqs_in_set], j=0;
-    for (int i=0; i< c_seqs_in_set; i++) {
+    for (int i=0; i< c_seqs_in_set; i++)
+    {
         a_perf->select_group_mute(j);
         sscanf(m_line, "%d [%d %d %d %d %d %d %d %d]"
-                " [%d %d %d %d %d %d %d %d]"
-                " [%d %d %d %d %d %d %d %d]"
-                " [%d %d %d %d %d %d %d %d]",
-            &j,
-            &mtx[0], &mtx[1], &mtx[2], &mtx[3],
-            &mtx[4], &mtx[5], &mtx[6], &mtx[7],
+               " [%d %d %d %d %d %d %d %d]"
+               " [%d %d %d %d %d %d %d %d]"
+               " [%d %d %d %d %d %d %d %d]",
+               &j,
+               &mtx[0], &mtx[1], &mtx[2], &mtx[3],
+               &mtx[4], &mtx[5], &mtx[6], &mtx[7],
 
-            &mtx[8], &mtx[9], &mtx[10], &mtx[11],
-            &mtx[12], &mtx[13], &mtx[14], &mtx[15],
+               &mtx[8], &mtx[9], &mtx[10], &mtx[11],
+               &mtx[12], &mtx[13], &mtx[14], &mtx[15],
 
-            &mtx[16], &mtx[17], &mtx[18], &mtx[19],
-            &mtx[20], &mtx[21], &mtx[22], &mtx[23],
+               &mtx[16], &mtx[17], &mtx[18], &mtx[19],
+               &mtx[20], &mtx[21], &mtx[22], &mtx[23],
 
-            &mtx[24], &mtx[25], &mtx[26], &mtx[27],
-            &mtx[28], &mtx[29], &mtx[30], &mtx[31]);
-        for (int k=0; k< c_seqs_in_set; k++) {
+               &mtx[24], &mtx[25], &mtx[26], &mtx[27],
+               &mtx[28], &mtx[29], &mtx[30], &mtx[31]);
+        for (int k=0; k< c_seqs_in_set; k++)
+        {
             a_perf->set_group_mute_state(k, mtx[k]);
         }
         j++;
@@ -121,14 +122,13 @@ optionsfile::parse( perform *a_perf )
     sscanf( m_line, "%ld", &buses );
     next_data_line( &file );
 
-    for ( int i=0; i<buses; ++i ){
-
+    for ( int i=0; i<buses; ++i )
+    {
         long bus_on, bus;
         sscanf( m_line, "%ld %ld", &bus, &bus_on );
         a_perf->get_master_midi_bus( )->set_clock( bus, (clock_e) bus_on );
         next_data_line( &file );
     }
-
 
     line_after( &file, "[keyboard-control]" );
     long keys = 0;
@@ -137,9 +137,8 @@ optionsfile::parse( perform *a_perf )
 
     a_perf->key_events.clear();
 
-
-    for ( int i=0; i<keys; ++i ){
-
+    for ( int i=0; i<keys; ++i )
+    {
         long key = 0, seq = 0;
         sscanf( m_line, "%ld %ld", &key, &seq );
         a_perf->set_key_event( key, seq );
@@ -152,29 +151,26 @@ optionsfile::parse( perform *a_perf )
 
     a_perf->key_groups.clear();
 
-
-    for ( int i=0; i<groups; ++i ){
-
+    for ( int i=0; i<groups; ++i )
+    {
         long key = 0, group = 0;
         sscanf( m_line, "%ld %ld", &key, &group );
         a_perf->set_key_group( key, group );
         next_data_line( &file );
     }
 
-
     sscanf( m_line, "%u %u", &a_perf->m_key_bpm_up,
-                             &a_perf->m_key_bpm_dn );
+            &a_perf->m_key_bpm_dn );
     next_data_line( &file );
     sscanf( m_line, "%u %u %u", &a_perf->m_key_screenset_up,
-                             &a_perf->m_key_screenset_dn,
-                             &a_perf->m_key_set_playing_screenset);
-
+            &a_perf->m_key_screenset_dn,
+            &a_perf->m_key_set_playing_screenset);
 
     next_data_line( &file );
 
     sscanf( m_line, "%u %u %u", &a_perf->m_key_group_on,
-                              &a_perf->m_key_group_off,
-                             &a_perf->m_key_group_learn);
+            &a_perf->m_key_group_off,
+            &a_perf->m_key_group_learn);
 
     next_data_line( &file );
 
@@ -233,8 +229,8 @@ optionsfile::parse( perform *a_perf )
     sscanf( m_line, "%ld", &buses );
     next_data_line( &file );
 
-    for ( int i=0; i<buses; ++i ){
-
+    for ( int i=0; i<buses; ++i )
+    {
         long bus_on, bus;
         sscanf( m_line, "%ld %ld", &bus, &bus_on );
         a_perf->get_master_midi_bus( )->set_input( bus, (bool) bus_on );
@@ -246,7 +242,6 @@ optionsfile::parse( perform *a_perf )
     line_after( &file, "[midi-clock-mod-ticks]" );
     sscanf( m_line, "%ld", &ticks );
     midibus::set_clock_mod(ticks);
-
 
     /* manual alsa ports */
     line_after( &file, "[manual-alsa-ports]" );
@@ -270,7 +265,6 @@ optionsfile::parse( perform *a_perf )
     return true;
 }
 
-
 bool
 optionsfile::write( perform *a_perf  )
 {
@@ -282,8 +276,6 @@ optionsfile::write( perform *a_perf  )
     if( ! file.is_open() )
         return false;
 
-
-
     /* midi control */
 
     file << "#\n";
@@ -293,54 +285,75 @@ optionsfile::write( perform *a_perf  )
     file << "[midi-control]\n";
     file <<  c_midi_controls << "\n";
 
-    for (int i=0; i< c_midi_controls; i++ ){
+    for (int i=0; i< c_midi_controls; i++ )
+    {
+        switch( i )
+        {
 
+        /* 32 mute for channel
+           32 group mute */
+        case c_seqs_in_set               :
+            file << "# mute in group\n";
+            break;
+        case c_midi_control_bpm_up       :
+            file << "# bpm up\n";
+            break;
+        case c_midi_control_bpm_dn       :
+            file << "# bpm down\n";
+            break;
+        case c_midi_control_ss_up        :
+            file << "# screen set up\n";
+            break;
+        case c_midi_control_ss_dn        :
+            file << "# screen set down\n";
+            break;
+        case c_midi_control_mod_replace  :
+            file << "# mod replace\n";
+            break;
+        case c_midi_control_mod_snapshot :
+            file << "# mod snapshot\n";
+            break;
+        case c_midi_control_mod_queue    :
+            file << "# mod queue\n";
+            break;
+        case c_midi_control_mod_gmute    :
+            file << "# mod gmute\n";
+            break;
+        case c_midi_control_mod_glearn   :
+            file << "# mod glearn\n";
+            break;
+        case c_midi_control_play_ss      :
+            file << "# screen set play\n";
+            break;
 
-        switch( i ){
-
-            /* 32 mute for channel
-               32 group mute */
-            case c_seqs_in_set               :  file << "# mute in group\n"; break;
-           case c_midi_control_bpm_up       :  file << "# bpm up\n"; break;
-            case c_midi_control_bpm_dn       :  file << "# bpm down\n"; break;
-            case c_midi_control_ss_up        :  file << "# screen set up\n"; break;
-            case c_midi_control_ss_dn        :  file << "# screen set down\n"; break;
-            case c_midi_control_mod_replace  :  file << "# mod replace\n"; break;
-            case c_midi_control_mod_snapshot :  file << "# mod snapshot\n"; break;
-            case c_midi_control_mod_queue    :  file << "# mod queue\n"; break;
-            case c_midi_control_mod_gmute    :  file << "# mod gmute\n"; break;
-            case c_midi_control_mod_glearn   :  file << "# mod glearn\n"; break;
-            case c_midi_control_play_ss      :  file << "# screen set play\n"; break;
-
-
-            default: break;
+        default:
+            break;
         }
 
         snprintf( outs, sizeof(outs), "%d [%1d %1d %3ld %3ld %3ld %3ld]"
-                " [%1d %1d %3ld %3ld %3ld %3ld]"
-                " [%1d %1d %3ld %3ld %3ld %3ld]",
-                 i,
-                 a_perf->get_midi_control_toggle(i)->m_active,
-                 a_perf->get_midi_control_toggle(i)->m_inverse_active,
-                 a_perf->get_midi_control_toggle(i)->m_status,
-                 a_perf->get_midi_control_toggle(i)->m_data,
-                 a_perf->get_midi_control_toggle(i)->m_min_value,
-                 a_perf->get_midi_control_toggle(i)->m_max_value,
+                  " [%1d %1d %3ld %3ld %3ld %3ld]"
+                  " [%1d %1d %3ld %3ld %3ld %3ld]",
+                  i,
+                  a_perf->get_midi_control_toggle(i)->m_active,
+                  a_perf->get_midi_control_toggle(i)->m_inverse_active,
+                  a_perf->get_midi_control_toggle(i)->m_status,
+                  a_perf->get_midi_control_toggle(i)->m_data,
+                  a_perf->get_midi_control_toggle(i)->m_min_value,
+                  a_perf->get_midi_control_toggle(i)->m_max_value,
 
-                 a_perf->get_midi_control_on(i)->m_active,
-                 a_perf->get_midi_control_on(i)->m_inverse_active,
-                 a_perf->get_midi_control_on(i)->m_status,
-                 a_perf->get_midi_control_on(i)->m_data,
-                 a_perf->get_midi_control_on(i)->m_min_value,
-                 a_perf->get_midi_control_on(i)->m_max_value,
+                  a_perf->get_midi_control_on(i)->m_active,
+                  a_perf->get_midi_control_on(i)->m_inverse_active,
+                  a_perf->get_midi_control_on(i)->m_status,
+                  a_perf->get_midi_control_on(i)->m_data,
+                  a_perf->get_midi_control_on(i)->m_min_value,
+                  a_perf->get_midi_control_on(i)->m_max_value,
 
-                 a_perf->get_midi_control_off(i)->m_active,
-                 a_perf->get_midi_control_off(i)->m_inverse_active,
-                 a_perf->get_midi_control_off(i)->m_status,
-                 a_perf->get_midi_control_off(i)->m_data,
-                 a_perf->get_midi_control_off(i)->m_min_value,
-                 a_perf->get_midi_control_off(i)->m_max_value );
-
+                  a_perf->get_midi_control_off(i)->m_active,
+                  a_perf->get_midi_control_off(i)->m_inverse_active,
+                  a_perf->get_midi_control_off(i)->m_status,
+                  a_perf->get_midi_control_off(i)->m_data,
+                  a_perf->get_midi_control_off(i)->m_min_value,
+                  a_perf->get_midi_control_off(i)->m_max_value );
 
         file << string(outs) << "\n";
     }
@@ -350,33 +363,34 @@ optionsfile::write( perform *a_perf  )
 
     int mtx[c_seqs_in_set];
     file <<  c_gmute_tracks << "\n";
-    for (int j=0; j < c_seqs_in_set; j++ ){
+    for (int j=0; j < c_seqs_in_set; j++ )
+    {
         a_perf->select_group_mute(j);
-        for (int i=0; i < c_seqs_in_set; i++) {
+        for (int i=0; i < c_seqs_in_set; i++)
+        {
             mtx[i] = a_perf->get_group_mute_state(i);
         }
+
         snprintf(outs, sizeof(outs),
-                "%d [%1d %1d %1d %1d %1d %1d %1d %1d]"
-                " [%1d %1d %1d %1d %1d %1d %1d %1d]"
-                " [%1d %1d %1d %1d %1d %1d %1d %1d]"
-                " [%1d %1d %1d %1d %1d %1d %1d %1d]",
-            j,
-            mtx[0], mtx[1], mtx[2], mtx[3],
-            mtx[4], mtx[5], mtx[6], mtx[7],
+                 "%d [%1d %1d %1d %1d %1d %1d %1d %1d]"
+                 " [%1d %1d %1d %1d %1d %1d %1d %1d]"
+                 " [%1d %1d %1d %1d %1d %1d %1d %1d]"
+                 " [%1d %1d %1d %1d %1d %1d %1d %1d]",
+                 j,
+                 mtx[0], mtx[1], mtx[2], mtx[3],
+                 mtx[4], mtx[5], mtx[6], mtx[7],
 
-            mtx[8], mtx[9], mtx[10], mtx[11],
-            mtx[12], mtx[13], mtx[14], mtx[15],
+                 mtx[8], mtx[9], mtx[10], mtx[11],
+                 mtx[12], mtx[13], mtx[14], mtx[15],
 
-            mtx[16], mtx[17], mtx[18], mtx[19],
-            mtx[20], mtx[21], mtx[22], mtx[23],
+                 mtx[16], mtx[17], mtx[18], mtx[19],
+                 mtx[20], mtx[21], mtx[22], mtx[23],
 
-            mtx[24], mtx[25], mtx[26], mtx[27],
-            mtx[28], mtx[29], mtx[30], mtx[31]);
+                 mtx[24], mtx[25], mtx[26], mtx[27],
+                 mtx[28], mtx[29], mtx[30], mtx[31]);
 
         file << string(outs) << "\n";
     }
-
-
 
     /* bus mute/unmute data */
     int buses = a_perf->get_master_midi_bus( )->get_num_out_buses();
@@ -384,12 +398,11 @@ optionsfile::write( perform *a_perf  )
     file << "\n\n\n[midi-clock]\n";
     file << buses << "\n";
 
-    for (int i=0; i< buses; i++ ){
-
-
+    for (int i=0; i< buses; i++ )
+    {
         file << "# " << a_perf->get_master_midi_bus( )->get_midi_out_bus_name(i) << "\n";
         snprintf(outs, sizeof(outs), "%d %d", i,
-                (char) a_perf->get_master_midi_bus( )->get_clock(i));
+                 (char) a_perf->get_master_midi_bus( )->get_clock(i));
         file << outs << "\n";
     }
 
@@ -397,24 +410,19 @@ optionsfile::write( perform *a_perf  )
     file << "\n\n[midi-clock-mod-ticks]\n";
     file << midibus::get_clock_mod() << "\n";
 
-
-
-
     /* bus input data */
     buses = a_perf->get_master_midi_bus( )->get_num_in_buses();
 
     file << "\n\n\n[midi-input]\n";
     file << buses << "\n";
 
-    for (int i=0; i< buses; i++ ){
-
-
+    for (int i=0; i< buses; i++ )
+    {
         file << "# " << a_perf->get_master_midi_bus( )->get_midi_in_bus_name(i) << "\n";
         snprintf(outs, sizeof(outs), "%d %d", i,
-                (char) a_perf->get_master_midi_bus( )->get_input(i));
+                 (char) a_perf->get_master_midi_bus( )->get_input(i));
         file << outs << "\n";
     }
-
 
     /* manual alsa ports */
     file << "\n\n\n[manual-alsa-ports]\n";
@@ -428,12 +436,10 @@ optionsfile::write( perform *a_perf  )
     while (c_interaction_method_names[x] && c_interaction_method_descs[x])
     {
         file << "# " << x << " - '" << c_interaction_method_names[x]
-                     << "' (" << c_interaction_method_descs[x] << ")\n";
+             << "' (" << c_interaction_method_descs[x] << ")\n";
         ++x;
     }
     file << global_interactionmethod << "\n";
-
-
 
     file << "\n\n\n[keyboard-control]\n";
     file << "# Key #, Sequence # \n";
@@ -441,22 +447,23 @@ optionsfile::write( perform *a_perf  )
              a_perf->key_events.size() : (size_t)c_seqs_in_set) << "\n";
 
     for( std::map<unsigned int,long>::const_iterator i = a_perf->key_events.begin();
-         i != a_perf->key_events.end(); ++i ){
-
+            i != a_perf->key_events.end(); ++i )
+    {
         snprintf(outs, sizeof(outs), "%u  %ld        # %s", i->first,
-                i->second, gdk_keyval_name( i->first ) );
+                 i->second, gdk_keyval_name( i->first ) );
         file << string(outs) << "\n";
     }
+
     file << "\n\n\n[keyboard-group]\n";
     file << "# Key #, group # \n";
     file << (a_perf->key_groups.size() < (size_t)c_seqs_in_set ?
              a_perf->key_groups.size() : (size_t)c_seqs_in_set) << "\n";
 
     for( std::map<unsigned int,long>::const_iterator i = a_perf->key_groups.begin();
-         i != a_perf->key_groups.end(); ++i ){
-
+            i != a_perf->key_groups.end(); ++i )
+    {
         snprintf(outs, sizeof(outs), "%u  %ld        # %s", i->first,
-                i->second, gdk_keyval_name(i->first));
+                 i->second, gdk_keyval_name(i->first));
         file << string(outs) << "\n";
     }
 
@@ -522,7 +529,6 @@ optionsfile::write( perform *a_perf  )
 
     file << "\n\n\n[jack-transport]\n\n"
 
-
          << "# jack_transport - Enable sync with JACK Transport.\n"
          << global_with_jack_transport << "\n\n"
 
@@ -536,7 +542,6 @@ optionsfile::write( perform *a_perf  )
          << "# 0 = Playback will be in live mode.  Use this to allow muting and unmuting of loops.\n"
          << "# 1 = Playback will use the song editors data.\n"
          << global_song_start_mode << "\n\n";
-
 
     file << "\n\n\n[last-used-dir]\n\n"
          << "# Last used directory.\n"

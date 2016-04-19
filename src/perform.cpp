@@ -35,8 +35,8 @@ using namespace Gtk;
 
 perform::perform()
 {
-    for (int i=0; i< c_max_sequence; i++) {
-
+    for (int i=0; i< c_max_sequence; i++)
+    {
         m_seqs[i] = NULL;
         m_seqs_active[i] = false;
 
@@ -67,8 +67,8 @@ perform::perform()
 
     midi_control zero = {false,false,0,0,0};
 
-    for ( int i=0; i<c_midi_controls; i++ ){
-
+    for ( int i=0; i<c_midi_controls; i++ )
+    {
         m_midi_cc_toggle[i] = zero;
         m_midi_cc_on[i] = zero;
         m_midi_cc_off[i] = zero;
@@ -188,39 +188,38 @@ perform::perform()
     m_have_redo = false;
 }
 
-
 void perform::init()
 {
     m_master_bus.init( );
 }
-
 
 void perform::init_jack()
 {
 
 #ifdef JACK_SUPPORT
 
-    if ( global_with_jack_transport  && !m_jack_running){
-
+    if ( global_with_jack_transport  && !m_jack_running)
+    {
         m_jack_running = true;
         m_jack_master = true;
 
         //printf ( "init_jack() m_jack_running[%d]\n", m_jack_running );
 
-        do {
-
+        do
+        {
             /* become a new client of the JACK server */
 #ifdef JACK_SESSION
-	    if (global_jack_session_uuid.empty())
-		m_jack_client = jack_client_open(PACKAGE, JackNullOption, NULL);
-	    else
-		m_jack_client = jack_client_open(PACKAGE, JackSessionID, NULL,
-                        global_jack_session_uuid.c_str());
+            if (global_jack_session_uuid.empty())
+                m_jack_client = jack_client_open(PACKAGE, JackNullOption, NULL);
+            else
+                m_jack_client = jack_client_open(PACKAGE, JackSessionID, NULL,
+                                                 global_jack_session_uuid.c_str());
 #else
-	    m_jack_client = jack_client_open(PACKAGE, JackNullOption, NULL );
+            m_jack_client = jack_client_open(PACKAGE, JackNullOption, NULL );
 #endif
 
-            if (m_jack_client == 0) {
+            if (m_jack_client == 0)
+            {
                 printf( "JACK server is not running.\n[JACK sync disabled]\n");
                 m_jack_running = false;
                 break;
@@ -228,12 +227,12 @@ void perform::init_jack()
 
             jack_on_shutdown( m_jack_client, jack_shutdown,(void *) this );
             jack_set_sync_callback(m_jack_client, jack_sync_callback,
-                    (void *) this );
+                                   (void *) this );
             jack_set_process_callback(m_jack_client, jack_process_callback, NULL);
 #ifdef JACK_SESSION
-	    if (jack_set_session_callback)
-		jack_set_session_callback(m_jack_client, jack_session_callback,
-			(void *) this );
+            if (jack_set_session_callback)
+                jack_set_session_callback(m_jack_client, jack_session_callback,
+                                          (void *) this );
 #endif
 
             /* true if we want to fail if there is already a master */
@@ -241,74 +240,76 @@ void perform::init_jack()
 
             if ( global_with_jack_master &&
                     jack_set_timebase_callback(m_jack_client, cond,
-                        jack_timebase_callback, this) == 0){
-
+                                               jack_timebase_callback, this) == 0)
+            {
                 printf("[JACK transport master]\n");
                 m_jack_master = true;
             }
-            else {
+            else
+            {
                 printf("[JACK transport slave]\n");
                 m_jack_master = false;
             }
-            if (jack_activate(m_jack_client)) {
+
+            if (jack_activate(m_jack_client))
+            {
                 printf("Cannot register as JACK client\n");
                 m_jack_running = false;
                 break;
             }
-        } while (0);
+        }
+        while (0);
     }
-
 #endif
 }
-
 
 void perform::deinit_jack()
 {
 #ifdef JACK_SUPPORT
 
-    if ( m_jack_running){
-
+    if ( m_jack_running)
+    {
         //printf ( "deinit_jack() m_jack_running[%d]\n", m_jack_running );
 
         m_jack_running = false;
         m_jack_master = false;
 
-        if ( jack_release_timebase(m_jack_client)){
+        if ( jack_release_timebase(m_jack_client))
+        {
             printf("Cannot release Timebase.\n");
         }
 
-        if (jack_client_close(m_jack_client)) {
+        if (jack_client_close(m_jack_client))
+        {
             printf("Cannot close JACK client.\n");
         }
-
-
     }
 
-    if ( !m_jack_running ){
+    if ( !m_jack_running )
+    {
         printf( "[JACK sync disabled]\n");
     }
 
 #endif
 }
 
-
 void perform::clear_all()
 {
     reset_sequences();
 
-    for (int i=0; i< c_max_sequence; i++ ){
-
+    for (int i=0; i< c_max_sequence; i++ )
+    {
         if ( is_active(i) )
             delete_sequence( i );
     }
 
     string e( "" );
 
-    for (int i=0; i<c_max_sets; i++ ){
+    for (int i=0; i<c_max_sets; i++ )
+    {
         set_screen_set_notepad( i, &e );
     }
 }
-
 
 void perform::set_mode_group_mute ()
 {
@@ -320,7 +321,6 @@ void perform::unset_mode_group_mute ()
     m_mode_group = false;
 }
 
-
 void perform::set_group_mute_state (int a_g_track, bool a_mute_state)
 {
     if (a_g_track < 0)
@@ -329,7 +329,6 @@ void perform::set_group_mute_state (int a_g_track, bool a_mute_state)
         a_g_track = c_seqs_in_set -1;
     m_mute_group[a_g_track + m_mute_group_selected * c_seqs_in_set] = a_mute_state;
 }
-
 
 bool perform::get_group_mute_state (int a_g_track)
 {
@@ -340,7 +339,6 @@ bool perform::get_group_mute_state (int a_g_track)
     return m_mute_group[a_g_track + m_mute_group_selected * c_seqs_in_set];
 }
 
-
 void perform::select_group_mute (int a_g_mute)
 {
     int j = (a_g_mute * c_seqs_in_set);
@@ -350,15 +348,16 @@ void perform::select_group_mute (int a_g_mute)
     if (a_g_mute > c_seqs_in_set)
         a_g_mute = c_seqs_in_set -1;
     if (m_mode_group_learn)
-        for (int i = 0; i < c_seqs_in_set; i++) {
-            if (is_active(i + k)) {
+        for (int i = 0; i < c_seqs_in_set; i++)
+        {
+            if (is_active(i + k))
+            {
                 assert(m_seqs[i + k]);
                 m_mute_group[i + j] = m_seqs[i + k]->get_playing();
             }
         }
     m_mute_group_selected = a_g_mute;
 }
-
 
 void perform::set_mode_group_learn ()
 {
@@ -368,14 +367,12 @@ void perform::set_mode_group_learn ()
         m_notify[x]->on_grouplearnchange( true );
 }
 
-
 void perform::unset_mode_group_learn ()
 {
     for (size_t x = 0; x < m_notify.size(); ++x)
         m_notify[x]->on_grouplearnchange( false );
     m_mode_group_learn = false;
 }
-
 
 void perform::select_mute_group ( int a_group )
 {
@@ -386,8 +383,10 @@ void perform::select_mute_group ( int a_group )
     if (a_group > c_seqs_in_set)
         a_group = c_seqs_in_set -1;
     m_mute_group_selected = a_group;
-    for (int i = 0; i < c_seqs_in_set; i++) {
-        if ((m_mode_group_learn) && (is_active(i + k))) {
+    for (int i = 0; i < c_seqs_in_set; i++)
+    {
+        if ((m_mode_group_learn) && (is_active(i + k)))
+        {
             assert(m_seqs[i + k]);
             m_mute_group[i + j] = m_seqs[i + k]->get_playing();
         }
@@ -395,25 +394,29 @@ void perform::select_mute_group ( int a_group )
     }
 }
 
-
 void perform::mute_group_tracks ()
 {
-    if (m_mode_group) {
-        for (int i=0; i< c_seqs_in_set; i++) {
-            for (int j=0; j < c_seqs_in_set; j++) {
-                if ( is_active(i * c_seqs_in_set + j) ) {
-                    if ((i == m_playing_screen) && (m_tracks_mute_state[j])) {
+    if (m_mode_group)
+    {
+        for (int i=0; i< c_seqs_in_set; i++)
+        {
+            for (int j=0; j < c_seqs_in_set; j++)
+            {
+                if ( is_active(i * c_seqs_in_set + j) )
+                {
+                    if ((i == m_playing_screen) && (m_tracks_mute_state[j]))
+                    {
                         sequence_playing_on (i * c_seqs_in_set + j);
-                    } else {
+                    }
+                    else
+                    {
                         sequence_playing_off (i * c_seqs_in_set + j);
                     }
                 }
             }
-
         }
     }
 }
-
 
 void perform::select_and_mute_group (int a_g_group)
 {
@@ -421,17 +424,14 @@ void perform::select_and_mute_group (int a_g_group)
     mute_group_tracks();
 }
 
-
 void perform::mute_all_tracks()
 {
     for (int i=0; i< c_max_sequence; i++ )
     {
         if ( is_active(i) )
             m_seqs[i]->set_song_mute( true );
-
     }
 }
-
 
 perform::~perform()
 {
@@ -446,8 +446,10 @@ perform::~perform()
     if (m_in_thread_launched )
         pthread_join( m_in_thread, NULL );
 
-    for (int i=0; i< c_max_sequence; i++ ){
-        if ( is_active(i) ){
+    for (int i=0; i< c_max_sequence; i++ )
+    {
+        if ( is_active(i) )
+        {
             delete m_seqs[i];
         }
     }
@@ -457,7 +459,8 @@ void
 perform::start_playing()
 {
     if(global_song_start_mode || m_start_from_perfedit)
-    { // song mode
+    {
+        // song mode
         if(m_jack_master)
         {
             set_left_frame();        // make sure it gets initial set if m_left_tick moved when !m_jack_running
@@ -465,8 +468,10 @@ perform::start_playing()
         }
         start_jack( );
         start( true );           // true for setting song m_playback_mode = true
-    } else
-    { // live mode
+    }
+    else
+    {
+        // live mode
         if(m_jack_master)
             position_jack(false);   // for cosmetic reasons - to stop transport line flicker on start
         start( false );
@@ -499,7 +504,7 @@ void perform::toggle_song_mode()
 
 void perform::toggle_jack_mode()
 {
-   set_jack_mode(!m_jack_running);
+    set_jack_mode(!m_jack_running);
 }
 
 void perform::set_jack_mode(bool a_mode)
@@ -516,7 +521,6 @@ bool perform::is_jack_running()
 {
     return m_jack_running;
 }
-
 
 void perform::set_follow_transport(bool a_set)
 {
@@ -544,32 +548,29 @@ void perform::set_left_tick( long a_tick )
     set_left_frame();
 }
 
-
 long perform::get_left_tick()
 {
     return m_left_tick;
 }
-
 
 void perform::set_starting_tick( long a_tick )
 {
     m_starting_tick = a_tick;
 }
 
-
 long perform::get_starting_tick()
 {
     return m_starting_tick;
 }
 
-
 void perform::set_right_tick( long a_tick )
 {
-    if ( a_tick >= c_ppqn * 4 ){
-
+    if ( a_tick >= c_ppqn * 4 )
+    {
         m_right_tick = a_tick;
 
-        if ( m_right_tick <= m_left_tick ){
+        if ( m_right_tick <= m_left_tick )
+        {
             m_left_tick = m_right_tick - c_ppqn * 4;
             m_starting_tick = m_left_tick;
             set_left_frame(); // since we just changed it
@@ -577,40 +578,34 @@ void perform::set_right_tick( long a_tick )
     }
 }
 
-
 long perform::get_right_tick()
 {
     return m_right_tick;
 }
-
 
 void perform::add_sequence( sequence *a_seq, int a_perf )
 {
     /* check for perferred */
     if ( a_perf < c_max_sequence &&
             is_active(a_perf) == false &&
-            a_perf >= 0 ){
-
+            a_perf >= 0 )
+    {
         m_seqs[a_perf] = a_seq;
         set_active(a_perf, true);
-        //a_seq->set_tag( a_perf );
-
-    } else {
-
-        for (int i=a_perf; i< c_max_sequence; i++ ){
-
-            if ( is_active(i) == false ){
-
+    }
+    else
+    {
+        for (int i=a_perf; i< c_max_sequence; i++ )
+        {
+            if ( is_active(i) == false )
+            {
                 m_seqs[i] = a_seq;
                 set_active(i,true);
-
-                //a_seq->set_tag( i  );
                 break;
             }
         }
     }
 }
-
 
 void perform::set_active( int a_sequence, bool a_active )
 {
@@ -627,7 +622,6 @@ void perform::set_active( int a_sequence, bool a_active )
     m_seqs_active[ a_sequence ] = a_active;
 }
 
-
 void perform::set_was_active( int a_sequence )
 {
     if ( a_sequence < 0 || a_sequence >= c_max_sequence )
@@ -641,8 +635,6 @@ void perform::set_was_active( int a_sequence )
     m_was_active_names[ a_sequence ] = true;
 }
 
-
-
 bool perform::is_active( int a_sequence )
 {
     if ( a_sequence < 0 || a_sequence >= c_max_sequence )
@@ -650,7 +642,6 @@ bool perform::is_active( int a_sequence )
 
     return m_seqs_active[ a_sequence ];
 }
-
 
 bool perform::is_dirty_main (int a_sequence)
 {
@@ -668,7 +659,6 @@ bool perform::is_dirty_main (int a_sequence)
     return was_active;
 }
 
-
 bool perform::is_dirty_edit (int a_sequence)
 {
     if ( a_sequence < 0 || a_sequence >= c_max_sequence )
@@ -685,7 +675,6 @@ bool perform::is_dirty_edit (int a_sequence)
     return was_active;
 }
 
-
 bool perform::is_dirty_perf (int a_sequence)
 {
     if ( a_sequence < 0 || a_sequence >= c_max_sequence )
@@ -701,7 +690,6 @@ bool perform::is_dirty_perf (int a_sequence)
 
     return was_active;
 }
-
 
 bool perform::is_dirty_names (int a_sequence)
 {
@@ -740,7 +728,6 @@ void perform::set_bpm(int a_bpm)
     }
 }
 
-
 int  perform::get_bpm()
 {
     return  m_master_bus.get_bpm( );
@@ -771,22 +758,19 @@ void perform::delete_sequence( int a_num )
     set_active(a_num, false);
 
     if ( m_seqs[a_num] != NULL &&
-            !m_seqs[a_num]->get_editing() ){
-
+            !m_seqs[a_num]->get_editing() )
+    {
         m_seqs[a_num]->set_playing( false );
         delete m_seqs[a_num];
         global_is_modified = true;
     }
 }
 
-
 bool perform::is_sequence_in_edit( int a_num )
 {
     return ( m_seqs[a_num] != NULL &&
-            m_seqs[a_num]->get_editing());
-
+             m_seqs[a_num]->get_editing());
 }
-
 
 void perform::new_sequence( int a_sequence )
 {
@@ -796,15 +780,12 @@ void perform::new_sequence( int a_sequence )
     global_is_modified = true;
 }
 
-
 midi_control * perform::get_midi_control_toggle( unsigned int a_seq )
 {
     if ( a_seq >= (unsigned int) c_midi_controls )
         return NULL;
     return &m_midi_cc_toggle[a_seq];
-
 }
-
 
 midi_control * perform::get_midi_control_on( unsigned int a_seq )
 {
@@ -813,7 +794,6 @@ midi_control * perform::get_midi_control_on( unsigned int a_seq )
     return &m_midi_cc_on[a_seq];
 }
 
-
 midi_control* perform::get_midi_control_off( unsigned int a_seq )
 {
     if ( a_seq >= (unsigned int) c_midi_controls )
@@ -821,18 +801,16 @@ midi_control* perform::get_midi_control_off( unsigned int a_seq )
     return &m_midi_cc_off[a_seq];
 }
 
-
 void perform::print()
 {
-    //   for( int i=0; i<m_numSeq; i++ ){
+//    for( int i=0; i<m_numSeq; i++ )
+//    {
+//        printf("Sequence %d\n", i);
+//        m_seqs[i]->print();
+//    }
 
-    //printf("Sequence %d\n", i);
-    //m_seqs[i]->print();
-    // }
-
-    //  m_master_bus.print();
+//      m_master_bus.print();
 }
-
 
 void perform::set_screen_set_notepad( int a_screen_set, string *a_notepad )
 {
@@ -840,12 +818,10 @@ void perform::set_screen_set_notepad( int a_screen_set, string *a_notepad )
         m_screen_set_notepad[a_screen_set] = *a_notepad;
 }
 
-
 string * perform::get_screen_set_notepad( int a_screen_set )
 {
     return &m_screen_set_notepad[a_screen_set];
 }
-
 
 void perform::set_screenset( int a_ss )
 {
@@ -858,18 +834,18 @@ void perform::set_screenset( int a_ss )
         m_screen_set = 0;
 }
 
-
 int perform::get_screenset()
 {
     return m_screen_set;
 }
 
-
 void perform::set_playing_screenset ()
 {
-    for (int j, i = 0; i < c_seqs_in_set; i++) {
+    for (int j, i = 0; i < c_seqs_in_set; i++)
+    {
         j = i + m_playing_screen * c_seqs_in_set;
-        if ( is_active(j) ){
+        if ( is_active(j) )
+        {
             assert( m_seqs[j] );
             m_tracks_mute_state[i] = m_seqs[j]->get_playing();
         }
@@ -878,36 +854,32 @@ void perform::set_playing_screenset ()
     mute_group_tracks();
 }
 
-
 int perform::get_playing_screenset ()
 {
     return m_playing_screen;
 }
-
 
 void perform::set_offset( int a_offset )
 {
     m_offset = a_offset  * c_mainwnd_rows * c_mainwnd_cols;
 }
 
-
 void perform::play( long a_tick )
 {
-
     /* just run down the list of sequences and have them dump */
 
     //printf( "play [%d]\n", a_tick );
 
     m_tick = a_tick;
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) ){
+    for (int i=0; i< c_max_sequence; i++ )
+    {
+        if ( is_active(i) )
+        {
             assert( m_seqs[i] );
 
-
             if ( m_seqs[i]->get_queued() &&
-                    m_seqs[i]->get_queued_tick() <= a_tick ){
-
+                    m_seqs[i]->get_queued_tick() <= a_tick )
+            {
                 m_seqs[i]->play( m_seqs[i]->get_queued_tick() - 1, m_playback_mode );
                 m_seqs[i]->toggle_playing();
             }
@@ -920,37 +892,37 @@ void perform::play( long a_tick )
     m_master_bus.flush();
 }
 
-
 void perform::set_orig_ticks( long a_tick  )
 {
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) == true ){
+    for (int i=0; i< c_max_sequence; i++ )
+    {
+        if ( is_active(i) == true )
+        {
             assert( m_seqs[i] );
             m_seqs[i]->set_orig_tick( a_tick );
         }
     }
 }
 
-
 void perform::clear_sequence_triggers( int a_seq  )
 {
-    if ( is_active(a_seq) == true ){
+    if ( is_active(a_seq) == true )
+    {
         assert( m_seqs[a_seq] );
         m_seqs[a_seq]->clear_triggers( );
     }
 }
 
-
 void perform::move_triggers( bool a_direction )
 {
-    if ( m_left_tick < m_right_tick ){
-
+    if ( m_left_tick < m_right_tick )
+    {
         long distance = m_right_tick - m_left_tick;
 
-        for (int i=0; i< c_max_sequence; i++ ){
-
-            if ( is_active(i) == true ){
+        for (int i=0; i< c_max_sequence; i++ )
+        {
+            if ( is_active(i) == true )
+            {
                 assert( m_seqs[i] );
                 m_seqs[i]->move_triggers( m_left_tick, distance, a_direction );
             }
@@ -958,12 +930,12 @@ void perform::move_triggers( bool a_direction )
     }
 }
 
-
 void perform::push_trigger_undo()
 {
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) == true ){
+    for (int i=0; i< c_max_sequence; i++ )
+    {
+        if ( is_active(i) == true )
+        {
             assert( m_seqs[i] );
             m_seqs[i]->push_trigger_undo( );
         }
@@ -971,14 +943,14 @@ void perform::push_trigger_undo()
     set_have_undo(true);
 }
 
-
 void perform::pop_trigger_undo()
 {
     int undo_count = 0;
     int redo_count = 0;
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) == true ){
+    for (int i=0; i< c_max_sequence; i++ )
+    {
+        if ( is_active(i) == true )
+        {
             assert( m_seqs[i] );
             m_seqs[i]->pop_trigger_undo( );
             if(m_seqs[i]->have_trigger_undo > 0)
@@ -987,6 +959,7 @@ void perform::pop_trigger_undo()
                 redo_count++;
         }
     }
+
     if(undo_count == 0)
         set_have_undo(false);
     else
@@ -1002,9 +975,10 @@ void perform::pop_trigger_redo()
 {
     int redo_count = 0;
     int undo_count = 0;
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) == true ){
+    for (int i=0; i< c_max_sequence; i++ )
+    {
+        if ( is_active(i) == true )
+        {
             assert( m_seqs[i] );
             m_seqs[i]->pop_trigger_redo( );
             if(m_seqs[i]->have_trigger_redo > 0)
@@ -1013,6 +987,7 @@ void perform::pop_trigger_redo()
                 undo_count++;
         }
     }
+
     if(redo_count == 0)
         set_have_redo(false);
     else
@@ -1035,24 +1010,23 @@ void perform::set_have_redo(bool a_redo)
     m_have_redo = a_redo;
 }
 
-
 /* copies between L and R -> R */
 void perform::copy_triggers( )
 {
-    if ( m_left_tick < m_right_tick ){
-
+    if ( m_left_tick < m_right_tick )
+    {
         long distance = m_right_tick - m_left_tick;
 
-        for (int i=0; i< c_max_sequence; i++ ){
-
-            if ( is_active(i) == true ){
+        for (int i=0; i< c_max_sequence; i++ )
+        {
+            if ( is_active(i) == true )
+            {
                 assert( m_seqs[i] );
                 m_seqs[i]->copy_triggers( m_left_tick, distance );
             }
         }
     }
 }
-
 
 void perform::start_jack()
 {
@@ -1062,7 +1036,6 @@ void perform::start_jack()
         jack_transport_start (m_jack_client );
 #endif
 }
-
 
 void perform::stop_jack()
 {
@@ -1093,7 +1066,6 @@ void perform::set_left_frame()
 
     m_left_frame = (uint32_t) frame;
 
-
     //printf("current_tick [%ld]", current_tick);
     //printf("rate [%zu]", rate);
     //printf("ctticks [%jd]\n", (uint64_t)ctticks);
@@ -1104,7 +1076,6 @@ void perform::set_left_frame()
 
 void perform::position_jack( bool a_state )
 {
-
     if(!m_jack_running)
         return;
     //printf( "perform::position_jack()\n" );
@@ -1120,7 +1091,8 @@ void perform::position_jack( bool a_state )
 
     long current_tick = 0;
 
-    if ( a_state ){
+    if ( a_state )
+    {
         current_tick = m_left_tick;
     }
 
@@ -1140,7 +1112,7 @@ void perform::position_jack( bool a_state )
     current_tick *= 10;
 
     pos.bar = (int32_t) (current_tick / (long) pos.ticks_per_beat
-            / pos.beats_per_bar);
+                         / pos.beats_per_bar);
     pos.beat = (int32_t) ((current_tick / (long) pos.ticks_per_beat) % 4);
     pos.tick = (int32_t) (current_tick % (c_ppqn * 10));
 
@@ -1168,33 +1140,32 @@ void perform::position_jack( bool a_state )
 #endif
 }
 
-
 void perform::start(bool a_state)
 {
-    if (m_jack_running) {
+    if (m_jack_running)
+    {
         return;
     }
 
     inner_start(a_state);
 }
 
-
 void perform::stop()
 {
-    if (m_jack_running) {
+    if (m_jack_running)
+    {
         return;
     }
 
     inner_stop();
 }
 
-
 void perform::inner_start(bool a_state)
 {
     m_condition_var.lock();
 
-    if (!global_is_running) {
-
+    if (!global_is_running)
+    {
         set_playback_mode( a_state );
 
         if (a_state)
@@ -1207,34 +1178,32 @@ void perform::inner_start(bool a_state)
     m_condition_var.unlock();
 }
 
-
 void perform::inner_stop()
 {
     set_start_from_perfedit(false);
     global_is_running = false;
-    //off_sequences();
     reset_sequences();
     m_usemidiclock = false;
 }
 
-
 void perform::off_sequences()
 {
-    for (int i = 0; i < c_max_sequence; i++) {
-
-        if (is_active(i)) {
+    for (int i = 0; i < c_max_sequence; i++)
+    {
+        if (is_active(i))
+        {
             assert(m_seqs[i]);
             m_seqs[i]->set_playing(false);
         }
     }
 }
 
-
 void perform::all_notes_off()
 {
-    for (int i=0; i< c_max_sequence; i++) {
-
-        if (is_active(i)) {
+    for (int i=0; i< c_max_sequence; i++)
+    {
+        if (is_active(i))
+        {
             assert(m_seqs[i]);
             m_seqs[i]->off_playing_notes();
         }
@@ -1243,12 +1212,12 @@ void perform::all_notes_off()
     m_master_bus.flush();
 }
 
-
 void perform::reset_sequences()
 {
-    for (int i=0; i< c_max_sequence; i++) {
-
-        if (is_active(i)) {
+    for (int i=0; i< c_max_sequence; i++)
+    {
+        if (is_active(i))
+        {
             assert( m_seqs[i] );
 
             bool state = m_seqs[i]->get_playing();
@@ -1265,46 +1234,45 @@ void perform::reset_sequences()
     m_master_bus.flush();
 }
 
-
 void perform::launch_output_thread()
 {
     int err;
 
     err = pthread_create(&m_out_thread, NULL, output_thread_func, this);
-    if (err != 0) {
+    if (err != 0)
+    {
         /*TODO: error handling*/
     }
     else
         m_out_thread_launched= true;
 }
 
-
 void perform::set_playback_mode( bool a_playback_mode )
 {
     m_playback_mode = a_playback_mode;
 }
-
 
 void perform::launch_input_thread()
 {
     int err;
 
     err = pthread_create(&m_in_thread, NULL, input_thread_func, this);
-    if (err != 0) {
+    if (err != 0)
+    {
         /*TODO: error handling*/
     }
     else
-    m_in_thread_launched = true;
+        m_in_thread_launched = true;
 }
-
 
 long perform::get_max_trigger()
 {
     long ret = 0, t;
 
-    for (int i=0; i< c_max_sequence; i++ ){
-
-        if ( is_active(i) == true ){
+    for (int i=0; i< c_max_sequence; i++ )
+    {
+        if ( is_active(i) == true )
+        {
             assert( m_seqs[i] );
 
             t = m_seqs[i]->get_max_trigger( );
@@ -1315,7 +1283,6 @@ long perform::get_max_trigger()
 
     return ret;
 }
-
 
 void* output_thread_func(void *a_pef )
 {
@@ -1328,16 +1295,17 @@ void* output_thread_func(void *a_pef )
      * set the process to realtime privs
      */
 
-    if ( global_priority ){
-
+    if ( global_priority )
+    {
         memset(&schp, 0, sizeof(sched_param));
         schp.sched_priority = 1;
 
 #ifndef __WIN32__
         // Not in MinGW RCB
-        if (sched_setscheduler(0, SCHED_FIFO, &schp) != 0) 	{
+        if (sched_setscheduler(0, SCHED_FIFO, &schp) != 0)
+        {
             printf("output_thread_func: couldnt sched_setscheduler"
-                    " (FIFO), you need to be root.\n");
+                   " (FIFO), you need to be root.\n");
             pthread_exit(0);
         }
 #endif
@@ -1357,10 +1325,12 @@ void* output_thread_func(void *a_pef )
 #ifdef JACK_SUPPORT
 
 int jack_process_callback(jack_nframes_t nframes, void* arg)
-{return 0;}
+{
+    return 0;
+}
 
 int jack_sync_callback(jack_transport_state_t state,
-        jack_position_t *pos, void *arg)
+                       jack_position_t *pos, void *arg)
 {
     perform *p = (perform *) arg;
 
@@ -1375,33 +1345,32 @@ int jack_sync_callback(jack_transport_state_t state,
 
     p->m_jack_transport_state_last =
         p->m_jack_transport_state =
-        state;
+            state;
 
+    switch (state)
+    {
+    case JackTransportStopped:
+        //printf( "[JackTransportStopped]\n" );
+        break;
 
-    switch (state) {
+    case JackTransportRolling:
+        //printf( "[JackTransportRolling]\n" );
+        break;
 
-        case JackTransportStopped:
-            //printf( "[JackTransportStopped]\n" );
-            break;
+    case JackTransportStarting:
+        //printf( "[JackTransportStarting]\n" );
+        if(p->m_start_from_perfedit)
+            p->inner_start( p->m_start_from_perfedit );
+        else
+            p->inner_start( global_song_start_mode );
+        break;
 
-        case JackTransportRolling:
-            //printf( "[JackTransportRolling]\n" );
-            break;
+    case JackTransportLooping:
+        //printf( "[JackTransportLooping]" );
+        break;
 
-        case JackTransportStarting:
-            //printf( "[JackTransportStarting]\n" );
-            if(p->m_start_from_perfedit)
-                p->inner_start( p->m_start_from_perfedit );
-            else
-                p->inner_start( global_song_start_mode );
-            break;
-
-        case JackTransportLooping:
-            //printf( "[JackTransportLooping]" );
-            break;
-
-        default:
-            break;
+    default:
+        break;
     }
 
     //printf( "starting frame[%d] tick[%8.2f]\n", p->m_jack_frame_current, p->m_jack_tick );
@@ -1442,20 +1411,19 @@ void jack_session_callback(jack_session_event_t *event, void *arg )
     Glib::signal_idle().connect( sigc::mem_fun( *p, &perform::jack_session_event) );
 }
 
-#endif
-#endif
-
+#endif // JACK_SESSION
+#endif // JACK_SUPPORT
 
 void perform::output_func()
 {
-    while (m_outputing) {
-
+    while (m_outputing)
+    {
         //printf ("waiting for signal\n");
 
         m_condition_var.lock();
 
-        while (!global_is_running) {
-
+        while (!global_is_running)
+        {
             m_condition_var.wait();
 
             /* if stopping, then kill thread */
@@ -1476,7 +1444,6 @@ void perform::output_func()
         struct timespec stats_loop_start;
         struct timespec stats_loop_finish;
 
-
         /* difference between last and current */
         struct timespec delta;
 #else
@@ -1487,7 +1454,6 @@ void perform::output_func()
 
         long stats_loop_start = 0;
         long stats_loop_finish = 0;
-
 
         /* difference between last and current */
         long delta;
@@ -1525,20 +1491,20 @@ void perform::output_func()
         if(m_jack_running && m_jack_master && !m_playback_mode)// live mode master start at zero
             position_jack(false);
 #endif
-        for( int i=0; i<100; i++ ){
+        for( int i=0; i<100; i++ )
+        {
             stats_all[i] = 0;
             stats_clock[i] = 0;
         }
 
         /* if we are in the performance view, we care
            about starting from the offset */
-        if ( m_playback_mode && !m_jack_running){
-
+        if ( m_playback_mode && !m_jack_running)
+        {
             current_tick = m_starting_tick;
             clock_tick = m_starting_tick;
             set_orig_ticks( m_starting_tick );
         }
-
 
         int ppqn = m_master_bus.get_ppqn();
 #ifndef __WIN32__
@@ -1556,8 +1522,8 @@ void perform::output_func()
             stats_last_clock_us= last * 1000;
 #endif
 
-        while( global_is_running ){
-
+        while( global_is_running )
+        {
             /************************************
 
               Get delta time ( current - last )
@@ -1568,14 +1534,14 @@ void perform::output_func()
 
              **************************************/
 
-            if ( global_stats ){
+            if ( global_stats )
+            {
 #ifndef __WIN32__
                 clock_gettime(CLOCK_REALTIME, &stats_loop_start);
 #else
                 stats_loop_start = timeGetTime();
 #endif
             }
-
 
             /* delta time */
 #ifndef __WIN32__
@@ -1601,17 +1567,19 @@ void perform::output_func()
             long delta_tick = (long)(delta_tick_num / delta_tick_denom);
             delta_tick_frac = (long)(delta_tick_num % delta_tick_denom);
 
-            if (m_usemidiclock) {
+            if (m_usemidiclock)
+            {
                 delta_tick = m_midiclocktick;
                 m_midiclocktick = 0;
             }
-            if (0 <= m_midiclockpos) {
+
+            if (0 <= m_midiclockpos)
+            {
                 delta_tick = 0;
                 clock_tick     = m_midiclockpos;
                 current_tick   = m_midiclockpos;
                 total_tick     = m_midiclockpos;
                 m_midiclockpos = -1;
-                //init_clock = true;
             }
 
             //printf ( "    delta_tick[%lf]\n", delta_tick  );
@@ -1619,8 +1587,8 @@ void perform::output_func()
 
             // no init until we get a good lock
 
-            if ( m_jack_running ){
-
+            if ( m_jack_running )
+            {
                 init_clock = false;
 
                 m_jack_transport_state = jack_transport_query( m_jack_client, &m_jack_pos );
@@ -1636,10 +1604,9 @@ void perform::output_func()
                 }
 
                 if ( m_jack_transport_state_last  ==  JackTransportStarting &&
-                        m_jack_transport_state       == JackTransportRolling ){
-
+                        m_jack_transport_state       == JackTransportRolling )
+                {
                     m_jack_frame_last = m_jack_frame_current;
-
 
                     //printf ("[Start Playback]\n" );
                     dumping = true;
@@ -1648,46 +1615,45 @@ void perform::output_func()
                         m_jack_pos.ticks_per_beat *
                         m_jack_pos.beats_per_minute / (m_jack_pos.frame_rate * 60.0);
 
-
                     /* convert ticks */
                     jack_ticks_converted =
                         m_jack_tick * ((double) c_ppqn /
-                                (m_jack_pos.ticks_per_beat *
-                                 m_jack_pos.beat_type / 4.0  ));
+                                       (m_jack_pos.ticks_per_beat *
+                                        m_jack_pos.beat_type / 4.0  ));
 
                     set_orig_ticks( (long) jack_ticks_converted );
                     current_tick = clock_tick = total_tick = jack_ticks_converted_last = jack_ticks_converted;
                     init_clock = true;
 
-                    if ( m_looping && m_playback_mode ){
-
+                    if ( m_looping && m_playback_mode )
+                    {
                         //printf( "left[%lf] right[%lf]\n", (double) get_left_tick(), (double) get_right_tick() );
 
-                        if ( current_tick >= get_right_tick() ){
-
+                        if ( current_tick >= get_right_tick() )
+                        {
                             if(m_jack_master)
                             {
                                 position_jack(true);
                             }
                             else
                             {
-                                while ( current_tick >= get_right_tick() ){
-
+                                while ( current_tick >= get_right_tick() )
+                                {
                                     double size = get_right_tick() - get_left_tick();
                                     current_tick = current_tick - size;
 
                                     //printf( "> current_tick[%lf]\n", current_tick );
-                            }
-                            reset_sequences();
-                            set_orig_ticks( (long)current_tick );
+                                }
+                                reset_sequences();
+                                set_orig_ticks( (long)current_tick );
                             }
                         }
                     }
                 }
 
                 if ( m_jack_transport_state_last  ==  JackTransportRolling &&
-                        m_jack_transport_state  == JackTransportStopped ){
-
+                        m_jack_transport_state  == JackTransportStopped )
+                {
                     m_jack_transport_state_last = JackTransportStopped;
                     //printf ("[Stop Playback]\n" );
                     jack_stopped = true;
@@ -1704,19 +1670,16 @@ void perform::output_func()
                     //printf( " current_transport_frame[%7d]", m_jack_frame_current );
 
                     // if we are moving ahead
-                    if ( (m_jack_frame_current > m_jack_frame_last)){
-
-
+                    if ( (m_jack_frame_current > m_jack_frame_last))
+                    {
                         m_jack_tick +=
                             (m_jack_frame_current - m_jack_frame_last)  *
                             m_jack_pos.ticks_per_beat *
                             m_jack_pos.beats_per_minute / (m_jack_pos.frame_rate * 60.0);
 
-
                         //printf ( "m_jack_tick += (m_jack_frame_current[%lf] - m_jack_frame_last[%lf]) *\n",
                         //        (double) m_jack_frame_current, (double) m_jack_frame_last );
                         //printf(  "m_jack_pos.ticks_per_beat[%lf] * m_jack_pos.beats_per_minute[%lf] / \n(m_jack_pos.frame_rate[%lf] * 60.0\n", (double) m_jack_pos.ticks_per_beat, (double) m_jack_pos.beats_per_minute, (double) m_jack_pos.frame_rate);
-
 
                         m_jack_frame_last = m_jack_frame_current;
                     }
@@ -1724,15 +1687,12 @@ void perform::output_func()
                     /* convert ticks */
                     jack_ticks_converted =
                         m_jack_tick * ((double) c_ppqn /
-                                (m_jack_pos.ticks_per_beat * m_jack_pos.beat_type / 4.0  ));
+                                       (m_jack_pos.ticks_per_beat * m_jack_pos.beat_type / 4.0  ));
 
                     //printf ( "jack_ticks_conv[%lf] = \n",  jack_ticks_converted );
                     //printf ( "    m_jack_tick[%lf] * ((double) c_ppqn[%lf] / \n", m_jack_tick, (double) c_ppqn );
                     //printf ( "   (m_jack_pos.ticks_per_beat[%lf] * m_jack_pos.beat_type[%lf] / 4.0  )\n",
                     //        m_jack_pos.ticks_per_beat, m_jack_pos.beat_type );
-
-
-
 
                     jack_ticks_delta = jack_ticks_converted - jack_ticks_converted_last;
 
@@ -1745,30 +1705,7 @@ void perform::output_func()
 
                     /* printf( "current_tick[%lf] delta[%lf]\n", current_tick, jack_ticks_delta ); */
 
-
-
-                    //long pbeat = (long) ((long) m_jack_tick % (long) (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
-                    //pbeat = pbeat / (long) m_jack_pos.ticks_per_beat;
-
-                    //long ptick = (long) m_jack_tick % (long) m_jack_pos.ticks_per_beat;
-                    //long pbar  = (long) ((long) m_jack_tick / (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ));
-
-
-                    //printf( " bbb [%2d:%2d:%4d]", pbar+1, pbeat+1, ptick );
-                    //printf( " bbb [%2d:%2d:%4d]", m_jack_pos.bar, m_jack_pos.beat, m_jack_pos.tick );
-
-                    /*double jack_tick = (m_jack_pos.bar-1) * (m_jack_pos.ticks_per_beat *  m_jack_pos.beats_per_bar ) +
-                      (m_jack_pos.beat-1) * m_jack_pos.ticks_per_beat + m_jack_pos.tick;*/
-
-                    //printf( " jtick[%8.3f]", m_jack_tick );
-                    //printf( " mtick[%8.3f]", jack_tick );
-
-                    //printf( " delta[%8.3f]", m_jack_tick - jack_tick );
-
-                    //printf( "\n");
-
                 } /* end if dumping / sane state */
-
             } /* if jack running */
             else
             {
@@ -1787,12 +1724,14 @@ void perform::output_func()
             /* init_clock will be true when we run for the first time, or
              * as soon as jack gets a good lock on playback */
 
-            if (init_clock) {
+            if (init_clock)
+            {
                 m_master_bus.init_clock( clock_tick );
                 init_clock = false;
             }
 
-            if (dumping) {
+            if (dumping)
+            {
                 if ( m_looping && m_playback_mode )
                 {
                     if ( current_tick >= get_right_tick() )
@@ -1821,14 +1760,13 @@ void perform::output_func()
                 /* midi clock */
                 m_master_bus.clock( clock_tick );
 
-
-                if ( global_stats ){
-
-                    while ( stats_total_tick <= total_tick ){
-
+                if ( global_stats )
+                {
+                    while ( stats_total_tick <= total_tick )
+                    {
                         /* was there a tick ? */
-                        if ( stats_total_tick % (c_ppqn / 24) == 0 ){
-
+                        if ( stats_total_tick % (c_ppqn / 24) == 0 )
+                        {
 #ifndef __WIN32__
                             long current_us = (current.tv_sec * 1000000) + (current.tv_nsec / 1000);
 #else
@@ -1840,7 +1778,6 @@ void perform::output_func()
                             int index = stats_clock_width_us / 300;
                             if ( index >= 100 ) index = 99;
                             stats_clock[index]++;
-
                         }
                         stats_total_tick++;
                     }
@@ -1869,54 +1806,50 @@ void perform::output_func()
             long elapsed_us = delta * 1000;
             //printf( "        elapsed_us[%ld]\n", elapsed_us );
 #endif
-
             /* now, we want to trigger every c_thread_trigger_width_ms,
                and it took us delta_us to play() */
 
             delta_us = (c_thread_trigger_width_ms * 1000) - elapsed_us;
             //printf( "sleeping_us[%ld]\n", delta_us );
 
-
             /* check midi clock adjustment */
 
             double next_total_tick = (total_tick + (c_ppqn / 24.0));
             double next_clock_delta   = (next_total_tick - total_tick - 1);
 
-
             double next_clock_delta_us =  (( next_clock_delta ) * 60000000.0f / c_ppqn  / bpm );
 
-            if ( next_clock_delta_us < (c_thread_trigger_width_ms * 1000.0f * 2.0f) ){
+            if ( next_clock_delta_us < (c_thread_trigger_width_ms * 1000.0f * 2.0f) )
+            {
                 delta_us = (long)next_clock_delta_us;
             }
 
 #ifndef __WIN32__
-            if ( delta_us > 0.0 ){
-
+            if ( delta_us > 0.0 )
+            {
                 delta.tv_sec =  (delta_us / 1000000);
                 delta.tv_nsec = (delta_us % 1000000) * 1000;
 
                 //printf("sleeping() ");
                 nanosleep( &delta, NULL );
-
             }
 #else
-            if ( delta_us > 0 ){
-
+            if ( delta_us > 0 )
+            {
                 delta =  (delta_us / 1000);
 
                 //printf("           sleeping() [0x%x]\n", delta);
                 Sleep(delta);
-
             }
 #endif
-
-            else {
-
+            else
+            {
                 if ( global_stats )
                     printf ("underrun\n" );
             }
 
-            if ( global_stats ){
+            if ( global_stats )
+            {
 #ifndef __WIN32__
                 clock_gettime(CLOCK_REALTIME, &stats_loop_finish);
 #else
@@ -1924,7 +1857,8 @@ void perform::output_func()
 #endif
             }
 
-            if ( global_stats ){
+            if ( global_stats )
+            {
 
 #ifndef __WIN32__
                 delta.tv_sec  =  (stats_loop_finish.tv_sec  - stats_loop_start.tv_sec  );
@@ -1934,7 +1868,6 @@ void perform::output_func()
                 delta = stats_loop_finish - stats_loop_start;
                 long delta_us = delta * 1000;
 #endif
-
                 int index = delta_us / 100;
                 if ( index >= 100  ) index = 99;
 
@@ -1942,20 +1875,21 @@ void perform::output_func()
 
                 if ( delta_us > stats_max )
                     stats_max = delta_us;
+
                 if ( delta_us < stats_min )
                     stats_min = delta_us;
 
                 stats_avg += delta_us;
                 stats_loop_index++;
 
-                if ( stats_loop_index > 200 ){
-
+                if ( stats_loop_index > 200 )
+                {
                     stats_loop_index = 0;
                     stats_avg /= 200;
 
                     printf("stats_avg[%ld]us stats_min[%ld]us"
-                            " stats_max[%ld]us\n", stats_avg,
-                            stats_min, stats_max);
+                           " stats_max[%ld]us\n", stats_avg,
+                           stats_min, stats_max);
 
                     stats_min = 0x7FFFFFFF;
                     stats_max = 0;
@@ -1967,11 +1901,11 @@ void perform::output_func()
                 inner_stop();
         }
 
-
-        if (global_stats){
-
+        if (global_stats)
+        {
             printf("\n\n-- trigger width --\n");
-            for (int i=0; i<100; i++ ){
+            for (int i=0; i<100; i++ )
+            {
                 printf( "[%3d][%8ld]\n", i * 100, stats_all[i] );
             }
             printf("\n\n-- clock width --\n" );
@@ -1979,7 +1913,8 @@ void perform::output_func()
 
             printf("optimal: [%d]us\n", ((c_ppqn / 24)* 60000000 / c_ppqn / bpm));
 
-            for ( int i=0; i<100; i++ ){
+            for ( int i=0; i<100; i++ )
+            {
                 printf( "[%3d][%8ld]\n", i * 300, stats_clock[i] );
             }
         }
@@ -1992,31 +1927,28 @@ void perform::output_func()
     pthread_exit(0);
 }
 
-
 void* input_thread_func(void *a_pef )
 {
-
     /* set our performance */
     perform *p = (perform *) a_pef;
     assert(p);
-
 
     struct sched_param schp;
     /*
      * set the process to realtime privs
      */
 
-    if ( global_priority ){
-
+    if ( global_priority )
+    {
         memset(&schp, 0, sizeof(sched_param));
         schp.sched_priority = 1;
 
 #ifndef __WIN32__
         // MinGW RCB
-        if (sched_setscheduler(0, SCHED_FIFO, &schp) != 0) 	{
-
+        if (sched_setscheduler(0, SCHED_FIFO, &schp) != 0)
+        {
             printf("input_thread_func: couldnt sched_setscheduler"
-                    " (FIFO), you need to be root.\n");
+                   " (FIFO), you need to be root.\n");
             pthread_exit(0);
         }
 #endif
@@ -2034,99 +1966,97 @@ void* input_thread_func(void *a_pef )
     return 0;
 }
 
-
 void perform::handle_midi_control( int a_control, bool a_state )
 {
+    switch (a_control)
+    {
+    case c_midi_control_bpm_up:
+        //printf ( "bpm up\n" );
+        set_bpm( get_bpm() + 1 );
+        break;
 
-    switch (a_control) {
+    case c_midi_control_bpm_dn:
+        //printf ( "bpm dn\n" );
+        set_bpm( get_bpm() - 1 );
+        break;
 
-        case c_midi_control_bpm_up:
-            //printf ( "bpm up\n" );
-            set_bpm( get_bpm() + 1 );
-            break;
+    case c_midi_control_ss_up:
+        //printf ( "ss up\n" );
+        set_screenset( get_screenset() + 1 );
+        break;
 
-        case c_midi_control_bpm_dn:
-            //printf ( "bpm dn\n" );
-            set_bpm( get_bpm() - 1 );
-            break;
+    case c_midi_control_ss_dn:
+        //printf ( "ss dn\n" );
+        set_screenset( get_screenset() - 1 );
+        break;
 
-        case c_midi_control_ss_up:
-            //printf ( "ss up\n" );
-            set_screenset( get_screenset() + 1 );
-            break;
+    case c_midi_control_mod_replace:
+        //printf ( "replace\n" );
+        if ( a_state )
+            set_sequence_control_status( c_status_replace );
+        else
+            unset_sequence_control_status( c_status_replace );
+        break;
 
-        case c_midi_control_ss_dn:
-            //printf ( "ss dn\n" );
-            set_screenset( get_screenset() - 1 );
-            break;
+    case c_midi_control_mod_snapshot:
+        //printf ( "snapshot\n" );
+        if ( a_state )
+            set_sequence_control_status( c_status_snapshot );
+        else
+            unset_sequence_control_status( c_status_snapshot );
+        break;
 
-        case c_midi_control_mod_replace:
-            //printf ( "replace\n" );
-            if ( a_state )
-                set_sequence_control_status( c_status_replace );
-            else
-                unset_sequence_control_status( c_status_replace );
-            break;
+    case c_midi_control_mod_queue:
+        //printf ( "queue\n" );
+        if ( a_state )
+            set_sequence_control_status( c_status_queue );
+        else
+            unset_sequence_control_status( c_status_queue );
 
-        case c_midi_control_mod_snapshot:
-            //printf ( "snapshot\n" );
-            if ( a_state )
-                set_sequence_control_status( c_status_snapshot );
-            else
-                unset_sequence_control_status( c_status_snapshot );
-            break;
+    //andy cases
+    case c_midi_control_mod_gmute:
+        printf ( "gmute\n" );
+        if (a_state)
+            set_mode_group_mute();
+        else
+            unset_mode_group_mute();
+        break;
 
-        case c_midi_control_mod_queue:
-            //printf ( "queue\n" );
-            if ( a_state )
-                set_sequence_control_status( c_status_queue );
-            else
-                unset_sequence_control_status( c_status_queue );
+    case c_midi_control_mod_glearn:
+        //printf ( "glearn\n" );
+        if (a_state)
+            set_mode_group_learn();
+        else
+            unset_mode_group_learn();
+        break;
 
-            //andy cases
-        case c_midi_control_mod_gmute:
-            printf ( "gmute\n" );
-            if (a_state)
-                set_mode_group_mute();
-            else
-                unset_mode_group_mute();
-            break;
+    case c_midi_control_play_ss:
+        //printf ( "play_ss\n" );
+        set_playing_screenset();
+        break;
 
-        case c_midi_control_mod_glearn:
-            //printf ( "glearn\n" );
-            if (a_state)
-                set_mode_group_learn();
-            else
-                unset_mode_group_learn();
-            break;
-
-        case c_midi_control_play_ss:
-            //printf ( "play_ss\n" );
-            set_playing_screenset();
-            break;
-
-        default:
-            if ((a_control >= c_seqs_in_set) && (a_control < c_midi_track_ctrl)) {
-                //printf ( "group mute\n" );
-                select_and_mute_group(a_control - c_seqs_in_set);
-            }
-            break;
+    default:
+        if ((a_control >= c_seqs_in_set) && (a_control < c_midi_track_ctrl))
+        {
+            //printf ( "group mute\n" );
+            select_and_mute_group(a_control - c_seqs_in_set);
+        }
+        break;
     }
 }
-
 
 void perform::input_func()
 {
     event ev;
 
-    while (m_inputing) {
-
-        if ( m_master_bus.poll_for_midi() > 0 ){
-
-            do {
-
-                if (m_master_bus.get_midi_event(&ev) ){
-
+    while (m_inputing)
+    {
+        if ( m_master_bus.poll_for_midi() > 0 )
+        {
+            do
+            {
+                if (m_master_bus.get_midi_event(&ev) )
+                {
                     // Obey MidiTimeClock:
                     if (ev.get_status() == EVENT_MIDI_START)
                     {
@@ -2167,27 +2097,25 @@ void perform::input_func()
                     }
 
                     /* filter system wide messages */
-                    if (ev.get_status() <= EVENT_SYSEX) {
-
+                    if (ev.get_status() <= EVENT_SYSEX)
+                    {
                         if( global_showmidi)
                             ev.print();
 
                         /* is there a sequence set ? */
-                        if (m_master_bus.is_dumping()) {
-
+                        if (m_master_bus.is_dumping())
+                        {
                             ev.set_timestamp(m_tick);
-
 
                             /* dump to it */
                             (m_master_bus.get_sequence())->stream_event(&ev);
-
                         }
 
                         /* use it to control our sequencer */
-                        else {
-
-                            for (int i = 0; i < c_midi_controls; i++) {
-
+                        else
+                        {
+                            for (int i = 0; i < c_midi_controls; i++)
+                            {
                                 unsigned char data[2] = {0,0};
                                 unsigned char status = ev.get_status();
 
@@ -2195,11 +2123,11 @@ void perform::input_func()
 
                                 if (get_midi_control_toggle(i)->m_active &&
                                         status  == get_midi_control_toggle(i)->m_status &&
-                                        data[0] == get_midi_control_toggle(i)->m_data ){
-
+                                        data[0] == get_midi_control_toggle(i)->m_data )
+                                {
                                     if (data[1] >= get_midi_control_toggle(i)->m_min_value &&
-                                            data[1] <= get_midi_control_toggle(i)->m_max_value ){
-
+                                            data[1] <= get_midi_control_toggle(i)->m_max_value )
+                                    {
                                         if ( i <  c_seqs_in_set )
                                             sequence_playing_toggle( i + m_offset );
                                     }
@@ -2207,56 +2135,52 @@ void perform::input_func()
 
                                 if ( get_midi_control_on(i)->m_active &&
                                         status  == get_midi_control_on(i)->m_status &&
-                                        data[0] == get_midi_control_on(i)->m_data ){
-
+                                        data[0] == get_midi_control_on(i)->m_data )
+                                {
                                     if ( data[1] >= get_midi_control_on(i)->m_min_value &&
-                                            data[1] <= get_midi_control_on(i)->m_max_value ){
-
+                                            data[1] <= get_midi_control_on(i)->m_max_value )
+                                    {
                                         if ( i <  c_seqs_in_set )
                                             sequence_playing_on( i  + m_offset);
                                         else
                                             handle_midi_control( i, true );
 
-                                    } else if (  get_midi_control_on(i)->m_inverse_active ){
-
+                                    }
+                                    else if (  get_midi_control_on(i)->m_inverse_active )
+                                    {
                                         if ( i <  c_seqs_in_set )
                                             sequence_playing_off(  i + m_offset );
                                         else
                                             handle_midi_control( i, false );
                                     }
-
                                 }
 
                                 if ( get_midi_control_off(i)->m_active &&
                                         status  == get_midi_control_off(i)->m_status &&
-                                        data[0] == get_midi_control_off(i)->m_data ){
-
+                                        data[0] == get_midi_control_off(i)->m_data )
+                                {
                                     if ( data[1] >= get_midi_control_off(i)->m_min_value &&
-                                            data[1] <= get_midi_control_off(i)->m_max_value ){
-
+                                            data[1] <= get_midi_control_off(i)->m_max_value )
+                                    {
                                         if ( i <  c_seqs_in_set )
                                             sequence_playing_off(  i + m_offset );
                                         else
                                             handle_midi_control( i, false );
-
-                                    } else if ( get_midi_control_off(i)->m_inverse_active ){
-
+                                    }
+                                    else if ( get_midi_control_off(i)->m_inverse_active )
+                                    {
                                         if ( i <  c_seqs_in_set )
                                             sequence_playing_on(  i + m_offset );
                                         else
                                             handle_midi_control( i, true );
-
                                     }
-
                                 }
-
                             }
                         }
-
                     }
 
-                    if (ev.get_status() == EVENT_SYSEX) {
-
+                    if (ev.get_status() == EVENT_SYSEX)
+                    {
                         if (global_showmidi)
                             ev.print();
 
@@ -2264,19 +2188,19 @@ void perform::input_func()
                             m_master_bus.sysex(&ev);
                     }
                 }
-
-            } while (m_master_bus.is_more_input());
+            }
+            while (m_master_bus.is_more_input());
         }
     }
     pthread_exit(0);
 }
 
-
 void perform::save_playing_state()
 {
-    for( int i=0; i<c_total_seqs; i++ ){
-
-        if ( is_active(i) == true ){
+    for( int i=0; i<c_total_seqs; i++ )
+    {
+        if ( is_active(i) == true )
+        {
             assert( m_seqs[i] );
             m_sequence_state[i] = m_seqs[i]->get_playing();
         }
@@ -2285,104 +2209,114 @@ void perform::save_playing_state()
     }
 }
 
-
 void perform::restore_playing_state()
 {
-    for( int i=0; i<c_total_seqs; i++ ){
-
-        if ( is_active(i) == true ){
+    for( int i=0; i<c_total_seqs; i++ )
+    {
+        if ( is_active(i) == true )
+        {
             assert( m_seqs[i] );
             m_seqs[i]->set_playing( m_sequence_state[i] );
         }
     }
 }
 
-
 void perform::set_sequence_control_status( int a_status )
 {
-    if ( a_status & c_status_snapshot ){
+    if ( a_status & c_status_snapshot )
+    {
         save_playing_state(  );
     }
 
     m_control_status |= a_status;
 }
 
-
 void perform::unset_sequence_control_status( int a_status )
 {
-    if ( a_status & c_status_snapshot ){
+    if ( a_status & c_status_snapshot )
+    {
         restore_playing_state(  );
     }
 
     m_control_status &= (~a_status);
 }
 
-
 void perform::sequence_playing_toggle( int a_sequence )
 {
-    if ( is_active(a_sequence) == true ){
+    if ( is_active(a_sequence) == true )
+    {
         assert( m_seqs[a_sequence] );
 
-        if ( m_control_status & c_status_queue ){
+        if ( m_control_status & c_status_queue )
+        {
             m_seqs[a_sequence]->toggle_queued();
         }
-        else {
-
-            if (  m_control_status & c_status_replace ){
+        else
+        {
+            if (  m_control_status & c_status_replace )
+            {
                 unset_sequence_control_status( c_status_replace );
                 off_sequences( );
             }
 
             m_seqs[a_sequence]->toggle_playing();
-
         }
     }
 }
 
-
 void perform::sequence_playing_on( int a_sequence )
 {
-    if ( is_active(a_sequence) == true ){
+    if ( is_active(a_sequence) == true )
+    {
         if (m_mode_group && (m_playing_screen == m_screen_set)
                 && (a_sequence >= (m_playing_screen * c_seqs_in_set))
                 && (a_sequence < ((m_playing_screen + 1) * c_seqs_in_set)))
             m_tracks_mute_state[a_sequence - m_playing_screen * c_seqs_in_set] = true;
         assert( m_seqs[a_sequence] );
-        if (!(m_seqs[a_sequence]->get_playing())) {
-            if (m_control_status & c_status_queue ) {
+        if (!(m_seqs[a_sequence]->get_playing()))
+        {
+            if (m_control_status & c_status_queue )
+            {
                 if (!(m_seqs[a_sequence]->get_queued()))
                     m_seqs[a_sequence]->toggle_queued();
-            } else
+            }
+            else
                 m_seqs[a_sequence]->set_playing(true);
-        } else {
+        }
+        else
+        {
             if ((m_seqs[a_sequence]->get_queued()) && (m_control_status & c_status_queue ))
                 m_seqs[a_sequence]->toggle_queued();
         }
     }
 }
 
-
 void perform::sequence_playing_off( int a_sequence )
 {
-    if ( is_active(a_sequence) == true ){
+    if ( is_active(a_sequence) == true )
+    {
         if (m_mode_group && (m_playing_screen == m_screen_set)
                 && (a_sequence >= (m_playing_screen * c_seqs_in_set))
                 && (a_sequence < ((m_playing_screen + 1) * c_seqs_in_set)))
             m_tracks_mute_state[a_sequence - m_playing_screen * c_seqs_in_set] = false;
         assert( m_seqs[a_sequence] );
-        if (m_seqs[a_sequence]->get_playing()) {
-            if (m_control_status & c_status_queue ) {
+        if (m_seqs[a_sequence]->get_playing())
+        {
+            if (m_control_status & c_status_queue )
+            {
                 if (!(m_seqs[a_sequence]->get_queued()))
                     m_seqs[a_sequence]->toggle_queued();
-            } else
+            }
+            else
                 m_seqs[a_sequence]->set_playing(false);
-        } else {
+        }
+        else
+        {
             if ((m_seqs[a_sequence]->get_queued()) && (m_control_status & c_status_queue ))
                 m_seqs[a_sequence]->toggle_queued();
         }
     }
 }
-
 
 void perform::set_key_event( unsigned int keycode, long sequence_slot )
 {
@@ -2408,7 +2342,6 @@ void perform::set_key_event( unsigned int keycode, long sequence_slot )
     key_events_rev[sequence_slot] = keycode;
 }
 
-
 void perform::set_key_group( unsigned int keycode, long group_slot )
 {
     // unhook previous binding...
@@ -2433,12 +2366,10 @@ void perform::set_key_group( unsigned int keycode, long group_slot )
     key_groups_rev[group_slot] = keycode;
 }
 
-
 #ifdef JACK_SUPPORT
-
 void jack_timebase_callback(jack_transport_state_t state,
-        jack_nframes_t nframes,
-        jack_position_t *pos, int new_pos, void *arg)
+                            jack_nframes_t nframes,
+                            jack_position_t *pos, int new_pos, void *arg)
 {
     static double jack_tick;
     static jack_nframes_t last_frame;
@@ -2459,7 +2390,6 @@ void jack_timebase_callback(jack_transport_state_t state,
     pos->ticks_per_beat = c_ppqn * 10;
     pos->beats_per_minute = p->get_bpm();
 
-
     /* Compute BBT info from frame number.  This is relatively
      * simple here, but would become complex if we supported tempo
      * or time signature changes at specific locations in the
@@ -2467,23 +2397,22 @@ void jack_timebase_callback(jack_transport_state_t state,
 
     // if we are in a new position
     if (  state_last    ==  JackTransportStarting &&
-            state_current ==  JackTransportRolling ){
-
+            state_current ==  JackTransportRolling )
+    {
         // printf ( "Starting [%d] [%d]\n", last_frame, current_frame );
 
         jack_tick = 0.0;
         last_frame = current_frame;
     }
 
-    if ( current_frame >= last_frame ){
-
-		 double jack_delta_tick =
+    if ( current_frame >= last_frame )
+    {
+        double jack_delta_tick =
             (current_frame) *
             pos->ticks_per_beat *
             pos->beats_per_minute / (pos->frame_rate * 60.0);
 
-		jack_tick = (jack_delta_tick < 0) ? -jack_delta_tick : jack_delta_tick;
-		//last_frame = current_frame;
+        jack_tick = (jack_delta_tick < 0) ? -jack_delta_tick : jack_delta_tick;
     }
 
     long ptick = 0, pbeat = 0, pbar = 0;
@@ -2499,7 +2428,7 @@ void jack_timebase_callback(jack_transport_state_t state,
     pos->beat = pbeat + 1;
     pos->tick = ptick;
     pos->bar_start_tick = pos->bar * pos->beats_per_bar *
-        pos->ticks_per_beat;
+                          pos->ticks_per_beat;
 
     // printf( " bbb [%2d:%2d:%4d]\n", pos->bar, pos->beat, pos->tick );
 
@@ -2514,9 +2443,8 @@ void jack_shutdown(void *arg)
     printf("JACK shut down.\nJACK sync Disabled.\n");
 }
 
-
-void print_jack_pos( jack_position_t* jack_pos ){
-
+void print_jack_pos( jack_position_t* jack_pos )
+{
     return;
     printf( "print_jack_pos()\n" );
     printf( "    bar  [%d]\n", jack_pos->bar  );
@@ -2531,7 +2459,6 @@ void print_jack_pos( jack_position_t* jack_pos ){
     printf( "    next_time        [%lf]\n", jack_pos->next_time );
 }
 
-
 #if 0
 
 int main ()
@@ -2539,7 +2466,8 @@ int main ()
     jack_client_t *client;
 
     /* become a new client of the JACK server */
-    if ((client = jack_client_new("transport tester")) == 0) {
+    if ((client = jack_client_new("transport tester")) == 0)
+    {
         fprintf(stderr, "jack server not running?\n");
         return 1;
     }
@@ -2547,13 +2475,15 @@ int main ()
     jack_on_shutdown(client, jack_shutdown, 0);
     jack_set_sync_callback(client, jack_sync_callback, NULL);
 
-    if (jack_activate(client)) {
+    if (jack_activate(client))
+    {
         fprintf(stderr, "cannot activate client");
         return 1;
     }
 
     bool cond = false; /* true if we want to fail if there is already a master */
-    if (jack_set_timebase_callback(client, cond, timebase, NULL) != 0){
+    if (jack_set_timebase_callback(client, cond, timebase, NULL) != 0)
+    {
         printf("Unable to take over timebase or there is already a master.\n");
         exit(1);
     }
@@ -2572,7 +2502,6 @@ int main ()
     pos.beats_per_minute = time_beats_per_minute;
     pos.bar_start_tick = 0.0;
 
-
     //jack_transport_reposition( client, &pos );
 
     jack_transport_start (client);
@@ -2589,15 +2518,14 @@ int main ()
     return 0;
 }
 
-#endif
-
-
-#endif
+#endif // 0
+#endif // JACK_SUPPORT
 
 void
 perform::apply_song_transpose()
 {
-    for (int i=0; i< c_max_sequence; i++ ){
+    for (int i=0; i< c_max_sequence; i++ )
+    {
         if ( is_active(i) )
         {
             get_sequence(i)->apply_song_transpose();

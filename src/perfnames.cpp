@@ -31,8 +31,8 @@ perfnames::perfnames( perform *a_perf, Adjustment *a_vadjust ):
     m_sequence_offset(0)
 {
     add_events( Gdk::BUTTON_PRESS_MASK |
-		Gdk::BUTTON_RELEASE_MASK |
-		Gdk::SCROLL_MASK );
+                Gdk::BUTTON_RELEASE_MASK |
+                Gdk::SCROLL_MASK );
 
     /* set default size */
     set_size_request( c_names_x, 100 );
@@ -69,12 +69,11 @@ perfnames::on_realize()
                                    -1);
 }
 
-
 void
 perfnames::change_vert()
 {
-    if ( m_sequence_offset != (int) m_vadjust->get_value() ){
-
+    if ( m_sequence_offset != (int) m_vadjust->get_value() )
+    {
         m_sequence_offset = (int) m_vadjust->get_value();
         queue_draw();
     }
@@ -87,10 +86,10 @@ perfnames::update_pixmap()
 }
 
 void
-perfnames::draw_area(){
+perfnames::draw_area()
+{
 
 }
-
 
 void
 perfnames::redraw( int sequence )
@@ -101,35 +100,32 @@ perfnames::redraw( int sequence )
 void
 perfnames::draw_sequence( int sequence )
 {
-
     int i = sequence - m_sequence_offset;
 
-    if ( sequence < c_total_seqs ){
-
-
-
+    if ( sequence < c_total_seqs )
+    {
         m_gc->set_foreground(m_black);
         m_window->draw_rectangle(m_gc,true,
                                  0,
-                                 (c_names_y * i) ,
+                                 (c_names_y * i),
                                  c_names_x,
                                  c_names_y + 1 );
 
-        if ( sequence % c_seqs_in_set == 0 ){
-
+        if ( sequence % c_seqs_in_set == 0 )
+        {
             char ss[3];
             snprintf(ss, sizeof(ss), "%2d", sequence / c_seqs_in_set );
 
             m_gc->set_foreground(m_white);
 
             p_font_renderer->render_string_on_drawable(m_gc,
-                                                       2,
-                                                       c_names_y * i + 2,
-                                                       m_window, ss, font::WHITE );
+                    2,
+                    c_names_y * i + 2,
+                    m_window, ss, font::WHITE );
         }
 
-        else {
-
+        else
+        {
             m_gc->set_foreground(m_white);
             m_window->draw_rectangle(m_gc,true,
                                      1,
@@ -137,7 +133,6 @@ perfnames::draw_sequence( int sequence )
                                      (6*2) + 1,
                                      c_names_y );
         }
-
 
         if ( m_mainperf->is_active( sequence ))
             m_gc->set_foreground(m_white);
@@ -150,8 +145,8 @@ perfnames::draw_sequence( int sequence )
                                  c_names_x - 3 - (6*2),
                                  c_names_y - 1  );
 
-        if ( m_mainperf->is_active( sequence )){
-
+        if ( m_mainperf->is_active( sequence ))
+        {
             m_sequence_active[sequence]=true;
 
             /* names */
@@ -161,9 +156,9 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_midi_channel() + 1);
 
             p_font_renderer->render_string_on_drawable(m_gc,
-                                                       5 + 6*2,
-                                                       c_names_y * i + 2,
-                                                       m_window, name, font::BLACK );
+                    5 + 6*2,
+                    c_names_y * i + 2,
+                    m_window, name, font::BLACK );
 
             char str[20];
             snprintf(str, sizeof(str),
@@ -174,9 +169,9 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_bw() );
 
             p_font_renderer->render_string_on_drawable(m_gc,
-                                                       5 + 6*2,
-                                                       c_names_y * i + 12,
-                                                       m_window, str, font::BLACK );
+                    5 + 6*2,
+                    c_names_y * i + 12,
+                    m_window, str, font::BLACK );
 
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
 
@@ -187,51 +182,46 @@ perfnames::draw_sequence( int sequence )
                                      10,
                                      c_names_y  );
 
-            if ( muted ){
-
+            if ( muted )
+            {
                 p_font_renderer->render_string_on_drawable(m_gc,
-                                                           5 + 6*2 + 6 * 20,
-                                                           c_names_y * i + 2,
-                                                           m_window, "M", font::WHITE );
-            } else {
-
+                        5 + 6*2 + 6 * 20,
+                        c_names_y * i + 2,
+                        m_window, "M", font::WHITE );
+            }
+            else
+            {
                 p_font_renderer->render_string_on_drawable(m_gc,
-                                                           5 + 6*2 + 6 * 20,
-                                                           c_names_y * i + 2,
-                                                           m_window, "M", font::BLACK );
+                        5 + 6*2 + 6 * 20,
+                        c_names_y * i + 2,
+                        m_window, "M", font::BLACK );
             }
         }
     }
-    else {
-
+    else
+    {
         m_gc->set_foreground(m_grey);
         m_window->draw_rectangle(m_gc,true,
                                  0,
-                                 (c_names_y * i) + 1 ,
+                                 (c_names_y * i) + 1,
                                  c_names_x,
                                  c_names_y );
 
     }
-
 }
-
-
 
 bool
 perfnames::on_expose_event(GdkEventExpose* a_e)
 {
     int seqs = (m_window_y / c_names_y) + 1;
 
-    for ( int i=0; i< seqs; i++ ){
-
-	int sequence = i + m_sequence_offset;
-
+    for ( int i=0; i< seqs; i++ )
+    {
+        int sequence = i + m_sequence_offset;
         draw_sequence(sequence);
-
     }
     return true;
 }
-
 
 void
 perfnames::convert_y( int a_y, int *a_seq)
@@ -240,12 +230,11 @@ perfnames::convert_y( int a_y, int *a_seq)
     *a_seq  += m_sequence_offset;
 
     if ( *a_seq >= c_total_seqs )
-	*a_seq = c_total_seqs - 1;
+        *a_seq = c_total_seqs - 1;
 
     if ( *a_seq < 0 )
-	*a_seq = 0;
+        *a_seq = 0;
 }
-
 
 bool
 perfnames::on_button_press_event(GdkEventButton *a_e)
@@ -260,10 +249,10 @@ perfnames::on_button_press_event(GdkEventButton *a_e)
     m_current_seq = sequence;
 
     /*      left mouse button     */
-    if ( a_e->button == 1 ){
-
-        if ( m_mainperf->is_active( sequence )){
-
+    if ( a_e->button == 1 )
+    {
+        if ( m_mainperf->is_active( sequence ))
+        {
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
             m_mainperf->get_sequence(sequence)->set_song_mute( !muted );
 
@@ -274,12 +263,12 @@ perfnames::on_button_press_event(GdkEventButton *a_e)
     return true;
 }
 
-
 bool
 perfnames::on_button_release_event(GdkEventButton* p0)
 {
     /*     right mouse button      */
-    if ( p0->button == 3 ){
+    if ( p0->button == 3 )
+    {
         popup_menu();
     }
 
@@ -289,19 +278,20 @@ perfnames::on_button_release_event(GdkEventButton* p0)
 bool
 perfnames::on_scroll_event( GdkEventScroll* a_ev )
 {
-	double val = m_vadjust->get_value();
+    double val = m_vadjust->get_value();
 
-    if (  a_ev->direction == GDK_SCROLL_UP ){
-		val -= m_vadjust->get_step_increment();
+    if (  a_ev->direction == GDK_SCROLL_UP )
+    {
+        val -= m_vadjust->get_step_increment();
     }
-    if (  a_ev->direction == GDK_SCROLL_DOWN ){
-		val += m_vadjust->get_step_increment();
+    if (  a_ev->direction == GDK_SCROLL_DOWN )
+    {
+        val += m_vadjust->get_step_increment();
     }
 
-	m_vadjust->clamp_page( val, val + m_vadjust->get_page_size());
+    m_vadjust->clamp_page( val, val + m_vadjust->get_page_size());
     return true;
 }
-
 
 void
 perfnames::on_size_allocate(Gtk::Allocation &a_r )
@@ -312,26 +302,24 @@ perfnames::on_size_allocate(Gtk::Allocation &a_r )
     m_window_y = a_r.get_height();
 }
 
-
-
 void
 perfnames::redraw_dirty_sequences()
 {
     int y_s = 0;
     int y_f = m_window_y / c_names_y;
 
-    for ( int y=y_s; y<=y_f; y++ ){
-
+    for ( int y=y_s; y<=y_f; y++ )
+    {
         int seq = y + m_sequence_offset; // 4am
 
-        if ( seq < c_total_seqs){
+        if ( seq < c_total_seqs)
+        {
+            bool dirty = (m_mainperf->is_dirty_names( seq ));
 
-                bool dirty = (m_mainperf->is_dirty_names( seq ));
-
-                if (dirty)
-                {
-                    draw_sequence( seq );
-                }
+            if (dirty)
+            {
+                draw_sequence( seq );
+            }
         }
     }
 }
