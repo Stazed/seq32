@@ -77,7 +77,14 @@ seqmenu::popup_menu()
         menu_song->items().push_back(MenuElem("Clear Song Data", mem_fun(*this,&seqmenu::seq_clear_perf)));
     }
 
-    menu_song->items().push_back(MenuElem("Mute All Tracks", mem_fun(*this,&seqmenu::mute_all_tracks)));
+    menu_song->items().push_back(MenuElem("Mute all tracks",
+                                            sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_ON)));
+
+    menu_song->items().push_back(MenuElem("Unmute all tracks",
+                                            sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_OFF)));
+
+    menu_song->items().push_back(MenuElem("Toggle mute for all tracks",
+                                            sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_TOGGLE)));
 
     if ( m_mainperf->is_active( m_current_seq ))
     {
@@ -132,9 +139,10 @@ seqmenu::set_bus_and_midi_channel( int a_bus, int a_ch )
 }
 
 void
-seqmenu::mute_all_tracks()
+seqmenu::set_song_mute(mute_op op)
 {
-    m_mainperf->mute_all_tracks();
+    m_mainperf->set_song_mute(op);
+    global_is_modified = true;
 }
 
 // Menu callback, Lanches Editor Window

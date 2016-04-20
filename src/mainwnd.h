@@ -125,6 +125,7 @@ private:
 
     void popup_menu (Menu * a_menu);
     void apply_song_transpose ();
+    void set_song_mute(mute_op op);
 
 public:
 

@@ -428,12 +428,26 @@ void perform::select_and_mute_group (int a_g_group)
     mute_group_tracks();
 }
 
-void perform::mute_all_tracks()
+void perform::set_song_mute( mute_op op  )
 {
     for (int i=0; i< c_max_sequence; i++ )
     {
         if ( is_active(i) )
-            m_seqs[i]->set_song_mute( true );
+        {
+            if(op == MUTE_ON)
+            {
+                m_seqs[i]->set_song_mute( true );
+            }
+            else if(op == MUTE_OFF)
+            {
+                m_seqs[i]->set_song_mute( false );
+            }
+            else if(op == MUTE_TOGGLE)
+            {
+                m_seqs[i]->set_song_mute( ! m_seqs[i]->get_song_mute() );
+            }
+            m_seqs[i]->set_dirty_mp();
+        }
     }
 }
 

@@ -108,13 +108,21 @@ mainwnd::mainwnd(perform *a_p):
                                             mem_fun(*this, &mainwnd::apply_song_transpose)));
 
     m_menu_edit->items().push_back(SeparatorElem());
+    m_menu_edit->items().push_back(MenuElem("_Mute all tracks",
+                                            sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_ON)));
+
+    m_menu_edit->items().push_back(MenuElem("_Unmute all tracks",
+                                            sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_OFF)));
+
+    m_menu_edit->items().push_back(MenuElem("_Toggle mute for all tracks",
+                                            sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_TOGGLE)));
+
+    m_menu_edit->items().push_back(SeparatorElem());
     m_menu_edit->items().push_back(MenuElem("_Import...",
                                             mem_fun(*this, &mainwnd::file_import_dialog)));
 
     m_menu_edit->items().push_back(MenuElem("Midi export _song",
                                             sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_song_midi)));
-
-    m_menu_edit->items().push_back(SeparatorElem());
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -878,6 +886,13 @@ mainwnd::apply_song_transpose()
         m_mainperf->apply_song_transpose();
         m_perf_edit->set_xpose(0);
     }
+}
+
+void
+mainwnd::set_song_mute(mute_op op)
+{
+    m_mainperf->set_song_mute(op);
+    global_is_modified = true;
 }
 
 void

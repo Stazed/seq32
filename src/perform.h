@@ -55,6 +55,13 @@ public:
     long m_max_value;
 };
 
+enum mute_op
+{
+    MUTE_TOGGLE = -1,
+    MUTE_OFF = 0,
+    MUTE_ON = 1
+};
+
 const int c_status_replace  = 0x01;
 const int c_status_snapshot = 0x02;
 const int c_status_queue    = 0x04;
@@ -357,7 +364,7 @@ public:
     void set_group_mute_state (int a_g_track, bool a_mute_state);
     bool get_group_mute_state (int a_g_track);
 
-    void mute_all_tracks();
+    void set_song_mute( mute_op op  );
 
     mastermidibus* get_master_midi_bus( );
 
