@@ -449,7 +449,11 @@ void mainwnd::file_new()
 
 void mainwnd::new_file()
 {
+    /* reset everything to default */
     m_mainperf->clear_all();
+    m_perf_edit->set_bp_measure(4);
+    m_perf_edit->set_bw(4);
+    m_perf_edit->set_xpose(0);
 
     m_main_wid->reset();
     m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
@@ -566,7 +570,11 @@ void mainwnd::open_file(const Glib::ustring& fn)
 {
     bool result;
 
+    /* reset everything to default */
     m_mainperf->clear_all();
+    m_perf_edit->set_bp_measure(4);
+    m_perf_edit->set_bw(4);
+    m_perf_edit->set_xpose(0);
 
     midifile f(fn);
     result = f.parse(m_mainperf, 0);

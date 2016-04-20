@@ -309,6 +309,10 @@ void perform::clear_all()
     {
         set_screen_set_notepad( i, &e );
     }
+
+    set_bpm(c_bpm);
+    set_have_undo(false);
+    set_have_redo(false);
 }
 
 void perform::set_mode_group_mute ()
