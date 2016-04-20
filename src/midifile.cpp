@@ -888,7 +888,7 @@ bool midifile::write_song (perform * a_perf)
             write_long (0x4D54726B);
 
             int size_tempo_time_sig = 0;
-            if(curTrack == 0)
+            if(numtracks == 0)
                 size_tempo_time_sig = 15; // size, (s/b 19(total) - 4(trk end) = 15 bytes)
 
             write_long (l.size () + size_tempo_time_sig);
@@ -898,7 +898,7 @@ bool midifile::write_song (perform * a_perf)
                 So we don't have an extra one...
             */
 
-            if(curTrack == 0)
+            if(numtracks == 0)
             {
                 /* time signature */
                 write_byte(0x00); // delta time
@@ -906,7 +906,7 @@ bool midifile::write_song (perform * a_perf)
                 write_byte(0x04); // length of remaining bytes
                 write_byte(a_perf->get_bp_measure());           // nn
                 write_byte(log(a_perf->get_bw())/log(2.0));     // dd
-                write_short(0x1808);
+                write_short(0x1808);                            // cc bb
 
                 /* Tempo */
                 write_byte(0x00); // delta time
