@@ -775,7 +775,10 @@ mainwnd::file_import_dialog()
         try
         {
             midifile f( dialog.get_filename() );
-            f.parse( m_mainperf, (int) m_adjust_load_offset->get_value() ); // FIXME check return value
+
+            if(f.parse( m_mainperf, (int) m_adjust_load_offset->get_value() ))
+                last_used_dir = dialog.get_filename().substr(0, dialog.get_filename().rfind("/") + 1);
+            else return;
         }
         catch(...)
         {
