@@ -111,10 +111,11 @@ private:
     void file_new();
     void file_open();
     void file_save();
-    void file_save_as();
+    void file_save_as( int type = c_seq24_midi );
     void file_exit();
     void new_file();
     bool save_file();
+    void export_midi(const Glib::ustring& fn);
     void choose_file();
     int query_save_changes();
     bool is_save();

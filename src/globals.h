@@ -135,6 +135,10 @@ const int c_adding = 0;
 const int c_normal = 1;
 const int c_paste  = 2;
 
+/* used for export file type */
+const int c_seq24_midi = 1;
+const int c_song_midi  = 2;
+
 /* redraw when recording ms */
 #ifdef __WIN32__
 const int c_redraw_ms = 20;

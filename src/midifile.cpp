@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include "midifile.h"
+#include <gtkmm.h>
 
 midifile::midifile(const Glib::ustring& a_name) :
     m_pos(0),
@@ -593,6 +594,14 @@ midifile::write_long (unsigned long a_x)
 }
 
 void
+midifile::write_mid (unsigned long a_x)
+{
+    write_byte ((a_x & 0xFF0000) >> 16);
+    write_byte ((a_x & 0x00FF00) >> 8);
+    write_byte ((a_x & 0x0000FF));
+}
+
+void
 midifile::write_short (unsigned short a_x)
 {
     write_byte ((a_x & 0xFF00) >> 8);
@@ -603,6 +612,19 @@ void
 midifile::write_byte (unsigned char a_x)
 {
     m_l.push_back (a_x);
+}
+
+void
+midifile::write_header( int numtracks)
+{
+    /* 'MThd' and length of 6 */
+    write_long (0x4D546864);
+    write_long (0x00000006);
+
+    /* format 1, number of tracks, ppqn */
+    write_short (0x0001);
+    write_short (numtracks);
+    write_short (c_ppqn);
 }
 
 bool midifile::write (perform * a_perf)
@@ -616,17 +638,7 @@ bool midifile::write (perform * a_perf)
             numtracks++;
     }
 
-    //printf ("numtracks[%d]\n", numtracks );
-
-    /* write header */
-    /* 'MThd' and length of 6 */
-    write_long (0x4D546864);
-    write_long (0x00000006);
-
-    /* format 1, number of tracks, ppqn */
-    write_short (0x0001);
-    write_short (numtracks);
-    write_short (c_ppqn);
+    write_header(numtracks);
 
     /* We should be good to load now   */
     /* for each Track in the midi file */
@@ -721,4 +733,193 @@ bool midifile::write (perform * a_perf)
     m_l.clear ();
 
     return true;
+}
+
+bool midifile::write_song (perform * a_perf)
+{
+    int numtracks = 0;
+
+    /* get number of tracks  */
+    for (int i = 0; i < c_max_sequence; i++)
+    {
+        if (a_perf->is_active(i) && a_perf->get_sequence(i)->get_trigger_count() > 0 &&
+                !a_perf->get_sequence(i)->get_song_mute()) // don't count tracks with NO triggers or muted
+        {
+                numtracks ++;
+        }
+    }
+
+    write_header(numtracks);
+
+    /* We should be good to load now   */
+    /* for each Track Sequence in the midi file */
+
+    numtracks = 0; // reset for seq->fill_list position
+
+    for (int curTrack = 0; curTrack < c_max_sequence; curTrack++)
+    {
+        //printf ("track[%d]\n", curTrack );
+        if (a_perf->is_active(curTrack) && !a_perf->get_sequence(curTrack)->get_song_mute())
+        {
+            /* all track triggers */
+            sequence * seq = NULL;
+            trigger *a_trig;
+
+            seq = a_perf->get_sequence(curTrack);
+
+            std::vector<trigger> trig_vect;
+            seq->get_sequence_triggers(trig_vect); // all triggers for the track
+
+            int vect_size = trig_vect.size();
+            if(vect_size < 1)
+                continue; // skip tracks with no triggers
+
+            list<char> l;
+
+            /*  sequence name  */
+            seq->seq_number_fill_list( &l, numtracks );
+            seq->seq_name_fill_list( &l );
+
+            // now for each trigger get sequence and add events to list char below - fill_list one by one in order,
+            // essentially creating a single long sequence.
+            // then set a single trigger for the big sequence - start at zero, end at last trigger end.
+
+            long total_seq_length = 0;
+            long prev_timestamp = 0;
+
+            for (int i = 0; i < vect_size; i++)
+            {
+                a_trig = &trig_vect[i]; // get the trigger
+
+                prev_timestamp = seq->song_fill_list_seq_event(&l,a_trig,prev_timestamp); // put events on list
+            }
+
+            total_seq_length = trig_vect[vect_size-1].m_tick_end;
+
+            /*
+                The sequence trigger is NOT part of the standard midi format and is proprietary to seq24.
+                It is added here because the trigger combining has an alternative benefit for editing.
+                The user can split, slice and rearrange triggers to form a new sequence. Then mute all
+                other tracks and export to a temporary midi file. Now they can import the combined
+                triggers/sequence as a new item. This makes editing of long improvised sequences into
+                smaller or modified sequences as well as combining several sequence parts painless. Also,
+                if the user has a variety of common items such as drum beats, control codes, etc that
+                can be used in other projects, this method is very convenient. The common items can
+                be kept in one file and exported all, individually, or in part by creating triggers and muting.
+            */
+            seq->song_fill_list_seq_trigger(&l,a_trig,total_seq_length,prev_timestamp); // the big sequence trigger
+
+            /* magic number 'MTrk' */
+            write_long (0x4D54726B);
+
+            int size_tempo_time_sig = 0;
+            if(curTrack == 0)
+                size_tempo_time_sig = 15; // size, (s/b 19(total) - 4(trk end) = 15 bytes)
+
+            write_long (l.size () + size_tempo_time_sig);
+
+            /*
+                Add the bpm and timesignature stuff here to the first track (0).
+                So we don't have an extra one...
+            */
+
+            if(curTrack == 0)
+            {
+                /* time signature */
+                write_byte(0x00); // delta time
+                write_short(0xFF58);
+                write_byte(0x04); // length of remaining bytes
+                write_byte(a_perf->get_bp_measure());           // nn
+                write_byte(log(a_perf->get_bw())/log(2.0));     // dd
+                write_short(0x1808);
+
+                /* Tempo */
+                write_byte(0x00); // delta time
+                write_short(0xFF51);
+                write_byte(0x03); // length of bytes - must be 3
+                write_mid(60000000/a_perf->get_bpm());
+            }
+
+            while (l.size () > 0)
+            {
+                write_byte (l.back ());
+                l.pop_back ();
+            }
+            numtracks++;
+        }
+    }
+
+    /* open binary file */
+    ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
+
+    if (!file.is_open ())
+        return false;
+
+    /* enable bufferization */
+    char file_buffer[1024];
+    file.rdbuf()->pubsetbuf(file_buffer, sizeof file_buffer);
+
+    for (list < unsigned char >::iterator i = m_l.begin ();
+            i != m_l.end (); i++)
+    {
+        char c = *i;
+        file.write(&c, 1);
+    }
+
+    m_l.clear ();
+
+    return true;
+}
+
+/**
+ *  From Sequencer64 project
+ *  Internal function for simple calculation of a power of 2 without a lot of
+ *  math.  Use for calculating the denominator of a time signature.
+ *
+ * \param logbase2
+ *      Provides the power to which 2 is to be raised.  This integer is
+ *      probably only rarely greater than 4 (which represents a denominator of
+ *      16).
+ *
+ * \return
+ *      Returns 2 raised to the logbase2 power.
+ */
+
+int
+midifile::pow2 (int logbase2)
+{
+    int result;
+    if (logbase2 == 0)
+        result = 1;
+    else
+    {
+        result = 2;
+        for (int c = 1; c < logbase2; c++)
+            result *= 2;
+    }
+    return result;
+}
+
+Glib::ustring
+midifile::Ulong_To_String_Hex ( unsigned long Number )
+{
+    char bus_num[12];
+    snprintf(bus_num, sizeof(bus_num), "%8lX", Number);
+
+    Glib::ustring str(bus_num);
+    return str;
+}
+
+void
+midifile::error_message_gtk( Glib::ustring message)
+{
+    Gtk::MessageDialog errdialog
+    (
+        message,
+        false,
+        Gtk::MESSAGE_ERROR,
+        Gtk::BUTTONS_OK,
+        true
+    );
+    errdialog.run();
 }

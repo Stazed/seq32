@@ -318,6 +318,13 @@ public:
     bool select_trigger(long a_tick);
     bool unselect_triggers ();
 
+    int get_trigger_count ()
+    {
+        return m_list_trigger.size();
+    }
+
+    void get_sequence_triggers(std::vector<trigger> &trig_vect);
+
     bool intersectTriggers( long position, long& start, long& end );
     bool intersectNotes( long position, long position_note, long& start, long& end, long& note );
     bool intersectEvents( long posstart, long posend, long status, long& start );
@@ -486,6 +493,12 @@ public:
     sequence & operator= (const sequence & a_rhs);
 
     void fill_list (list < char >*a_list, int a_pos);
+    void seq_number_fill_list( list<char> *a_list, int a_pos );
+    void seq_name_fill_list( list<char> *a_list );
+    void fill_proprietary_list(list < char >*a_list);
+    void meta_track_end( list<char> *a_list, long delta_time);
+    long song_fill_list_seq_event( list<char> *a_list, trigger *a_trig, long prev_timestamp );
+    void song_fill_list_seq_trigger( list<char> *a_list, trigger *a_trig, long a_length, long prev_timestamp );
 
     void select_events (unsigned char a_status, unsigned char a_cc,
                         bool a_inverse = false);

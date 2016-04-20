@@ -89,10 +89,9 @@ mainwnd::mainwnd(perform *a_p):
                                             Gtk::AccelKey("<control>S"),
                                             mem_fun(*this, &mainwnd::file_save)));
     m_menu_file->items().push_back(MenuElem("Save _as...",
-                                            mem_fun(*this, &mainwnd::file_save_as)));
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_seq24_midi)));
+
     m_menu_file->items().push_back(SeparatorElem());
-    m_menu_file->items().push_back(MenuElem("_Import...",
-                                            mem_fun(*this, &mainwnd::file_import_dialog)));
     m_menu_file->items().push_back(MenuElem("O_ptions...",
                                             mem_fun(*this,&mainwnd::options_dialog)));
     m_menu_file->items().push_back(SeparatorElem());
@@ -107,6 +106,15 @@ mainwnd::mainwnd(perform *a_p):
 
     m_menu_edit->items().push_back(MenuElem("_Apply song transpose",
                                             mem_fun(*this, &mainwnd::apply_song_transpose)));
+
+    m_menu_edit->items().push_back(SeparatorElem());
+    m_menu_edit->items().push_back(MenuElem("_Import...",
+                                            mem_fun(*this, &mainwnd::file_import_dialog)));
+
+    m_menu_edit->items().push_back(MenuElem("Midi export _song",
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_song_midi)));
+
+    m_menu_edit->items().push_back(SeparatorElem());
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -459,7 +467,7 @@ void mainwnd::file_save()
 }
 
 /* callback function */
-void mainwnd::file_save_as()
+void mainwnd::file_save_as( int type )
 {
     Gtk::FileChooserDialog dialog("Save file as",
                                   Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -512,9 +520,18 @@ void mainwnd::file_save_as()
             if (result == Gtk::RESPONSE_NO)
                 return;
         }
-        global_filename = fname;
-        update_window_title();
-        save_file();
+
+        if(type == c_seq24_midi)
+        {
+            global_filename = fname;
+            update_window_title();
+            save_file();
+        }
+        else
+        {
+            export_midi(fname);
+        }
+
         break;
     }
 
@@ -523,6 +540,27 @@ void mainwnd::file_save_as()
     }
 }
 
+void mainwnd::export_midi(const Glib::ustring& fn)
+{
+    bool result = false;
+
+    midifile f(fn);
+
+    result = f.write_song(m_mainperf);
+
+    if (!result)
+    {
+        Gtk::MessageDialog errdialog
+        (
+            *this,
+            "Error writing file.",
+            false,
+            Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK,
+            true
+        );
+        errdialog.run();
+    }
+}
 
 void mainwnd::open_file(const Glib::ustring& fn)
 {
@@ -595,7 +633,6 @@ void mainwnd::choose_file()
     }
 }
 
-
 bool mainwnd::save_file()
 {
     bool result = false;
@@ -607,6 +644,7 @@ bool mainwnd::save_file()
     }
 
     midifile f(global_filename);
+
     result = f.write(m_mainperf);
 
     if (!result)
@@ -616,6 +654,7 @@ bool mainwnd::save_file()
                                      Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
         errdialog.run();
     }
+
     global_is_modified = !result; /* means if file is saved then clear the modified flag */
 
     return result;

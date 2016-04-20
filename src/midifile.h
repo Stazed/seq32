@@ -44,8 +44,14 @@ private:
     unsigned long read_var();
 
     void write_long( unsigned long );
+    void write_mid( unsigned long );
     void write_short( unsigned short );
     void write_byte( unsigned char );
+
+    void write_header( int numtracks);
+    int pow2 (int logbase2);
+    Glib::ustring Ulong_To_String_Hex( unsigned long Number );
+    void error_message_gtk( Glib::ustring message);
 
 public:
 
@@ -55,5 +61,6 @@ public:
 
     bool parse( perform *a_perf, int a_screen_set );
     bool write( perform *a_perf );
+    bool write_song (perform * a_perf);
 
 };
