@@ -92,11 +92,20 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
     if (!file.is_open ())
     {
-        fprintf(stderr, "Error opening MIDI file\n");
+        error_message_gtk("Error opening MIDI file");
         return false;
     }
 
-    int file_size = file.tellg ();
+    unsigned int file_size = file.tellg ();
+
+    if(file_size < sizeof(unsigned long))
+    {
+        Glib::ustring message = "Error - Invalid file size: ";
+        message += NumberToString(file_size);
+        error_message_gtk(message);
+        file.close ();
+        return false;
+    }
 
     /* run to start */
     file.seekg (0, ios::beg);
@@ -108,7 +117,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     }
     catch(std::bad_alloc& ex)
     {
-        fprintf(stderr, "Memory allocation failed\n");
+        error_message_gtk("Memory allocation failed");
         return false;
     }
     file.read ((char *) &m_d[0], file_size);
@@ -154,14 +163,18 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     /* magic number 'MThd' */
     if (ID != 0x4D546864)
     {
-        fprintf(stderr, "Invalid MIDI header detected: %8lX\n", ID);
+        Glib::ustring message = "Invalid MIDI header detected: ";
+        message += Ulong_To_String_Hex(ID);
+        error_message_gtk(message);
         return false;
     }
 
     /* we are only supporting format 1 for now */
     if (Format != 1)
     {
-        fprintf(stderr, "Unsupported MIDI format detected: %d\n", Format);
+        Glib::ustring message = "Unsupported MIDI format detected: ";
+        message += NumberToString(Format);
+        error_message_gtk(message);
         return false;
     }
 
@@ -181,8 +194,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         /* Get ID + Length */
         ID = read_long ();
         TrackLength = read_long ();
-        //printf( "[%8lX] len[%8lX]\n", ID,  TrackLength );
-
 
         /* magic number 'MTrk' */
         if (ID == 0x4D54726B)
@@ -192,7 +203,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             seq = new sequence ();
             if (seq == NULL)
             {
-                fprintf(stderr, "Memory allocation failed\n");
+                error_message_gtk("Memory allocation failed");
                 return false;
             }
             seq->set_master_midi_bus (&a_perf->m_master_bus);
@@ -358,6 +369,66 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                             m_pos += len;
                             break;
 
+                        case 0x58:    /* Time Signature  bp_measure / bw */
+                            /*
+                                If the midi file contains both proprietary (c_timesig)
+                                and Midi type 0x58 then it came from seq42 or seq24 (Stazed versions).
+                                In this case the Midi type is parsed first (because it is listed first)
+                                then it gets overwritten by the proprietary, above.
+                            */
+                            if (len == 4)
+                            {
+                                int bp_measure = int(read_byte());  // nn
+                                int logbase2 = int(read_byte());    // dd
+
+                                read_byte();                        // cc eat it
+                                read_byte();                        // bb eat it
+
+                                long bw = long(pow2(logbase2));     // convert dd to bw
+
+                                if(bp_measure == 0 || bw == 0)      // spec assumes 4 x 4 as we do
+                                    break;
+
+                                if(curTrack == 0)                   // set main perform if first track
+                                {
+                                    a_perf->set_bp_measure(bp_measure);
+                                    a_perf->set_bw(bw);
+                                }
+
+                                seq->set_bp_measure(bp_measure);    // set the sequence each time
+                                seq->set_bw(bw);
+
+                                /*printf
+                                (
+                                   "Time Signature set to %d/%d\n",
+                                    int(seq->get_bp_measure()),
+                                    int(seq->get_bw())
+                                );*/
+                            }
+                            else
+                                m_pos += len;           /* eat it           */
+                            break;
+
+                        case 0x51:                      /* Set Tempo  = bpm      */
+                            if (len == 3)
+                            {
+                                unsigned tempo = unsigned(read_byte());
+                                tempo = (tempo * 256) + unsigned(read_byte());
+                                tempo = (tempo * 256) + unsigned(read_byte());
+
+                                if(tempo == 0)          /* Midi spec assumes 120 bpm as we do */
+                                    break;
+
+                                int bpm = (double) 60000000.0 / tempo;
+
+                                if(curTrack == 0)  // only if first track - we don't support tempo change
+                                    a_perf->set_bpm(bpm);
+                                //printf("BPM set to %d\n", bpm);
+                            }
+                            else
+                                m_pos += len;           /* eat it           */
+                            break;
+
                         /* Trk Done */
                         case 0x2f:
 
@@ -418,14 +489,18 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                     }
                     else
                     {
-                        fprintf(stderr, "Unexpected system event : 0x%.2X", status);
+                        Glib::ustring message = "Unexpected system event : ";
+                        message += Ulong_To_String_Hex((unsigned long)status);
+                        error_message_gtk(message);
                         return false;
                     }
 
                     break;
 
                 default:
-                    fprintf(stderr, "Unsupported MIDI event: %hhu\n", status);
+                    Glib::ustring message = "Unsupported MIDI event:  ";
+                    message += Ulong_To_String_Hex((unsigned long)status);
+                    error_message_gtk(message);
                     return false;
                     break;
                 }
@@ -745,7 +820,7 @@ bool midifile::write_song (perform * a_perf)
         if (a_perf->is_active(i) && a_perf->get_sequence(i)->get_trigger_count() > 0 &&
                 !a_perf->get_sequence(i)->get_song_mute()) // don't count tracks with NO triggers or muted
         {
-                numtracks ++;
+            numtracks ++;
         }
     }
 
