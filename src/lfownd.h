@@ -36,7 +36,7 @@ using namespace Gtk;
 
 class lfownd: public Gtk::Window
 {
-public:
+private:
 
     VScale *m_scale_value;
     VScale *m_scale_range;
@@ -55,13 +55,13 @@ public:
     seqdata *m_seqdata;
 
     void scale_lfo_change();
-    static double wave_func(double a_angle, int wave_type);
+    bool on_focus_out_event(GdkEventFocus* p0 );
 
 public:
 
+    static double wave_func(double a_angle, int wave_type);
     lfownd (sequence *a_seq, seqdata *a_seqdata);
     void toggle_visible();
     virtual ~lfownd();
-
 };
 

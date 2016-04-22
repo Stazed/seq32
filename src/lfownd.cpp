@@ -106,7 +106,6 @@ lfownd::lfownd(sequence *a_seq, seqdata *a_seqdata)
 
 void lfownd::toggle_visible()
 {
-    m_seq->push_undo();
     show_all();
     raise();
 }
@@ -122,4 +121,14 @@ void lfownd::scale_lfo_change()
                                  m_seqdata->m_status, m_seqdata->m_cc);
     m_seqdata->update_pixmap();
     m_seqdata->draw_pixmap_on_window();
+}
+
+bool lfownd::on_focus_out_event(GdkEventFocus* p0 )
+{
+    if(m_seq->get_hold_undo())
+    {
+        m_seq->push_undo(true);
+        m_seq->set_hold_undo(false);
+    }
+    return true;
 }

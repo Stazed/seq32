@@ -75,10 +75,39 @@ sequence::sequence( ) :
 }
 
 void
-sequence::push_undo()
+sequence::set_hold_undo (bool a_hold)
+{
+    list<event>::iterator i;
+
+    lock();
+
+    if(a_hold)
+    {
+        for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+        {
+            m_list_undo_hold.push_back( (*i) );
+        }
+    }
+    else
+       m_list_undo_hold.clear( );
+
+    unlock();
+}
+
+int
+sequence::get_hold_undo ()
+{
+    return m_list_undo_hold.size();
+}
+
+void
+sequence::push_undo(bool a_hold)
 {
     lock();
-    m_list_undo.push( m_list_event );
+    if(a_hold)
+        m_list_undo.push( m_list_undo_hold );
+    else
+        m_list_undo.push( m_list_event );
     unlock();
     set_have_undo();
 }
@@ -1430,11 +1459,17 @@ sequence::increment_selected( unsigned char a_status, unsigned char a_control )
                     a_status == EVENT_CONTROL_CHANGE ||
                     a_status == EVENT_PITCH_WHEEL )
             {
+                if(!get_hold_undo())
+                    set_hold_undo(true);
+
                 (*i).increment_data2();
             }
 
             if ( a_status == EVENT_PROGRAM_CHANGE || a_status == EVENT_CHANNEL_PRESSURE )
             {
+                if(!get_hold_undo())
+                    set_hold_undo(true);
+
                 (*i).increment_data1();
             }
         }
@@ -1460,11 +1495,17 @@ sequence::decrement_selected(unsigned char a_status, unsigned char a_control )
                     a_status == EVENT_CONTROL_CHANGE ||
                     a_status == EVENT_PITCH_WHEEL )
             {
+                if(!get_hold_undo())
+                    set_hold_undo(true);
+
                 (*i).decrement_data2();
             }
 
             if ( a_status == EVENT_PROGRAM_CHANGE || a_status == EVENT_CHANNEL_PRESSURE )
             {
+                if(!get_hold_undo())
+                    set_hold_undo(true);
+
                 (*i).decrement_data1();
             }
         }
@@ -1637,6 +1678,9 @@ sequence::change_event_data_range( long a_tick_s, long a_tick_f,
 
         if ( set )
         {
+            if(!get_hold_undo())
+                set_hold_undo(true);
+
             //float weight;
 
             /* no divide by 0 */
@@ -1736,6 +1780,9 @@ void sequence::change_event_data_lfo(double a_value, double a_range,
 
         if ( set )
         {
+            if(!get_hold_undo())
+                set_hold_undo(true);
+
             //float weight;
 
             /* no divide by 0 */
