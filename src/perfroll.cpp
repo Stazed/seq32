@@ -619,6 +619,27 @@ perfroll::on_button_release_event(GdkEventButton* a_ev)
 void
 perfroll::auto_scroll_horz()
 {
+    if(m_zoom >= c_perf_scale_x)
+    {
+        double progress = (double)m_mainperf->get_tick()/m_zoom/c_ppen;
+
+        int zoom_ratio = m_zoom/c_perf_scale_x;
+
+        progress *= zoom_ratio;
+
+        int offset = zoom_ratio;
+        if(zoom_ratio != 1)
+            offset *= -2;
+
+        double page_size_adjust = (m_hadjust->get_page_size()/zoom_ratio)/2;
+        double get_value_adjust = m_hadjust->get_value()*zoom_ratio;
+
+        if(progress > page_size_adjust || (get_value_adjust > progress))
+            m_hadjust->set_value(progress - page_size_adjust + offset);
+
+        return;
+    }
+
     long progress_tick = m_mainperf->get_tick();
     long tick_offset = m_4bar_offset * c_ppqn * 16;
 
@@ -637,7 +658,7 @@ perfroll::auto_scroll_horz()
         case 16:
             m_hadjust->set_value(left_tick / 2 );
             break;
-        case 32:
+/*        case 32:
             m_hadjust->set_value(left_tick );
             break;
         case 64:
@@ -645,7 +666,7 @@ perfroll::auto_scroll_horz()
             break;
         case 128:
             m_hadjust->set_value(left_tick * 4 );
-            break;
+            break;*/
         default:
             break;
         }
