@@ -435,7 +435,7 @@ perfedit::stop_playing()
 void
 perfedit::collapse()
 {
-    m_mainperf->push_trigger_undo();
+    m_mainperf->push_trigger_undo(-1); //  all tracks
     m_mainperf->move_triggers( false );
     m_perfroll->queue_draw();
 }
@@ -443,7 +443,7 @@ perfedit::collapse()
 void
 perfedit::copy()
 {
-    m_mainperf->push_trigger_undo();
+    m_mainperf->push_trigger_undo(-1); // all tracks
     m_mainperf->copy_triggers(  );
     m_perfroll->queue_draw();
 }
@@ -451,7 +451,7 @@ perfedit::copy()
 void
 perfedit::expand()
 {
-    m_mainperf->push_trigger_undo();
+    m_mainperf->push_trigger_undo(-1); // all tracks
     m_mainperf->move_triggers( true );
     m_perfroll->queue_draw();
 }

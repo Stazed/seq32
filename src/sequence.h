@@ -203,9 +203,6 @@ public:
     void pop_undo ();
     void pop_redo ();
 
-    bool have_trigger_undo;
-    bool have_trigger_redo;
-
     void push_trigger_undo ();
     void pop_trigger_undo ();
     void pop_trigger_redo ();

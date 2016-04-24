@@ -111,6 +111,10 @@ private:
 
     bool m_sequence_state[  c_max_sequence ];
 
+    /* used for undo/redo track number */
+    vector<int> undo_vect;
+    vector<int> redo_vect;
+
     /* our midibus */
     mastermidibus m_master_bus;
 
@@ -277,7 +281,7 @@ public:
     void move_triggers( bool a_direction );
     void copy_triggers(  );
 
-    void push_trigger_undo();
+    void push_trigger_undo(int a_track);
     void pop_trigger_undo();
     void pop_trigger_redo();
     void set_have_undo(bool a_undo);

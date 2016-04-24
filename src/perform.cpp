@@ -948,42 +948,65 @@ void perform::move_triggers( bool a_direction )
     }
 }
 
-void perform::push_trigger_undo()
+void perform::push_trigger_undo(int a_track)
 {
-    for (int i=0; i< c_max_sequence; i++ )
+    undo_vect.push_back(a_track);
+
+    if(a_track < 0) // -1 is all tracks
     {
-        if ( is_active(i) == true )
+        for (int i=0; i< c_max_sequence; i++ )
         {
-            assert( m_seqs[i] );
-            m_seqs[i]->push_trigger_undo( );
+            if ( is_active(i) == true )
+            {
+                assert( m_seqs[i] );
+                m_seqs[i]->push_trigger_undo( );
+            }
         }
     }
+    else
+    {
+        if ( is_active(a_track) == true )
+        {
+            assert( m_seqs[a_track] );
+            m_seqs[a_track]->push_trigger_undo( );
+        }
+    }
+
     set_have_undo(true);
 }
 
 void perform::pop_trigger_undo()
 {
-    int undo_count = 0;
-    int redo_count = 0;
-    for (int i=0; i< c_max_sequence; i++ )
+    int a_track = undo_vect[undo_vect.size()-1];
+    undo_vect.pop_back();
+    redo_vect.push_back(a_track);
+
+    if(a_track < 0)
     {
-        if ( is_active(i) == true )
+        for (int i=0; i< c_max_sequence; i++ )
         {
-            assert( m_seqs[i] );
-            m_seqs[i]->pop_trigger_undo( );
-            if(m_seqs[i]->have_trigger_undo > 0)
-                undo_count++;
-            if(m_seqs[i]->have_trigger_redo > 0)
-                redo_count++;
+            if ( is_active(i) == true )
+            {
+                assert( m_seqs[i] );
+                m_seqs[i]->pop_trigger_undo( );
+            }
+        }
+    }
+    else
+    {
+        if ( is_active(a_track) == true )
+        {
+            assert( m_seqs[a_track] );
+            m_seqs[a_track]->pop_trigger_undo( );
         }
     }
 
-    if(undo_count == 0)
+    if(undo_vect.size() == 0)
         set_have_undo(false);
     else
         set_have_undo(true);
 
-    if(redo_count == 0)
+    if(redo_vect.size() == 0)
         set_have_redo(false);
     else
         set_have_redo(true);
@@ -991,27 +1014,36 @@ void perform::pop_trigger_undo()
 
 void perform::pop_trigger_redo()
 {
-    int redo_count = 0;
-    int undo_count = 0;
-    for (int i=0; i< c_max_sequence; i++ )
+    int a_track = redo_vect[redo_vect.size()-1];
+    redo_vect.pop_back();
+    undo_vect.push_back(a_track);
+
+    if(a_track < 0)
     {
-        if ( is_active(i) == true )
+        for (int i=0; i< c_max_sequence; i++ )
         {
-            assert( m_seqs[i] );
-            m_seqs[i]->pop_trigger_redo( );
-            if(m_seqs[i]->have_trigger_redo > 0)
-                redo_count++;
-            if(m_seqs[i]->have_trigger_undo > 0)
-                undo_count++;
+            if ( is_active(i) == true )
+            {
+                assert( m_seqs[i] );
+                m_seqs[i]->pop_trigger_redo( );
+            }
+        }
+    }
+    else
+    {
+        if ( is_active(a_track) == true )
+        {
+            assert( m_seqs[a_track] );
+            m_seqs[a_track]->pop_trigger_redo( );
         }
     }
 
-    if(redo_count == 0)
+    if(redo_vect.size() == 0)
         set_have_redo(false);
     else
         set_have_redo(true);
 
-    if(undo_count == 0)
+    if(undo_vect.size() == 0)
         set_have_undo(false);
     else
         set_have_undo(true);

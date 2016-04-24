@@ -184,7 +184,7 @@ void FruityPerfInput::on_left_button_pressed(GdkEventButton* a_ev, perfroll& ths
                     // snap to length of sequence
                     tick = tick - (tick % seq_length);
 
-                    ths.m_mainperf->push_trigger_undo();
+                    ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
                     ths.m_mainperf->get_sequence( ths.m_drop_sequence )->add_trigger( tick, seq_length );
                     ths.draw_background_on( ths.m_pixmap, ths.m_drop_sequence );
                     ths.draw_sequence_on( ths.m_pixmap, ths.m_drop_sequence );
@@ -211,7 +211,7 @@ void FruityPerfInput::on_right_button_pressed(GdkEventButton* a_ev, perfroll& th
 
         if ( state )
         {
-            ths.m_mainperf->push_trigger_undo();
+            ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
             ths.m_mainperf->get_sequence( ths.m_drop_sequence )->del_trigger( tick );
         }
     }
@@ -275,7 +275,7 @@ bool FruityPerfInput::on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths
             if(ths.have_button_press)
             {
                 // this is necessary to ensure no push unless we have motion notify
-                ths.m_mainperf->push_trigger_undo();
+                ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
                 ths.have_button_press = false;
             }
 
@@ -359,7 +359,7 @@ bool Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 
                 if ( state )
                 {
-                    ths.m_mainperf->push_trigger_undo();
+                    ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
                     ths.m_mainperf->get_sequence( ths.m_drop_sequence )->del_trigger( tick );
                 }
                 else
@@ -368,7 +368,7 @@ bool Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
                     tick = tick - (tick % seq_length);
                     //m_adding_pressed_state = true;
 
-                    ths.m_mainperf->push_trigger_undo();
+                    ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
                     ths.m_mainperf->get_sequence( ths.m_drop_sequence )->add_trigger( tick, seq_length );
                     ths.draw_background_on( ths.m_pixmap, ths.m_drop_sequence );
                     ths.draw_sequence_on( ths.m_pixmap, ths.m_drop_sequence );
@@ -516,7 +516,7 @@ bool Seq24PerfInput::on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths)
             if(ths.have_button_press)
             {
                 // this is necessary to ensure no push unless we have motion notify
-                ths.m_mainperf->push_trigger_undo();
+                ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
                 ths.have_button_press = false;
             }
 

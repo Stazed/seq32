@@ -742,7 +742,7 @@ perfroll::on_key_press_event(GdkEventKey* a_p0)
         {
             if ( a_p0->keyval ==  GDK_Delete || a_p0->keyval == GDK_BackSpace )
             {
-                m_mainperf->push_trigger_undo();
+                m_mainperf->push_trigger_undo(m_drop_sequence);
                 m_mainperf->get_sequence( m_drop_sequence )->del_selected_trigger();
 
                 ret = true;
@@ -753,7 +753,7 @@ perfroll::on_key_press_event(GdkEventKey* a_p0)
                 /* cut */
                 if ( a_p0->keyval == GDK_x || a_p0->keyval == GDK_X )
                 {
-                    m_mainperf->push_trigger_undo();
+                    m_mainperf->push_trigger_undo(m_drop_sequence);
                     m_mainperf->get_sequence( m_drop_sequence )->cut_selected_trigger();
                     ret = true;
                 }
@@ -767,7 +767,7 @@ perfroll::on_key_press_event(GdkEventKey* a_p0)
                 /* paste */
                 if ( a_p0->keyval == GDK_v || a_p0->keyval == GDK_V )
                 {
-                    m_mainperf->push_trigger_undo();
+                    m_mainperf->push_trigger_undo(m_drop_sequence);
                     m_mainperf->get_sequence( m_drop_sequence )->paste_trigger();
                     ret = true;
                 }
@@ -860,7 +860,7 @@ perfroll::on_size_request(GtkRequisition* a_r )
 void
 perfroll::split_trigger( int a_sequence, long a_tick )
 {
-    m_mainperf->push_trigger_undo();
+    m_mainperf->push_trigger_undo(a_sequence);
     m_mainperf->get_sequence( a_sequence )->split_trigger( a_tick );
 
     draw_background_on( m_pixmap, a_sequence );

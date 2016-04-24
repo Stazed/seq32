@@ -65,9 +65,7 @@ sequence::sequence( ) :
     m_rec_vol(0),
 
     m_have_undo(false),
-    m_have_redo(false),
-    have_trigger_undo(false),
-    have_trigger_redo(false)
+    m_have_redo(false)
 {
     /* no notes are playing */
     for (int i=0; i< c_midi_notes; i++ )
@@ -184,7 +182,6 @@ sequence::push_trigger_undo()
         (*i).m_selected = false;
     }
 
-    have_trigger_undo = true;
     unlock();
 }
 
@@ -198,11 +195,7 @@ sequence::pop_trigger_undo()
         m_list_trigger_redo.push( m_list_trigger );
         m_list_trigger = m_list_trigger_undo.top();
         m_list_trigger_undo.pop();
-        have_trigger_redo = true;
     }
-
-    if (m_list_trigger_undo.size() == 0 )
-        have_trigger_undo = false;
 
     unlock();
 }
@@ -217,11 +210,7 @@ sequence::pop_trigger_redo()
         m_list_trigger_undo.push( m_list_trigger );
         m_list_trigger = m_list_trigger_redo.top();
         m_list_trigger_redo.pop();
-        have_trigger_undo = true;
     }
-
-    if (m_list_trigger_redo.size() == 0 )
-        have_trigger_redo = false;
 
     unlock();
 }
