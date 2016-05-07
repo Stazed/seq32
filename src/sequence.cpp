@@ -1637,6 +1637,9 @@ sequence::paste_selected( long a_tick, int a_note )
         for ( i = clipboard.begin(); i != clipboard.end(); i++ )
             if ( (*i).get_note( ) > highest_note ) highest_note = (*i).get_note();
 
+        if(a_note == 0) // for seqevent
+            a_note = highest_note;
+
         for ( i = clipboard.begin(); i != clipboard.end(); i++ )
         {
             (*i).set_note( (*i).get_note( ) - (highest_note - a_note) );
