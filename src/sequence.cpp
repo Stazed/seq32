@@ -1128,6 +1128,38 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
     return ret;
 }
 
+/* used with seqevent when selecting NOTEON/NOTEOFF- will
+select opposite linked event */
+int
+sequence::select_linked (long a_tick_s, long a_tick_f, unsigned char a_status)
+{
+    int ret = 0;
+    list<event>::iterator i;
+
+    lock();
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if( (*i).get_status()    == a_status &&
+                (*i).get_timestamp() >= a_tick_s &&
+                (*i).get_timestamp() <= a_tick_f )
+        {
+            if((*i).is_linked())
+            {
+                if((*i).is_selected())
+                    (*i).get_linked()->select();
+                else
+                    (*i).get_linked()->unselect();
+
+                ret++;
+            }
+        }
+    }
+    unlock();
+
+    return ret;
+}
+
 /* select events in range, returns number
    selected */
 int

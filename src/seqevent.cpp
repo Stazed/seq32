@@ -1005,7 +1005,7 @@ bool FruitySeqEventInput::on_button_release_event(GdkEventButton* a_ev, seqevent
         }
     }
 
-    if ( a_ev->button == 3 || a_ev->button == 1 )
+    if ( a_ev->button == 3 || (a_ev->button == 1  && a_ev->state & GDK_CONTROL_MASK))
     {
         if ( ths.m_selecting )
         {
@@ -1017,6 +1017,12 @@ bool FruitySeqEventInput::on_button_release_event(GdkEventButton* a_ev, seqevent
             ths.m_seq->select_events( tick_s, tick_f,
                                       ths.m_status,
                                       ths.m_cc, sequence::e_toggle_selection );
+
+            if(ths.m_status == EVENT_NOTE_ON || ths.m_status == EVENT_NOTE_OFF)
+            {
+                ths.m_seq->select_linked( tick_s, tick_f, ths.m_status);
+                ths.m_seq->set_dirty();
+            }
         }
     }
 
@@ -1270,6 +1276,12 @@ bool Seq24SeqEventInput::on_button_release_event(GdkEventButton* a_ev, seqevent&
             ths.m_seq->select_events( tick_s, tick_f,
                                       ths.m_status,
                                       ths.m_cc, sequence::e_select );
+
+            if(ths.m_status == EVENT_NOTE_ON || ths.m_status == EVENT_NOTE_OFF)
+            {
+                ths.m_seq->select_linked( tick_s, tick_f, ths.m_status);
+                ths.m_seq->set_dirty();
+            }
         }
 
         if ( ths.m_moving )
