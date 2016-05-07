@@ -981,6 +981,12 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
 
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
     {
+        if((*i).get_status() != EVENT_NOTE_ON && (*i).get_status() != EVENT_NOTE_OFF )
+            continue;   // necessary since channel pressure and control change use d0 for
+                        // seqdata (which is returned by get_note()). This causes seqroll
+                        // note selection to occasionally select them when their seqdata values
+                        // are within the range of tick selection. So only, note ons and offs.
+
         if( (*i).get_note() <= a_note_h &&  (*i).get_note() >= a_note_l )
         {
             if ( (*i).is_linked() )
@@ -1063,7 +1069,7 @@ sequence::select_note_events( long a_tick_s, int a_note_h,
                     }
                 }
             }
-            else
+            else // else NOT linked note on/off, i.e. junk...
             {
                 tick_s = tick_f = (*i).get_timestamp();
                 if ( tick_s  >= a_tick_s - 16 && tick_f <= a_tick_f)
