@@ -2,6 +2,7 @@
 
 EXTRA_DIST += \
 	src/bus.xpm \
+  src/chord.xpm \
   src/collapse.xpm \
   src/copy.xpm \
   src/down.xpm \
