@@ -27,7 +27,8 @@ seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust):
     m_black(Gdk::Color("black")),
     m_white(Gdk::Color("white")),
     m_grey(Gdk::Color("grey")),
-    m_red(Gdk::Color("orange")),
+    m_blue(Gdk::Color("blue")),
+    m_red(Gdk::Color("red")),
 
     m_seq(a_seq),
 
@@ -47,12 +48,13 @@ seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust):
                 Gdk::LEAVE_NOTIFY_MASK |
                 Gdk::SCROLL_MASK );
 
-    // in the construor you can only allocate colors,
-    // get_window() returns 0 because we have not be realized
+    // in the constructor you can only allocate colors,
+    // get_window() returns 0 because we have not been realized
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
     colormap->alloc_color( m_black );
     colormap->alloc_color( m_white );
     colormap->alloc_color( m_grey );
+    colormap->alloc_color( m_blue );
     colormap->alloc_color( m_red );
 
     set_flags(Gtk::CAN_FOCUS );
@@ -66,7 +68,7 @@ seqdata::update_sizes()
 {
     if( is_realized() )
     {
-        /* create pixmaps with window dimentions */
+        /* create pixmaps with window dimensions */
 
         m_pixmap = Gdk::Pixmap::create( m_window,
                                         m_window_x,
@@ -230,7 +232,7 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
             if(selected)
                 m_gc->set_foreground( m_red );
             else
-                m_gc->set_foreground( m_black );
+                m_gc->set_foreground( m_blue );
 
             /* turn into screen corrids */
             event_x = tick / m_zoom;
@@ -320,7 +322,7 @@ seqdata::on_expose_event(GdkEventExpose* a_e)
     return true;
 }
 
-/* takes screen corrdinates, give us notes and ticks */
+/* takes screen coordinates, give us notes and ticks */
 void
 seqdata::convert_x( int a_x, long *a_tick )
 {
@@ -529,7 +531,6 @@ seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 bool
 seqdata::on_leave_notify_event(GdkEventCrossing* p0)
 {
-    // m_dragging = false;
     if(m_seq->get_hold_undo())
     {
         m_seq->push_undo(true);

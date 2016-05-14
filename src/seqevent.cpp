@@ -25,10 +25,10 @@ seqevent::seqevent(sequence *a_seq,
                    int a_snap,
                    seqdata *a_seqdata_wid,
                    Gtk::Adjustment   *a_hadjust):
-    m_black(Gdk::Color("black")),
+    m_dk_blue(Gdk::Color("dark blue")),   // event box outline
     m_white(Gdk::Color("white")),
     m_grey(Gdk::Color("grey")),
-    m_red(Gdk::Color("orange")),
+    m_red(Gdk::Color("red")),             // selected event, selection box
 
     m_hadjust(a_hadjust),
 
@@ -51,7 +51,7 @@ seqevent::seqevent(sequence *a_seq,
     m_status(EVENT_NOTE_ON)
 {
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-    colormap->alloc_color( m_black );
+    colormap->alloc_color( m_dk_blue );
     colormap->alloc_color( m_white );
     colormap->alloc_color( m_grey );
     colormap->alloc_color( m_red );
@@ -202,7 +202,7 @@ seqevent::draw_background()
         if ( i % ticks_per_m_line == 0 )
         {
             /* solid line on every beat */
-            m_gc->set_foreground(m_black);
+            m_gc->set_foreground(m_dk_blue);
             m_gc->set_line_attributes( 1,
                                        Gdk::LINE_SOLID,
                                        Gdk::CAP_NOT_LAST,
@@ -240,7 +240,7 @@ seqevent::draw_background()
                                Gdk::CAP_NOT_LAST,
                                Gdk::JOIN_MITER );
 
-    m_gc->set_foreground(m_black);
+    m_gc->set_foreground(m_dk_blue);
     m_pixmap->draw_rectangle(m_gc,false,
                              -1,
                              0,
@@ -296,7 +296,7 @@ seqevent::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
     bool selected;
 
     /* draw boxes from sequence */
-    m_gc->set_foreground( m_black );
+    m_gc->set_foreground( m_dk_blue );
 
     int start_tick = m_scroll_offset_ticks ;
     int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
@@ -312,7 +312,7 @@ seqevent::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
             /* turn into screen corrids */
             x = tick / m_zoom;
 
-            m_gc->set_foreground(m_black);
+            m_gc->set_foreground(m_dk_blue);
 
             a_draw->draw_rectangle(m_gc,true,
                                    x -  m_scroll_offset_x,
@@ -406,7 +406,7 @@ seqevent::draw_selection_on_window()
         m_old.x = x;
         m_old.width = w;
 
-        m_gc->set_foreground(m_black);
+        m_gc->set_foreground(m_dk_blue);
         m_window->draw_rectangle(m_gc,false,
                                  x,
                                  y,
@@ -421,7 +421,7 @@ seqevent::draw_selection_on_window()
         x = m_selected.x + delta_x;
         x -= m_scroll_offset_x;
 
-        m_gc->set_foreground(m_black);
+        m_gc->set_foreground(m_dk_blue);
         m_window->draw_rectangle(m_gc,false,
                                  x,
                                  y,

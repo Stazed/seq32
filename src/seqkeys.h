@@ -46,7 +46,7 @@ private:
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
-    Gdk::Color    m_black, m_white, m_grey;
+    Gdk::Color    m_black, m_white, m_red;
 
     Glib::RefPtr<Gdk::Pixmap> m_pixmap;
 
@@ -99,7 +99,7 @@ public:
     void set_listen_button_release(GdkEventButton* a_ev);
     void set_listen_motion_notify(GdkEventMotion* a_p0);
 
-    /* sets key to grey */
+    /* sets key to red */
     void set_hint_key( int a_key );
 
     /* true == on, false == off */
