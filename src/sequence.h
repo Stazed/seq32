@@ -381,6 +381,11 @@ public:
 
     int select_linked (long a_tick_s, long a_tick_f, unsigned char a_status);
 
+    int select_event_handle( long a_tick_s, long a_tick_f,
+                         unsigned char a_status,
+                         unsigned char a_cc, int a_data_s);
+
+
     int get_num_selected_notes ();
     int get_num_selected_events (unsigned char a_status, unsigned char a_cc);
 
@@ -433,6 +438,8 @@ public:
     void decrement_selected (unsigned char a_status, unsigned char a_control);
 
     void randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus );
+
+    void adjust_data_handle( unsigned char a_status, int a_data );
 
     /* moves note off event */
     void grow_selected (long a_delta_tick);

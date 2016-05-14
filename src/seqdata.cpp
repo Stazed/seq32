@@ -38,7 +38,8 @@ seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust):
     m_scroll_offset_ticks(0),
     m_scroll_offset_x(0),
 
-    m_dragging(false)
+    m_dragging(false),
+    m_drag_handle(false)
 {
     add_events( Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
@@ -256,12 +257,13 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
                               event_x -  m_scroll_offset_x + 1,
                               c_dataarea_y );
 
-            /* draw caps */
+            /* draw handle */
             a_draw->draw_rectangle(m_gc,
                               true,
                               event_x -  m_scroll_offset_x - 3,
                               c_dataarea_y - event_height ,
-                              8,4);
+                              c_data_handle_x,
+                              c_data_handle_y);
 
             /* draw numbers */
             a_draw->draw_drawable(m_gc,
@@ -361,13 +363,27 @@ seqdata::on_button_press_event(GdkEventButton* a_p0)
         m_drop_x = (int) a_p0->x + m_scroll_offset_x;
         m_drop_y = (int) a_p0->y;
 
+        /* if they select the handle */
+        long tick_s, tick_f;
+
+        convert_x( m_drop_x - 3, &tick_s );
+        convert_x( m_drop_x + 3, &tick_f );
+
+        m_drag_handle = m_seq->select_event_handle(tick_s, tick_f,
+                                              m_status, m_cc,
+                                              c_dataarea_y - m_drop_y +3);
+
+        if(m_drag_handle)
+            if(!m_seq->get_hold_undo()) // if they used line draw but did not leave...
+                m_seq->push_undo();
+
         /* reset box that holds dirty redraw spot */
         m_old.x = 0;
         m_old.y = 0;
         m_old.width = 0;
         m_old.height = 0;
 
-        m_dragging = true;
+        m_dragging = !m_drag_handle;
     }
 
     return true;
@@ -400,6 +416,13 @@ seqdata::on_button_release_event(GdkEventButton* a_p0)
 
         /* convert x,y to ticks, then set events in range */
         m_dragging = false;
+    }
+
+    if(m_drag_handle)
+    {
+        m_drag_handle = false;
+        m_seq->unselect();
+        m_seq->set_dirty();
     }
 
     update_pixmap();
@@ -444,6 +467,20 @@ seqdata::xy_to_rect(  int a_x1,  int a_y1,
 bool
 seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 {
+    if(m_drag_handle)
+    {
+        m_current_y = (int) a_p0->y - 3;
+
+        m_current_y = c_dataarea_y - m_current_y;
+        if(m_current_y < 0 )
+            m_current_y = 0;
+
+        m_seq->adjust_data_handle(m_status, m_current_y );
+
+        update_pixmap();
+        draw_events_on( m_window );
+    }
+
     if ( m_dragging )
     {
         m_current_x = (int) a_p0->x + m_scroll_offset_x;

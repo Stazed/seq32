@@ -1166,6 +1166,130 @@ sequence::select_linked (long a_tick_s, long a_tick_f, unsigned char a_status)
     return ret;
 }
 
+int
+sequence::select_event_handle( long a_tick_s, long a_tick_f,
+                         unsigned char a_status,
+                         unsigned char a_cc, int a_data_s)
+{
+    /* use selected note ons if any */
+    bool have_selection = false;
+
+    int ret=0;
+    list<event>::iterator i;
+
+    lock();
+
+    if(a_status == EVENT_NOTE_ON)
+        if( get_num_selected_events(a_status, a_cc) )
+            have_selection = true;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if( (*i).get_status()    == a_status &&
+                (*i).get_timestamp() >= a_tick_s &&
+                (*i).get_timestamp() <= a_tick_f )
+        {
+            unsigned char d0,d1;
+            (*i).get_data( &d0, &d1 );
+
+            //printf("a_data_s [%d]: d0 [%d]: d1 [%d] \n", a_data_s, d0, d1);
+
+            if ( a_status == EVENT_CONTROL_CHANGE && d0 == a_cc )
+            {
+                if(d1 <= (a_data_s + 2) && d1 >= (a_data_s - 2) )  // is it in range
+                {
+                    unselect();
+                    (*i).select( );
+                    ret++;
+                    break;
+                }
+            }
+
+            if(a_status != EVENT_CONTROL_CHANGE )
+            {
+                if(a_status == EVENT_NOTE_ON || a_status == EVENT_NOTE_OFF
+                   || a_status == EVENT_AFTERTOUCH || a_status == EVENT_PITCH_WHEEL )
+                {
+                    if(d1 <= (a_data_s + 2) && d1 >= (a_data_s - 2) ) // is it in range
+                    {
+                        if( have_selection)       // note on only
+                        {
+                            if((*i).is_selected())
+                            {
+                                unselect();       // all events
+                                (*i).select( );   // only this one
+                                if(ret)           // if we have a marked (unselected) one then clear it
+                                {
+                                    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+                                    {
+                                        if((*i).is_marked())
+                                        {
+                                            (*i).unmark();
+                                            break;
+                                        }
+                                    }
+                                    ret--;        // clear the marked one
+                                    have_selection = false; // reset for marked flag at end
+                                }
+                                ret++;            // for the selected one
+                                break;
+                            }
+                            else                  // NOT selected note on, but in range
+                            {
+                                if(!ret)          // only mark the first one
+                                {
+                                    (*i).mark( ); // marked for hold until done
+                                    ret++;        // indicate we got one
+                                }
+                                continue;         // keep going until we find a selected one if any, or are done
+                            }
+                        }
+                        else                      // NOT note on
+                        {
+                            unselect();
+                            (*i).select( );
+                            ret++;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    if(d0 <= (a_data_s + 2) && d0 >= (a_data_s - 2) )  // is it in range
+                    {
+                        unselect();
+                        (*i).select( );
+                        ret++;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /* is it a note on that is unselected but in range? - then use it...
+     have_selection will be set to false if we found a selected one in range  */
+    if(ret && have_selection)
+    {
+        for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+        {
+            if((*i).is_marked())
+            {
+                unselect();
+                (*i).unmark();
+                (*i).select();
+                break;
+            }
+        }
+    }
+
+    set_dirty();
+
+    unlock();
+
+    return ret;
+}
+
 /* select events in range, returns number
    selected */
 int
@@ -1578,6 +1702,59 @@ sequence::randomize_selected( unsigned char a_status, unsigned char a_control, i
             // See http://c-faq.com/lib/randrange.html
             random = (rand() / (RAND_MAX / ((2 * a_plus_minus) + 1) + 1)) - a_plus_minus;
             data_item += random;
+            if(data_item > 127)
+            {
+                data_item = 127;
+            }
+            else if(data_item < 0)
+            {
+                data_item = 0;
+            }
+
+            data[data_idx] = data_item;
+
+            (*i).set_data(data[0], data[1]);
+        }
+    }
+
+    unlock();
+}
+
+void
+sequence::adjust_data_handle( unsigned char a_status, int a_data )
+{
+    unsigned char data[2];
+    unsigned char data_item;;
+    int data_idx = 0;
+
+    lock();
+
+    list<event>::iterator i;
+
+    for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
+    {
+        if ( (*i).is_selected() &&
+                (*i).get_status() == a_status )
+        {
+            (*i).get_data( data, data+1 );
+
+            if ( a_status == EVENT_NOTE_ON ||
+                    a_status == EVENT_NOTE_OFF ||
+                    a_status == EVENT_AFTERTOUCH ||
+                    a_status == EVENT_CONTROL_CHANGE ||
+                    a_status == EVENT_PITCH_WHEEL )
+            {
+                data_idx = 1;
+            }
+
+            if ( a_status == EVENT_PROGRAM_CHANGE ||
+                    a_status == EVENT_CHANNEL_PRESSURE )
+            {
+                data_idx = 0;
+            }
+
+            data_item = a_data;
+
             if(data_item > 127)
             {
                 data_item = 127;
