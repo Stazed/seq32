@@ -19,6 +19,7 @@
 //-----------------------------------------------------------------------------
 
 #include "perform.h"
+#include "mainwnd.h"
 #include "midibus.h"
 #include "event.h"
 #include <stdio.h>
@@ -1222,6 +1223,9 @@ void perform::inner_start(bool a_state)
             off_sequences();
 
         global_is_running = true;
+
+        set_insensitive_menu_and_song(true);
+
         m_condition_var.signal();
     }
 
@@ -1234,6 +1238,7 @@ void perform::inner_stop()
     global_is_running = false;
     reset_sequences();
     m_usemidiclock = false;
+    set_insensitive_menu_and_song(false);
 }
 
 void perform::off_sequences()
