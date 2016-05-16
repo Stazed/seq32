@@ -404,7 +404,8 @@ mainwnd::set_menu_sensitive(bool a_running)
 void
 mainwnd::set_menu_mode()
 {
-    m_menubar->set_sensitive(!m_button_menu->get_active());
+    if(!global_is_running)
+        m_menubar->set_sensitive(!m_button_menu->get_active());
 }
 
 void
