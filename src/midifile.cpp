@@ -838,7 +838,7 @@ bool midifile::write_song (perform * a_perf)
         {
             /* all track triggers */
             sequence * seq = NULL;
-            trigger *a_trig;
+            trigger *a_trig = NULL;
 
             seq = a_perf->get_sequence(curTrack);
 
@@ -865,8 +865,8 @@ bool midifile::write_song (perform * a_perf)
             for (int i = 0; i < vect_size; i++)
             {
                 a_trig = &trig_vect[i]; // get the trigger
-
-                prev_timestamp = seq->song_fill_list_seq_event(&l,a_trig,prev_timestamp); // put events on list
+                if(a_trig != NULL)
+                    prev_timestamp = seq->song_fill_list_seq_event(&l,a_trig,prev_timestamp); // put events on list
             }
 
             total_seq_length = trig_vect[vect_size-1].m_tick_end;
@@ -882,7 +882,8 @@ bool midifile::write_song (perform * a_perf)
                 can be used in other projects, this method is very convenient. The common items can
                 be kept in one file and exported all, individually, or in part by creating triggers and muting.
             */
-            seq->song_fill_list_seq_trigger(&l,a_trig,total_seq_length,prev_timestamp); // the big sequence trigger
+            if(a_trig != NULL)
+                seq->song_fill_list_seq_trigger(&l,a_trig,total_seq_length,prev_timestamp); // the big sequence trigger
 
             /* magic number 'MTrk' */
             write_long (0x4D54726B);
