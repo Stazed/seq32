@@ -34,8 +34,8 @@
 #include "pixmaps/learn.xpm"
 #include "pixmaps/learn2.xpm"
 #include "pixmaps/perfedit.xpm"
-#include "pixmaps/seq24.xpm"
-#include "pixmaps/seq24_32.xpm"
+#include "pixmaps/seq32.xpm"
+#include "pixmaps/seq32_32.xpm"
 #include "pixmaps/menu.xpm"
 
 bool global_is_running = false;
@@ -65,7 +65,7 @@ mainwnd::mainwnd(perform *a_p):
     m_mainperf(a_p),
     m_options(NULL)
 {
-    set_icon(Gdk::Pixbuf::create_from_xpm_data(seq24_32_xpm));
+    set_icon(Gdk::Pixbuf::create_from_xpm_data(seq32_32_xpm));
 
     /* register for notification */
     m_mainperf->m_notify.push_back( this );
@@ -143,7 +143,7 @@ mainwnd::mainwnd(perform *a_p):
     /* top line items */
     HBox *tophbox = manage( new HBox( false, 0 ) );
     tophbox->pack_start(*manage(new Image(
-                                    Gdk::Pixbuf::create_from_xpm_data(seq24_xpm))),
+                                    Gdk::Pixbuf::create_from_xpm_data(seq32_xpm))),
                         false, false);
 
     m_button_mode = manage( new ToggleButton( "song mode" ) );
