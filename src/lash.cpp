@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ lash::lash(int *argc, char ***argv)
     else
     {
         lash_event_t* event = lash_event_new_with_type(LASH_Client_Name);
-        lash_event_set_string(event, "Seq24");
+        lash_event_set_string(event, "Seq32");
         lash_send_event(m_client, event);
         printf("[Connected to LASH]\n");
     }
@@ -93,13 +93,13 @@ lash::handle_event(lash_event_t* ev)
 
     if (type == LASH_Save_File)
     {
-        midifile f(str + "/seq24.mid");
+        midifile f(str + "/seq32.mid");
         f.write(m_perform);
         lash_send_event(m_client, lash_event_new_with_type(LASH_Save_File));
     }
     else if (type == LASH_Restore_File)
     {
-        midifile f(str + "/seq24.mid");
+        midifile f(str + "/seq32.mid");
         f.parse(m_perform, 0);
         lash_send_event(m_client, lash_event_new_with_type(LASH_Restore_File));
     }

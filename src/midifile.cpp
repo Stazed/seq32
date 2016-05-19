@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -372,7 +372,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                         case 0x58:    /* Time Signature  bp_measure / bw */
                             /*
                                 If the midi file contains both proprietary (c_timesig)
-                                and Midi type 0x58 then it came from seq42 or seq24 (Stazed versions).
+                                and Midi type 0x58 then it came from seq42 or seq32 (Stazed versions).
                                 In this case the Midi type is parsed first (because it is listed first)
                                 then it gets overwritten by the proprietary, above.
                             */
@@ -434,7 +434,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
 
                             // If delta is 0, then another event happened at the same time
                             // as the track end.  the sequence class will discard the last
-                            // note.  This is a fix for that.   Native Seq24 file will always
+                            // note.  This is a fix for that.   Native Seq32 file will always
                             // have a Delta >= 1
                             if ( Delta == 0 )
                             {
@@ -872,7 +872,7 @@ bool midifile::write_song (perform * a_perf)
             total_seq_length = trig_vect[vect_size-1].m_tick_end;
 
             /*
-                The sequence trigger is NOT part of the standard midi format and is proprietary to seq24.
+                The sequence trigger is NOT part of the standard midi format and is proprietary to seq32.
                 It is added here because the trigger combining has an alternative benefit for editing.
                 The user can split, slice and rearrange triggers to form a new sequence. Then mute all
                 other tracks and export to a temporary midi file. Now they can import the combined

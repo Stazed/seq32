@@ -316,7 +316,7 @@ bool FruityPerfInput::on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths
 }
 
 /* popup menu calls this */
-void Seq24PerfInput::set_adding( bool a_adding, perfroll& ths )
+void Seq32PerfInput::set_adding( bool a_adding, perfroll& ths )
 {
     if ( a_adding )
     {
@@ -330,7 +330,7 @@ void Seq24PerfInput::set_adding( bool a_adding, perfroll& ths )
     }
 }
 
-bool Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
+bool Seq32PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 {
     ths.grab_focus( );
 
@@ -467,7 +467,7 @@ bool Seq24PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
     return true;
 }
 
-bool Seq24PerfInput::on_button_release_event(GdkEventButton* a_ev, perfroll& ths)
+bool Seq32PerfInput::on_button_release_event(GdkEventButton* a_ev, perfroll& ths)
 {
     if ( a_ev->button == 1 )
     {
@@ -497,7 +497,7 @@ bool Seq24PerfInput::on_button_release_event(GdkEventButton* a_ev, perfroll& ths
     return true;
 }
 
-bool Seq24PerfInput::on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths)
+bool Seq32PerfInput::on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths)
 {
     long tick;
     int x = (int) a_ev->x;

@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ private:
 
     void transport_callback( button a_type, Button *a_button );
 
-    void mouse_seq24_callback(Gtk::RadioButton*);
+    void mouse_seq32_callback(Gtk::RadioButton*);
     void mouse_fruity_callback(Gtk::RadioButton*);
 
     /*notebook pages*/

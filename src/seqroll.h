@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -66,9 +66,9 @@ struct FruitySeqRollInput
     long m_drag_paste_start_pos[2];
 };
 
-struct Seq24SeqRollInput
+struct Seq32SeqRollInput
 {
-    Seq24SeqRollInput() : m_adding( false )
+    Seq32SeqRollInput() : m_adding( false )
     {}
     bool on_button_press_event(GdkEventButton* a_ev, seqroll& ths);
     bool on_button_release_event(GdkEventButton* a_ev, seqroll& ths);
@@ -85,8 +85,8 @@ private:
     friend struct FruitySeqRollInput;
     FruitySeqRollInput m_fruity_interaction;
 
-    friend struct Seq24SeqRollInput;
-    Seq24SeqRollInput m_seq24_interaction;
+    friend struct Seq32SeqRollInput;
+    Seq32SeqRollInput m_seq32_interaction;
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;

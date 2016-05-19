@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -171,7 +171,7 @@ options::add_midi_input_page()
 }
 
 /*Keyboard page*/
-/*Keybinding setup (editor for .seq24rc keybindings).*/
+/*Keybinding setup (editor for .seq32rc keybindings).*/
 void
 options::add_keyboard_page()
 {
@@ -381,15 +381,15 @@ options::add_mouse_page()
     interactionbox->set_border_width(4);
     interactionframe->add(*interactionbox);
 
-    Gtk::RadioButton *rb_seq24 = manage(new RadioButton(
-                                            "se_q24 (original style)", true));
-    interactionbox->pack_start(*rb_seq24, Gtk::PACK_SHRINK);
+    Gtk::RadioButton *rb_seq32 = manage(new RadioButton(
+                                            "se_q32 (original style)", true));
+    interactionbox->pack_start(*rb_seq32, Gtk::PACK_SHRINK);
 
     Gtk::RadioButton * rb_fruity = manage(new RadioButton(
             "_fruity (similar to a certain well known sequencer)", true));
     interactionbox->pack_start(*rb_fruity, Gtk::PACK_SHRINK);
 
-    Gtk::RadioButton::Group group = rb_seq24->get_group();
+    Gtk::RadioButton::Group group = rb_seq32->get_group();
     rb_fruity->set_group(group);
 
     switch(global_interactionmethod)
@@ -398,14 +398,14 @@ options::add_mouse_page()
         rb_fruity->set_active();
         break;
 
-    case e_seq24_interaction:
+    case e_seq32_interaction:
     default:
-        rb_seq24->set_active();
+        rb_seq32->set_active();
         break;
     }
 
-    rb_seq24->signal_toggled().connect(sigc::bind(mem_fun(*this,
-                                       &options::mouse_seq24_callback), rb_seq24));
+    rb_seq32->signal_toggled().connect(sigc::bind(mem_fun(*this,
+                                       &options::mouse_seq32_callback), rb_seq32));
 
     rb_fruity->signal_toggled().connect(sigc::bind(mem_fun(*this,
                                         &options::mouse_fruity_callback), rb_fruity));
@@ -439,7 +439,7 @@ options::add_jack_sync_page()
 
     check = manage(new CheckButton("Trans_port Master", true));
     check->set_active (global_with_jack_master);
-    add_tooltip( check, "Seq24 will attempt to serve as JACK Master.");
+    add_tooltip( check, "Seq32 will attempt to serve as JACK Master.");
     check->signal_toggled().connect(bind(mem_fun(*this,
                                          &options::transport_callback), e_jack_master, check));
 
@@ -448,7 +448,7 @@ options::add_jack_sync_page()
     check = manage (new CheckButton ("Master C_onditional", true));
     check->set_active (global_with_jack_master_cond);
     add_tooltip( check,
-                 "Seq24 will fail to be master if there is already a master set.");
+                 "Seq32 will fail to be master if there is already a master set.");
     check->signal_toggled().connect(bind(mem_fun(*this,
                                          &options::transport_callback), e_jack_master_cond, check));
 
@@ -503,10 +503,10 @@ options::input_callback (int a_bus, Button * i_button)
 }
 
 void
-options::mouse_seq24_callback(Gtk::RadioButton *btn)
+options::mouse_seq32_callback(Gtk::RadioButton *btn)
 {
     if (btn->get_active())
-        global_interactionmethod = e_seq24_interaction;
+        global_interactionmethod = e_seq32_interaction;
 }
 
 void

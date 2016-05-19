@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -60,9 +60,9 @@ struct FruitySeqEventInput
     bool on_motion_notify_event(GdkEventMotion* a_ev, seqevent& ths);
     void updateMousePtr(seqevent& ths);
 };
-struct Seq24SeqEventInput
+struct Seq32SeqEventInput
 {
-    Seq24SeqEventInput() : m_adding( false ) {}
+    Seq32SeqEventInput() : m_adding( false ) {}
     bool on_button_press_event(GdkEventButton* a_ev, seqevent& ths);
     bool on_button_release_event(GdkEventButton* a_ev, seqevent& ths);
     bool on_motion_notify_event(GdkEventMotion* a_ev, seqevent& ths);
@@ -78,8 +78,8 @@ private:
     friend struct FruitySeqEventInput;
     FruitySeqEventInput m_fruity_interaction;
 
-    friend struct Seq24SeqEventInput;
-    Seq24SeqEventInput m_seq24_interaction;
+    friend struct Seq32SeqEventInput;
+    Seq32SeqEventInput m_seq32_interaction;
 
     Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;

@@ -1,4 +1,4 @@
-# Makefile.am for seq24
+# Makefile.am for seq32
 
 EXTRA_DIST += \
 	src/bus.xpm \
@@ -28,8 +28,8 @@ EXTRA_DIST += \
   src/rec.xpm \
   src/redo.xpm \
   src/scale.xpm \
-  src/seq24_32.xpm \
-  src/seq24.xpm \
+  src/seq32_32.xpm \
+  src/seq32.xpm \
   src/seq-editor.xpm \
   src/sequences.xpm \
   src/snap.xpm \

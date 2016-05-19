@@ -1,19 +1,19 @@
 
 
 /* Name of package */
-#define PACKAGE "seq24"
+#define PACKAGE "seq32"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "seq24-devel@lists.sourceforge.net"
+#define PACKAGE_BUGREPORT "seq32-devel@lists.sourceforge.net"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "seq24"
+#define PACKAGE_NAME "seq32"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "seq24 0.0.0"
+#define PACKAGE_STRING "seq32 0.0.0"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "seq24"
+#define PACKAGE_TARNAME "seq32"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "0.0.0"

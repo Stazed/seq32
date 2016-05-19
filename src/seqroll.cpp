@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free So%ftware Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -989,8 +989,8 @@ seqroll::on_button_press_event(GdkEventButton* a_ev)
     case e_fruity_interaction:
         result = m_fruity_interaction.on_button_press_event(a_ev, *this);
         break;
-    case e_seq24_interaction:
-        result = m_seq24_interaction.on_button_press_event(a_ev, *this);
+    case e_seq32_interaction:
+        result = m_seq32_interaction.on_button_press_event(a_ev, *this);
         break;
     default:
         result = false;
@@ -1008,8 +1008,8 @@ seqroll::on_button_release_event(GdkEventButton* a_ev)
     case e_fruity_interaction:
         result = m_fruity_interaction.on_button_release_event(a_ev, *this);
         break;
-    case e_seq24_interaction:
-        result = m_seq24_interaction.on_button_release_event(a_ev, *this);
+    case e_seq32_interaction:
+        result = m_seq32_interaction.on_button_release_event(a_ev, *this);
         break;
     default:
         result = false;
@@ -1031,8 +1031,8 @@ seqroll::on_motion_notify_event(GdkEventMotion* a_ev)
     case e_fruity_interaction:
         result = m_fruity_interaction.on_motion_notify_event(a_ev, *this);
         break;
-    case e_seq24_interaction:
-        result = m_seq24_interaction.on_motion_notify_event(a_ev, *this);
+    case e_seq32_interaction:
+        result = m_seq32_interaction.on_motion_notify_event(a_ev, *this);
         break;
     default:
         result = false;
@@ -1924,7 +1924,7 @@ bool FruitySeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& t
 
 /* popup menu calls this */
 void
-Seq24SeqRollInput::set_adding( bool a_adding, seqroll& ths )
+Seq32SeqRollInput::set_adding( bool a_adding, seqroll& ths )
 {
     if ( a_adding )
     {
@@ -1938,7 +1938,7 @@ Seq24SeqRollInput::set_adding( bool a_adding, seqroll& ths )
     }
 }
 
-bool Seq24SeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths)
+bool Seq32SeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths)
 {
     int numsel;
 
@@ -2131,7 +2131,7 @@ bool Seq24SeqRollInput::on_button_press_event(GdkEventButton* a_ev, seqroll& ths
     return true;
 }
 
-bool Seq24SeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& ths)
+bool Seq32SeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& ths)
 {
     ths.m_seqkeys_wid->set_listen_button_release(a_ev); // play note off
 
@@ -2238,7 +2238,7 @@ bool Seq24SeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& t
     return true;
 }
 
-bool Seq24SeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& ths)
+bool Seq32SeqRollInput::on_motion_notify_event(GdkEventMotion* a_ev, seqroll& ths)
 {
     ths.m_current_x = (int) (a_ev->x  + ths.m_scroll_offset_x );
     ths.m_current_y = (int) (a_ev->y  + ths.m_scroll_offset_y );

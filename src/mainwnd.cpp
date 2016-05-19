@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ mainwnd::mainwnd(perform *a_p):
                                             Gtk::AccelKey("<control>S"),
                                             mem_fun(*this, &mainwnd::file_save)));
     m_menu_file->items().push_back(MenuElem("Save _as...",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_seq24_midi)));
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_seq32_midi)));
 
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("O_ptions...",
@@ -554,7 +554,7 @@ void mainwnd::file_save_as( int type )
                 return;
         }
 
-        if(type == c_seq24_midi)
+        if(type == c_seq32_midi)
         {
             global_filename = fname;
             update_window_title();
@@ -1125,7 +1125,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
                    << "\" (code = "
                    << a_ev->keyval
                    << ") is not one of the configured mute-group keys.\n"
-                   << "To change this see File/Options menu or .seq24rc";
+                   << "To change this see File/Options menu or .seq32rc";
 
                 Gtk::MessageDialog dialog(*this,
                                           "MIDI mute group learn failed", false,

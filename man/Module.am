@@ -1,4 +1,4 @@
-# Makefile.am for seq24
+# Makefile.am for seq32
 
-dist_man_MANS = man/seq24.1
+dist_man_MANS = man/seq32.1
 

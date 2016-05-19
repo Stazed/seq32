@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------
 //
-//  This file is part of seq24.
+//  This file is part of seq32.
 //
-//  seq24 is free software; you can redistribute it and/or modify
+//  seq32 is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  seq24 is distributed in the hope that it will be useful,
+//  seq32 is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with seq24; if not, write to the Free Software
+//  along with seq32; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //-----------------------------------------------------------------------------
@@ -73,10 +73,10 @@ bool global_stats = false;
 bool global_pass_sysex = false;
 Glib::ustring global_filename = "";
 Glib::ustring last_used_dir ="/";
-std::string config_filename = ".seq24rc";
-std::string user_filename = ".seq24usr";
+std::string config_filename = ".seq32rc";
+std::string user_filename = ".seq32usr";
 bool global_print_keys = false;
-interaction_method_e global_interactionmethod = e_seq24_interaction;
+interaction_method_e global_interactionmethod = e_seq32_interaction;
 
 bool global_with_jack_transport = false;
 bool global_with_jack_master = false;
@@ -190,19 +190,19 @@ main (int argc, char *argv[])
         case '?':
         case 'h':
 
-            printf( "Usage: seq24 [OPTIONS] [FILENAME]\n\n" );
+            printf( "Usage: seq32 [OPTIONS] [FILENAME]\n\n" );
             printf( "Options:\n" );
             printf( "   -h, --help: show this message\n" );
             printf( "   -v, --version: show program version information\n" );
-            printf( "   -m, --manual_alsa_ports: seq24 won't attach alsa ports\n" );
+            printf( "   -m, --manual_alsa_ports: seq32 won't attach alsa ports\n" );
             printf( "   -s, --showmidi: dumps incoming midi events to screen\n" );
             printf( "   -p, --priority: runs higher priority with FIFO scheduler (must be root)\n" );
             printf( "   -P, --pass_sysex: passes any incoming sysex messages to all outputs \n" );
             printf( "   -i, --ignore <number>: ignore ALSA device\n" );
             printf( "   -k, --show_keys: prints pressed key value\n" );
-            printf( "   -x, --interaction_method <number>: see .seq24rc for methods to use\n" );
-            printf( "   -j, --jack_transport: seq24 will sync to jack transport\n" );
-            printf( "   -J, --jack_master: seq24 will try to be jack master\n" );
+            printf( "   -x, --interaction_method <number>: see .seq32rc for methods to use\n" );
+            printf( "   -j, --jack_transport: seq32 will sync to jack transport\n" );
+            printf( "   -J, --jack_master: seq32 will try to be jack master\n" );
             printf( "   -C, --jack_master_cond: jack master will fail if there is already a master\n" );
             printf( "   -M, --song_start_mode <mode>: The following play\n" );
             printf( "                          modes are available (0 = live mode)\n");
@@ -293,11 +293,11 @@ main (int argc, char *argv[])
 
     p_font_renderer = new font();
 
-    mainwnd seq24_window( &p );
+    mainwnd seq32_window( &p );
     if (optind < argc)
     {
         if (Glib::file_test(argv[optind], Glib::FILE_TEST_EXISTS))
-            seq24_window.open_file(argv[optind]);
+            seq32_window.open_file(argv[optind]);
         else
             printf("File not found: %s\n", argv[optind]);
     }
@@ -306,7 +306,7 @@ main (int argc, char *argv[])
 #ifdef LASH_SUPPORT
     lash_driver->start(&p);
 #endif
-    kit.run(seq24_window);
+    kit.run(seq32_window);
 
     p.deinit_jack();
 
