@@ -824,7 +824,8 @@ seqedit::fill_top_bar()
     connect (bind
              (mem_fun (*this, &seqedit::transposable_change_callback),
               m_check_transposable));
-    add_tooltip( m_check_transposable, "Remove check if sequence should NOT apply song transpose.");
+    add_tooltip( m_check_transposable,  "Remove check if sequence should\n"
+                                        "NOT apply song transpose.");
 
     m_hbox->pack_start( *m_check_transposable, false, false );
 
