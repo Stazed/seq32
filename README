@@ -1,13 +1,13 @@
-seq24 README
+seq32 README
 ------------
 
 How to install? 
 
     read INSTALL.
 
-How to use seq24?
+How to use seq32?
     
-    Documentation on using seq24 is in the SEQ24 file.
+    Documentation on using seq32 is in the SEQ32 file.
 
 Information on modifying, copying?
 
@@ -20,7 +20,7 @@ Who wrote this?
 
 Why did they write this?
 
-    Again, Read SEQ24
+    Again, Read SEQ32
 
 What to do with a fresh repository checkout?
 

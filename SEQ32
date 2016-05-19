@@ -1,4 +1,4 @@
-SEQ24 - Midi Sequencer
+SEQ32 - Midi Sequencer
 ======================
 
 
@@ -12,7 +12,7 @@ SEQ24 - Midi Sequencer
 
 [1] What & Why
 
-Seq24 is a real-time midi sequencer. It was created to 
+Seq32 is a real-time midi sequencer. It was created to 
 provide a very simple interface for editing and playing 
 midi 'loops'. After searching for a software based 
 sequencer that would provide the functionality needed for 
@@ -105,7 +105,7 @@ simple interface.
 	defined mute/unmute patterns (groups) in the active screen 
 	set, similar to hardware sequencers. 
 	This is done either by one of the 'group toggle' keys 
-	or by a MIDI controller, both assigned in the .seq24rc file. 
+	or by a MIDI controller, both assigned in the .seq32rc file. 
 	A Mute/Unmute pattern (group) is stored by holding a 
 	'group learn' key while pressing the corresponding 
 	'group toggle' key. 
@@ -136,7 +136,7 @@ simple interface.
 
         * keep queue
 
-	Pressing the 'keep queue' key assigned in the .seq24rc file 
+	Pressing the 'keep queue' key assigned in the .seq32rc file 
 	activates permanent queue mode until you use the temporary 
 	Queue function again pressing 'Right Ctrl'. 
 
@@ -225,10 +225,10 @@ simple interface.
 	is not playing.
 
 
-[3e] .seq24rc File 
+[3e] .seq32rc File 
 
-        After you run seq24 for the first time, it will generate 
-        a .seq24rc file in your home directory.
+        After you run seq32 for the first time, it will generate 
+        a .seq32rc file in your home directory.
 
         It contains the the data for remote midi control, keyboard
         control, and midi clock.
@@ -303,18 +303,18 @@ simple interface.
         group [state of the first 8 sequences] [second 8] [third 8] [fourth 8]
 
         After the list of sequences and their midi events, you can 
-        set seq24 to handle midi events and change the following: 
+        set seq32 to handle midi events and change the following: 
 
 
         * [midi-clock]
 
         The midi clock fields will contain the clocking state from the last 
-        time seq24 was run.  Turn off clock with a 0, or on with a 1.
+        time seq32 was run.  Turn off clock with a 0, or on with a 1.
 
 
         * [keyboard-control]      
         
-        The keyboard control is a dump of the keys that seq24 
+        The keyboard control is a dump of the keys that seq32 
         recognises and its corresponding sequence number.
 	Note that the first number corresponds to the number of sequences in
 	the active screen set.
@@ -335,47 +335,47 @@ simple interface.
 	
    
      *NOTES*: 
-	To see the required key codes when pressed, run seq24 with --show_keys.
+	To see the required key codes when pressed, run seq32 with --show_keys.
 
-	Seq24 will overwrite the .seq24rc file on quit. You should therefore
-	quit seq24 before doing modifications to the .seq24rc file.
+	Seq32 will overwrite the .seq32rc file on quit. You should therefore
+	quit seq32 before doing modifications to the .seq32rc file.
 
-	Some keys should not be assigned to control sequences in seq24 as they
-	are already assigned in the seq24 menu (with ctrl). 
+	Some keys should not be assigned to control sequences in seq32 as they
+	are already assigned in the seq32 menu (with ctrl). 
 	
 
 [3f] JACK Transport
 
-        In order to run seq24 with JACK Tranport Sync, you need 
+        In order to run seq32 with JACK Tranport Sync, you need 
         to enable it at the command line with the following flags:
 
-        --jack_transport : seq24 will sync to JACK transport 
+        --jack_transport : seq32 will sync to JACK transport 
                            if the JACK server is available.
         
-        --jack_master : seq24 will try to be JACK master
+        --jack_master : seq32 will try to be JACK master
         
         --jack_master_cond : The attempt to be JACK master will 
                              fail if there is already a master,
                              otherwise it will just take over.
 
-        --jack_start_mode <x> : When seq24 is synced to JACK,  
+        --jack_start_mode <x> : When seq32 is synced to JACK,  
                                 The playback command comes 
-                                from the JACK server.  seq24 will 
+                                from the JACK server.  seq32 will 
                                 play in performance mode
                                 by default (section [3d]).  
                                 If you want live mode, set 
                                 --jack_start_mode 0.
 
-        It is best to run seq24 with another master like ardour.  You
-        can not change the BPM of seq24 while rolling in JACK sync mode.
+        It is best to run seq32 with another master like ardour.  You
+        can not change the BPM of seq32 while rolling in JACK sync mode.
 
 
 -----------------------------------------------------------
 
 [4] Contact
 
-	If you have Ideas about seq24 or a bug report,
-please email seq24@filter24.org.  If its a bug report,
+	If you have Ideas about seq32 or a bug report,
+please email seq32@filter24.org.  If its a bug report,
 please add [BUG] to the subject.
 
 -----------------------------------------------------------

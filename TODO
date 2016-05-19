@@ -111,5 +111,6 @@
     Edit whole sequence list.  Filters?  Super flexable
 
 << Other >>
-[ ] Midi file export (render mode)
+[x] Midi file export (render mode)
 [ ] Song Cue Points Based on Keys or Midi Input
+[ ] Update README and man
