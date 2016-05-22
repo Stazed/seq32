@@ -61,7 +61,7 @@ double lfownd::wave_func(double a_angle, int wave_type)
 
 lfownd::~lfownd()
 {
-    // TODO Auto-generated destructor stub
+    //printf("Delete destructor lfownd\n");
 }
 
 lfownd::lfownd(sequence *a_seq, seqdata *a_seqdata)
