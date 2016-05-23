@@ -43,11 +43,10 @@ class mainwnd : public Gtk::Window, public performcallback
     /* notification handler for learn mode toggle */
     virtual void on_grouplearnchange(bool state);
 
-    friend void set_insensitive_menu_and_song(bool a_running);
-
 private:
 
     perform  *m_mainperf;
+    bool      m_menu_mode;
     static int m_sigpipe[2];
 
 #if GTK_MINOR_VERSION < 12
@@ -88,10 +87,8 @@ private:
 
     sigc::connection   m_timeout_connect;
 
-    void set_song_button_sensitive(bool a_running);
     void set_song_mode();
     void toggle_song_mode();
-    void set_menu_sensitive(bool a_running);
     void set_menu_mode();
     void toggle_menu_mode();
 
@@ -141,6 +138,3 @@ public:
     bool on_key_release_event(GdkEventKey* a_ev);
 
 };
-
-extern void set_insensitive_menu_and_song(bool a_running);
-

@@ -41,19 +41,6 @@
 bool global_is_running = false;
 bool global_is_modified = false;
 
-static mainwnd * gs_mainwnd_pointer = nullptr;
-
-void
-set_insensitive_menu_and_song(bool a_running)
-{
-    if (gs_mainwnd_pointer != nullptr)
-    {
-        gs_mainwnd_pointer->set_song_button_sensitive(a_running);
-        gs_mainwnd_pointer->set_menu_sensitive(a_running);
-    }
-}
-
-
 // tooltip helper, for old vs new gtk...
 #if GTK_MINOR_VERSION >= 12
 #   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
@@ -63,6 +50,7 @@ set_insensitive_menu_and_song(bool a_running)
 
 mainwnd::mainwnd(perform *a_p):
     m_mainperf(a_p),
+    m_menu_mode(false),
     m_options(NULL)
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq32_32_xpm));
@@ -304,9 +292,6 @@ mainwnd::mainwnd(perform *a_p):
     m_sigpipe[0] = -1;
     m_sigpipe[1] = -1;
     install_signal_handlers();
-
-    if (gs_mainwnd_pointer == nullptr)
-        gs_mainwnd_pointer = this;
 }
 
 
@@ -365,13 +350,17 @@ mainwnd::timer_callback(  )
     if (m_button_mode->get_active() != global_song_start_mode)
         m_button_mode->set_active(global_song_start_mode);
 
-    return true;
-}
+    if(global_is_running && m_button_mode->get_sensitive())
+        m_button_mode->set_sensitive(false);
+    else if(!global_is_running && !m_button_mode->get_sensitive())
+        m_button_mode->set_sensitive(true);
 
-void
-mainwnd::set_song_button_sensitive(bool a_running)
-{
-    m_button_mode->set_sensitive(!a_running);
+    if(global_is_running && m_menubar->get_sensitive())
+        m_menubar->set_sensitive(false);
+    else if(!global_is_running && (m_menubar->get_sensitive() == m_menu_mode ))
+        m_menubar->set_sensitive(!m_menu_mode);
+
+    return true;
 }
 
 void
@@ -393,19 +382,9 @@ mainwnd::toggle_song_mode()
 }
 
 void
-mainwnd::set_menu_sensitive(bool a_running)
-{
-    if(a_running)
-        m_menubar->set_sensitive(false);
-    else if(!a_running && (m_menubar->get_sensitive() == m_button_menu->get_active() ))
-        m_menubar->set_sensitive(!m_button_menu->get_active());
-}
-
-void
 mainwnd::set_menu_mode()
 {
-    if(!global_is_running)
-        m_menubar->set_sensitive(!m_button_menu->get_active());
+    m_menu_mode = m_button_menu->get_active();
 }
 
 void
@@ -970,7 +949,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 {
     if ( a_ev->type == GDK_KEY_PRESS )
     {
-        if(!global_is_running && !m_button_menu->get_active()) // only allow menu when not running & menu button not pressed
+        if(!global_is_running && !m_menu_mode) // only allow menu when not running & menu button not pressed
         {
             if ( a_ev->state & GDK_MOD1_MASK ) // alt key
             {
