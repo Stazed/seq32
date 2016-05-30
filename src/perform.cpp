@@ -1784,23 +1784,26 @@ void perform::output_func()
             {
                 if ( m_looping && m_playback_mode )
                 {
+                    static bool jack_position_once = false;
                     if ( current_tick >= get_right_tick() )
                     {
-                        if(m_jack_running && m_jack_master)
+#ifdef JACK_SUPPORT
+                        if(m_jack_running && m_jack_master && !jack_position_once)
                         {
                             position_jack(true);
+                            jack_position_once = true;
                         }
-                        else
-                        {
-                            double leftover_tick = current_tick - (get_right_tick());
+#endif // JACK_SUPPORT
+                        double leftover_tick = current_tick - (get_right_tick());
 
-                            play( get_right_tick() - 1 );
-                            reset_sequences();
+                        play( get_right_tick() - 1 );
+                        reset_sequences();
 
-                            set_orig_ticks( get_left_tick() );
-                            current_tick = (double) get_left_tick() + leftover_tick;
-                        }
+                        set_orig_ticks( get_left_tick() );
+                        current_tick = (double) get_left_tick() + leftover_tick;
                     }
+                    else
+                        jack_position_once = false;
                 }
 
                 /* play */
