@@ -1383,7 +1383,7 @@ int jack_sync_callback(jack_transport_state_t state,
                        jack_position_t *pos, void *arg)
 {
     perform *p = (perform *) arg;
-
+/*
     p->m_jack_frame_current = jack_get_current_transport_frame(p->m_jack_client);
 
     p->m_jack_tick =
@@ -1392,7 +1392,7 @@ int jack_sync_callback(jack_transport_state_t state,
         p->m_jack_pos.beats_per_minute / (p->m_jack_pos.frame_rate * 60.0);
 
     p->m_jack_frame_last = p->m_jack_frame_current;
-
+*/
     p->m_jack_transport_state_last =
         p->m_jack_transport_state =
             state;
@@ -1681,22 +1681,16 @@ void perform::output_func()
 
                         if ( current_tick >= get_right_tick() )
                         {
-                            if(m_jack_master)
+                            while ( current_tick >= get_right_tick() )
                             {
-                                position_jack(true);
-                            }
-                            else
-                            {
-                                while ( current_tick >= get_right_tick() )
-                                {
-                                    double size = get_right_tick() - get_left_tick();
-                                    current_tick = current_tick - size;
+                                double size = get_right_tick() - get_left_tick();
+                                current_tick = current_tick - size;
 
-                                    //printf( "> current_tick[%lf]\n", current_tick );
-                                }
-                                reset_sequences();
-                                set_orig_ticks( (long)current_tick );
+                                //printf( "> current_tick[%lf]\n", current_tick );
                             }
+                            off_sequences();
+                            set_orig_ticks( (long)current_tick );
+
                         }
                     }
                 }
@@ -1737,7 +1731,8 @@ void perform::output_func()
                     /* convert ticks */
                     jack_ticks_converted =
                         m_jack_tick * ((double) c_ppqn /
-                                       (m_jack_pos.ticks_per_beat * m_jack_pos.beat_type / 4.0  ));
+                                       (m_jack_pos.ticks_per_beat *
+                                        m_jack_pos.beat_type / 4.0  ));
 
                     //printf ( "jack_ticks_conv[%lf] = \n",  jack_ticks_converted );
                     //printf ( "    m_jack_tick[%lf] * ((double) c_ppqn[%lf] / \n", m_jack_tick, (double) c_ppqn );
@@ -1759,7 +1754,7 @@ void perform::output_func()
             } /* if jack running */
             else
             {
-#endif
+#endif // JACK_SUPPORT
                 /* default if jack is not compiled in, or not running */
                 /* add delta to current ticks */
                 clock_tick     += delta_tick;
@@ -1769,7 +1764,7 @@ void perform::output_func()
 
 #ifdef JACK_SUPPORT
             }
-#endif
+#endif // JACK_SUPPORT
 
             /* init_clock will be true when we run for the first time, or
              * as soon as jack gets a good lock on playback */
