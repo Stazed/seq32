@@ -2448,12 +2448,7 @@ void jack_timebase_callback(jack_transport_state_t state,
                             jack_position_t *pos, int new_pos, void *arg)
 {
     static double jack_tick;
-    static jack_nframes_t last_frame;
     static jack_nframes_t current_frame;
-    static jack_transport_state_t state_current;
-    static jack_transport_state_t state_last;
-
-    state_current = state;
 
     perform *p = (perform *) arg;
     current_frame = jack_get_current_transport_frame( p->m_jack_client );
@@ -2471,25 +2466,11 @@ void jack_timebase_callback(jack_transport_state_t state,
      * or time signature changes at specific locations in the
      * transport timeline. */
 
-    // if we are in a new position
-    if (  state_last    ==  JackTransportStarting &&
-            state_current ==  JackTransportRolling )
-    {
-        // printf ( "Starting [%d] [%d]\n", last_frame, current_frame );
 
-        jack_tick = 0.0;
-        last_frame = current_frame;
-    }
-
-    if ( current_frame >= last_frame )
-    {
-        double jack_delta_tick =
-            (current_frame) *
-            pos->ticks_per_beat *
-            pos->beats_per_minute / (p->m_jack_frame_rate * 60.0);
-
-        jack_tick = (jack_delta_tick < 0) ? -jack_delta_tick : jack_delta_tick;
-    }
+    jack_tick =
+        (current_frame) *
+        pos->ticks_per_beat *
+        pos->beats_per_minute / (p->m_jack_frame_rate * 60.0);
 
     long ptick = 0, pbeat = 0, pbar = 0;
 
@@ -2507,8 +2488,6 @@ void jack_timebase_callback(jack_transport_state_t state,
                           pos->ticks_per_beat;
 
     // printf( " bbb [%2d:%2d:%4d]\n", pos->bar, pos->beat, pos->tick );
-
-    state_last = state_current;
 }
 
 void jack_shutdown(void *arg)
