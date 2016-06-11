@@ -50,6 +50,7 @@ perform::perform()
     m_mode_group = true;
     m_mode_group_learn = false;
     m_looping = false;
+    m_reposition = false;
     m_inputing = true;
     m_outputing = true;
     m_tick = 0;
@@ -446,6 +447,11 @@ void perform::select_and_mute_group (int a_g_group)
 {
     select_mute_group(a_g_group);
     mute_group_tracks();
+}
+
+void perform::set_reposition()
+{
+    m_reposition = true;
 }
 
 void perform::set_song_mute( mute_op op  )
@@ -1802,6 +1808,15 @@ void perform::output_func()
                 current_tick   += delta_tick;
                 total_tick     += delta_tick;
                 dumping = true;
+
+                /* if we reposition key-p from perfroll
+                   then reset to adjusted starting  */
+                if ( m_playback_mode && !m_jack_running && !m_usemidiclock && m_reposition)
+                {
+                    current_tick = m_starting_tick;
+                    set_orig_ticks( m_starting_tick );
+                    m_reposition = false;
+                }
 
 #ifdef JACK_SUPPORT
             }

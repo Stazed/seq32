@@ -743,6 +743,32 @@ perfroll::on_motion_notify_event(GdkEventMotion* a_ev)
 bool
 perfroll::on_key_press_event(GdkEventKey* a_p0)
 {
+    if (a_p0->keyval == GDK_p)         /* Move to mouse position */
+    {
+        int x = 0;
+        int y = 0;
+
+        long a_tick = 0;
+
+        get_pointer(x, y);
+        if(x < 0)
+            x = 0;
+        snap_x(&x);
+        convert_x(x, &a_tick);
+
+        if(m_mainperf->is_jack_running())
+        {
+            m_mainperf->position_jack(true, a_tick);
+        }
+        else
+        {
+            m_mainperf->set_starting_tick(a_tick);
+            m_mainperf->set_reposition();
+        }
+
+        return true;
+    }
+
     bool ret = false;
 
     if ( m_mainperf->is_active( m_drop_sequence))
