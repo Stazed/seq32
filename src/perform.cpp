@@ -1853,7 +1853,13 @@ void perform::output_func()
 #endif // JACK_SUPPORT
                         double leftover_tick = current_tick - (get_right_tick());
 
-                        play( get_right_tick() - 1 );
+#ifdef JACK_SUPPORT     // don't play during JackTransportStarting to avoid xruns on FF or rewind
+                        if(m_jack_running && m_jack_transport_state != JackTransportStarting)
+                            play( get_right_tick() - 1 );
+#endif // JACK_SUPPORT
+                        if(!m_jack_running)
+                            play( get_right_tick() - 1 );
+
                         reset_sequences();
 
                         set_orig_ticks( get_left_tick() );
@@ -1864,7 +1870,12 @@ void perform::output_func()
                 }
 
                 /* play */
-                play( (long) current_tick );
+#ifdef JACK_SUPPORT // don't play during JackTransportStarting to avoid xruns on FF or rewind
+                if(m_jack_running && m_jack_transport_state != JackTransportStarting)
+                    play( (long) current_tick );
+#endif // JACK_SUPPORT
+                if(!m_jack_running)
+                    play( (long) current_tick );
                 //printf( "play[%d]\n", current_tick );
 
                 /* midi clock */
