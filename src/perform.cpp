@@ -1653,7 +1653,7 @@ void perform::output_func()
 
             /* delta time to ticks */
             /* bpm */
-            int bpm  = m_master_bus.get_bpm();
+            int bpm  = m_master_bus.get_bpm() * ( 4.0 / m_bw);
 
             /* get delta ticks, delta_ticks_f is in 1000th of a tick */
             long long delta_tick_num = bpm * ppqn * delta_us + delta_tick_frac;
