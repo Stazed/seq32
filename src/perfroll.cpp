@@ -305,17 +305,33 @@ perfroll::draw_progress()
     int old_progress_x = ( m_old_progress_ticks - tick_offset ) / m_perf_scale_x ;
 
     /* draw old */
-    m_window->draw_drawable(m_gc,
-                            m_pixmap,
-                            old_progress_x, 0,
-                            old_progress_x, 0,
-                            1, m_window_y );
+    m_window->draw_drawable
+    (
+        m_gc,
+        m_pixmap,
+        old_progress_x-1, 0,
+        old_progress_x-1, 0,
+        2, m_window_y
+    );
+
+    m_gc->set_line_attributes( 2,
+                           Gdk::LINE_SOLID,
+                           Gdk::CAP_NOT_LAST,
+                           Gdk::JOIN_MITER );
 
     m_gc->set_foreground(m_black);
-    m_window->draw_line(m_gc,
-                        progress_x, 0,
-                        progress_x, m_window_y);
 
+    m_window->draw_line
+    (
+        m_gc,
+        progress_x, 0,
+        progress_x, m_window_y
+    );
+    // reset
+    m_gc->set_line_attributes( 1,
+                           Gdk::LINE_SOLID,
+                           Gdk::CAP_NOT_LAST,
+                           Gdk::JOIN_MITER );
     m_old_progress_ticks = tick;
 
     if(global_is_running && m_mainperf->get_follow_transport())
@@ -759,6 +775,7 @@ perfroll::on_key_press_event(GdkEventKey* a_p0)
         if(m_mainperf->is_jack_running())
         {
             m_mainperf->set_reposition();
+            m_mainperf->set_starting_tick(a_tick);
             m_mainperf->position_jack(true, a_tick);
         }
         else

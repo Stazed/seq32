@@ -191,6 +191,7 @@ private:
     bool m_jack_running;
     bool m_toggle_jack;
     bool m_jack_master;
+    long m_jack_stop_tick;
 
     void inner_start( bool a_state );
     void inner_stop();
@@ -268,6 +269,12 @@ public:
     long get_tick( )
     {
         return m_tick;
+    };
+
+    void set_jack_stop_tick(long a_tick);
+    long get_jack_stop_tick( )
+    {
+        return m_jack_stop_tick;
     };
 
     void set_left_tick( long a_tick );
@@ -360,7 +367,7 @@ public:
         m_looping = a_looping;
     };
 
-    void set_reposition();
+    void set_reposition(bool a_pos_type = true);
 
     void set_sequence_control_status( int a_status );
     void unset_sequence_control_status( int a_status );
@@ -433,6 +440,8 @@ public:
     friend void jack_shutdown(void *arg);
     friend void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
                                        jack_position_t *pos, int new_pos, void *arg);
+
+    friend long get_current_jack_position(void *arg);
 #endif // JACK_SUPPORT
 };
 

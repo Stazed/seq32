@@ -516,7 +516,7 @@ sequence::zero_markers()
 {
     lock();
 
-    m_last_tick = 0;  // this clears the progress line on stop
+    //m_last_tick = 0;  // this clears the progress line on stop
 
     //m_masterbus->flush( );
 

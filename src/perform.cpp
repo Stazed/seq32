@@ -165,6 +165,8 @@ perform::perform()
     m_key_menu   = GDK_F3;
     m_key_follow_trans  = GDK_F4;
 
+    m_jack_stop_tick = 0;
+
     m_offset = 0;
     m_control_status = 0;
     m_screen_set = 0;
@@ -449,9 +451,9 @@ void perform::select_and_mute_group (int a_g_group)
     mute_group_tracks();
 }
 
-void perform::set_reposition()
+void perform::set_reposition(bool a_pos_type)
 {
-    m_reposition = true;
+    m_reposition = a_pos_type;
 }
 
 void perform::set_song_mute( mute_op op  )
@@ -580,10 +582,22 @@ void perform::toggle_follow_transport()
     set_follow_transport(!m_follow_transport);
 }
 
+void perform::set_jack_stop_tick(long a_tick)
+{
+    m_jack_stop_tick = a_tick;
+}
+
 void perform::set_left_tick( long a_tick )
 {
     m_left_tick = a_tick;
     m_starting_tick = a_tick;
+
+    if(m_jack_master && m_jack_running)
+        position_jack(true, a_tick);
+    else
+        m_tick = a_tick;
+
+    m_reposition = false;
 
     if ( m_left_tick >= m_right_tick )
         m_right_tick = m_left_tick + c_ppqn * 4;
@@ -597,6 +611,7 @@ long perform::get_left_tick()
 void perform::set_starting_tick( long a_tick )
 {
     m_starting_tick = a_tick;
+    m_tick = a_tick;    // set progress line
 }
 
 long perform::get_starting_tick()
@@ -614,6 +629,13 @@ void perform::set_right_tick( long a_tick )
         {
             m_left_tick = m_right_tick - c_ppqn * 4;
             m_starting_tick = m_left_tick;
+
+            if(m_jack_master && m_jack_running)
+                position_jack(true, m_left_tick);
+            else
+                m_tick = m_left_tick;
+
+            m_reposition = false;
         }
     }
 }
@@ -2059,9 +2081,32 @@ void perform::output_func()
             }
         }
 
-        m_tick = 0;  // This clears the progress line on song editor and mainwnd on stop
+         /* m_tick is the progress play tick that displays the progress line */
+#ifdef JACK_SUPPORT
+        if(m_playback_mode && m_jack_master)
+        {
+            position_jack(m_playback_mode,m_left_tick);
+        }
+        if(!m_playback_mode && m_jack_running)
+            position_jack(m_playback_mode,0);
+
+#endif // JACK_SUPPORT
+        if(m_playback_mode && !m_jack_running)
+            m_tick = m_left_tick;
+
+        if(!m_playback_mode )
+            m_tick = 0;
+        // this means we leave m_tick as is if in slave mode
+
         m_master_bus.flush();
         m_master_bus.stop();
+
+#ifdef JACK_SUPPORT
+        if(m_jack_running)
+            m_jack_stop_tick = get_current_jack_position(this);
+#endif // JACK_SUPPORT
+
+        //m_reposition = false;   // needed if FF/Rewind pressed while playing
     }
 
     pthread_exit(0);
@@ -2533,6 +2578,29 @@ void jack_timebase_callback(jack_transport_state_t state,
         pos->beats_per_minute / ( p->m_jack_frame_rate* 60.0);
 
     p->jack_BBT_position(*pos, jack_tick);
+}
+
+long get_current_jack_position(void *arg)
+{
+    perform *p = (perform *) arg;
+    jack_nframes_t current_frame;
+    double jack_tick;
+    double ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
+    double beats_per_minute =  p->get_bpm();
+    double beat_type = p->get_bw();
+
+    current_frame = jack_get_current_transport_frame( p->m_jack_client );
+
+    jack_tick =
+        (current_frame) *
+        ticks_per_beat  *
+        beats_per_minute / ( p->m_jack_frame_rate* 60.0);
+
+
+    /* convert ticks */
+    return jack_tick * ((double) c_ppqn /
+                    (ticks_per_beat *
+                     beat_type / 4.0  ));
 }
 
 void jack_shutdown(void *arg)
