@@ -1,8 +1,86 @@
+
+seq32-1.0.1 (2016-06-22)
+
+Seq32 is primarily a copy and paste of features added to seq42. The two projects are maintained with
+similar features for ease of maintenance and compatibility.
+
+The following is only a partial list. Not to mention many, many, many bug fixes....
+
+New Features
+  * The "song mode" button was moved from the jack sync menu to the main window and now applies always,
+    not just for jack.
+  * The jack sync (xpm) button was moved from the jack sync menu to the song editor.
+  * Key binding added to the song mode button and jack sync buttons which can be used from the sequence
+    editor, and other windows.
+  * Fixed the menu/sequencer key binding conflict - menu goes insensitive when running. Menu stop button
+    added to shut off menu when NOT running. Key binding added.
+  * Fixed key binding conflict when typing the set name on the main window, to stop triggering sequences.
+  * Fixed inconsistent start/stop methods. When starting from the main window, sequence editor(keybind),
+    or when connected to jack and started by the transport,	when the song button is pressed it will	cause
+    the song editor to play. It will start at the left tick marker if in jack master mode, and also when
+    not connected to jack. When started from the song editor, the song button is ignored and ALWAYS plays
+    the song. When the song button is unchecked, it will play live if started from the main window and
+    sequence editor, when connected to jack or not.
+  * Changed the 'View' menu to 'Edit'.
+  * Moved 'Import' from the file menu to the 'Edit' menu.
+  * Stopped project file name change on Import.
+  * Added 'Mute all tracks', 'Unmute all tracks', and 'Toggle mute for all tracks' to Edit menu.
+  * Added transpose button to song editor. Added transpose check button to sequences (not permanent).
+  * Added 'Apply song transpose' for permanent application of transpose to all sequences with their
+  	transpose button checked.
+  * sequence editor now supports use of the cursor keys to move selected notes up/down in pitch or
+    left/right in time.  Up and down move by one semitone.  Hold down Shift to move up or down by octave.
+    Right and left move the selected notes by the current snap amount.  (Note that it doesn't automatically
+    snap the notes to the grid; if you want that, use the quantize function first.)  You can also nudge
+    the selected notes by individual ticks by holding down the Shift key with left or right.
+  * sequence editor has new menu items to randomize selected events (adding or subtracting a random value
+    in a range from +/-1 to +/-16).  This can be used on velocity or CC values.
+  * sequence editor has new menu items to select notes that occur on specific beats (even 1/4, odd 1/4,
+    even 1/8, odd 1/8, even 1/16, odd 1/16).
+  * Added new lfo window to sequence editor -
+    allows manipulation of midi events - thanks to Mattias Lasersköld - Seq42
+  	
+The following features are from the seq42 project for conformity:
+
+* NEW - split trigger (middle mouse button) will now split on mouse pointer location - grid-snapped
+* NEW - ctrl-C song trigger and paste to any location. Middle mouse button click to location ctrl-V
+  will paste to the location grid-snapped. Subsequent ctrl-V will paste directly after previous paste
+  location. If no paste location is selected, then default will paste after copied trigger. 
+* NEW - Now beats-per-measure, beat-width song editor are saved to file. New grid-snaps were added to
+  accomodate.
+* NEW - Export midi song render - combines all triggers on track together - can be used in conventional
+  midi players. From edit menu, export song.
+		Muted tracks and tracks with NO triggers will NOT be exported.
+		This feature can also be used as a powerfull editing feature as follows:
+			The user can split, slice and rearrange triggers to form a new sequence. Then mute all
+			other tracks and export to a temporary midi file. Now they can import the combined
+		    triggers/sequence as a new item. This makes editing of long improvised sequences into
+		    smaller or modified sequences as well as combining several sequence parts painless. Also,
+		    if the user has a variety of common items such as drum beats, control codes, etc that
+		    can be used in other projects, this method is very convenient. The common items can
+		    be kept in one file and exported all, individually, or in part by creating triggers and muting.
+		    
+* NEW - Note listen added to sequence draw notes and move notes.
+* NEW - Fixed Jack master to work properly. Start as master on left tick marker and looping works.
+* NEW - Jack slave and master conditional work - and will follow the jack frame without master BBT
+* NEW - Fixed BBT calcualtions as master to send correct starting position.
+* NEW - Added auto scroll to song editor and sequence editor (Thanks to Chris Ahlstrom - sequencer64 for the better code).
+* NEW - Data event edit handles added for individual adjustment.
+* NEW - New colors for sequence editor.
+* NEW - Added Zoom of song editor (Thanks to Chris Ahlstrom - sequencer64) - ctrl mouse wheel, z and Z when focus on track editor.
+* NEW - Added Chord note selection to sequence editor (Thanks to LMMS for the lookup table).
+* NEW - Added Song editor will display play position marker even when stopped and show position changes from other jack clients.
+* NEW - Added Auto scroll will follow position marker even when stopped.
+* New - Fixed Beat width to work when NOT in jack mode.
+* NEW - Added Non-timeline like key-p reposition song editor play location. With mouse focus on song editor(tracks), press 'p' to move play position to mouse location.
+* NEW - Add sequence data selected note Ons to draw last in case mutiple events cover the selection.
+* NEW - Midi import and export now read/supply type 1 midi tempo and time signature (Thanks to Chris Ahlstrom - sequencer64).
+* NEW - Add pause to follow transport when editing with button press on song editor and sequence editor.
+* NEW - Added additional music scale items in sequence editor (Thanks to Chris Ahlstrom - sequencer64).
+
 seq32-1.0.0 (2016-05-18)
 
 New SEQ32 version created - started at 1.0.0
-
-
 
 seq24-0.9.3 (2016-01-24)
 
