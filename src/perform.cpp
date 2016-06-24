@@ -189,6 +189,7 @@ perform::perform()
 
     m_bp_measure = 4;
     m_bw = 4;
+    m_excell_FF_RW = 1.0;
 
     m_have_undo = false;
     m_have_redo = false;
