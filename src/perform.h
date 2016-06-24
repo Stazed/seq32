@@ -224,6 +224,10 @@ public:
 
     unsigned int m_key_start;
     unsigned int m_key_stop;
+    unsigned int m_key_forward;
+    unsigned int m_key_rewind;
+    unsigned int m_key_pointer;
+
     unsigned int m_key_song;
     unsigned int m_key_jack;
     unsigned int m_key_menu;
@@ -239,9 +243,11 @@ public:
 
     void start_playing();
     void stop_playing();
+
+    void FF_rewind();
+
     void set_start_from_perfedit(bool a_start);
     void toggle_song_mode();
-
     void toggle_jack_mode();
     void set_jack_mode(bool a_mode);
     bool get_toggle_jack();
@@ -296,6 +302,8 @@ public:
     void set_have_redo(bool a_redo);
     bool m_have_undo;
     bool m_have_redo;
+
+    float m_excell_FF_RW;
 
     void print();
 
@@ -448,6 +456,9 @@ public:
 /* located in perform.C */
 extern void *output_thread_func(void *a_p);
 extern void *input_thread_func(void *a_p);
+
+/* located in perfedit.h */
+extern int FF_RW_button_type;
 
 #ifdef JACK_SUPPORT
 

@@ -45,6 +45,8 @@ using namespace sigc;
 #   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
 #endif
 
+int FF_RW_button_type = 0;
+
 perfedit::perfedit( perform *a_perf )
 {
     using namespace Menu_Helpers;
@@ -388,6 +390,17 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 
+        if ( a_ev->keyval ==  m_mainperf->m_key_forward )
+        {
+            fast_forward(true);
+            return true;
+        }
+
+        if ( a_ev->keyval ==  m_mainperf->m_key_rewind )
+        {
+            rewind(true);
+            return true;
+        }
 #ifdef JACK_SUPPORT
         if ( a_ev->keyval ==  m_mainperf->m_key_jack )
         {
@@ -402,6 +415,25 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
         return Gtk::Window::on_key_press_event(a_ev);
     }
 
+    return false;
+}
+
+bool
+perfedit::on_key_release_event(GdkEventKey* a_ev)
+{
+    if ( a_ev->type == GDK_KEY_RELEASE )
+    {
+        if ( a_ev->keyval ==  m_mainperf->m_key_forward )
+        {
+            fast_forward(false);
+            return true;
+        }
+        if ( a_ev->keyval ==  m_mainperf->m_key_rewind )
+        {
+            rewind(false);
+            return true;
+        }
+    }
     return false;
 }
 
@@ -430,6 +462,28 @@ void
 perfedit::stop_playing()
 {
     m_mainperf->stop_playing();
+}
+
+void
+perfedit::rewind(bool a_press)
+{
+    if(a_press)
+        FF_RW_button_type = -1;
+    else
+        FF_RW_button_type = 0;
+
+	gtk_timeout_add(120,FF_RW_timeout,m_mainperf);
+}
+
+void
+perfedit::fast_forward(bool a_press)
+{
+    if(a_press)
+        FF_RW_button_type = 1;
+    else
+        FF_RW_button_type = 0;
+
+	gtk_timeout_add(120,FF_RW_timeout,m_mainperf);
 }
 
 void
@@ -696,4 +750,21 @@ bool
 perfedit::on_delete_event(GdkEventAny *a_event)
 {
     return false;
+}
+
+int
+FF_RW_timeout(void *arg)
+{
+    perform *p = (perform *) arg;
+
+    if(FF_RW_button_type != 0)
+    {
+        p->FF_rewind();
+        if(p->m_excell_FF_RW < 60.0f)
+            p->m_excell_FF_RW *= 1.1f;
+        return (TRUE);
+    }
+
+    p->m_excell_FF_RW = 1.0;
+    return (FALSE);
 }

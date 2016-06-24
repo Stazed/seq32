@@ -144,6 +144,8 @@ private:
 
     void start_playing ();
     void stop_playing ();
+    void rewind(bool a_press);
+    void fast_forward(bool a_press);
 
     void set_looped ();
     void set_jack_mode();
@@ -162,6 +164,7 @@ private:
 
     bool on_delete_event (GdkEventAny * a_event);
     bool on_key_press_event(GdkEventKey* a_ev);
+    bool on_key_release_event(GdkEventKey* a_ev);
 
 public:
 
@@ -186,6 +189,10 @@ public:
 
     void auto_scroll_perfroll();
 
+    friend int FF_RW_timeout(void *arg);
+
     perfedit (perform * a_perf);
     ~perfedit ();
 };
+
+int FF_RW_timeout(void *arg);

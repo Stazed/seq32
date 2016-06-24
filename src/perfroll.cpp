@@ -759,7 +759,7 @@ perfroll::on_motion_notify_event(GdkEventMotion* a_ev)
 bool
 perfroll::on_key_press_event(GdkEventKey* a_p0)
 {
-    if (a_p0->keyval == GDK_p)         /* Move to mouse position */
+    if (a_p0->keyval == m_mainperf->m_key_pointer)         /* Move to mouse position */
     {
         int x = 0;
         int y = 0;

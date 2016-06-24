@@ -160,6 +160,10 @@ perform::perform()
 
     m_key_start  = GDK_space;
     m_key_stop   = GDK_Escape;
+    m_key_forward   = GDK_f;
+    m_key_rewind   = GDK_r;
+    m_key_pointer   = GDK_p;
+
     m_key_song   = GDK_F1;
     m_key_jack   = GDK_F2;
     m_key_menu   = GDK_F3;
@@ -530,6 +534,37 @@ perform::stop_playing()
 {
     stop_jack();
     stop();
+}
+
+void
+perform::FF_rewind()
+{
+    if(FF_RW_button_type == 0)
+        return;
+
+    long a_tick = 0;
+    long measure_ticks = (c_ppqn * 4) * m_bp_measure / m_bw;
+    measure_ticks /= 4;
+    measure_ticks *= m_excell_FF_RW;
+
+    if(FF_RW_button_type < 0)  // rewind
+    {
+        a_tick = m_tick - measure_ticks;
+        if(a_tick < 0)
+            a_tick = 0;
+    }
+    if(FF_RW_button_type > 0)  // Fast Forward
+        a_tick = m_tick + measure_ticks;
+
+    if(m_jack_running)
+    {
+        position_jack(true, a_tick);
+    }
+    else
+    {
+        set_starting_tick(a_tick);  // this will set progress line
+        set_reposition();
+    }
 }
 
 void perform::set_start_from_perfedit( bool a_start )
