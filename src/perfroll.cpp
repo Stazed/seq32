@@ -334,7 +334,7 @@ perfroll::draw_progress()
                            Gdk::JOIN_MITER );
     m_old_progress_ticks = tick;
 
-    if(global_is_running && m_mainperf->get_follow_transport())
+    if(global_is_running)
         auto_scroll_horz();
 }
 
@@ -644,6 +644,9 @@ perfroll::on_button_release_event(GdkEventButton* a_ev)
 void
 perfroll::auto_scroll_horz()
 {
+    if(!m_mainperf->get_follow_transport())
+        return;
+
     if(m_zoom >= c_perf_scale_x)
     {
         double progress = (double)m_mainperf->get_tick()/m_zoom/c_ppen;
