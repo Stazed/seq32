@@ -187,8 +187,6 @@ public:
     void set_follow_transport ();
     void toggle_follow_transport();
 
-    void auto_scroll_perfroll();
-
     friend int FF_RW_timeout(void *arg);
 
     perfedit (perform * a_perf);

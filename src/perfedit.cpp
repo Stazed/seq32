@@ -684,12 +684,6 @@ perfedit::toggle_follow_transport()
 }
 
 void
-perfedit::auto_scroll_perfroll()
-{
-    m_perfroll->auto_scroll_horz();
-}
-
-void
 perfedit::on_realize()
 {
     // we need to do the default realize

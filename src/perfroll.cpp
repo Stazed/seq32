@@ -334,8 +334,7 @@ perfroll::draw_progress()
                            Gdk::JOIN_MITER );
     m_old_progress_ticks = tick;
 
-    if(global_is_running)
-        auto_scroll_horz();
+    auto_scroll_horz();
 }
 
 void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_sequence )
