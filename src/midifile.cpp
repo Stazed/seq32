@@ -857,7 +857,7 @@ bool midifile::write_song (perform * a_perf)
 
             // now for each trigger get sequence and add events to list char below - fill_list one by one in order,
             // essentially creating a single long sequence.
-            // then set a single trigger for the big sequence - start at zero, end at last trigger end.
+            // then set a single trigger for the big sequence - start at zero, end at last trigger end + snap.
 
             long total_seq_length = 0;
             long prev_timestamp = 0;
@@ -870,6 +870,12 @@ bool midifile::write_song (perform * a_perf)
             }
 
             total_seq_length = trig_vect[vect_size-1].m_tick_end;
+
+            /* adjust sequence length to snap nearest measure past end */
+            long measure_ticks = (c_ppqn * 4) * seq->get_bp_measure() / seq->get_bw();
+            long remainder = total_seq_length % measure_ticks;
+            if(remainder != measure_ticks -1)
+                total_seq_length += (measure_ticks - remainder - 1);
 
             /*
                 The sequence trigger is NOT part of the standard midi format and is proprietary to seq32.
