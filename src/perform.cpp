@@ -2278,43 +2278,57 @@ void perform::input_func()
             {
                 if (m_master_bus.get_midi_event(&ev) )
                 {
-                    // Obey MidiTimeClock:
+                    // EVENT_MIDI_START is only used when starting from the beginning of the song
                     if (ev.get_status() == EVENT_MIDI_START)
                     {
                         stop();
-                        start(false);
+                        start(global_song_start_mode);
                         m_midiclockrunning = true;
                         m_usemidiclock = true;
                         m_midiclocktick = 0;
                         m_midiclockpos = 0;
                     }
-                    // midi continue: start from current pos.
+                    // midi continue: start from midi song position
+                    // this will be sent immediately after  EVENT_MIDI_SONG_POS
+                    // and is used for start from other than beginning of the song
                     else if (ev.get_status() == EVENT_MIDI_CONTINUE)
                     {
                         m_midiclockrunning = true;
-                        start(false);
+                        start(global_song_start_mode);
                         //m_usemidiclock = true;
                     }
                     else if (ev.get_status() == EVENT_MIDI_STOP)
                     {
-                        // do nothing, just let the system pause
-                        // since we're not getting ticks after the stop, the song wont advance
-                        // when start is recieved, we'll reset the position, or
-                        // when continue is recieved, we wont
                         m_midiclockrunning = false;
                         all_notes_off();
+                        stop();
                     }
                     else if (ev.get_status() == EVENT_MIDI_CLOCK)
                     {
                         if (m_midiclockrunning)
                             m_midiclocktick += 8;
                     }
-                    // not tested (todo: test it!)
                     else if (ev.get_status() == EVENT_MIDI_SONG_POS)
                     {
                         unsigned char a, b;
                         ev.get_data(&a, &b);
-                        m_midiclockpos = ((int)a << 7) && (int)b;
+
+                        m_midiclockpos = combine_bytes(a,b);
+
+                        /*
+                            http://www.blitter.com/~russtopia/MIDI/~jglatt/tech/midispec/ssp.htm
+
+                            Example: If a Song Position value of 8 is received,
+                            then a sequencer (or drum box) should cue playback to the
+                            third quarter note of the song.
+                            (8 MIDI beats * 6 MIDI clocks per MIDI beat = 48 MIDI Clocks.
+                            Since there are 24 MIDI Clocks in a quarter note,
+                            the first quarter occurs on a time of 0 MIDI Clocks,
+                            the second quarter note occurs upon the 24th MIDI Clock,
+                            and the third quarter note occurs on the 48th MIDI Clock).
+                         */
+
+                        m_midiclockpos *= 48;   // 8 MIDI beats * 6 MIDI clocks per MIDI beat = 48 MIDI Clocks.
                     }
 
                     /* filter system wide messages */
@@ -2414,6 +2428,25 @@ void perform::input_func()
         }
     }
     pthread_exit(0);
+}
+
+/*
+    http://www.blitter.com/~russtopia/MIDI/~jglatt/tech/midispec/wheel.htm
+    Two data bytes follow the status. The two bytes should be combined together
+    to form a 14-bit value. The first data byte's bits 0 to 6 are bits 0 to 6 of
+    the 14-bit value. The second data byte's bits 0 to 6 are really bits 7 to 13
+    of the 14-bit value. In other words, assuming that a C program has the first
+    byte in the variable First and the second data byte in the variable Second,
+    here's how to combine them into a 14-bit value (actually 16-bit since most
+    computer CPUs deal with 16-bit, not 14-bit, integers):
+*/
+unsigned short perform::combine_bytes(unsigned char First, unsigned char Second)
+{
+   unsigned short _14bit;
+   _14bit = (unsigned short)Second;
+   _14bit <<= 7;
+   _14bit |= (unsigned short)First;
+   return(_14bit);
 }
 
 void perform::save_playing_state()
