@@ -2184,15 +2184,20 @@ sequence::stream_event(  event *a_ev  )
 
     if ( m_recording )
     {
-        if ( global_is_running )
+        if ( global_is_running ) // This and below are the reason we need a global, no perform access
         {
             if(m_rec_vol != 0)
-                a_ev->set_note_velocity(m_rec_vol);
+            {
+                if ( a_ev->is_note_on())
+                {
+                    a_ev->set_note_velocity(m_rec_vol);
+                }
+            }
 
             add_event( a_ev );
             set_dirty();
         }
-        else
+        else // this would be step edit, so set generic default note length, vol, to snap
         {
             if ( a_ev->is_note_on() )
             {
@@ -2213,7 +2218,7 @@ sequence::stream_event(  event *a_ev  )
 
     link_new();
 
-    if ( m_quanized_rec && global_is_running)
+    if ( m_quanized_rec && global_is_running)  // need global here since we don't have perform access
     {
         if (a_ev->is_note_off())
         {
