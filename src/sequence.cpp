@@ -466,7 +466,10 @@ sequence::play( long a_tick, bool a_playback_mode )
             if ( ((*e).get_timestamp() + offset_base ) >= (start_tick_offset) &&
                     ((*e).get_timestamp() + offset_base ) <= (end_tick_offset) )
             {
-                if( transpose && ((*e).is_note_on() || (*e).is_note_off()))
+                if( transpose &&
+                   ((*e).is_note_on() ||
+                   (*e).is_note_off() ||
+                   ((*e).get_status() == EVENT_AFTERTOUCH)))
                 {
                     transposed_event.set_timestamp((*e).get_timestamp());
                     transposed_event.set_status((*e).get_status());
@@ -3808,8 +3811,9 @@ sequence::transpose_notes( int a_steps, int a_scale )
     {
         /* is it being moved ? */
         if ( ((*i).get_status() ==  EVENT_NOTE_ON ||
-                (*i).get_status() ==  EVENT_NOTE_OFF) &&
-                (*i).is_marked() )
+              (*i).get_status() ==  EVENT_NOTE_OFF ||
+              (*i).get_status() ==  EVENT_AFTERTOUCH) &&
+              (*i).is_marked())
         {
             e = (*i);
             e.unmark();
@@ -3832,6 +3836,10 @@ sequence::transpose_notes( int a_steps, int a_scale )
             e.set_note( note );
 
             transposed_events.push_front(e);
+        }
+        else
+        {
+            (*i).unmark(); // don't transpose these and ignore
         }
     }
 
@@ -4400,7 +4408,7 @@ sequence::apply_song_transpose()
     for( list<event>::iterator iter = m_list_event.begin();
             iter != m_list_event.end(); iter++ )
     {
-        if ((*iter).is_note_on() || (*iter).is_note_off())
+        if ((*iter).is_note_on() || (*iter).is_note_off() || ((*iter).get_status() == EVENT_AFTERTOUCH))
         {
             (*iter).set_note((*iter).get_note()+transpose);
         }
