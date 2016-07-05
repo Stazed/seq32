@@ -1465,16 +1465,7 @@ int jack_sync_callback(jack_transport_state_t state,
                        jack_position_t *pos, void *arg)
 {
     perform *p = (perform *) arg;
-/*
-    p->m_jack_frame_current = jack_get_current_transport_frame(p->m_jack_client);
 
-    p->m_jack_tick =
-        p->m_jack_frame_current *
-        p->m_jack_pos.ticks_per_beat *
-        p->m_jack_pos.beats_per_minute / (p->m_jack_pos.frame_rate * 60.0);
-
-    p->m_jack_frame_last = p->m_jack_frame_current;
-*/
     p->m_jack_transport_state_last =
         p->m_jack_transport_state =
             state;
