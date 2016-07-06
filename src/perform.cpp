@@ -681,19 +681,19 @@ long perform::get_right_tick()
     return m_right_tick;
 }
 
-void perform::add_sequence( sequence *a_seq, int a_perf )
+void perform::add_sequence( sequence *a_seq, int a_pref )
 {
-    /* check for perferred */
-    if ( a_perf < c_max_sequence &&
-            is_active(a_perf) == false &&
-            a_perf >= 0 )
+    /* check for preferred */
+    if ( a_pref < c_max_sequence &&
+            is_active(a_pref) == false &&
+            a_pref >= 0 )
     {
-        m_seqs[a_perf] = a_seq;
-        set_active(a_perf, true);
+        m_seqs[a_pref] = a_seq;
+        set_active(a_pref, true);
     }
-    else
+    else if(a_pref >= 0)
     {
-        for (int i=a_perf; i< c_max_sequence; i++ )
+        for (int i=a_pref; i< c_max_sequence; i++ )
         {
             if ( is_active(i) == false )
             {

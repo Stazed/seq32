@@ -198,7 +198,7 @@ event::print()
 {
     printf( "[%06ld] [%04X] %02X ",
             m_timestamp,
-            m_sysex.size(),
+            (unsigned char)m_sysex.size(),
             m_status );
 
     if ( m_status == EVENT_SYSEX )
