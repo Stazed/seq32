@@ -313,24 +313,6 @@ mainwnd::~mainwnd()
 bool
 mainwnd::timer_callback(  )
 {
-#ifdef JACK_SUPPORT
-    if(!global_is_running)      //  FF/RW when not running
-    {
-        if(m_mainperf->is_jack_running())
-        {
-            long tick = get_current_jack_position(m_mainperf);
-            long diff = tick - m_mainperf->get_jack_stop_tick();
-
-            if(diff != 0)
-            {
-                m_mainperf->set_reposition();
-                m_mainperf->set_starting_tick(tick);
-                m_mainperf->set_jack_stop_tick(tick);
-            }
-        }
-    }
-#endif // JACK_SUPPORT
-
     long ticks = m_mainperf->get_tick();
 
     m_main_time->idle_progress( ticks );
