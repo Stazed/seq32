@@ -207,6 +207,7 @@ private:
     /* for dumping midi input to sequence for recording */
     bool m_dumping_input;
     sequence *m_seq;
+    vector < sequence *> m_vector_sequence;
 
     /* current note transpose value (for all transposable sequences) */
     int m_transpose;
@@ -274,6 +275,7 @@ public:
     bool is_more_input( );
     bool get_midi_event( event *a_in );
     void set_sequence_input( bool a_state, sequence *a_seq );
+    void dump_midi_input(event *a_in);
 
     bool is_dumping( )
     {

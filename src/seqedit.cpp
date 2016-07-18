@@ -1461,7 +1461,16 @@ seqedit::play_change_callback()
 void
 seqedit::record_change_callback()
 {
-    m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
+    /*
+        Both record_change_callback() and thru_change_callback() will call
+        set_sequence_input() for the same sequence. We only need to call
+        it if it is not already set, if setting. And, we should not unset
+        it if the m_toggle_thru->get_active() is true.
+    */
+
+    if(!m_toggle_thru->get_active())    // only change if thru is not active
+        m_mainperf->get_master_midi_bus()->set_sequence_input( m_toggle_record->get_active(), m_seq );
+
     m_seq->set_recording( m_toggle_record->get_active() );
 }
 
@@ -1498,7 +1507,16 @@ seqedit::redo_callback()
 void
 seqedit::thru_change_callback()
 {
-    m_mainperf->get_master_midi_bus()->set_sequence_input( true, m_seq );
+    /*
+        Both thru_change_callback() and record_change_callback() will call
+        set_sequence_input() for the same sequence. We only need to call
+        it if it is not already set, if setting. And, we should not unset
+        it if the m_toggle_record->get_active() is true.
+    */
+
+    if(!m_toggle_record->get_active())  // only change if record is not active
+        m_mainperf->get_master_midi_bus()->set_sequence_input( m_toggle_thru->get_active(), m_seq );
+
     m_seq->set_thru( m_toggle_thru->get_active() );
 }
 
@@ -1609,7 +1627,7 @@ seqedit::on_delete_event(GdkEventAny *a_event)
 {
     //printf( "seqedit::on_delete_event()\n" );
     m_seq->set_recording( false );
-    m_mainperf->get_master_midi_bus()->set_sequence_input( false, NULL );
+    m_mainperf->get_master_midi_bus()->set_sequence_input( false, m_seq );
     m_seq->set_editing( false );
 
     delete m_lfo_wnd;
