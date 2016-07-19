@@ -259,7 +259,7 @@ public:
 
     void init();
 
-    void clear_all();
+    bool clear_all();
 
     void launch_input_thread();
     void launch_output_thread();

@@ -113,6 +113,7 @@ private:
     void file_save();
     void file_save_as( int type = c_seq32_midi );
     void file_exit();
+    void new_open_error_dialog();
     void new_file();
     bool save_file();
     void export_midi(const Glib::ustring& fn);

@@ -327,8 +327,19 @@ void perform::deinit_jack()
 #endif
 }
 
-void perform::clear_all()
+bool perform::clear_all()
 {
+    for (int i=0; i< c_max_sequence; i++ )
+    {
+        if ( is_active(i) )
+        {
+            if ( m_seqs[i] != NULL && m_seqs[i]->get_editing() )
+            {
+                return false;
+            }
+        }
+    }
+
     reset_sequences();
 
     for (int i=0; i< c_max_sequence; i++ )
@@ -344,9 +355,10 @@ void perform::clear_all()
         set_screen_set_notepad( i, &e );
     }
 
-    set_bpm(c_bpm);
     set_have_undo(false);
     set_have_redo(false);
+
+    return true;
 }
 
 void perform::set_mode_group_mute ()

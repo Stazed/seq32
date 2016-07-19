@@ -456,18 +456,25 @@ void mainwnd::file_new()
 void mainwnd::new_file()
 {
     /* reset everything to default */
-    m_mainperf->clear_all();
-    m_perf_edit->set_bp_measure(4);
-    m_perf_edit->set_bw(4);
-    m_perf_edit->set_xpose(0);
+    if(m_mainperf->clear_all())
+    {
+        m_perf_edit->set_bp_measure(4);
+        m_perf_edit->set_bw(4);
+        m_perf_edit->set_xpose(0);
+        m_mainperf->set_bpm(c_bpm);
 
-    m_main_wid->reset();
-    m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
-                                 m_mainperf->get_screenset() ));
+        m_main_wid->reset();
+        m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
+                                     m_mainperf->get_screenset() ));
 
-    global_filename = "";
-    update_window_title();
-    global_is_modified = false;
+        global_filename = "";
+        update_window_title();
+        global_is_modified = false;
+    }
+    else
+    {
+        new_open_error_dialog();
+    }
 }
 
 /* callback function */
@@ -572,38 +579,55 @@ void mainwnd::export_midi(const Glib::ustring& fn)
     }
 }
 
+void mainwnd::new_open_error_dialog()
+{
+    Gtk::MessageDialog errdialog
+    (
+        *this,
+        "All sequence edit windows\nmust be closed before\nopening a new file.",
+        false,
+        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK,
+        true
+    );
+    errdialog.run();
+}
+
 void mainwnd::open_file(const Glib::ustring& fn)
 {
     bool result;
 
     /* reset everything to default */
-    m_mainperf->clear_all();
-    m_perf_edit->set_bp_measure(4);
-    m_perf_edit->set_bw(4);
-    m_perf_edit->set_xpose(0);
-
-    midifile f(fn);
-    result = f.parse(m_mainperf, 0);
-
-    global_is_modified = !result; /* this means good file = NOT modified and bad = modified?? */
-
-    if (!result)
+    if(m_mainperf->clear_all())
     {
-        Gtk::MessageDialog errdialog(*this,
-                                     "Error reading file: " + fn, false,
-                                     Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-        errdialog.run();
-        return;
+        m_perf_edit->set_xpose(0);
+
+        midifile f(fn);
+        result = f.parse(m_mainperf, 0);
+
+        global_is_modified = !result; /* this means good file = NOT modified and bad = modified?? */
+
+        if (!result)
+        {
+            Gtk::MessageDialog errdialog(*this,
+                                         "Error reading file: " + fn, false,
+                                         Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+            errdialog.run();
+            return;
+        }
+
+        last_used_dir = fn.substr(0, fn.rfind("/") + 1);
+        global_filename = fn;
+        update_window_title();
+
+        m_main_wid->reset();
+        m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
+                                    m_mainperf->get_screenset()));
+        m_adjust_bpm->set_value( m_mainperf->get_bpm());
     }
-
-    last_used_dir = fn.substr(0, fn.rfind("/") + 1);
-    global_filename = fn;
-    update_window_title();
-
-    m_main_wid->reset();
-    m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
-                                m_mainperf->get_screenset()));
-    m_adjust_bpm->set_value( m_mainperf->get_bpm());
+    else
+    {
+        new_open_error_dialog();
+    }
 }
 
 /*callback function*/
@@ -879,6 +903,9 @@ mainwnd::popup_menu(Menu *a_menu)
 void
 mainwnd::apply_song_transpose()
 {
+    if(global_is_running)
+        return;
+
     if(m_mainperf->get_master_midi_bus()->get_transpose() != 0)
     {
         m_mainperf->apply_song_transpose();
