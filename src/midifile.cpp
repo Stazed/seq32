@@ -631,27 +631,6 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
             }
         }
     }
-    if ((file_size - m_pos) > (int) sizeof (unsigned int))
-    {
-        /* Get ID + Length */
-        ID = read_long ();
-        if (ID == c_bp_measure)
-        {
-            long bp_mes = read_long ();
-            a_perf->set_bp_measure(bp_mes);
-        }
-    }
-
-    if ((file_size - m_pos) > (int) sizeof (unsigned int))
-    {
-        /* Get ID + Length */
-        ID = read_long ();
-        if (ID == c_beat_width)
-        {
-            long bw = read_long ();
-            a_perf->set_bw(bw);
-        }
-    }
 
     // *** ADD NEW TAGS AT END **************/
 
@@ -702,6 +681,26 @@ midifile::write_header( int numtracks)
     write_short (c_ppqn);
 }
 
+void
+midifile::write_tempo(perform * a_perf)
+{
+    write_byte(0x00); // delta time
+    write_short(0xFF51);
+    write_byte(0x03); // length of bytes - must be 3
+    write_mid(60000000/a_perf->get_bpm());
+}
+
+void
+midifile::write_time_sig(perform * a_perf)
+{
+    write_byte(0x00); // delta time
+    write_short(0xFF58);
+    write_byte(0x04); // length of remaining bytes
+    write_byte(a_perf->get_bp_measure());           // nn
+    write_byte(log(a_perf->get_bw())/log(2.0));     // dd
+    write_short(0x1808);                            // cc bb
+}
+
 bool midifile::write (perform * a_perf)
 {
     int numtracks = 0;
@@ -730,7 +729,23 @@ bool midifile::write (perform * a_perf)
 
             /* magic number 'MTrk' */
             write_long (0x4D54726B);
-            write_long (l.size ());
+
+            int size_tempo_time_sig = 0;
+            if(curTrack == 0)
+                size_tempo_time_sig = 15; // size, (s/b 19(total) - 4(trk end) = 15 bytes)
+
+            write_long (l.size () + size_tempo_time_sig);
+
+            /*
+                Add the bpm and timesignature stuff here to the first track (0).
+                So we don't have an extra one...
+            */
+
+            if(curTrack == 0)
+            {
+                write_time_sig(a_perf);
+                write_tempo(a_perf);
+            }
 
             //printf("MTrk len[%d]\n", l.size());
 
@@ -779,14 +794,6 @@ bool midifile::write (perform * a_perf)
             write_long( a_perf->get_group_mute_state(i) );
         }
     }
-
-    /* write out the beats per measure */
-    write_long(c_bp_measure);
-    write_long(a_perf->get_bp_measure());
-
-    /* write out the beat width */
-    write_long(c_beat_width);
-    write_long(a_perf->get_bw());
 
     /* open binary file */
     ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
@@ -907,19 +914,8 @@ bool midifile::write_song (perform * a_perf)
 
             if(numtracks == 0)
             {
-                /* time signature */
-                write_byte(0x00); // delta time
-                write_short(0xFF58);
-                write_byte(0x04); // length of remaining bytes
-                write_byte(a_perf->get_bp_measure());           // nn
-                write_byte(log(a_perf->get_bw())/log(2.0));     // dd
-                write_short(0x1808);                            // cc bb
-
-                /* Tempo */
-                write_byte(0x00); // delta time
-                write_short(0xFF51);
-                write_byte(0x03); // length of bytes - must be 3
-                write_mid(60000000/a_perf->get_bpm());
+                write_time_sig(a_perf);
+                write_tempo(a_perf);
             }
 
             while (l.size () > 0)
