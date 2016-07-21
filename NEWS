@@ -1,3 +1,13 @@
+seq32-1.0.5 (2016-07-21)
+  * NEW - Midi recording now capable of simultaneous, multi-sequence recording, channel specific. Record up to
+  16 channels at once.
+  * Now using SMF for time signature instead of proprietary tags (only effects projects that are NOT 4/4). If affected,
+  the file should be loaded, then the time signature reset, and saved.
+  * Warning added when opening or creating new file to close all sequence editors.
+  * 'Apply song transpose' from edit menu not allowed when sequencer is running.
+  * Proprietary tag for sequence transpose changed from ...13 to ...14 for consistency with sequencer64. You will 
+  have to reset the flag of off sequences, then save. 
+
 seq32-1.0.4 (2016-07-15)
   * Move to jack_process_callback() - seq32 is not slow sync.
   * Midi recording is now channel specific.
