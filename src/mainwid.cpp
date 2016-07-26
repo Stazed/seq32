@@ -524,8 +524,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
     {
         m_moving = false;
 
-        if ( ! m_mainperf->is_active( m_current_seq ) && m_current_seq != -1
-                && !m_mainperf->is_sequence_in_edit( m_current_seq )  )
+        if ( ! m_mainperf->is_active( m_current_seq ) && m_current_seq != -1 )
         {
             m_mainperf->new_sequence( m_current_seq  );
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;
