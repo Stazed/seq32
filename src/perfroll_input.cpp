@@ -450,8 +450,6 @@ bool Seq32PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 
         if ( ths.m_mainperf->is_active( ths.m_drop_sequence ))
         {
-            ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_trigger_paste_tick(tick); // for paste
-
             bool state = ths.m_mainperf->get_sequence( ths.m_drop_sequence )->get_trigger_state(tick);
 
             if ( state )     // clicked on trigger for split
