@@ -20,22 +20,22 @@
 
 #include "mutex.h"
 
-const pthread_mutex_t mutex::recmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+const pthread_mutex_t seq32_mutex::recmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 const pthread_cond_t condition_var::cond  = PTHREAD_COND_INITIALIZER;
 
-mutex::mutex( )
+seq32_mutex::seq32_mutex( )
 {
     m_mutex_lock = recmutex;
 }
 
 void
-mutex::lock( )
+seq32_mutex::lock( )
 {
     pthread_mutex_lock( &m_mutex_lock );
 }
 
 void
-mutex::unlock( )
+seq32_mutex::unlock( )
 {
     pthread_mutex_unlock( &m_mutex_lock );
 }

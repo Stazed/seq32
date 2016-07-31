@@ -88,7 +88,7 @@ private:
     long m_lasttick;
 
     /* locking */
-    mutex m_mutex;
+    seq32_mutex m_mutex;
 
     /* mutex */
     void lock();
@@ -213,7 +213,7 @@ private:
     int m_transpose;
 
     /* locking */
-    mutex m_mutex;
+    seq32_mutex m_mutex;
 
     /* mutex */
     void lock();
