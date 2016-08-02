@@ -440,6 +440,7 @@ public:
     friend class optionsfile;
     friend class options;
 
+    bool sequence_is_song_exportable(int a_seq);
     void apply_song_transpose ();
 
 #ifdef JACK_SUPPORT

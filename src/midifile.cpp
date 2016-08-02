@@ -821,14 +821,17 @@ bool midifile::write_song (perform * a_perf)
 {
     int numtracks = 0;
 
-    /* get number of tracks  */
+    /* get number of sequences  */
     for (int i = 0; i < c_max_sequence; i++)
     {
-        if (a_perf->is_active(i) && a_perf->get_sequence(i)->get_trigger_count() > 0 &&
-                !a_perf->get_sequence(i)->get_song_mute()) // don't count tracks with NO triggers or muted
-        {
-            numtracks ++;
-        }
+        if(a_perf->sequence_is_song_exportable(i))
+            numtracks++;
+    }
+
+    if(numtracks == 0)
+    {
+        printf("There are NO exportable tracks to export!\nDo any have triggers?\nAre all tracks muted?\n");
+        return false;
     }
 
     write_header(numtracks);
@@ -840,21 +843,18 @@ bool midifile::write_song (perform * a_perf)
 
     for (int curTrack = 0; curTrack < c_max_sequence; curTrack++)
     {
-        //printf ("track[%d]\n", curTrack );
-        if (a_perf->is_active(curTrack) && !a_perf->get_sequence(curTrack)->get_song_mute())
+        if(a_perf->sequence_is_song_exportable(curTrack))
         {
-            /* all track triggers */
+            /* all sequence triggers */
             sequence * seq = NULL;
             trigger *a_trig = NULL;
 
             seq = a_perf->get_sequence(curTrack);
 
             std::vector<trigger> trig_vect;
-            seq->get_sequence_triggers(trig_vect); // all triggers for the track
+            seq->get_sequence_triggers(trig_vect);
 
             int vect_size = trig_vect.size();
-            if(vect_size < 1)
-                continue; // skip tracks with no triggers
 
             list<char> l;
 

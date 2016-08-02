@@ -2384,7 +2384,7 @@ void perform::input_func()
                             ev.set_timestamp(m_tick);
 
                             /* dump to it - possibly multiple sequences set */
-                            m_master_bus.dump_midi_input(&ev);
+                            m_master_bus.dump_midi_input(ev);
                         }
 
                         /* use it to control our sequencer */
@@ -2830,6 +2830,19 @@ int main ()
 
 #endif // 0
 #endif // JACK_SUPPORT
+
+bool
+perform::sequence_is_song_exportable(int a_seq)
+{
+    if (is_active(a_seq) &&                                 // active?
+        get_sequence(a_seq)->get_trigger_count() > 0 &&     // does it have triggers?
+        !get_sequence(a_seq)->get_song_mute())              // is it NOT muted?
+    {
+        return true;                                        // then it is good.
+    }
+    return false;                                           // somewhere we failed above
+}
+
 
 void
 perform::apply_song_transpose()
