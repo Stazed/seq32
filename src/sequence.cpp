@@ -55,8 +55,6 @@ sequence::sequence( ) :
 
     m_trigger_offset(0),
 
-    m_paste_tick(-1),
-
     m_length(4 * c_ppqn),
     m_snap_tick(c_ppqn / 4),
 
@@ -3162,7 +3160,6 @@ sequence::cut_selected_trigger()
 void
 sequence::copy_selected_trigger()
 {
-    set_trigger_paste_tick(-1); // clear any unpasted middle click
     lock();
 
     list<trigger>::iterator i;
@@ -3181,14 +3178,14 @@ sequence::copy_selected_trigger()
 }
 
 void
-sequence::paste_trigger()
+sequence::paste_trigger(long a_tick)
 {
     if ( m_trigger_copied )
     {
         long length =  m_trigger_clipboard.m_tick_end -
                        m_trigger_clipboard.m_tick_start + 1;
         // paste at copy end or get_trigger_paste_tick
-        if(get_trigger_paste_tick() < 0)    // < 0 means no paste tick set so use default
+        if(a_tick < 0)    // < 0 means no paste tick set so use default
         {
             add_trigger( m_trigger_clipboard.m_tick_end + 1,
                          length,
@@ -3202,30 +3199,15 @@ sequence::paste_trigger()
         }
         else
         {
-            long offset_adjust = get_trigger_paste_tick() - m_trigger_clipboard.m_tick_start;
-            add_trigger(get_trigger_paste_tick(),
-                        length,
-                        m_trigger_clipboard.m_offset + offset_adjust); // +/- distance to paste tick from start
+            long offset_adjust = a_tick - m_trigger_clipboard.m_tick_start;
+            add_trigger(a_tick, length, m_trigger_clipboard.m_offset + offset_adjust); // +/- distance to paste tick from start
 
-            m_trigger_clipboard.m_tick_start = get_trigger_paste_tick();
+            m_trigger_clipboard.m_tick_start = a_tick;
             m_trigger_clipboard.m_tick_end = m_trigger_clipboard.m_tick_start + length - 1;
             m_trigger_clipboard.m_offset += offset_adjust;
             m_trigger_clipboard.m_offset = adjust_offset(m_trigger_clipboard.m_offset);
-            set_trigger_paste_tick(-1); // reset to default
         }
     }
-}
-
-void
-sequence::set_trigger_paste_tick(long a_tick)
-{
-    m_paste_tick = a_tick;
-}
-
-long
-sequence::get_trigger_paste_tick()
-{
-    return m_paste_tick;
 }
 
 /* this refreshes the play marker to the LastTick */
