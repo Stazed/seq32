@@ -146,8 +146,6 @@ private:
 
     long m_trigger_offset;
 
-    long m_paste_tick;
-
     /* length of sequence in pulses
        should be powers of two in bars */
     long m_length;
@@ -335,10 +333,7 @@ public:
     void del_selected_trigger();
     void cut_selected_trigger();
     void copy_selected_trigger();
-    void paste_trigger();
-
-    void set_trigger_paste_tick(long a_tick);
-    long get_trigger_paste_tick();
+    void paste_trigger(long a_tick = -1); // -1 default behavior no paste tick
 
     void move_selected_triggers_to(long a_tick, bool a_adjust_offset, int a_which=2);
     long get_selected_trigger_start_tick();

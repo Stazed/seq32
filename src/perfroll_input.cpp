@@ -90,7 +90,8 @@ bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
             }
             else    // clicked on track (off trigger) - paste
             {
-                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_trigger_paste_tick(tick);
+                ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
+                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->paste_trigger(tick);
             }
         }
     }
@@ -117,7 +118,8 @@ void FruityPerfInput::on_left_button_pressed(GdkEventButton* a_ev, perfroll& ths
             }
             else // clicked off trigger for paste
             {
-                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_trigger_paste_tick(tick);
+                ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
+                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->paste_trigger(tick);
             }
         }
     }
@@ -458,7 +460,8 @@ bool Seq32PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
             }
             else    // clicked off trigger for paste
             {
-                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_trigger_paste_tick(tick);
+                ths.m_mainperf->push_trigger_undo(ths.m_drop_sequence);
+                ths.m_mainperf->get_sequence( ths.m_drop_sequence )->paste_trigger(tick);
             }
         }
     }
