@@ -382,12 +382,13 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
                     else
                         m_gc->set_foreground(m_white);
 
+                    /* main trigger box */
                     a_draw->draw_rectangle(m_gc,true,
                                            x,
                                            y,
                                            w,
                                            h );
-
+                    /* trigger outline */
                     m_gc->set_foreground(m_black);
                     a_draw->draw_rectangle(m_gc,false,
                                            x,
@@ -395,6 +396,7 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
                                            w,
                                            h );
 
+                    /* little seq grab handle - left hand side */
                     m_gc->set_foreground(m_black);
                     a_draw->draw_rectangle(m_gc,false,
                                            x,
@@ -402,6 +404,7 @@ void perfroll::draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_seque
                                            c_perfroll_size_box_w,
                                            c_perfroll_size_box_w );
 
+                    /* seq grab handle - right side */
                     a_draw->draw_rectangle(m_gc,false,
                                            x+w-c_perfroll_size_box_w,
                                            y+h-c_perfroll_size_box_w,
