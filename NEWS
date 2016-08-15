@@ -1,3 +1,13 @@
+seq32-1.0.6 (2016-08-15)
+  * Fix mutex vs std::mutex name clash with some gcc 5 compilers
+  * Add middle button paste of copied/cut triggers automatic.
+  * Add additional song snaps to allow for at least 1/2 beat precision.
+  * Fix zoom truncation of grid drawing on song editor.
+  * Add number skipping to display of grid measure numbers when squashed by zoom.
+  * Revert back to using proprietary tags for global song time signature (SMF will not work in all cases).
+  * Fix intermittent move sequence failure - carryover from seq24.
+  * Various cleanup.
+
 seq32-1.0.5 (2016-07-21)
   * NEW - Midi recording now capable of simultaneous, multi-sequence recording, channel specific. Record up to
   16 channels at once.
