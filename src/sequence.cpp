@@ -524,8 +524,11 @@ sequence::zero_markers()
     unlock();
 }
 
-/* verfies state, all noteons have an off,
-   links noteoffs with their ons */
+/*
+    Verifies state, all note ONs have an OFF, links note OFFs with their ONs.
+    This will delete any notes that are >= m_length, so any resize or move
+    of notes must modify for wrapping if note OFF is >= m_length.
+*/
 void
 sequence::verify_and_link()
 {
@@ -547,19 +550,17 @@ sequence::verify_and_link()
     /* pair ons and offs */
     while ( on != m_list_event.end() )
     {
-        /* check for a note on, then look for its
-           note off */
+        /* check for a note ON, then look for its note OFF */
         if ( (*on).is_note_on() )
         {
-            /* get next possible off node */
+            /* get next possible OFF note */
             off = on;
             off++;
             end_found = false;
 
             while ( off != m_list_event.end() )
             {
-                /* is a off event, == notes, and isnt
-                   markeded  */
+                /* is a OFF event, == notes, and is not marked  */
                 if ( (*off).is_note_off()                  &&
                         (*off).get_note() == (*on).get_note() &&
                         ! (*off).is_marked()                  )
@@ -609,7 +610,7 @@ sequence::verify_and_link()
     /* kill those not in range */
     for ( i = m_list_event.begin(); i != m_list_event.end(); i++ )
     {
-        /* if our current time stamp is greater then the length */
+        /* if our current time stamp is greater than or equal to the length */
 
         if ( (*i).get_timestamp() >= m_length || (*i).get_timestamp() < 0 )
         {
@@ -1398,7 +1399,7 @@ sequence::unselect()
     unlock();
 }
 
-/* removes and adds readds selected in position */
+/* removes and adds re-adds selected in position */
 void
 sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
 {
@@ -1429,22 +1430,29 @@ sequence::move_selected_notes( long a_delta_tick, int a_delta_note )
                 noteon = e.is_note_on();
                 timestamp = e.get_timestamp() + a_delta_tick;
 
-                if (timestamp > m_length)
+                /*
+                    If timestamp + delta is greater that m_length we do round robin magic.
+                    If timestamp > m_length then adjust to the beginning.
+                    If timestamp == m_length (0) then it is adjusted to 0 and later trimmed.
+                    If timestamp < 0 then adjust to the end.
+                */
+
+                if (timestamp >= m_length)  // wrap to beginning or set to 0
                 {
                     timestamp = timestamp - m_length;
                 }
 
-                if (timestamp < 0)
+                if (timestamp < 0)          // adjust to the end
                 {
                     timestamp = m_length + timestamp;
                 }
 
-                if ((timestamp==0) && !noteon)
+                if ((timestamp==0) && !noteon)  // trim if equal
                 {
                     timestamp = m_length-2;
                 }
 
-                if ((timestamp==m_length) && noteon)
+                if ((timestamp==m_length) && noteon)    // wrap note ON to beginning
                 {
                     timestamp = 0;
                 }
@@ -1533,7 +1541,7 @@ sequence::stretch_selected( long a_delta_tick )
 }
 
 
-/* moves note off event */
+/* moves note OFF event */
 void
 sequence::grow_selected( long a_delta_tick )
 {
@@ -1561,18 +1569,24 @@ sequence::grow_selected( long a_delta_tick )
                 off->get_timestamp() +
                 a_delta_tick;
 
-            //If timestamp + delta is greater that m_length we do round robbin magic
-            if (length > m_length)
+            /*
+                If timestamp + delta is greater that m_length we do round robin magic.
+                If length > m_length then adjust to the beginning.
+                If length == m_length then it is adjusted to 0 and later trimmed.
+                If length < 0 then adjust to the end.
+            */
+
+            if (length >= m_length) // wrap to beginning or set to 0
             {
                 length = length - m_length;
             }
 
-            if (length < 0)
+            if (length < 0)         // adjust to ending
             {
                 length = m_length + length;
             }
 
-            if (length==0)
+            if (length==0)          // trim
             {
                 length = m_length-2;
             }
@@ -3893,7 +3907,7 @@ sequence::shift_notes( int a_ticks )
     unlock();
 }
 
-// NOT DELETING THE ENDS, NOT SELECTED.
+/* if a note event then the status is EVENT_NOTE_ON */
 void
 sequence::quanize_events( unsigned char a_status, unsigned char a_cc,
                           long a_snap_tick,  int a_divide, bool a_linked )
@@ -3951,7 +3965,7 @@ sequence::quanize_events( unsigned char a_status, unsigned char a_cc,
                 timestamp_delta = (a_snap_tick - timestamp_remander) / a_divide;
             }
 
-            if ((timestamp_delta + timestamp) >= m_length)
+            if ((timestamp_delta + timestamp) >= m_length) // wrap around note ON to the front
             {
                 timestamp_delta = - e.get_timestamp() ;
             }
@@ -3959,13 +3973,44 @@ sequence::quanize_events( unsigned char a_status, unsigned char a_cc,
             e.set_timestamp( e.get_timestamp() + timestamp_delta );
             quantized_events.push_front(e);
 
-            if ( (*i).is_linked() && a_linked )
+            /*
+                since the only events that are linked are notes and the status of all note calls to
+                this function are ONs, then the linked must be only EVENT_NOTE_OFF.
+            */
+
+            if ( (*i).is_linked() && a_linked ) // note OFF's only
             {
                 f = *(*i).get_linked();
                 f.unmark();
                 (*i).get_linked()->select();
 
-                f.set_timestamp( f.get_timestamp() + timestamp_delta );
+                //printf("timestamp before [%ld]: timestamp_delta [%ld]: m_length [%ld]\n", f.get_timestamp(), timestamp_delta, m_length);
+
+                long adjusted_timestamp = f.get_timestamp() + timestamp_delta;
+
+                /*
+                    If adjusted_timestamp is negative then we have a note OFF that was previously wrapped before the
+                    adjustment. Since the timestamp_delta is based on the note ON which was not wrapped
+                    we need to add back the m_length for the wrapping.
+                */
+
+                if(adjusted_timestamp < 0 ) // wrapped note OFF before being adjusted
+                    adjusted_timestamp += m_length;
+
+                /*
+                    If the adjusted_timestamp after is >= m_length then it will be deleted by
+                    verify_and_link() since verify_and_link() discards any notes (ON or OFF) that are
+                    >= m_length. So we must wrap if > m_length and trim if  == m_length
+                */
+
+                if(adjusted_timestamp == m_length )  // note OFF equal sequence length after adjustment so trim
+                    adjusted_timestamp -= c_note_off_margin;
+
+                if(adjusted_timestamp > m_length )  // note OFF is past end of sequence after adjustment so wrap it around
+                    adjusted_timestamp -= m_length;
+
+                f.set_timestamp( adjusted_timestamp );
+
                 quantized_events.push_front(f);
             }
         }
