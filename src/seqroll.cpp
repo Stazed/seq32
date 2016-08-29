@@ -578,6 +578,7 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
 
     int note_x;
     int note_width;
+    int note_off_width = 0; // needed for wrapped note OFF
     int note_y;
     int note_height;
 
@@ -642,9 +643,10 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
                         note_width = (tick_f - tick_s) / m_zoom;
                         if ( note_width < 1 ) note_width = 1;
                     }
-                    else
+                    else    // this is wrap around note
                     {
-                        note_width = (m_seq->get_length() - tick_s) / m_zoom;
+                        note_width = (m_seq->get_length() - tick_s) / m_zoom; // this is note ON width
+                        note_off_width = tick_f / m_zoom;                     // needed for wrapped note OFF
                     }
                 }
                 else
@@ -680,6 +682,8 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
                                         note_y,
                                         note_width,
                                         note_height);
+
+                /* if note wraps around to the beginning */
                 if (tick_f < tick_s)
                 {
                     a_draw->draw_rectangle(	m_gc,true,
@@ -689,8 +693,15 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
                                             note_height);
                 }
 
-                /* draw inside box if there is room */
-                if ( note_width > 3 )
+                /*
+                    Draw inside box if there is room.
+                    The check for note_width is based on the note ON width. If the note ON
+                    is less than 3 and there is a wrapped note OFF of width > 3 then the note
+                    OFF portion would not draw the inside rectangle. Thus the need for the additional
+                    note_off_width check.
+                */
+
+                if ( note_width > 3  || note_off_width > 3)
                 {
                     if ( selected )
                         m_gc->set_foreground(m_red);
@@ -699,7 +710,7 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
 
                     if ( method == 1 )
                     {
-                        if (tick_f >= tick_s)
+                        if (tick_f >= tick_s)   // note is not wrapped
                         {
                             a_draw->draw_rectangle(	m_gc,true,
                                                     note_x + 1 + in_shift,
@@ -707,17 +718,28 @@ void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )
                                                     note_width - 3 + length_add,
                                                     note_height - 3);
                         }
-                        else
+                        else    // note is wrapped
                         {
+                            /* note ON */
                             a_draw->draw_rectangle(	m_gc,true,
                                                     note_x + 1 + in_shift,
                                                     note_y + 1,
                                                     note_width,
                                                     note_height - 3);
-                            a_draw->draw_rectangle(	m_gc,true,
+
+                            /*
+                                note OFF - wrapped. If the off_note_width is < 0 then the draw would
+                                span the entire sequence (presumably because the negative is converted to
+                                a positive??). This would occur occasionally when there was
+                                a very small wrapped note OFF - due to rounding.
+                             */
+                            long off_note_width = (tick_f/m_zoom) - 3 + length_add;
+
+                            if(off_note_width >= 0 )
+                                a_draw->draw_rectangle(	m_gc,true,
                                                     0,
                                                     note_y + 1,
-                                                    (tick_f/m_zoom) - 3 + length_add,
+                                                    off_note_width,
                                                     note_height - 3);
                         }
                     }
