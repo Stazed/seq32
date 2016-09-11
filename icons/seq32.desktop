@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Seq32
+GenericName=
+Comment=MIDI Sequencer
+Icon=/usr/share/pixmaps/SEQ32_32.png
+
+Type=Application
+Categories=AudioVideo;Audio;
+
+Exec=seq32
+Terminal=false
