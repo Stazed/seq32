@@ -63,7 +63,7 @@ perfedit::perfedit( perform *a_perf )
 
     /* main window */
     set_title( "seq32 - Song Editor");
-    set_size_request(700, 400);
+    set_size_request(750, 400);
 
     /* tooltips */
     m_tooltips = manage( new Tooltips( ) );
