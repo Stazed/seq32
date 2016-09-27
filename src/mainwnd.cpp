@@ -134,7 +134,7 @@ mainwnd::mainwnd(perform *a_p):
                                     Gdk::Pixbuf::create_from_xpm_data(seq32_xpm))),
                         false, false);
 
-    m_button_mode = manage( new ToggleButton( "song mode" ) );
+    m_button_mode = manage( new ToggleButton( " Live " ) );
     m_button_mode->set_can_focus(false);
     m_button_mode->signal_toggled().connect(  mem_fun( *this, &mainwnd::set_song_mode ));
     add_tooltip( m_button_mode, "Toggle song mode (or live/sequence mode)." );
@@ -367,6 +367,21 @@ void
 mainwnd::set_song_mode()
 {
     global_song_start_mode = m_button_mode->get_active();
+    
+    bool is_active = m_button_mode->get_active();
+    
+    /*
+     * spaces with 'Live' are to keep button width close
+     * to the same when changed for cosmetic purposes.
+     */
+    
+    std::string label = is_active ? "Song" : " Live ";
+    Gtk::Label * lblptr(dynamic_cast<Gtk::Label *>
+    (
+         m_button_mode->get_child())
+    );
+    if (lblptr != NULL)
+        lblptr->set_text(label);
 }
 
 void
