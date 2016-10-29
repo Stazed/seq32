@@ -169,6 +169,10 @@ perform::perform()
     m_key_menu   = GDK_F3;
     m_key_follow_trans  = GDK_F4;
 
+    //setlist next/prev keys:
+    m_key_leftarrow = GDK_Left; //NOT GDK_leftarrow;
+    m_key_rightarrow = GDK_Right; //NOT GDK_rightarrow;
+
     m_jack_stop_tick = 0;
 
     m_offset = 0;
@@ -2855,3 +2859,120 @@ perform::apply_song_transpose()
         }
     }
 }
+
+/****************************************************/
+
+void perform::set_setlist_mode(bool mode)
+{
+    m_setlist_mode = mode;
+}
+
+bool perform::get_setlist_mode()
+{
+    return m_setlist_mode;
+}
+
+void perform::set_setlist_file(char *fn)
+{
+    const int flen = 250; //todo: sjh: set this somewhere
+    
+    if(m_setlist_file == NULL)
+    {
+        m_setlist_file = (char *) malloc(flen * sizeof(char));
+        memset(m_setlist_file,0,flen*sizeof(char));
+    }
+    
+    strcpy(m_setlist_file,fn);
+
+    /*Now read the file*/
+    FILE *fp;
+    char str[flen];
+    int nfiles = 0;
+        
+    if((fp=fopen(m_setlist_file,"r"))!=NULL)
+    {
+        //Count the lines:
+        while(fgets(str,flen,fp)!=NULL)
+        {
+            nfiles++;
+        }
+        
+        m_setlist_nfiles = nfiles;
+        m_setlist_fileset = (char **)malloc(m_setlist_nfiles*sizeof(char *));
+        rewind(fp);
+        nfiles = 0;
+        
+        while(fgets(str,flen,fp)!=NULL)
+        {
+            m_setlist_fileset[nfiles] = (char *)malloc(flen*sizeof(char));
+            strncpy(m_setlist_fileset[nfiles],strtok(str, "\n"),flen);//todo: might need to use strtok to strip out newlines.
+            nfiles++;
+        }
+    }
+    else
+    {
+        //TODO: sjh: Error box needs to handle bad files..
+        //Gtk::MessageDialog errdialog(*this,
+        //        "Error reading playlist file: " + m_setlist_file, false,
+        //        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        //errdialog.run();
+        printf("Unable to open playlist file %s\n",m_setlist_file);
+        set_setlist_mode(false);
+    }
+}
+
+char * perform::get_setlist_current_file()
+{
+    return m_setlist_fileset[m_setlist_current_idx];
+}
+
+void perform::set_setlist_next()
+{
+    m_setlist_current_idx++;
+    
+    if(m_setlist_current_idx >= m_setlist_nfiles)
+    {
+        /* Now we explicity choose to exit setlist mode */
+        //m_setlist_mode = false;
+        m_setlist_current_idx = m_setlist_nfiles -1;
+        m_setlist_load_next_file = false;
+    }
+    else
+    {
+        m_setlist_load_next_file = false;
+    }
+}
+
+bool perform::get_setlist_load_next_file()
+{
+    return m_setlist_load_next_file;
+}
+
+void perform::set_setlist_load_next_file (bool val)
+{
+    m_setlist_load_next_file = val;
+}
+
+int perform::get_setlist_index()
+{
+    return m_setlist_current_idx;
+}
+
+void perform::offset_setlist_index(int offset)
+{
+    m_setlist_current_idx = min(m_setlist_nfiles-1,max(0,m_setlist_current_idx+offset));
+}
+
+bool perform::set_setlist_index(int index)
+{
+    if(index < 0)
+        return false;
+
+    if(index >= m_setlist_nfiles)
+        return false;
+
+    m_setlist_current_idx = index;
+    
+    return true;
+}
+

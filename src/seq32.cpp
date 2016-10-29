@@ -50,6 +50,7 @@ static struct
     {"priority", 0, 0, 'p'},
     {"ignore", required_argument, 0, 'i'},
     {"interaction_method", required_argument, 0, 'x'},
+    {"setlist file", required_argument, 0, 'X'},
     {"jack_transport",0, 0, 'j'},
     {"jack_master",0, 0, 'J'},
     {"jack_master_cond", 0, 0, 'C'},
@@ -177,7 +178,7 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "Chi:jJkmM:pPsSU:vx:", long_options,
+        c = getopt_long(argc, argv, "Chi:jJkmM:pPsSU:vx:X:", long_options,
                         &option_index);
 
         /* Detect the end of the options. */
@@ -201,6 +202,7 @@ main (int argc, char *argv[])
             printf( "   -i, --ignore <number>: ignore ALSA device\n" );
             printf( "   -k, --show_keys: prints pressed key value\n" );
             printf( "   -x, --interaction_method <number>: see .seq32rc for methods to use\n" );
+            printf( "   -X, --setlist file: path to setlist file and name\n" );
             printf( "   -j, --jack_transport: seq32 will sync to jack transport\n" );
             printf( "   -J, --jack_master: seq32 will try to be jack master\n" );
             printf( "   -C, --jack_master_cond: jack master will fail if there is already a master\n" );
@@ -280,6 +282,11 @@ main (int argc, char *argv[])
             global_interactionmethod = (interaction_method_e)atoi(optarg);
             break;
 
+        case 'X':
+            	p.set_setlist_mode(true);
+            	p.set_setlist_file(optarg);
+            	break;
+
         default:
             break;
         }
@@ -301,6 +308,36 @@ main (int argc, char *argv[])
         else
             printf("File not found: %s\n", argv[optind]);
     }
+
+    /* sjh: ok, we can load the file from the playlist if we are in that mode
+     * we have to loop through every entry in the list and drop out if its
+     * the end of the list and we haven't loaded a single file yet...
+     *
+     * TODO: this function is repeated verbatim in mainwnd.cpp...
+     */
+    while(p.get_setlist_mode())
+    {
+    	if(Glib::file_test(p.get_setlist_current_file(), Glib::FILE_TEST_EXISTS))
+    	{
+            seq32_window.open_file(p.get_setlist_current_file(),true);
+            break;
+    	}
+    	else
+    	{
+            printf("File not found: %s\n", p.get_setlist_current_file());
+            p.set_setlist_next();
+    	}
+    }
+
+    if(p.get_setlist_mode())
+    {
+    	printf("Playlist mode is true\n");
+    }
+    else
+    {
+    	printf("Playlist mode is false\n");
+    }
+
 
     /* connect to lash daemon and poll events*/
 #ifdef LASH_SUPPORT

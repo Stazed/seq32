@@ -89,7 +89,35 @@ struct performcallback
 
 class perform
 {
+public:
+
+    //Setlist mode
+    void 	set_setlist_mode(bool mode);
+    bool 	get_setlist_mode();
+    void 	set_setlist_file(char *fn);
+    char * 	get_setlist_current_file();
+    void 	set_setlist_next();
+    bool	get_setlist_load_next_file();
+    void 	set_setlist_load_next_file (bool val);
+    int		get_setlist_index();
+    bool 	set_setlist_index(int index);
+    void 	offset_setlist_index(int offset);
+
+    unsigned int 	m_key_leftarrow;
+    unsigned int 	m_key_rightarrow;
+    int 			m_setjump;				//flag for passing messages up to mainwnd
+    // end selist public
 private:
+
+    //Setlist mode
+    bool m_setlist_mode;
+    char *m_setlist_file;
+    int m_setlist_nfiles;
+    int m_setlist_current_idx;
+    char ** m_setlist_fileset;
+    bool m_setlist_load_next_file;
+    // end selist private
+
     //andy mute group
     bool m_mute_group[c_gmute_tracks];
     bool m_tracks_mute_state[c_seqs_in_set];
