@@ -2872,11 +2872,11 @@ bool perform::get_setlist_mode()
     return m_setlist_mode;
 }
 
-void perform::set_setlist_file(char *fn)
+void perform::set_setlist_file(char *fn)  // TODO do this the c++ way
 {
     const int flen = 250; //todo: sjh: set this somewhere
     
-    if(m_setlist_file == NULL)
+    if(m_setlist_file == NULL)  // array
     {
         m_setlist_file = (char *) malloc(flen * sizeof(char));
         memset(m_setlist_file,0,flen*sizeof(char));

@@ -111,10 +111,10 @@ private:
 
     //Setlist mode
     bool m_setlist_mode;
-    char *m_setlist_file;
+    char *m_setlist_file;   // TODO use vector
     int m_setlist_nfiles;
     int m_setlist_current_idx;
-    char ** m_setlist_fileset;
+    char ** m_setlist_fileset;  // TODO use vector
     bool m_setlist_load_next_file;
     // end selist private
 
