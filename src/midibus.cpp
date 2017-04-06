@@ -849,7 +849,7 @@ mastermidibus::mastermidibus()
     }
 
     /* set our clients name */
-    snd_seq_set_client_name(m_alsa_seq, "seq32");
+    snd_seq_set_client_name(m_alsa_seq, global_client_name.c_str());
 
     /* set up our clients queue */
     m_queue = snd_seq_alloc_queue( m_alsa_seq );

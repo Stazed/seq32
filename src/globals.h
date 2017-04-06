@@ -191,6 +191,8 @@ extern Glib::ustring last_used_dir;
 
 extern bool global_print_keys;
 
+extern Glib::ustring global_client_name;
+
 const int c_max_instruments = 64;
 
 struct user_midi_bus_definition
