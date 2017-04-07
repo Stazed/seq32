@@ -78,6 +78,7 @@ Glib::ustring last_used_dir ="/";
 std::string config_filename = ".seq32rc";
 std::string user_filename = ".seq32usr";
 Glib::ustring global_client_name = "seq32"; // default
+Glib::ustring setlist_file = "";
 bool global_print_keys = false;
 interaction_method_e global_interactionmethod = e_seq32_interaction;
 
@@ -85,6 +86,7 @@ bool global_with_jack_transport = false;
 bool global_with_jack_master = false;
 bool global_with_jack_master_cond = false;
 bool global_song_start_mode = false;
+bool setlist_mode = false;
 
 Glib::ustring global_jack_session_uuid = "";
 
@@ -251,9 +253,9 @@ main (int argc, char *argv[])
             break;
 
         case 'X':
-            	p.set_setlist_mode(true);
-            	p.set_setlist_file(optarg);
-            	break;
+            setlist_mode = true;
+            setlist_file = Glib::ustring(optarg);
+            break;
 
         default:
             break;
@@ -322,6 +324,13 @@ main (int argc, char *argv[])
      *
      * TODO: this function is repeated verbatim in mainwnd.cpp...
      */
+    
+    if(setlist_mode) // FIXME
+    {
+        p.set_setlist_mode(setlist_mode);
+        p.set_setlist_file((char*)setlist_file.c_str());
+    }
+    
     while(p.get_setlist_mode())
     {
     	if(Glib::file_test(p.get_setlist_current_file(), Glib::FILE_TEST_EXISTS))
