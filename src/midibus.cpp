@@ -90,8 +90,9 @@ midibus::midibus( int a_localclient,
 
     /* copy names */
     char tmp[60];
-    snprintf( tmp, 59, "[%d] seq32 %d",
+    snprintf( tmp, 59, "[%d] %s %d",
               m_id,
+              global_client_name.c_str(),
               m_id );
 
     m_name = tmp;
@@ -109,8 +110,9 @@ midibus::midibus( char a_id, int a_queue )
 
     /* copy names */
     char tmp[60];
-    snprintf( tmp, 59, "[%d] seq32 %d",
+    snprintf( tmp, 59, "[%d] %s %d",
               m_id,
+              global_client_name.c_str(),
               m_id );
 
     m_name = tmp;
@@ -196,10 +198,13 @@ bool midibus::init_in( )
 #ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
+    
+    Glib::ustring tmp = global_client_name;
+    tmp += " in";
 
     /* create ports */
     ret = snd_seq_create_simple_port(m_seq,
-                                     "seq32 in",
+                                     tmp.c_str(),
                                      SND_SEQ_PORT_CAP_NO_EXPORT |
                                      SND_SEQ_PORT_CAP_WRITE,
                                      SND_SEQ_PORT_TYPE_MIDI_GENERIC |
@@ -248,9 +253,12 @@ bool midibus::init_in_sub( )
 #ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
-
+    
+    Glib::ustring tmp = global_client_name;
+    tmp += " in";
+    
     /* create ports */
-    ret = snd_seq_create_simple_port(m_seq, "seq32 in",
+    ret = snd_seq_create_simple_port(m_seq, tmp.c_str(),
                                      SND_SEQ_PORT_CAP_WRITE |
                                      SND_SEQ_PORT_CAP_SUBS_WRITE,
                                      SND_SEQ_PORT_TYPE_MIDI_GENERIC |
