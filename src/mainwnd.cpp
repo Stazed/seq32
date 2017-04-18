@@ -207,13 +207,17 @@ mainwnd::mainwnd(perform *a_p):
     HBox *bpmhbox = manage(new HBox(false, 4));
     bottomhbox->pack_start(*bpmhbox, Gtk::PACK_SHRINK);
 
-    m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 5, 500, 1));
+    m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1));
     m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
-    m_spinbutton_bpm->set_editable( false );
+    m_spinbutton_bpm->set_name( "BPM Edit" );
+    m_spinbutton_bpm->set_editable( true );
+    m_spinbutton_bpm->set_digits(2);                    // 2 = two decimal precision
     m_adjust_bpm->signal_value_changed().connect(
         mem_fun(*this, &mainwnd::adj_callback_bpm));
+
     add_tooltip( m_spinbutton_bpm, "Adjust beats per minute (BPM) value");
-    Label* bpmlabel = manage(new Label("_bpm", true));
+
+    Label* bpmlabel = manage(new Label("_BPM", true));
     bpmlabel->set_mnemonic_widget(*m_spinbutton_bpm);
     bpmhbox->pack_start(*bpmlabel, Gtk::PACK_SHRINK);
     bpmhbox->pack_start(*m_spinbutton_bpm, Gtk::PACK_SHRINK);
@@ -947,9 +951,9 @@ mainwnd::adj_callback_ss( )
 void
 mainwnd::adj_callback_bpm( )
 {
-    if(m_mainperf->get_bpm() != (int) m_adjust_bpm->get_value())
+    if(m_mainperf->get_bpm() !=  m_adjust_bpm->get_value())
     {
-        m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
+        m_mainperf->set_bpm( m_adjust_bpm->get_value());
         global_is_modified = true;
     }
 }
@@ -1020,6 +1024,9 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         // or we get duplicate entries on caps and reverse tab
         if(get_focus()->get_name() == "Screen Name")      // if we are on the screen name
             return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+        
+        if(get_focus()->get_name() == "BPM Edit")        // if we are on the BPM spin button - allow editing
+           return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
         // stop, start, song, jack, menu, edit ,L
         if(a_ev->keyval == GDK_Tab || a_ev->keyval == GDK_Return) // use it for buttons only

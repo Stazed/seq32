@@ -419,7 +419,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                 if(tempo == 0)          /* Midi spec assumes 120 bpm as we do */
                                     break;
 
-                                int bpm = (double) 60000000.0 / tempo;
+                                double bpm = (double) 60000000.0 / tempo;
 
                                 if(curTrack == 0)  // only if first track - we don't support tempo change
                                     a_perf->set_bpm(bpm);
@@ -601,7 +601,10 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         ID = read_long ();
         if (ID == c_bpmtag)
         {
-            long bpm = read_long ();
+            double bpm = (double) read_long ();
+            if(bpm > (c_bpm_scale_factor - 1.0))
+                bpm /= c_bpm_scale_factor;
+            
             a_perf->set_bpm (bpm);
         }
     }
@@ -801,7 +804,12 @@ bool midifile::write (perform * a_perf)
 
     /* bpm */
     write_long (c_bpmtag);
-    write_long (a_perf->get_bpm ());
+    /* From sequencer64 for consistency...
+     * We now encode the Sequencer64-specific BPM value by multiplying it
+     *  by 1000.0 first, to get more implicit precision in the number.
+     */
+    long scaled_bpm = long(a_perf->get_bpm() * c_bpm_scale_factor);
+    write_long (scaled_bpm);
 
     /* write out the mute groups */
     write_long (c_mutegroups);
