@@ -221,7 +221,19 @@ mainwnd::mainwnd(perform *a_p):
     bpmlabel->set_mnemonic_widget(*m_spinbutton_bpm);
     bpmhbox->pack_start(*bpmlabel, Gtk::PACK_SHRINK);
     bpmhbox->pack_start(*m_spinbutton_bpm, Gtk::PACK_SHRINK);
-
+    
+    /* bpm tap tempo button - sequencer64 */
+    m_button_tap = manage(new Button("0"));
+    m_button_tap->signal_clicked().connect(mem_fun(*this, &mainwnd::tap));
+    add_tooltip
+    (
+        m_button_tap,
+        "Tap in time to set the beats per minute (BPM) value. "
+        "After 5 seconds of no taps, the tap-counter will reset to 0. "
+        "Also see the File / Options / Keyboard / Tap BPM key assignment."
+    );    
+    bpmhbox->pack_start( *m_button_tap, false, false );
+    
     /* screen set name edit line */
     HBox *notebox = manage(new HBox(false, 4));
     bottomhbox->pack_start(*notebox, Gtk::PACK_EXPAND_WIDGET);
@@ -282,6 +294,11 @@ mainwnd::mainwnd(perform *a_p):
 
     /* add main layout box */
     this->add (*mainvbox);
+    
+    /* tap button  */
+    m_current_beats = 0;
+    m_base_time_ms  = 0;
+    m_last_time_ms  = 0;
 
     /* show everything */
     show_all();
@@ -363,7 +380,24 @@ mainwnd::timer_callback(  )
         m_menubar->set_sensitive(false);
     else if(!global_is_running && (m_menubar->get_sensitive() == m_menu_mode ))
         m_menubar->set_sensitive(!m_menu_mode);
-
+    
+    /* Tap button - sequencer64 */
+    if (m_current_beats > 0)
+    {
+        if (m_last_time_ms > 0)
+        {
+            struct timespec spec;
+            clock_gettime(CLOCK_REALTIME, &spec);
+            long ms = long(spec.tv_sec) * 1000;     /* seconds to ms        */
+            ms += round(spec.tv_nsec * 1.0e-6);     /* nanoseconds to ms    */
+            long difference = ms - m_last_time_ms;
+            if (difference > 5000L)                 /* 5 second wait        */
+            {
+                m_current_beats = m_base_time_ms = m_last_time_ms = 0;
+                set_tap_button(0);
+            }
+        }
+    }
     return true;
 }
 
@@ -940,6 +974,50 @@ mainwnd::set_song_mute(mute_op op)
 }
 
 void
+mainwnd::tap ()
+{
+    double bpm = update_bpm();
+    set_tap_button(m_current_beats);
+    if (m_current_beats > 1)                    /* first one is useless */
+        m_adjust_bpm->set_value(double(bpm));
+}
+
+void
+mainwnd::set_tap_button (int beats)
+{
+    Gtk::Label * tapptr(dynamic_cast<Gtk::Label *>(m_button_tap->get_child()));
+    if (tapptr != nullptr)
+    {
+        char temp[8];
+        snprintf(temp, sizeof(temp), "%d", beats);
+        tapptr->set_text(temp);
+    }
+}
+
+double
+mainwnd::update_bpm ()
+{
+    double bpm = 0.0;
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    long ms = long(spec.tv_sec) * 1000;     /* seconds to milliseconds      */
+    ms += round(spec.tv_nsec * 1.0e-6);     /* nanoseconds to milliseconds  */
+    if (m_current_beats == 0)
+    {
+        m_base_time_ms = ms;
+        m_last_time_ms = 0;
+    }
+    else if (m_current_beats >= 1)
+    {
+        int diffms = ms - m_base_time_ms;
+        bpm = m_current_beats * 60000.0 / diffms;
+        m_last_time_ms = ms;
+    }
+    ++m_current_beats;
+    return bpm;
+}
+
+void
 mainwnd::adj_callback_ss( )
 {
     m_mainperf->set_screenset( (int) m_adjust_ss->get_value());
@@ -1057,6 +1135,11 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         {
             m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
             m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
+        }
+        
+        if (a_ev->keyval  == m_mainperf->m_key_tap_bpm )
+        {
+            tap();
         }
 
         if ( a_ev->keyval == m_mainperf->m_key_replace )

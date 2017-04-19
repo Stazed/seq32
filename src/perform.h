@@ -143,7 +143,7 @@ private:
     bool m_usemidiclock;
     bool m_midiclockrunning; // stopped or started
     int  m_midiclocktick;
-    long  m_midiclockpos;
+    long m_midiclockpos;
 
     int m_bp_measure;
     int m_bw;
@@ -207,6 +207,7 @@ public:
 
     unsigned int m_key_bpm_up;
     unsigned int m_key_bpm_dn;
+    unsigned int m_key_tap_bpm;
 
     unsigned int m_key_replace;
     unsigned int m_key_queue;

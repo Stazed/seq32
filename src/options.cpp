@@ -226,6 +226,12 @@ options::add_keyboard_page()
     controltable->attach(*entry, 1, 2, 3, 4);
 #endif // JACK_SUPPORT
 
+    label = manage(new Label("Tap BPM", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                                    &m_perf->m_key_tap_bpm));
+    controltable->attach(*label, 0, 1, 4, 5);
+    controltable->attach(*entry, 1, 2, 4, 5);
+    
     label = manage(new Label("Snapshot 1", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_snapshot_1));

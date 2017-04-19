@@ -76,6 +76,8 @@ private:
 
     SpinButton  *m_spinbutton_bpm;
     Adjustment  *m_adjust_bpm;
+    
+    Button      *m_button_tap;
 
     SpinButton  *m_spinbutton_ss;
     Adjustment  *m_adjust_ss;
@@ -86,6 +88,11 @@ private:
     Entry       *m_entry_notes;
 
     sigc::connection   m_timeout_connect;
+    
+    /* tap button - From sequencer64 */
+    int m_current_beats; // value is displayed in the button.
+    long m_base_time_ms; // Indicates the first time the tap button was ... tapped.
+    long m_last_time_ms; // Indicates the last time the tap button was tapped.
 
     void set_song_mode();
     void toggle_song_mode();
@@ -127,6 +134,11 @@ private:
     void popup_menu (Menu * a_menu);
     void apply_song_transpose ();
     void set_song_mute(mute_op op);
+    
+    /* From  sequencer64 tap button */
+    void tap ();
+    void set_tap_button (int beats);
+    double update_bpm ();
 
 public:
 

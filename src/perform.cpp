@@ -144,6 +144,7 @@ perform::perform()
 
     m_key_bpm_up = GDK_apostrophe;
     m_key_bpm_dn = GDK_semicolon;
+    m_key_tap_bpm = GDK_F9;
 
     m_key_replace = GDK_Control_L;
     m_key_queue = GDK_Control_R;
