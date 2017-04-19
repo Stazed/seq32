@@ -244,18 +244,24 @@ options::add_keyboard_page()
     controltable->attach(*label, 2, 3, 1, 2);
     controltable->attach(*entry, 3, 4, 1, 2);
 
-    label = manage(new Label("bpm down", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("BPM up", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                                    &m_perf->m_key_bpm_up));
+    controltable->attach(*label, 2, 3, 2, 3);
+    controltable->attach(*entry, 3, 4, 2, 3);
+    
+    label = manage(new Label("BPM down", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_bpm_dn));
     controltable->attach(*label, 2, 3, 3, 4);
     controltable->attach(*entry, 3, 4, 3, 4);
 
-    label = manage(new Label("bpm up", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Rewind", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
-                                    &m_perf->m_key_bpm_up));
-    controltable->attach(*label, 2, 3, 2, 3);
-    controltable->attach(*entry, 3, 4, 2, 3);
-
+                                    &m_perf->m_key_rewind));
+    controltable->attach(*label, 2, 3, 4, 5);
+    controltable->attach(*entry, 3, 4, 4, 5);  
+    
     label = manage(new Label("Replace", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_replace));
@@ -279,6 +285,12 @@ options::add_keyboard_page()
                                     &m_perf->m_key_menu));
     controltable->attach(*label, 4, 5, 3, 4);
     controltable->attach(*entry, 5, 6, 3, 4);
+    
+    label = manage(new Label("Fast forward", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                                    &m_perf->m_key_forward));
+    controltable->attach(*label, 4, 5, 4, 5);
+    controltable->attach(*entry, 5, 6, 4, 5);
 
     label = manage(new Label("Screenset up", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
@@ -303,6 +315,12 @@ options::add_keyboard_page()
                                     &m_perf->m_key_follow_trans));
     controltable->attach(*label, 6, 7, 3, 4);
     controltable->attach(*entry, 7, 8, 3, 4);
+    
+    label = manage(new Label("Pointer key", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                                    &m_perf->m_key_pointer));
+    controltable->attach(*label, 6, 7, 4, 5);
+    controltable->attach(*entry, 7, 8, 4, 5);
 
     /*Frame for sequence toggle keys*/
     Frame* toggleframe = manage(new Frame("Sequence toggle keys"));
