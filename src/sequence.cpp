@@ -37,6 +37,8 @@ sequence::sequence( ) :
     m_quanized_rec(false),
     m_thru(false),
     m_queued(false),
+    m_overwrite_recording(false),
+    m_loop_reset(false),
 
     m_trigger_copied(false),
 
@@ -211,6 +213,20 @@ sequence::pop_trigger_redo()
     }
 
     unlock();
+}
+
+void
+sequence::set_unit_measure()
+{
+    lock();
+    m_unit_measure = (get_bp_measure() * (c_ppqn * 4)) /  get_bw();
+    unlock();
+}
+
+long
+sequence::get_unit_measure()
+{
+    return m_unit_measure;
 }
 
 void
@@ -2193,6 +2209,12 @@ sequence::stream_event(  event *a_ev  )
     /* status comes in with the channel bit - only record matching channel of sequence */
     if(get_midi_channel() == (a_in.m_status & 0x0F))
     {
+        /* if in overwrite record, any events after reset should clear old items from previous pass*/
+        if(m_overwrite_recording && m_loop_reset)
+        {
+            m_loop_reset = false;
+            remove_all(); // clear old items
+        }
         /*
             This clears the channel bit now that we have a match.
             Channel will be appended on bus by midibus::play().
@@ -3610,6 +3632,34 @@ bool
 sequence::get_quanidez_rec( )
 {
     return m_quanized_rec;
+}
+
+void
+sequence::set_overwrite_rec( bool a_ov )
+{
+    lock();
+    m_overwrite_recording = a_ov;
+    unlock();
+}
+
+bool
+sequence::get_overwrite_rec( )
+{
+    return m_overwrite_recording;
+}
+
+void
+sequence::set_loop_reset( bool a_reset )
+{
+    lock();
+    m_loop_reset = a_reset;
+    unlock();
+}
+
+bool
+sequence::get_loop_reset( )
+{
+    return m_loop_reset;
 }
 
 void

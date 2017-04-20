@@ -98,6 +98,7 @@ private:
     Menu       *m_menu_bp_measure;
     Menu       *m_menu_bw;
     Menu       *m_menu_rec_vol;
+    Menu       *m_menu_rec_type;
 
     int         m_pos;
 
@@ -167,10 +168,11 @@ private:
     Button      *m_button_bw;
     Entry       *m_entry_bw;
 
-    Button	    *m_button_lfo;
+    Button	*m_button_lfo;
     lfownd      *m_lfo_wnd;
 
     Button	*m_button_rec_vol;
+    Button      *m_button_rec_type;
 
     ToggleButton *m_toggle_play;
     ToggleButton *m_toggle_record;
@@ -221,6 +223,7 @@ private:
     void set_bp_measure( int a_beats_per_measure );
     void set_bw( int a_beat_width );
     void set_rec_vol( int a_rec_vol );
+    void set_rec_type( int a_rec_type );
     void set_measures( int a_length_measures  );
     void apply_length( int a_bp_measure, int a_bw, int a_measures );
     long get_measures();
@@ -258,6 +261,7 @@ private:
 
     void popup_menu( Menu *a_menu );
     void popup_event_menu();
+    void popup_record_menu();
     void popup_midibus_menu();
     void popup_sequence_menu();
     void popup_tool_menu();

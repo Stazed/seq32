@@ -118,7 +118,7 @@ seqedit::seqedit( sequence *a_seq,
     std::string title = "seq32 - ";
     title.append(m_seq->get_name());
     set_title(title);
-    set_size_request(700, 500);
+    set_size_request(860, 500);
 
     m_seq->set_editing( true );
 
@@ -172,7 +172,8 @@ seqedit::seqedit( sequence *a_seq,
     m_menu_bp_measure = manage( new Menu() );
     m_menu_bw = manage( new Menu() );
     m_menu_rec_vol = manage( new Menu() );
-
+    m_menu_rec_type = NULL;
+    
     m_menu_midich = NULL;
     m_menu_midibus = NULL;
     m_menu_sequences = NULL;
@@ -270,6 +271,12 @@ seqedit::seqedit( sequence *a_seq,
         mem_fun( *this, &seqedit::q_rec_change_callback));
     add_tooltip( m_toggle_q_rec, "Quantized Record." );
 
+    /* Record button */
+    m_button_rec_type = manage( new Button( "Rec" ));
+    m_button_rec_type->signal_clicked().connect(
+          mem_fun( *this, &seqedit::popup_record_menu));
+    add_tooltip( m_button_rec_type, "Select record type" );
+    
     m_button_rec_vol = manage( new Button());
     m_button_rec_vol->add( *manage( new Label("Vol")));
     m_button_rec_vol->signal_clicked().connect(
@@ -288,6 +295,7 @@ seqedit::seqedit( sequence *a_seq,
     m_toggle_thru->set_active( m_seq->get_thru());
 
     dhbox->pack_end( *m_button_rec_vol, false, false, 4);
+    dhbox->pack_end( *m_button_rec_type, false, false);   
     dhbox->pack_end( *m_toggle_q_rec, false, false, 4);
     dhbox->pack_end( *m_toggle_record, false, false, 4);
     dhbox->pack_end( *m_toggle_thru, false, false, 4);
@@ -319,6 +327,7 @@ seqedit::seqedit( sequence *a_seq,
 
     set_bp_measure( m_seq->get_bp_measure() );
     set_bw( m_seq->get_bw() );
+    m_seq->set_unit_measure(); /* need to set this before set_measures() */
     set_measures( get_measures() );
 
     set_midi_channel( m_seq->get_midi_channel() );
@@ -1245,6 +1254,32 @@ seqedit::popup_event_menu()
 }
 
 void
+seqedit::popup_record_menu()
+{
+    using namespace Menu_Helpers;
+    
+    m_menu_rec_type = manage( new Menu());
+    
+    bool legacy = true;
+    if(m_seq->get_overwrite_rec() == true || m_seqroll_wid->get_expanded_record() == true )
+        legacy = false;
+    
+    /* record type */
+    m_menu_rec_type->items().push_back( ImageMenuElem( "Legacy merge looped recording",
+                                    *create_menu_image( legacy ),
+                                    sigc::bind(mem_fun(*this, &seqedit::set_rec_type), 0 )));
+    
+    m_menu_rec_type->items().push_back(ImageMenuElem("Overwrite looped recording",
+                                    *create_menu_image( m_seq->get_overwrite_rec() ),
+                                    sigc::bind(mem_fun(*this, &seqedit::set_rec_type), 1)));
+    
+    m_menu_rec_type->items().push_back(ImageMenuElem("Expand sequence length to fit recording",
+                                    *create_menu_image( m_seqroll_wid->get_expanded_record() ),
+                                    sigc::bind(mem_fun(*this, &seqedit::set_rec_type), 2)));
+    m_menu_rec_type->popup(0,0);
+}
+
+void
 seqedit::transposable_change_callback(CheckButton *a_button)
 {
     m_seq->set_transposable(a_button->get_active());
@@ -1371,6 +1406,7 @@ void
 seqedit::apply_length( int a_bp_measure, int a_bw, int a_measures )
 {
     m_seq->set_length( a_measures * a_bp_measure * ((c_ppqn * 4) / a_bw) );
+    m_seq->set_unit_measure(); // for follow_progress , redraw, update progress
 
     m_seqroll_wid->reset();
     m_seqtime_wid->reset();
@@ -1382,7 +1418,7 @@ seqedit::apply_length( int a_bp_measure, int a_bw, int a_measures )
 long
 seqedit::get_measures()
 {
-    long units = ((m_seq->get_bp_measure() * (c_ppqn * 4)) /  m_seq->get_bw() );
+    long units = m_seq->get_unit_measure();
 
     long measures = (m_seq->get_length() / units);
 
@@ -1455,6 +1491,28 @@ seqedit::set_rec_vol( int a_rec_vol  )
 }
 
 void
+seqedit::set_rec_type( int a_rec_type )
+{
+    if(a_rec_type == 0)
+    {
+        m_seqroll_wid->set_expanded_recording(false);
+        m_seq->set_overwrite_rec(false); 
+        return;
+    }
+    if(a_rec_type == 1)
+    {
+        m_seq->set_overwrite_rec(true);
+        m_seqroll_wid->set_expanded_recording(false);
+    }
+    if(a_rec_type == 2)
+    {
+        m_seqroll_wid->set_expanded_recording(true);
+        m_seq->set_overwrite_rec(false); 
+        return;
+    }
+}
+
+void
 seqedit::name_change_callback()
 {
     m_seq->set_name( m_entry_name->get_text());
@@ -1489,6 +1547,8 @@ void
 seqedit::q_rec_change_callback()
 {
     m_seq->set_quanized_rec( m_toggle_q_rec->get_active() );
+    if(m_toggle_q_rec->get_active() && !m_toggle_record->get_active()) // If we set Q then also set record
+        m_toggle_record->activate();                                   // but do not unset record if unset Q
 }
 
 void
@@ -1600,6 +1660,15 @@ seqedit::timeout()
         raise();
     }
 
+    m_seqroll_wid->draw_progress_on_window();
+    
+    if(m_seq->get_recording() &&  m_seqroll_wid->get_expanded_record() && 
+            (m_seq->get_last_tick() >= ( m_seq->get_length() - ( m_seq->get_unit_measure()/4 ) )))
+    {
+        set_measures(get_measures() + 1);
+        m_seqroll_wid->follow_progress();
+    }
+    
     if (m_seq->is_dirty_edit() )
     {
 
@@ -1608,9 +1677,9 @@ seqedit::timeout()
         m_seqdata_wid->redraw();
     }
 
-    m_seqroll_wid->draw_progress_on_window();
 
-    if(global_is_running && m_mainperf->get_follow_transport())
+    if(global_is_running && m_mainperf->get_follow_transport() &&
+            !(m_seqroll_wid->get_expanded_record() && m_seq->get_recording()) )
     {
         m_seqroll_wid->follow_progress();
     }

@@ -131,6 +131,10 @@ private:
     bool m_quanized_rec;
     bool m_thru;
     bool m_queued;
+    bool m_overwrite_recording;
+    
+    /* flag to indicate play marker has gone to beginning of sequence on looping */
+    bool m_loop_reset;
 
     bool m_trigger_copied;
 
@@ -158,6 +162,7 @@ private:
        should be powers of two in bars */
     long m_length;
     long m_snap_tick;
+    long m_unit_measure;
 
     /* these are just for the editor to mark things
        in correct time */
@@ -176,9 +181,10 @@ private:
        places it on our midibus */
     void put_event_on_bus (event * a_e);
 
-    /* resetes the location counters */
+    /* resets the location counters */
     void reset_loop ();
 
+    /* remove all events from sequence */
     void remove_all ();
 
     /* mutex */
@@ -224,8 +230,8 @@ public:
     void set_name (string a_name);
     void set_name (char *a_name);
 
-    void set_measures (long a_length_measures);
-    long get_measures ();
+    void set_unit_measure ();
+    long get_unit_measure ();
 
     void set_bp_measure (long a_beats_per_measure);
     long get_bp_measure ();
@@ -285,6 +291,10 @@ public:
     void set_snap_tick( int a_st );
     void set_quanized_rec( bool a_qr );
     bool get_quanidez_rec( );
+    void set_overwrite_rec( bool a_ov );
+    bool get_overwrite_rec( );    
+    void set_loop_reset( bool a_reset);
+    bool get_loop_reset( );
 
     void set_thru (bool);
     bool get_thru ();
