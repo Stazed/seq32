@@ -1,3 +1,24 @@
+seq32-1.0.8 (2017-04-19)
+  * Add expanded recording and overwrite recording. New 'Rec' button in seqedit window.
+  * Add user key configuration for rewind, fast forward and pointer keys.
+  * Add BPM tap button - sequencer64 type. Thanks to Chris Ahlstrom.
+  * Change BPM from integer to double, two decimal precision.
+  * Add command line option to define alsa client name by user: -n <name>
+
+seq32-1.0.7 (2016-10-10)
+  * Add arch aur PKGBUILD.
+  * Fix gcc 6 compiler warning for misleading indentation.
+  * Adjust perfedit size request for some larger displays
+  * Add label change to song/live button.
+  * Add icons and .desktop files.
+  * Fix drawing of note box inside on small wrapped notes.
+  * Fix move_selected(), grow_selected_notes(), and quanized_selected() to stop being deleted by
+    verify_and_link() when adjustment is >= sequence length.
+  * Fix reverse pattern for unlinked notes.
+  * NEW Add sequence reverse pattern to seqedit tools menu.
+  * Fix random_selected() to stop wrapping when beyond max/min values.
+  * Fix adjust_data_handle() to stop wrapping when beyond max value.
+  
 seq32-1.0.6 (2016-08-15)
   * Fix mutex vs std::mutex name clash with some gcc 5 compilers
   * Add middle button paste of copied/cut triggers automatic.
@@ -10,13 +31,13 @@ seq32-1.0.6 (2016-08-15)
 
 seq32-1.0.5 (2016-07-21)
   * NEW - Midi recording now capable of simultaneous, multi-sequence recording, channel specific. Record up to
-  16 channels at once.
+    16 channels at once.
   * Now using SMF for time signature instead of proprietary tags (only effects projects that are NOT 4/4). If affected,
-  the file should be loaded, then the time signature reset, and saved.
+    the file should be loaded, then the time signature reset, and saved.
   * Warning added when opening or creating new file to close all sequence editors.
   * 'Apply song transpose' from edit menu not allowed when sequencer is running.
   * Proprietary tag for sequence transpose changed from ...13 to ...14 for consistency with sequencer64. You will 
-  have to reset the flag of off sequences, then save. 
+    have to reset the flag of off sequences, then save. 
 
 seq32-1.0.4 (2016-07-15)
   * Move to jack_process_callback() - seq32 is not slow sync.
