@@ -559,7 +559,7 @@ perform::stop_playing()
 void
 perform::FF_rewind()
 {
-    if(FF_RW_button_type == 0)
+    if(FF_RW_button_type == FF_RW_RELEASE)
         return;
 
     long a_tick = 0;
@@ -567,13 +567,13 @@ perform::FF_rewind()
     measure_ticks /= 4;
     measure_ticks *= m_excell_FF_RW;
 
-    if(FF_RW_button_type < 0)  // rewind
+    if(FF_RW_button_type == FF_RW_REWIND)   // rewind
     {
         a_tick = m_tick - measure_ticks;
         if(a_tick < 0)
             a_tick = 0;
     }
-    if(FF_RW_button_type > 0)  // Fast Forward
+    else                                    // Fast Forward
         a_tick = m_tick + measure_ticks;
 
     if(m_jack_running)
@@ -582,7 +582,7 @@ perform::FF_rewind()
     }
     else
     {
-        set_starting_tick(a_tick);  // this will set progress line
+        set_starting_tick(a_tick);          // this will set progress line
         set_reposition();
     }
 }

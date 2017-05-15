@@ -62,6 +62,14 @@ enum mute_op
     MUTE_ON = 1
 };
 
+enum ff_rw_type_e
+{
+    FF_RW_REWIND    = -1,
+    FF_RW_RELEASE   =  0,
+    FF_RW_FORWARD   =  1
+};
+
+
 const int c_status_replace  = 0x01;
 const int c_status_snapshot = 0x02;
 const int c_status_queue    = 0x04;
@@ -464,7 +472,7 @@ extern void *output_thread_func(void *a_p);
 extern void *input_thread_func(void *a_p);
 
 /* located in perfedit.h */
-extern int FF_RW_button_type;
+extern ff_rw_type_e FF_RW_button_type;
 
 #ifdef JACK_SUPPORT
 

@@ -48,7 +48,7 @@ using namespace sigc;
 #   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
 #endif
 
-int FF_RW_button_type = 0;
+ff_rw_type_e FF_RW_button_type = FF_RW_RELEASE;
 
 perfedit::perfedit( perform *a_perf )
 {
@@ -476,9 +476,14 @@ void
 perfedit::rewind(bool a_press)
 {
     if(a_press)
-        FF_RW_button_type = -1;
+    {
+        if(FF_RW_button_type == FF_RW_REWIND) // for key repeat, just ignore repeat
+            return;
+        
+        FF_RW_button_type = FF_RW_REWIND;
+    }
     else
-        FF_RW_button_type = 0;
+        FF_RW_button_type = FF_RW_RELEASE;
 
     gtk_timeout_add(120,FF_RW_timeout,m_mainperf);
 }
@@ -487,9 +492,14 @@ void
 perfedit::fast_forward(bool a_press)
 {
     if(a_press)
-        FF_RW_button_type = 1;
+    {
+        if(FF_RW_button_type == FF_RW_FORWARD) // for key repeat, just ignore repeat
+            return;
+        
+        FF_RW_button_type = FF_RW_FORWARD;
+    }
     else
-        FF_RW_button_type = 0;
+        FF_RW_button_type = FF_RW_RELEASE;
 
     gtk_timeout_add(120,FF_RW_timeout,m_mainperf);
 }
@@ -765,7 +775,7 @@ FF_RW_timeout(void *arg)
 {
     perform *p = (perform *) arg;
 
-    if(FF_RW_button_type != 0)
+    if(FF_RW_button_type != FF_RW_RELEASE)
     {
         p->FF_rewind();
         if(p->m_excell_FF_RW < 60.0f)
