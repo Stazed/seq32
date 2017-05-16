@@ -517,7 +517,7 @@ public:
 
     sequence & operator= (const sequence & a_rhs);
 
-    void fill_list (list < char >*a_list, int a_pos);
+    void fill_list (list < char >*a_list, int a_pos, bool write_triggers = true);
     void seq_number_fill_list( list<char> *a_list, int a_pos );
     void seq_name_fill_list( list<char> *a_list );
     void fill_proprietary_list(list < char >*a_list);

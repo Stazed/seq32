@@ -89,7 +89,7 @@ mainwnd::mainwnd(perform *a_p):
                                             Gtk::AccelKey("<control>S"),
                                             mem_fun(*this, &mainwnd::file_save)));
     m_menu_file->items().push_back(MenuElem("Save _as...",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_seq32_midi)));
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ32_FORMAT, nullptr)));
 
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("O_ptions...",
@@ -122,7 +122,7 @@ mainwnd::mainwnd(perform *a_p):
                                             mem_fun(*this, &mainwnd::file_import_dialog)));
 
     m_menu_edit->items().push_back(MenuElem("Midi export _song",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_song_midi)));
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SONG_FORMAT, nullptr)));
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -398,6 +398,13 @@ mainwnd::timer_callback(  )
             }
         }
     }
+    
+    if(m_mainperf->get_export_sequence() != c_no_export_sequence)
+    {
+        file_save_as(E_MIDI_SOLO_SEQUENCE, m_mainperf->get_sequence(m_mainperf->get_export_sequence()));
+        m_mainperf->set_export_sequence(c_no_export_sequence);
+    }
+    
     return true;
 }
 
@@ -537,7 +544,7 @@ void mainwnd::file_save()
 }
 
 /* callback function */
-void mainwnd::file_save_as( int type )
+void mainwnd::file_save_as( file_type_e type, sequence *a_seq )
 {
     Gtk::FileChooserDialog dialog("Save file as",
                                   Gtk::FILE_CHOOSER_ACTION_SAVE);
@@ -593,15 +600,15 @@ void mainwnd::file_save_as( int type )
                 return;
         }
 
-        if(type == c_seq32_midi)
+        if(type == E_MIDI_SEQ32_FORMAT)
         {
             global_filename = fname;
             update_window_title();
             save_file();
         }
-        else
+        else                            // export song triggers or solo sequence
         {
-            export_midi(fname);
+            export_midi(fname, a_seq);  // a_seq will be nullptr if song export
         }
 
         break;
@@ -612,13 +619,16 @@ void mainwnd::file_save_as( int type )
     }
 }
 
-void mainwnd::export_midi(const Glib::ustring& fn)
+void mainwnd::export_midi(const Glib::ustring& fn, sequence *a_seq)
 {
     bool result = false;
 
     midifile f(fn);
-
-    result = f.write_song(m_mainperf);
+    
+    if(a_seq == nullptr)
+        result = f.write_song(m_mainperf);      // song trigger export
+    else
+        result = f.write(m_mainperf, a_seq);    // solo sequence export
 
     if (!result)
     {
@@ -685,6 +695,11 @@ void mainwnd::open_file(const Glib::ustring& fn)
     }
 }
 
+void mainwnd::export_sequence_midi(sequence *a_seq)
+{
+    file_save_as(E_MIDI_SOLO_SEQUENCE, a_seq);
+}
+
 /*callback function*/
 void mainwnd::file_open()
 {
@@ -734,13 +749,13 @@ bool mainwnd::save_file()
 
     if (global_filename == "")
     {
-        file_save_as();
+        file_save_as(E_MIDI_SEQ32_FORMAT, nullptr);
         return true;
     }
-
+    
     midifile f(global_filename);
 
-    result = f.write(m_mainperf);
+    result = f.write(m_mainperf, nullptr);
 
     if (!result)
     {

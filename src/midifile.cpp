@@ -725,31 +725,46 @@ midifile::write_time_sig(perform * a_perf)
     write_short(0x1808);                            // cc bb
 }
 
-bool midifile::write (perform * a_perf)
+bool midifile::write (perform * a_perf, sequence *a_solo_seq)
 {
     int numtracks = 0;
+    bool write_triggers = true;             // default normal seq24 format
 
-    /* get number of tracks */
-    for (int i = 0; i < c_max_sequence; i++)
+    file_type_e type = E_MIDI_SEQ32_FORMAT; // default
+    
+    if(a_solo_seq != nullptr)
     {
-        if (a_perf->is_active (i))
-            numtracks++;
+        type = E_MIDI_SOLO_SEQUENCE;
+        numtracks = 1;
+        write_triggers = false;             // solo sequence - don't write triggers
     }
-
+    
+    if(type == E_MIDI_SEQ32_FORMAT)         // no need to count when solo
+    {
+        /* get number of tracks */
+        for (int i = 0; i < c_max_sequence; i++)
+        {
+            if (a_perf->is_active (i))
+                numtracks++;
+        }
+    }
     write_header(numtracks);
 
     /* We should be good to load now   */
     /* for each Track in the midi file */
     for (int curTrack = 0; curTrack < c_max_sequence; curTrack++)
     {
-        if (a_perf->is_active (curTrack))
+        if (a_perf->is_active (curTrack) || type == E_MIDI_SOLO_SEQUENCE)
         {
             /* sequence pointer */
-            sequence * seq = a_perf->get_sequence (curTrack);
+            sequence * seq = a_solo_seq; // will be nullptr if not solo
+                    
+            if(type == E_MIDI_SEQ32_FORMAT)
+                seq =  a_perf->get_sequence (curTrack);
 
             //printf ("track[%d]\n", curTrack );
             list<char> l;
-            seq->fill_list (&l, curTrack);
+            seq->fill_list (&l, curTrack, write_triggers);
 
             /* magic number 'MTrk' */
             write_long (0x4D54726B);
@@ -779,59 +794,64 @@ bool midifile::write (perform * a_perf)
                 l.pop_back ();
             }
         }
+        if(type == E_MIDI_SOLO_SEQUENCE)
+            break;       
     }
 
-    /* midi control */
-    write_long (c_midictrl);
-    write_long (0);
-
-    /* bus mute/unmute data */
-    write_long (c_midiclocks);
-    write_long (0);
-
-    /* notepad data */
-    write_long (c_notes);
-    write_short (c_max_sets);
-
-    for (int i = 0; i < c_max_sets; i++)
+    /* No need to send proprietary if solo sequence */
+    if(type == E_MIDI_SEQ32_FORMAT)
     {
-        string * note = a_perf->get_screen_set_notepad (i);
-        write_short (note->length ());
+        /* midi control */
+        write_long (c_midictrl);
+        write_long (0);
 
-        for (unsigned int j = 0; j < note->length (); j++)
-            write_byte ((*note)[j]);
-    }
+        /* bus mute/unmute data */
+        write_long (c_midiclocks);
+        write_long (0);
 
-    /* bpm */
-    write_long (c_bpmtag);
-    /* From sequencer64 for consistency...
-     * We now encode the Sequencer64-specific BPM value by multiplying it
-     *  by 1000.0 first, to get more implicit precision in the number.
-     */
-    long scaled_bpm = long(a_perf->get_bpm() * c_bpm_scale_factor);
-    write_long (scaled_bpm);
+        /* notepad data */
+        write_long (c_notes);
+        write_short (c_max_sets);
 
-    /* write out the mute groups */
-    write_long (c_mutegroups);
-    write_long (c_gmute_tracks);
-    for (int j=0; j < c_seqs_in_set; ++j)
-    {
-        a_perf->select_group_mute(j);
-        write_long(j);
-        for (int i=0; i < c_seqs_in_set; ++i)
+        for (int i = 0; i < c_max_sets; i++)
         {
-            write_long( a_perf->get_group_mute_state(i) );
+            string * note = a_perf->get_screen_set_notepad (i);
+            write_short (note->length ());
+
+            for (unsigned int j = 0; j < note->length (); j++)
+                write_byte ((*note)[j]);
         }
+
+        /* bpm */
+        write_long (c_bpmtag);
+        /* From sequencer64 for consistency...
+         * We now encode the Sequencer64-specific BPM value by multiplying it
+         *  by 1000.0 first, to get more implicit precision in the number.
+         */
+        long scaled_bpm = long(a_perf->get_bpm() * c_bpm_scale_factor);
+        write_long (scaled_bpm);
+
+        /* write out the mute groups */
+        write_long (c_mutegroups);
+        write_long (c_gmute_tracks);
+        for (int j=0; j < c_seqs_in_set; ++j)
+        {
+            a_perf->select_group_mute(j);
+            write_long(j);
+            for (int i=0; i < c_seqs_in_set; ++i)
+            {
+                write_long( a_perf->get_group_mute_state(i) );
+            }
+        }
+
+        /* write out the beats per measure */
+        write_long(c_perf_bp_mes);
+        write_long(a_perf->get_bp_measure());
+
+        /* write out the beat width */
+        write_long(c_perf_bw);
+        write_long(a_perf->get_bw());
     }
-
-    /* write out the beats per measure */
-    write_long(c_perf_bp_mes);
-    write_long(a_perf->get_bp_measure());
-
-    /* write out the beat width */
-    write_long(c_perf_bw);
-    write_long(a_perf->get_bw());
-
     /* open binary file */
     ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
 

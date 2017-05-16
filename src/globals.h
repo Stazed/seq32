@@ -152,10 +152,6 @@ const int c_adding = 0;
 const int c_normal = 1;
 const int c_paste  = 2;
 
-/* used for export file type */
-const int c_seq32_midi = 1;
-const int c_song_midi  = 2;
-
 /* redraw when recording ms */
 #ifdef __WIN32__
 const int c_redraw_ms = 20;
@@ -477,7 +473,14 @@ extern interaction_method_e global_interactionmethod;
 template <typename T>
 string NumberToString ( T Number )
 {
-	stringstream ss;
-	ss << Number;
-	return ss.str();
+    stringstream ss;
+    ss << Number;
+    return ss.str();
 }
+
+enum file_type_e
+{
+    E_MIDI_SEQ32_FORMAT,
+    E_MIDI_SONG_FORMAT,
+    E_MIDI_SOLO_SEQUENCE
+};

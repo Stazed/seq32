@@ -61,6 +61,8 @@ seqmenu::popup_menu()
     {
         m_menu->items().push_back(MenuElem("Cut", mem_fun(*this,&seqmenu::seq_cut)));
         m_menu->items().push_back(MenuElem("Copy", mem_fun(*this,&seqmenu::seq_copy)));
+        m_menu->items().push_back(MenuElem("Export", mem_fun(*this,&seqmenu::seq_export)));
+        
     }
     else
     {
@@ -190,6 +192,16 @@ seqmenu::seq_copy()
 {
     if ( m_mainperf->is_active( m_current_seq ))
         m_clipboard = *(m_mainperf->get_sequence( m_current_seq ));
+}
+
+// Exports solo sequence to selected midi file
+void
+seqmenu::seq_export()
+{
+    if ( m_mainperf->is_active( m_current_seq ))
+    {
+        m_mainperf->set_export_sequence(m_current_seq);
+    }
 }
 
 // Deletes and Copies to Clipboard */

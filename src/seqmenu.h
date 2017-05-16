@@ -57,6 +57,7 @@ private:
     void seq_new();
 
     void seq_copy();
+    void seq_export();
     void seq_cut();
     void seq_paste();
 

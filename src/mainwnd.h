@@ -118,12 +118,12 @@ private:
     void file_new();
     void file_open();
     void file_save();
-    void file_save_as( int type = c_seq32_midi );
+    void file_save_as( file_type_e type, sequence *a_seq = nullptr );
     void file_exit();
     void new_open_error_dialog();
     void new_file();
     bool save_file();
-    void export_midi(const Glib::ustring& fn);
+    void export_midi(const Glib::ustring& fn, sequence *a_seq = nullptr);
     void choose_file();
     int query_save_changes();
     bool is_save();
@@ -146,8 +146,9 @@ public:
     ~mainwnd();
 
     void open_file(const Glib::ustring&);
+    void export_sequence_midi(sequence *a_seq);
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);
     bool on_key_release_event(GdkEventKey* a_ev);
-
+    
 };
