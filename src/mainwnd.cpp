@@ -879,8 +879,13 @@ mainwnd::file_import_dialog()
         try
         {
             midifile f( dialog.get_filename() );
-
-            if(f.parse( m_mainperf, (int) m_adjust_load_offset->get_value() ))
+            
+            /* True flag in f.parse() below is to indicate imported file. We can't use
+             * the offset value since it could be the same as regular 'open' file of 0.
+             * The flag is used to trigger the verification pop-up on changed tempo/time-sig
+             * for imported files only */
+            
+            if(f.parse( m_mainperf, (int) m_adjust_load_offset->get_value(), true ))
                 last_used_dir = dialog.get_filename().substr(0, dialog.get_filename().rfind("/") + 1);
             else return;
         }

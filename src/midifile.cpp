@@ -85,7 +85,7 @@ midifile::read_var ()
     return ret;
 }
 
-bool midifile::parse (perform * a_perf, int a_screen_set)
+bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
 {
     /* open binary file */
     ifstream file(m_name.c_str(), ios::in | ios::binary | ios::ate);
@@ -123,6 +123,11 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
     file.read ((char *) &m_d[0], file_size);
     file.close ();
 
+    /* for import tempo, time signature verify change */
+    long bp_measure = a_perf->get_bp_measure();
+    long bw = a_perf->get_bw();
+    double bpm = a_perf->get_bpm();
+    
     /* set position to 0 */
     m_pos = 0;
 
@@ -378,25 +383,25 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                             */
                             if (len == 4)
                             {
-                                int bp_measure = int(read_byte());  // nn
-                                int logbase2 = int(read_byte());    // dd
+                                long import_bp_measure = long(read_byte());     // nn
+                                int logbase2 = int(read_byte());                // dd
 
-                                read_byte();                        // cc eat it
-                                read_byte();                        // bb eat it
+                                read_byte();                                    // cc eat it
+                                read_byte();                                    // bb eat it
 
-                                long bw = long(pow2(logbase2));     // convert dd to bw
+                                long import_bw = long(pow2(logbase2));          // convert dd to bw
 
-                                if(bp_measure == 0 || bw == 0)      // spec assumes 4 x 4 as we do
+                                if(import_bp_measure == 0 || import_bw == 0)    // spec assumes 4 x 4 as we do
                                     break;
 
-                                if(curTrack == 0)                   // set main perform if first track
+                                if(curTrack == 0)                               // set for main perform if first track
                                 {
-                                    a_perf->set_bp_measure(bp_measure);
-                                    a_perf->set_bw(bw);
+                                    bp_measure = import_bp_measure;             // these will be checked for user approval if different
+                                    bw = import_bw;                             // from current project amounts along with bpm on import
                                 }
 
-                                seq->set_bp_measure(bp_measure);    // set the sequence each time
-                                seq->set_bw(bw);
+                                seq->set_bp_measure(import_bp_measure);         // set the sequence always
+                                seq->set_bw(import_bw);
 
                                 /*printf
                                 (
@@ -416,13 +421,11 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
                                 tempo = (tempo * 256) + unsigned(read_byte());
                                 tempo = (tempo * 256) + unsigned(read_byte());
 
-                                if(tempo == 0)          /* Midi spec assumes 120 bpm as we do */
-                                    break;
+                                if(tempo == 0 || curTrack != 0)                 // Midi spec assumes 120 bpm if tempo == 0,  as we do
+                                    break;                                      // If not first track don't use because we don't support tempo change
 
-                                double bpm = (double) 60000000.0 / tempo;
+                                bpm = (double) 60000000.0 / tempo;              // this will be checked for user approval with time signature on import
 
-                                if(curTrack == 0)  // only if first track - we don't support tempo change
-                                    a_perf->set_bpm(bpm);
                                 //printf("BPM set to %d\n", bpm);
                             }
                             else
@@ -601,11 +604,9 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         ID = read_long ();
         if (ID == c_bpmtag)
         {
-            double bpm = (double) read_long ();
+            bpm = (double) read_long ();            // will be verified on import
             if(bpm > (c_bpm_scale_factor - 1.0))
                 bpm /= c_bpm_scale_factor;
-            
-            a_perf->set_bpm (bpm);
         }
     }
 
@@ -641,8 +642,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         ID = read_long ();
         if (ID == c_perf_bp_mes)
         {
-            long bp_mes = read_long ();
-            a_perf->set_bp_measure(bp_mes);
+            bp_measure = read_long ();              // will be verified on import
         }
     }
 
@@ -652,12 +652,39 @@ bool midifile::parse (perform * a_perf, int a_screen_set)
         ID = read_long ();
         if (ID == c_perf_bw)
         {
-            long bw = read_long ();
-            a_perf->set_bw(bw);
+            bw = read_long ();                      //  will be verified on import
         }
     }
+    
     // *** ADD NEW TAGS AT END **************/
+    
+    if(!a_import)   // always load tempo/time-sig when NOT imported
+    {
+        a_perf->set_bpm(bpm);
+        a_perf->set_bp_measure(bp_measure);
+        a_perf->set_bw(bw);
+    }
+    else    // imported file - verify if user wants to change project tempo/time-sig
+    {
+        /* round the bpm value to our precision so change comparison below will work */
+        bpm = round(bpm * 100.0)/100.0;
 
+        bool is_changed = false;
+
+        if(a_perf->get_bpm() != bpm || a_perf->get_bp_measure() != bp_measure || a_perf->get_bw() != bw)
+            is_changed = true;
+
+        if(is_changed)
+        {
+            if(verify_change_tempo_timesig(bpm, bp_measure, bw))
+            {
+                a_perf->set_bpm(bpm);
+                a_perf->set_bp_measure(bp_measure);
+                a_perf->set_bw(bw);
+            }
+        }
+    }
+    
     return true;
     //printf ( "done\n");
 }
@@ -1057,4 +1084,36 @@ midifile::error_message_gtk( Glib::ustring message)
         true
     );
     errdialog.run();
+}
+
+bool
+midifile::verify_change_tempo_timesig(double tempo, long bp_measure, long bw)
+{
+    std::string str_number = "";
+    Glib::ustring message = "From Import file:  ";
+    message += m_name.c_str();
+    
+    str_number = std::to_string(tempo);
+    message += "\n\nTempo:  "; message += str_number.c_str();
+    
+    str_number = std::to_string(bp_measure);
+    message += "\nBeats per measure:  "; message += str_number.c_str();
+    
+    str_number = std::to_string(bw);
+    message += "\nBeat width:  "; message += str_number.c_str();
+    
+    message += "\n\nTempo or time signature is different from current project!\n\n";
+    message += "Do you want to change the current project tempo and time signature to the import values?";
+
+    Gtk::MessageDialog warning(message,
+                           false,
+                           Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
+
+    auto result = warning.run();
+
+    if (result == Gtk::RESPONSE_NO )
+    {
+        return false;
+    }
+    return true;
 }

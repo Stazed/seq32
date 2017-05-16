@@ -54,6 +54,7 @@ private:
     int pow2 (int logbase2);
     Glib::ustring Ulong_To_String_Hex( unsigned long Number );
     void error_message_gtk( Glib::ustring message);
+    bool verify_change_tempo_timesig(double tempo, long bp_measure, long bw);
 
 public:
 
@@ -61,8 +62,14 @@ public:
 
     ~midifile();
 
-    bool parse( perform *a_perf, int a_screen_set );
+    bool parse( perform *a_perf, int a_screen_set, bool a_import = false );
     bool write( perform *a_perf, sequence *a_seq );
     bool write_song (perform * a_perf);
 
+    /* used for bpm rounding precision*/
+    inline double round( double val )
+    {
+        if( val < 0 ) return ceil(val - 0.5);
+        return floor(val + 0.5);
+    }
 };
