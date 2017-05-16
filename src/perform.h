@@ -69,6 +69,7 @@ enum ff_rw_type_e
     FF_RW_FORWARD   =  1
 };
 
+const int c_no_export_sequence = -1;
 
 const int c_status_replace  = 0x01;
 const int c_status_snapshot = 0x02;
@@ -109,7 +110,7 @@ private:
 
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
-
+    
     bool m_seqs_active[ c_max_sequence ];
 
     bool m_was_active_main[ c_max_sequence ];
@@ -155,6 +156,8 @@ private:
 
     int m_bp_measure;
     int m_bw;
+    
+    int m_export_sequence;
 
     bool m_show_ui_sequence_key;
 
@@ -451,6 +454,9 @@ public:
 
     bool sequence_is_song_exportable(int a_seq);
     void apply_song_transpose ();
+    
+    void set_export_sequence(int a_seq);
+    int get_export_sequence();
 
 #ifdef JACK_SUPPORT
     void jack_BBT_position(jack_position_t &pos, double jack_tick);
