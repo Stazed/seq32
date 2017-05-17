@@ -273,7 +273,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
 
                     /* set data and add */
                     e.set_data (data[0], data[1]);
-                    seq->add_event (&e);
+                    seq->add_event_no_sort (&e);                                // for speed will be sorted later at track end (case 0x2f)
 
                     /* set midi channel */
                     seq->set_midi_channel (status & 0x0F);
@@ -288,7 +288,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
 
                     /* set data and add */
                     e.set_data (data[0]);
-                    seq->add_event (&e);
+                    seq->add_event_no_sort (&e);                                // for speed will be sorted later at track end (case 0x2f)
 
                     /* set midi channel */
                     seq->set_midi_channel (status & 0x0F);
@@ -443,6 +443,8 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
                             {
                                 CurrentTime += 1;
                             }
+
+                            seq->sort_events();                                 // sort now after all events added
 
                             seq->set_length (CurrentTime, false);
                             seq->zero_markers ();

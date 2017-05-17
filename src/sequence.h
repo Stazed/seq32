@@ -328,6 +328,10 @@ public:
 
     /* adds event to internal list */
     void add_event (const event * a_e);
+    
+    /* for speed on file load these are used to great benefit */
+    void add_event_no_sort( const event *a_e );     // all events are added first
+    void sort_events();                             // called after all events added, once
 
     void add_trigger (long a_tick, long a_length, long a_offset = 0, bool a_adjust_offset = true);
     void split_trigger( long a_tick );
