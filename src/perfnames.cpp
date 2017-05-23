@@ -20,9 +20,11 @@
 #include "perfnames.h"
 #include "font.h"
 
+//class mainwnd;
 
-perfnames::perfnames( perform *a_perf, Adjustment *a_vadjust ):
-    seqmenu(a_perf),
+
+perfnames::perfnames( perform *a_perf, mainwnd *a_main, Adjustment *a_vadjust ):
+    seqmenu(a_perf, a_main ),
     m_black(Gdk::Color( "black" )),
     m_white(Gdk::Color( "white" )),
     m_grey(Gdk::Color( "grey" )),

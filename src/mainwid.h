@@ -23,7 +23,9 @@
 #include "perform.h"
 #include "seqmenu.h"
 
+/* forward declarations */
 class seqedit;
+class mainwnd;
 
 #pragma once
 
@@ -113,7 +115,7 @@ private:
 
 public:
 
-    mainwid( perform *a_p );
+    mainwid( perform *a_p, mainwnd *a_main );
     ~mainwid( );
 
     void reset();

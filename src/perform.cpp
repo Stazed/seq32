@@ -190,7 +190,6 @@ perform::perform()
 
     m_bp_measure = 4;
     m_bw = 4;
-    m_export_sequence = c_no_export_sequence;
     m_excell_FF_RW = 1.0;
 
     m_have_undo = false;
@@ -2856,16 +2855,4 @@ perform::apply_song_transpose()
             get_sequence(i)->apply_song_transpose();
         }
     }
-}
-
-void
-perform::set_export_sequence(int a_seq)
-{
-    m_export_sequence = a_seq;
-}
-
-int
-perform::get_export_sequence()
-{
-    return m_export_sequence;
 }

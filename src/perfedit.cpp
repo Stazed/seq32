@@ -50,7 +50,7 @@ using namespace sigc;
 
 ff_rw_type_e FF_RW_button_type = FF_RW_RELEASE;
 
-perfedit::perfedit( perform *a_perf )
+perfedit::perfedit( perform *a_perf, mainwnd *a_main )
 {
     using namespace Menu_Helpers;
 
@@ -74,7 +74,7 @@ perfedit::perfedit( perform *a_perf )
     m_vscroll   =  manage(new VScrollbar( *m_vadjust ));
     m_hscroll   =  manage(new HScrollbar( *m_hadjust ));
 
-    m_perfnames = manage( new perfnames( m_mainperf, m_vadjust ));
+    m_perfnames = manage( new perfnames( m_mainperf, a_main, m_vadjust ));
 
     m_perfroll = manage( new perfroll( m_mainperf,
                                        this,

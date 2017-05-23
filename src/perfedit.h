@@ -64,6 +64,7 @@
 
 using namespace Gtk;
 
+/* forward declarations */
 class perfroll;
 class perftime;
 
@@ -189,7 +190,7 @@ public:
 
     friend int FF_RW_timeout(void *arg);
 
-    perfedit (perform * a_perf);
+    perfedit (perform * a_perf, mainwnd *a_main);
     ~perfedit ();
 };
 

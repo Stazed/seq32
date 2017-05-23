@@ -64,7 +64,7 @@ mainwnd::mainwnd(perform *a_p):
 #if GTK_MINOR_VERSION < 12
     m_tooltips = manage( new Tooltips() );
 #endif
-    m_main_wid = manage( new mainwid( m_mainperf ));
+    m_main_wid = manage( new mainwid( m_mainperf, this));
     m_main_time = manage( new maintime( ));
 
     m_menubar = manage(new MenuBar());
@@ -308,7 +308,7 @@ mainwnd::mainwnd(perform *a_p):
     m_timeout_connect = Glib::signal_timeout().connect(
                             mem_fun(*this, &mainwnd::timer_callback), 25);
 
-    m_perf_edit = new perfedit( m_mainperf );
+    m_perf_edit = new perfedit( m_mainperf, this );
 
     m_sigpipe[0] = -1;
     m_sigpipe[1] = -1;
@@ -397,12 +397,6 @@ mainwnd::timer_callback(  )
                 set_tap_button(0);
             }
         }
-    }
-    
-    if(m_mainperf->get_export_sequence() != c_no_export_sequence)
-    {
-        file_save_as(E_MIDI_SOLO_SEQUENCE, m_mainperf->get_sequence(m_mainperf->get_export_sequence()));
-        m_mainperf->set_export_sequence(c_no_export_sequence);
     }
     
     return true;

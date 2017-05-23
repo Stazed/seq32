@@ -21,12 +21,14 @@
 #include "seqmenu.h"
 #include "seqedit.h"
 #include "font.h"
+#include "mainwnd.h"
 
 // Constructor
 
-seqmenu::seqmenu( perform *a_p  ) :
+seqmenu::seqmenu( perform *a_p, mainwnd *a_main ) :
     m_menu(NULL),
-    m_mainperf(a_p)
+    m_mainperf(a_p),
+    m_mainwnd(a_main)
 {
     using namespace Menu_Helpers;
 
@@ -200,7 +202,7 @@ seqmenu::seq_export()
 {
     if ( m_mainperf->is_active( m_current_seq ))
     {
-        m_mainperf->set_export_sequence(m_current_seq);
+        m_mainwnd->export_sequence_midi(m_mainperf->get_sequence(m_current_seq));
     }
 }
 
