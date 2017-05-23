@@ -61,6 +61,7 @@ private:
 
     void seq_copy();
     void seq_export();
+    void track_export();
     void seq_cut();
     void seq_paste();
 

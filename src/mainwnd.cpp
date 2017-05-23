@@ -89,7 +89,7 @@ mainwnd::mainwnd(perform *a_p):
                                             Gtk::AccelKey("<control>S"),
                                             mem_fun(*this, &mainwnd::file_save)));
     m_menu_file->items().push_back(MenuElem("Save _as...",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ32_FORMAT, nullptr)));
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ32_FORMAT, c_no_export_sequence)));
 
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("O_ptions...",
@@ -122,7 +122,7 @@ mainwnd::mainwnd(perform *a_p):
                                             mem_fun(*this, &mainwnd::file_import_dialog)));
 
     m_menu_edit->items().push_back(MenuElem("Midi export _song",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SONG_FORMAT, nullptr)));
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SONG_FORMAT, c_no_export_sequence)));
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -538,10 +538,33 @@ void mainwnd::file_save()
 }
 
 /* callback function */
-void mainwnd::file_save_as( file_type_e type, sequence *a_seq )
+void mainwnd::file_save_as( file_type_e type, int a_seq )
 {
     Gtk::FileChooserDialog dialog("Save file as",
                                   Gtk::FILE_CHOOSER_ACTION_SAVE);
+    
+    switch(type)
+    {
+    case E_MIDI_SONG_FORMAT:
+        dialog.set_title("Midi export song triggers");
+        break;
+        
+    case E_MIDI_SOLO_SEQUENCE:
+        dialog.set_title("Midi export sequence");
+        break;
+        
+    case E_MIDI_SOLO_TRIGGER:
+        dialog.set_title("Midi export solo trigger");
+        break;
+        
+    case E_MIDI_SOLO_TRACK:
+        dialog.set_title("Midi export solo track");
+        break;
+        
+    default:            // Save file as -- native seq32
+        break;
+    }
+    
     dialog.set_transient_for(*this);
 
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -600,9 +623,9 @@ void mainwnd::file_save_as( file_type_e type, sequence *a_seq )
             update_window_title();
             save_file();
         }
-        else                            // export song triggers or solo sequence
+        else                            // export song triggers, solo track or solo trigger
         {
-            export_midi(fname, a_seq);  // a_seq will be nullptr if song export
+            export_midi(fname, type, a_seq);
         }
 
         break;
@@ -613,16 +636,17 @@ void mainwnd::file_save_as( file_type_e type, sequence *a_seq )
     }
 }
 
-void mainwnd::export_midi(const Glib::ustring& fn, sequence *a_seq)
+void mainwnd::export_midi(const Glib::ustring& fn, file_type_e type, int a_seq)
 {
     bool result = false;
 
     midifile f(fn);
     
-    if(a_seq == nullptr)
-        result = f.write_song(m_mainperf);      // song trigger export
+    if(type == E_MIDI_SOLO_SEQUENCE)
+        result = f.write(m_mainperf, a_seq);            // solo sequence export
     else
-        result = f.write(m_mainperf, a_seq);    // solo sequence export
+        result = f.write_song(m_mainperf, type, a_seq); // export song triggers, solo track or solo trigger
+
 
     if (!result)
     {
@@ -689,9 +713,14 @@ void mainwnd::open_file(const Glib::ustring& fn)
     }
 }
 
-void mainwnd::export_sequence_midi(sequence *a_seq)
+void mainwnd::export_sequence_midi(int a_seq)
 {
     file_save_as(E_MIDI_SOLO_SEQUENCE, a_seq);
+}
+
+void mainwnd::export_track_midi(int a_seq)
+{
+    file_save_as(E_MIDI_SOLO_TRACK, a_seq);
 }
 
 /*callback function*/
@@ -743,13 +772,13 @@ bool mainwnd::save_file()
 
     if (global_filename == "")
     {
-        file_save_as(E_MIDI_SEQ32_FORMAT, nullptr);
+        file_save_as(E_MIDI_SEQ32_FORMAT, c_no_export_sequence);
         return true;
     }
     
     midifile f(global_filename);
 
-    result = f.write(m_mainperf, nullptr);
+    result = f.write(m_mainperf, c_no_export_sequence);
 
     if (!result)
     {

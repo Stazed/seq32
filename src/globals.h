@@ -45,6 +45,7 @@ const int c_total_seqs = c_seqs_in_set * c_max_sets;
 /* number of sequences */
 /* 32 screen sets */
 const int c_max_sequence =  c_mainwnd_rows *  c_mainwnd_cols * c_max_sets;
+const int c_no_export_sequence = -1;
 
 const int c_ppqn         = 192;  /* default - dosnt change */
 const int c_ppwn         = c_ppqn * 4;  // whole note
@@ -482,5 +483,7 @@ enum file_type_e
 {
     E_MIDI_SEQ32_FORMAT,
     E_MIDI_SONG_FORMAT,
-    E_MIDI_SOLO_SEQUENCE
+    E_MIDI_SOLO_SEQUENCE,
+    E_MIDI_SOLO_TRIGGER,
+    E_MIDI_SOLO_TRACK
 };

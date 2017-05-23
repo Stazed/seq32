@@ -63,8 +63,8 @@ seqmenu::popup_menu()
     {
         m_menu->items().push_back(MenuElem("Cut", mem_fun(*this,&seqmenu::seq_cut)));
         m_menu->items().push_back(MenuElem("Copy", mem_fun(*this,&seqmenu::seq_copy)));
-        m_menu->items().push_back(MenuElem("Export", mem_fun(*this,&seqmenu::seq_export)));
-        
+        m_menu->items().push_back(MenuElem("Export sequence", mem_fun(*this,&seqmenu::seq_export)));
+        m_menu->items().push_back(MenuElem("Export track", mem_fun(*this,&seqmenu::track_export)));       
     }
     else
     {
@@ -202,10 +202,19 @@ seqmenu::seq_export()
 {
     if ( m_mainperf->is_active( m_current_seq ))
     {
-        m_mainwnd->export_sequence_midi(m_mainperf->get_sequence(m_current_seq));
+        m_mainwnd->export_sequence_midi(m_current_seq);
     }
 }
 
+// Exports solo track in song format
+void
+seqmenu::track_export()
+{
+    if ( m_mainperf->is_active( m_current_seq ))
+    {
+        m_mainwnd->export_track_midi(m_current_seq);
+    }
+}
 // Deletes and Copies to Clipboard */
 void
 seqmenu::seq_cut()

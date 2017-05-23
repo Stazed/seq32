@@ -1587,7 +1587,7 @@ bool perform::jack_session_event()
     cmd += m_jsession_ev->client_uuid;
 
     midifile f(fname);
-    f.write(this, nullptr);
+    f.write(this, c_no_export_sequence);
 
     m_jsession_ev->command_line = strdup( cmd.c_str() );
 
