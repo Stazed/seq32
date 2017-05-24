@@ -170,6 +170,7 @@ extern bool global_showmidi;
 extern bool global_priority;
 extern bool global_stats;
 extern bool global_pass_sysex;
+extern bool global_use_sysex;
 extern bool global_with_jack_transport;
 extern bool global_with_jack_master;
 extern bool global_with_jack_master_cond;
@@ -487,3 +488,5 @@ enum file_type_e
     E_MIDI_SOLO_TRIGGER,
     E_MIDI_SOLO_TRACK
 };
+
+int FF_RW_timeout(void *arg);

@@ -195,4 +195,3 @@ public:
     ~perfedit ();
 };
 
-int FF_RW_timeout(void *arg);
