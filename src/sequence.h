@@ -92,6 +92,7 @@ private:
 
     list < trigger > m_list_trigger;
     trigger m_trigger_clipboard;
+    trigger *m_export_trigger; 
 
     stack < list < event > >m_list_undo;
     stack < list < event > >m_list_redo;
@@ -356,6 +357,8 @@ public:
     void cut_selected_trigger();
     void copy_selected_trigger();
     void paste_trigger(long a_tick = -1); // -1 default behavior no paste tick
+    void set_trigger_export();
+    trigger *get_trigger_export();
 
     void move_selected_triggers_to(long a_tick, bool a_adjust_offset, trigger_edit editMode = MOVE);
     long get_selected_trigger_start_tick();

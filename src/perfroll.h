@@ -151,6 +151,7 @@ public:
     void draw_progress();
 
     void redraw_dirty_sequences();
+    int get_drop_sequence();
 
     perfroll( perform *a_perf,
               perfedit *a_perf_edit,

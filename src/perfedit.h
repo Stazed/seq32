@@ -75,6 +75,7 @@ class perfedit:public Gtk::Window
 private:
 
     perform *m_mainperf;
+    mainwnd *m_mainwnd;
 
     Table *m_table;
 

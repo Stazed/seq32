@@ -723,6 +723,11 @@ void mainwnd::export_track_midi(int a_seq)
     file_save_as(E_MIDI_SOLO_TRACK, a_seq);
 }
 
+void mainwnd::export_trigger_midi(int a_seq)
+{
+    file_save_as(E_MIDI_SOLO_TRIGGER, a_seq);
+}
+
 /*callback function*/
 void mainwnd::file_open()
 {

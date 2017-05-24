@@ -20,6 +20,7 @@
 
 #include "perfedit.h"
 #include "sequence.h"
+#include "mainwnd.h"
 
 #include "pixmaps/snap.xpm"
 #include "pixmaps/play2.xpm"
@@ -60,6 +61,7 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_snap = c_ppqn / 4;
 
     m_mainperf = a_perf;
+    m_mainwnd = a_main;
 
     /* main window */
     set_title( "seq32 - Song Editor");
@@ -416,6 +418,11 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 #endif // JACK_SUPPORT
+        if ( a_ev->keyval ==  GDK_F10 )     // FIXME trigger export make configurable
+        {
+            m_mainperf->get_sequence(m_perfroll->get_drop_sequence())->set_trigger_export();
+            m_mainwnd->export_trigger_midi(m_perfroll->get_drop_sequence());
+        }
     }
 
     if(!event_was_handled)

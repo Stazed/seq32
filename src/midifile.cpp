@@ -926,16 +926,16 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
                 numtracks++;
         }
         break;
- /*      
+ 
     case E_MIDI_SOLO_TRIGGER:
-        if(a_solo_track->get_trigger_export() == nullptr) // sanity check - should never happen
+        if(a_perf->get_sequence(a_solo_track)->get_trigger_export() == nullptr) // sanity check - should never happen
         {
             error_message_gtk("Cannot export trigger - none selected");
             return true;    // true so we don't generate a second error about "Error writing file".
         }
         numtracks = 1;
         break;
- */
+ 
     case E_MIDI_SOLO_TRACK:
         if(a_perf->sequence_is_song_exportable(a_solo_track))
         {
@@ -1024,10 +1024,9 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
                 if(a_trig != NULL)
                     seq->song_fill_list_seq_trigger(&l,a_trig,total_seq_length,prev_timestamp); // the big sequence trigger
             }
-            else                                            // solo trigger export
-            {
-#if 0
-                a_trig = a_track->get_trigger_export();                         // the trigger we chose to export
+            else                                                                // solo trigger export
+            { 
+                a_trig = seq->get_trigger_export();                             // the trigger we chose to export
                 
                 seq = a_perf->get_sequence(curTrack);                           // get trigger sequence
                 
@@ -1043,12 +1042,7 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
  
                 /* proprietary triggers will not be exported */
                 
-                //printf("tri start %ld: end %ld: offset %ld\n", a_trig->m_tick_start, a_trig->m_tick_end, a_trig->m_offset);
-                //printf("trigger_length: %ld  time_stamp: %ld\n",total_seq_length, time_stamp);
-                
                 seq->meta_track_end(&l, total_seq_length);                      // write end track
-                a_track->set_trigger_export(nullptr);                           // clear the pointer
-#endif // 0
             }
             /* magic number 'MTrk' */
             write_long (0x4D54726B);

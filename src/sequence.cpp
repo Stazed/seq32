@@ -24,6 +24,7 @@
 list < event > sequence::m_list_clipboard;
 
 sequence::sequence( ) :
+    m_export_trigger(nullptr),
     m_midi_channel(0),
     m_bus(0),
 
@@ -3261,6 +3262,31 @@ sequence::paste_trigger(long a_tick)
             m_trigger_clipboard.m_offset = adjust_offset(m_trigger_clipboard.m_offset);
         }
     }
+}
+
+void
+sequence::set_trigger_export()
+{
+    lock();
+
+    list<trigger>::iterator i;
+
+    for ( i = m_list_trigger.begin(); i != m_list_trigger.end(); i++ )
+    {
+        if ( i->m_selected )
+        {
+            m_export_trigger = &*i;
+            break;
+        }
+    }
+
+    unlock();
+}
+
+trigger *
+sequence::get_trigger_export()
+{
+    return m_export_trigger;
 }
 
 /* this refreshes the play marker to the LastTick */
