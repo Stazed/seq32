@@ -423,7 +423,7 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             if(m_mainperf->is_active(m_perfroll->get_drop_sequence()))
             {
                 m_mainperf->get_sequence(m_perfroll->get_drop_sequence())->set_trigger_export();
-                m_mainwnd->export_trigger_midi(m_perfroll->get_drop_sequence());
+                m_mainwnd->export_seq_track_trigger(E_MIDI_SOLO_TRIGGER, m_perfroll->get_drop_sequence());
             }
         }
     }

@@ -713,19 +713,10 @@ void mainwnd::open_file(const Glib::ustring& fn)
     }
 }
 
-void mainwnd::export_sequence_midi(int a_seq)
+void
+mainwnd::export_seq_track_trigger(file_type_e type, int a_seq)
 {
-    file_save_as(E_MIDI_SOLO_SEQUENCE, a_seq);
-}
-
-void mainwnd::export_track_midi(int a_seq)
-{
-    file_save_as(E_MIDI_SOLO_TRACK, a_seq);
-}
-
-void mainwnd::export_trigger_midi(int a_seq)
-{
-    file_save_as(E_MIDI_SOLO_TRIGGER, a_seq);
+    file_save_as(type, a_seq);
 }
 
 /*callback function*/

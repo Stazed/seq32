@@ -928,9 +928,9 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
         break;
  
     case E_MIDI_SOLO_TRIGGER:
-        if(a_perf->get_sequence(a_solo_track)->get_trigger_export() == nullptr) // sanity check - should never happen
+        if(a_perf->get_sequence(a_solo_track)->get_trigger_export() == nullptr)
         {
-            error_message_gtk("Cannot export trigger - none selected");
+            error_message_gtk("Cannot export trigger - none selected!");
             return true;    // true so we don't generate a second error about "Error writing file".
         }
         numtracks = 1;

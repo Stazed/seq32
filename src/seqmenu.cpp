@@ -202,7 +202,7 @@ seqmenu::seq_export()
 {
     if ( m_mainperf->is_active( m_current_seq ))
     {
-        m_mainwnd->export_sequence_midi(m_current_seq);
+        m_mainwnd->export_seq_track_trigger(E_MIDI_SOLO_SEQUENCE, m_current_seq);
     }
 }
 
@@ -212,7 +212,7 @@ seqmenu::track_export()
 {
     if ( m_mainperf->is_active( m_current_seq ))
     {
-        m_mainwnd->export_track_midi(m_current_seq);
+        m_mainwnd->export_seq_track_trigger(E_MIDI_SOLO_TRACK, m_current_seq);
     }
 }
 // Deletes and Copies to Clipboard */

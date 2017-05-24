@@ -146,9 +146,7 @@ public:
     ~mainwnd();
 
     void open_file(const Glib::ustring&);
-    void export_sequence_midi(int a_seq);
-    void export_track_midi(int a_seq);
-    void export_trigger_midi(int a_seq);
+    void export_seq_track_trigger(file_type_e type, int a_seq);
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);
     bool on_key_release_event(GdkEventKey* a_ev);
