@@ -420,8 +420,11 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
 #endif // JACK_SUPPORT
         if ( a_ev->keyval ==  GDK_F10 )     // FIXME trigger export make configurable
         {
-            m_mainperf->get_sequence(m_perfroll->get_drop_sequence())->set_trigger_export();
-            m_mainwnd->export_trigger_midi(m_perfroll->get_drop_sequence());
+            if(m_mainperf->is_active(m_perfroll->get_drop_sequence()))
+            {
+                m_mainperf->get_sequence(m_perfroll->get_drop_sequence())->set_trigger_export();
+                m_mainwnd->export_trigger_midi(m_perfroll->get_drop_sequence());
+            }
         }
     }
 
