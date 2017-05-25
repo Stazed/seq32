@@ -2154,7 +2154,8 @@ void perform::output_func()
 #ifdef JACK_SUPPORT
         if(m_playback_mode && m_jack_master) // master in song mode
         {
-            position_jack(m_playback_mode,m_left_tick);
+            if(!m_reposition)                // allows for continue option sysex only for now
+                position_jack(m_playback_mode,m_left_tick);
         }
         if(!m_playback_mode && m_jack_running && m_jack_master) // master in live mode
         {
@@ -2565,28 +2566,26 @@ void perform::parse_sysex(event a_e)
     switch(data[7])
     {
     case SYS_YPT300_START:
+        m_start_from_perfedit = true;           // assume song mode start
         start_playing();
         break;
 
     case SYS_YPT300_STOP:
+        set_reposition(true);                   // allow to continue where stopped
         stop_playing();
-        set_reposition(false);                  // don't reset to left tick, i.e. continue on start
         break;
 
     case SYS_YPT300_TOP:                        // beginning of song or left marker
-        if(global_song_start_mode)              // don't bother reposition in 'Live' mode
+        if(is_jack_running())
         {
-            if(is_jack_running())
-            {
-                set_reposition();
-                set_starting_tick(m_left_tick);
-                position_jack(true, m_left_tick);
-            }
-            else
-            {
-                set_reposition();
-                set_starting_tick(m_left_tick);
-            }
+            set_reposition();
+            set_starting_tick(m_left_tick);
+            position_jack(true, m_left_tick);
+        }
+        else
+        {
+            set_reposition();
+            set_starting_tick(m_left_tick);
         }
         break;
 
