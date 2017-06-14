@@ -1706,6 +1706,7 @@ void perform::output_func()
         {
             current_tick = m_starting_tick;
             clock_tick = m_starting_tick;
+            total_tick = m_starting_tick;
             set_orig_ticks( m_starting_tick );
         }
 
@@ -1917,22 +1918,22 @@ void perform::output_func()
             else
             {
 #endif // JACK_SUPPORT
+                /* if we reposition key-p, FF, rewind, adjust delta_tick for change
+                 * then reset to adjusted starting  */
+                if ( m_playback_mode && !m_jack_running && !m_usemidiclock && m_reposition)
+                {
+                    delta_tick = m_starting_tick - clock_tick;
+                    init_clock=true;                // must set to send EVENT_MIDI_SONG_POS
+                    m_starting_tick = m_left_tick;  // restart at left marker
+                    m_reposition = false;
+                }  
+                
                 /* default if jack is not compiled in, or not running */
                 /* add delta to current ticks */
                 clock_tick     += delta_tick;
                 current_tick   += delta_tick;
                 total_tick     += delta_tick;
                 dumping = true;
-
-                /* if we reposition key-p from perfroll
-                   then reset to adjusted starting  */
-                if ( m_playback_mode && !m_jack_running && !m_usemidiclock && m_reposition)
-                {
-                    current_tick = m_starting_tick; // reposition sets m_starting_tick
-                    set_orig_ticks( m_starting_tick );
-                    m_starting_tick = m_left_tick;  // restart at left marker
-                    m_reposition = false;
-                }
 
 #ifdef JACK_SUPPORT
             }
