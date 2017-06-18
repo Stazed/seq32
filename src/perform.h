@@ -62,6 +62,13 @@ enum mute_op
     MUTE_ON = 1
 };
 
+enum ff_rw_type_e
+{
+    FF_RW_REWIND    = -1,
+    FF_RW_RELEASE   =  0,
+    FF_RW_FORWARD   =  1
+};
+
 const int c_status_replace  = 0x01;
 const int c_status_snapshot = 0x02;
 const int c_status_queue    = 0x04;
@@ -129,7 +136,7 @@ private:
 
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
-
+    
     bool m_seqs_active[ c_max_sequence ];
 
     bool m_was_active_main[ c_max_sequence ];
@@ -171,7 +178,7 @@ private:
     bool m_usemidiclock;
     bool m_midiclockrunning; // stopped or started
     int  m_midiclocktick;
-    long  m_midiclockpos;
+    long m_midiclockpos;
 
     int m_bp_measure;
     int m_bw;
@@ -235,6 +242,7 @@ public:
 
     unsigned int m_key_bpm_up;
     unsigned int m_key_bpm_dn;
+    unsigned int m_key_tap_bpm;
 
     unsigned int m_key_replace;
     unsigned int m_key_queue;
@@ -388,8 +396,8 @@ public:
 
     void reset_sequences();
 
-    void set_bpm(int a_bpm);
-    int  get_bpm( );
+    void set_bpm(double a_bpm);
+    double  get_bpm( );
 
     void set_bp_measure(int a_bp_mes);
     int get_bp_measure( );
@@ -421,6 +429,7 @@ public:
     void input_func();
 
     unsigned short combine_bytes(unsigned char First, unsigned char Second);
+    void parse_sysex(event a_e);
 
     long get_max_trigger();
 
@@ -470,6 +479,7 @@ public:
 
     bool sequence_is_song_exportable(int a_seq);
     void apply_song_transpose ();
+    
 
 #ifdef JACK_SUPPORT
     void jack_BBT_position(jack_position_t &pos, double jack_tick);
@@ -491,7 +501,7 @@ extern void *output_thread_func(void *a_p);
 extern void *input_thread_func(void *a_p);
 
 /* located in perfedit.h */
-extern int FF_RW_button_type;
+extern ff_rw_type_e FF_RW_button_type;
 
 #ifdef JACK_SUPPORT
 

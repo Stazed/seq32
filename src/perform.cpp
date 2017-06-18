@@ -144,6 +144,7 @@ perform::perform()
 
     m_key_bpm_up = GDK_apostrophe;
     m_key_bpm_dn = GDK_semicolon;
+    m_key_tap_bpm = GDK_F9;
 
     m_key_replace = GDK_Control_L;
     m_key_queue = GDK_Control_R;
@@ -562,7 +563,7 @@ perform::stop_playing()
 void
 perform::FF_rewind()
 {
-    if(FF_RW_button_type == 0)
+    if(FF_RW_button_type == FF_RW_RELEASE)
         return;
 
     long a_tick = 0;
@@ -570,13 +571,13 @@ perform::FF_rewind()
     measure_ticks /= 4;
     measure_ticks *= m_excell_FF_RW;
 
-    if(FF_RW_button_type < 0)  // rewind
+    if(FF_RW_button_type == FF_RW_REWIND)   // rewind
     {
         a_tick = m_tick - measure_ticks;
         if(a_tick < 0)
             a_tick = 0;
     }
-    if(FF_RW_button_type > 0)  // Fast Forward
+    else                                    // Fast Forward
         a_tick = m_tick + measure_ticks;
 
     if(m_jack_running)
@@ -585,7 +586,7 @@ perform::FF_rewind()
     }
     else
     {
-        set_starting_tick(a_tick);  // this will set progress line
+        set_starting_tick(a_tick);          // this will set progress line
         set_reposition();
     }
 }
@@ -841,10 +842,10 @@ mastermidibus* perform::get_master_midi_bus( )
     return &m_master_bus;
 }
 
-void perform::set_bpm(int a_bpm)
+void perform::set_bpm(double a_bpm)
 {
-    if ( a_bpm < 5 )  a_bpm = 5;
-    if ( a_bpm > 500 ) a_bpm = 500;
+    if ( a_bpm < c_bpm_minimum ) a_bpm = c_bpm_minimum;
+    if ( a_bpm > c_bpm_maximum ) a_bpm = c_bpm_maximum;
 
     if ( ! (m_jack_running && global_is_running ))
     {
@@ -852,7 +853,7 @@ void perform::set_bpm(int a_bpm)
     }
 }
 
-int  perform::get_bpm()
+double  perform::get_bpm()
 {
     return  m_master_bus.get_bpm( );
 }
@@ -1231,7 +1232,7 @@ void perform::position_jack( bool a_state, long a_tick )
     */
 
     int ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
-    int beats_per_minute =  m_master_bus.get_bpm();
+    double beats_per_minute =  m_master_bus.get_bpm();
 
     uint64_t tick_rate = ((uint64_t)m_jack_frame_rate * current_tick * 60.0);
     long tpb_bpm = ticks_per_beat * beats_per_minute / (m_bw / 4.0 );
@@ -1590,7 +1591,7 @@ bool perform::jack_session_event()
     cmd += m_jsession_ev->client_uuid;
 
     midifile f(fname);
-    f.write(this);
+    f.write(this, c_no_export_sequence);
 
     m_jsession_ev->command_line = strdup( cmd.c_str() );
 
@@ -1709,6 +1710,7 @@ void perform::output_func()
         {
             current_tick = m_starting_tick;
             clock_tick = m_starting_tick;
+            total_tick = m_starting_tick;
             set_orig_ticks( m_starting_tick );
         }
 
@@ -1765,7 +1767,7 @@ void perform::output_func()
 
             /* delta time to ticks */
             /* bpm */
-            int bpm  = m_master_bus.get_bpm() * ( 4.0 / m_bw);
+            double bpm  = m_master_bus.get_bpm() * ( 4.0 / m_bw);
 
             /* get delta ticks, delta_ticks_f is in 1000th of a tick */
             long long delta_tick_num = bpm * ppqn * delta_us + delta_tick_frac;
@@ -1920,22 +1922,22 @@ void perform::output_func()
             else
             {
 #endif // JACK_SUPPORT
+                /* if we reposition key-p, FF, rewind, adjust delta_tick for change
+                 * then reset to adjusted starting  */
+                if ( m_playback_mode && !m_jack_running && !m_usemidiclock && m_reposition)
+                {
+                    delta_tick = m_starting_tick - clock_tick;
+                    init_clock=true;                // must set to send EVENT_MIDI_SONG_POS
+                    m_starting_tick = m_left_tick;  // restart at left marker
+                    m_reposition = false;
+                }  
+                
                 /* default if jack is not compiled in, or not running */
                 /* add delta to current ticks */
                 clock_tick     += delta_tick;
                 current_tick   += delta_tick;
                 total_tick     += delta_tick;
                 dumping = true;
-
-                /* if we reposition key-p from perfroll
-                   then reset to adjusted starting  */
-                if ( m_playback_mode && !m_jack_running && !m_usemidiclock && m_reposition)
-                {
-                    current_tick = m_starting_tick; // reposition sets m_starting_tick
-                    set_orig_ticks( m_starting_tick );
-                    m_starting_tick = m_left_tick;  // restart at left marker
-                    m_reposition = false;
-                }
 
 #ifdef JACK_SUPPORT
             }
@@ -2143,9 +2145,9 @@ void perform::output_func()
                 printf( "[%3d][%8ld]\n", i * 100, stats_all[i] );
             }
             printf("\n\n-- clock width --\n" );
-            int bpm  = m_master_bus.get_bpm();
+            double bpm  = m_master_bus.get_bpm();
 
-            printf("optimal: [%d]us\n", ((c_ppqn / 24)* 60000000 / c_ppqn / bpm));
+            printf("optimal: [%f]us\n", ((c_ppqn / 24)* 60000000 / c_ppqn / bpm));
 
             for ( int i=0; i<100; i++ )
             {
@@ -2157,7 +2159,8 @@ void perform::output_func()
 #ifdef JACK_SUPPORT
         if(m_playback_mode && m_jack_master) // master in song mode
         {
-            position_jack(m_playback_mode,m_left_tick);
+            if(!m_reposition)                // allows for continue option sysex only for now
+                position_jack(m_playback_mode,m_left_tick);
         }
         if(!m_playback_mode && m_jack_running && m_jack_master) // master in live mode
         {
@@ -2461,6 +2464,9 @@ void perform::input_func()
 
                     if (ev.get_status() == EVENT_SYSEX)
                     {
+                        if (global_use_sysex)
+                            parse_sysex(ev);
+                        
                         if (global_showmidi)
                             ev.print();
 
@@ -2492,6 +2498,123 @@ unsigned short perform::combine_bytes(unsigned char First, unsigned char Second)
    _14bit <<= 7;
    _14bit |= (unsigned short)First;
    return(_14bit);
+}
+
+void perform::parse_sysex(event a_e)
+{
+/*  http://www.indiana.edu/~emusic/etext/MIDI/chapter3_MIDI9.shtml 
+ *  A System Exclusive code set begins with 11110000 (240 decimal or F0 hex),
+ *  followed by the manufacturer ID#, then by an unspecified number of
+ *  data bytes of any ranges from 0-127) and ends with 11110111
+ *  (decimal 247 or F7 hex), meaning End of SysEx message. No other coded
+ *  are to be transmitted during a SysEx message (except a system real time
+ *  message). Normally, after the manufacturer ID, each maker will have its
+ *  own instrument model subcode, so a Yamaha DX7 will ignore a Yamaha SY77's
+ *  patch dump. In addition, most instruments have a SysEx ID # setting so
+ *  more than one of the same instruments can be on a network but not 
+ *  necessarily respond to a patch dump not intended for it.
+ */
+
+    enum sysex_YPT
+    {
+        SYS_YPT300_START,
+        SYS_YPT300_STOP,
+        SYS_YPT300_TOP,             //  Beginning of song
+        SYS_YPT300_FAST_FORWARD,
+        SYS_YPT300_REWIND,
+        SYS_YPT300_METRONOME        //  or anything else 
+    };
+
+/*  For FF and rewind the sysex is only sent on key press.
+ *  So to shut it off a second key press is used as the 
+ *  button release. Not real convenient, but personally I
+ *  only really care about start and stop.
+ */
+    
+    /* layout of YPT-300 sysex messages */
+    //  EVENT_SYSEX                                         // byte 0 0xF0
+    const unsigned char c_yamaha_ID         = 0x43;         // byte 1 
+    const unsigned long c_YPT_model_subcode = 0x73015015;   // bytes 2 - 5
+    // 0x00                                                 // byte 6
+    // the message we are looking for - enum 0 to 5         // byte 7
+    // 0x00                                                 // byte 8
+    // end sysex 0xF7                                       // byte 9
+    
+    unsigned char *data = a_e.get_sysex();
+    long data_size =  a_e.get_size();
+    
+    if(data_size < 10)               // sanity check
+        return; 
+
+    /* Check the manufacturer ID */
+    if(data[1] != c_yamaha_ID)                      // could use others here
+        return;
+    
+    /* Check the model subcode */
+    unsigned long subcode = 0;
+    
+    subcode += (data[2] << 24);
+    subcode += (data[3] << 16);
+    subcode += (data[4] << 8);
+    subcode += (data[5]);
+
+    if(subcode != c_YPT_model_subcode)
+        return;
+
+/*    for(int i = 0; i < data_size; i++)
+    {
+        printf( "%02X \n", data[i]);
+    }
+ */
+
+    /* We are good to go */  
+    switch(data[7])
+    {
+    case SYS_YPT300_START:
+        m_start_from_perfedit = true;           // assume song mode start
+        start_playing();
+        break;
+
+    case SYS_YPT300_STOP:
+        set_reposition(true);                   // allow to continue where stopped
+        stop_playing();
+        break;
+
+    case SYS_YPT300_TOP:                        // beginning of song or left marker
+        if(is_jack_running())
+        {
+            set_reposition();
+            set_starting_tick(m_left_tick);
+            position_jack(true, m_left_tick);
+        }
+        else
+        {
+            set_reposition();
+            set_starting_tick(m_left_tick);
+        }
+        break;
+
+    case SYS_YPT300_FAST_FORWARD:
+        if(FF_RW_button_type == FF_RW_RELEASE)  // if we are not already fast forwarding
+            FF_RW_button_type = FF_RW_FORWARD;  // then set it
+        else                                    // we're already fast forwarding
+            FF_RW_button_type = FF_RW_RELEASE;  // so unset it
+
+        gtk_timeout_add(120,FF_RW_timeout,this);
+        break;
+
+    case SYS_YPT300_REWIND:
+        if(FF_RW_button_type == FF_RW_RELEASE)  // if we are not already rewinding
+            FF_RW_button_type = FF_RW_REWIND;   // then set it
+        else                                    // we're already rewinding
+            FF_RW_button_type = FF_RW_RELEASE;  // so unset it
+
+        gtk_timeout_add(120,FF_RW_timeout,this);
+        break;
+
+    default:
+        break;
+    }
 }
 
 void perform::save_playing_state()

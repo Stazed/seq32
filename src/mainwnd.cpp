@@ -67,7 +67,7 @@ mainwnd::mainwnd(perform *a_p):
 #if GTK_MINOR_VERSION < 12
     m_tooltips = manage( new Tooltips() );
 #endif
-    m_main_wid = manage( new mainwid( m_mainperf ));
+    m_main_wid = manage( new mainwid( m_mainperf, this));
     m_main_time = manage( new maintime( ));
 
     m_menubar = manage(new MenuBar());
@@ -92,7 +92,7 @@ mainwnd::mainwnd(perform *a_p):
                                             Gtk::AccelKey("<control>S"),
                                             mem_fun(*this, &mainwnd::file_save)));
     m_menu_file->items().push_back(MenuElem("Save _as...",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_seq32_midi)));
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ32_FORMAT, c_no_export_sequence)));
     m_menu_file->items().push_back(MenuElem("Open _setlist...",
                                             mem_fun(*this, &mainwnd::file_open_setlist)));
 
@@ -127,7 +127,7 @@ mainwnd::mainwnd(perform *a_p):
                                             mem_fun(*this, &mainwnd::file_import_dialog)));
 
     m_menu_edit->items().push_back(MenuElem("Midi export _song",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), c_song_midi)));
+                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SONG_FORMAT, c_no_export_sequence)));
 
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
@@ -212,16 +212,32 @@ mainwnd::mainwnd(perform *a_p):
     HBox *bpmhbox = manage(new HBox(false, 4));
     bottomhbox->pack_start(*bpmhbox, Gtk::PACK_SHRINK);
 
-    m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), 5, 500, 1));
+    m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1));
     m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
-    m_spinbutton_bpm->set_editable( false );
+    m_spinbutton_bpm->set_name( "BPM Edit" );
+    m_spinbutton_bpm->set_editable( true );
+    m_spinbutton_bpm->set_digits(2);                    // 2 = two decimal precision
     m_adjust_bpm->signal_value_changed().connect(
         mem_fun(*this, &mainwnd::adj_callback_bpm));
+
     add_tooltip( m_spinbutton_bpm, "Adjust beats per minute (BPM) value");
-    Label* bpmlabel = manage(new Label("_bpm", true));
+
+    Label* bpmlabel = manage(new Label("_BPM", true));
     bpmlabel->set_mnemonic_widget(*m_spinbutton_bpm);
     bpmhbox->pack_start(*bpmlabel, Gtk::PACK_SHRINK);
     bpmhbox->pack_start(*m_spinbutton_bpm, Gtk::PACK_SHRINK);
+
+    /* bpm tap tempo button - sequencer64 */
+    m_button_tap = manage(new Button("0"));
+    m_button_tap->signal_clicked().connect(mem_fun(*this, &mainwnd::tap));
+    add_tooltip
+    (
+        m_button_tap,
+        "Tap in time to set the beats per minute (BPM) value. "
+        "After 5 seconds of no taps, the tap-counter will reset to 0. "
+        "Also see the File / Options / Keyboard / Tap BPM key assignment."
+    );
+    bpmhbox->pack_start( *m_button_tap, false, false );
 
     /* screen set name edit line */
     HBox *notebox = manage(new HBox(false, 4));
@@ -284,6 +300,11 @@ mainwnd::mainwnd(perform *a_p):
     /* add main layout box */
     this->add (*mainvbox);
 
+    /* tap button  */
+    m_current_beats = 0;
+    m_base_time_ms  = 0;
+    m_last_time_ms  = 0;
+
     /* show everything */
     show_all();
 
@@ -292,7 +313,7 @@ mainwnd::mainwnd(perform *a_p):
     m_timeout_connect = Glib::signal_timeout().connect(
                             mem_fun(*this, &mainwnd::timer_callback), 25);
 
-    m_perf_edit = new perfedit( m_mainperf );
+    m_perf_edit = new perfedit( m_mainperf, this );
 
     m_sigpipe[0] = -1;
     m_sigpipe[1] = -1;
@@ -397,7 +418,6 @@ mainwnd::timer_callback(  )
     else if(!global_is_running && (m_menubar->get_sensitive() == m_menu_mode ))
         m_menubar->set_sensitive(!m_menu_mode);
 
-
     if(m_mainperf->get_setlist_mode())
     {
         if(m_mainperf->get_setlist_load_next_file())
@@ -422,6 +442,25 @@ mainwnd::timer_callback(  )
             {
                 setlist_jump(m_mainperf->m_setjump);
                 m_mainperf->m_setjump=0;
+            }
+        }
+    }
+
+
+    /* Tap button - sequencer64 */
+    if (m_current_beats > 0)
+    {
+        if (m_last_time_ms > 0)
+        {
+            struct timespec spec;
+            clock_gettime(CLOCK_REALTIME, &spec);
+            long ms = long(spec.tv_sec) * 1000;     /* seconds to ms        */
+            ms += round(spec.tv_nsec * 1.0e-6);     /* nanoseconds to ms    */
+            long difference = ms - m_last_time_ms;
+            if (difference > 5000L)                 /* 5 second wait        */
+            {
+                m_current_beats = m_base_time_ms = m_last_time_ms = 0;
+                set_tap_button(0);
             }
         }
     }
@@ -589,10 +628,33 @@ void mainwnd::file_save()
 }
 
 /* callback function */
-void mainwnd::file_save_as( int type )
+void mainwnd::file_save_as( file_type_e type, int a_seq )
 {
     Gtk::FileChooserDialog dialog("Save file as",
                                   Gtk::FILE_CHOOSER_ACTION_SAVE);
+
+    switch(type)
+    {
+    case E_MIDI_SONG_FORMAT:
+        dialog.set_title("Midi export song triggers");
+        break;
+
+    case E_MIDI_SOLO_SEQUENCE:
+        dialog.set_title("Midi export sequence");
+        break;
+
+    case E_MIDI_SOLO_TRIGGER:
+        dialog.set_title("Midi export solo trigger");
+        break;
+
+    case E_MIDI_SOLO_TRACK:
+        dialog.set_title("Midi export solo track");
+        break;
+
+    default:            // Save file as -- native seq32
+        break;
+    }
+
     dialog.set_transient_for(*this);
 
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -645,15 +707,15 @@ void mainwnd::file_save_as( int type )
                 return;
         }
 
-        if(type == c_seq32_midi)
+        if(type == E_MIDI_SEQ32_FORMAT)
         {
             global_filename = fname;
             update_window_title();
             save_file();
         }
-        else
+        else                            // export song triggers, solo track or solo trigger
         {
-            export_midi(fname);
+            export_midi(fname, type, a_seq);
         }
 
         break;
@@ -664,13 +726,17 @@ void mainwnd::file_save_as( int type )
     }
 }
 
-void mainwnd::export_midi(const Glib::ustring& fn)
+void mainwnd::export_midi(const Glib::ustring& fn, file_type_e type, int a_seq)
 {
     bool result = false;
 
     midifile f(fn);
 
-    result = f.write_song(m_mainperf);
+    if(type == E_MIDI_SOLO_SEQUENCE)
+        result = f.write(m_mainperf, a_seq);            // solo sequence export
+    else
+        result = f.write_song(m_mainperf, type, a_seq); // export song triggers, solo track or solo trigger
+
 
     if (!result)
     {
@@ -762,6 +828,12 @@ bool mainwnd::open_file(const Glib::ustring& fn, bool setlist_mode)
     return true;
 }
 
+void
+mainwnd::export_seq_track_trigger(file_type_e type, int a_seq)
+{
+    file_save_as(type, a_seq);
+}
+
 /*callback function*/
 void mainwnd::file_open()
 {
@@ -844,13 +916,13 @@ bool mainwnd::save_file()
 
     if (global_filename == "")
     {
-        file_save_as();
+        file_save_as(E_MIDI_SEQ32_FORMAT, c_no_export_sequence);
         return true;
     }
 
     midifile f(global_filename);
 
-    result = f.write(m_mainperf);
+    result = f.write(m_mainperf, c_no_export_sequence);
 
     if (!result)
     {
@@ -934,7 +1006,9 @@ mainwnd::file_import_dialog()
     Gtk::FileFilter filter_midi;
     filter_midi.set_name("MIDI files");
     filter_midi.add_pattern("*.midi");
+    filter_midi.add_pattern("*.MIDI");
     filter_midi.add_pattern("*.mid");
+    filter_midi.add_pattern("*.MID");
     dialog.add_filter(filter_midi);
 
     Gtk::FileFilter filter_any;
@@ -973,7 +1047,12 @@ mainwnd::file_import_dialog()
         {
             midifile f( dialog.get_filename() );
 
-            if(f.parse( m_mainperf, (int) m_adjust_load_offset->get_value() ))
+            /* True flag in f.parse() below is to indicate imported file. We can't use
+             * the offset value since it could be the same as regular 'open' file of 0.
+             * The flag is used to trigger the verification pop-up on changed tempo/time-sig
+             * for imported files only */
+
+            if(f.parse( m_mainperf, (int) m_adjust_load_offset->get_value(), true ))
                 last_used_dir = dialog.get_filename().substr(0, dialog.get_filename().rfind("/") + 1);
             else return;
         }
@@ -1088,6 +1167,50 @@ mainwnd::set_song_mute(mute_op op)
 }
 
 void
+mainwnd::tap ()
+{
+    double bpm = update_bpm();
+    set_tap_button(m_current_beats);
+    if (m_current_beats > 1)                    /* first one is useless */
+        m_adjust_bpm->set_value(double(bpm));
+}
+
+void
+mainwnd::set_tap_button (int beats)
+{
+    Gtk::Label * tapptr(dynamic_cast<Gtk::Label *>(m_button_tap->get_child()));
+    if (tapptr != nullptr)
+    {
+        char temp[8];
+        snprintf(temp, sizeof(temp), "%d", beats);
+        tapptr->set_text(temp);
+    }
+}
+
+double
+mainwnd::update_bpm ()
+{
+    double bpm = 0.0;
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    long ms = long(spec.tv_sec) * 1000;     /* seconds to milliseconds      */
+    ms += round(spec.tv_nsec * 1.0e-6);     /* nanoseconds to milliseconds  */
+    if (m_current_beats == 0)
+    {
+        m_base_time_ms = ms;
+        m_last_time_ms = 0;
+    }
+    else if (m_current_beats >= 1)
+    {
+        int diffms = ms - m_base_time_ms;
+        bpm = m_current_beats * 60000.0 / diffms;
+        m_last_time_ms = ms;
+    }
+    ++m_current_beats;
+    return bpm;
+}
+
+void
 mainwnd::adj_callback_ss( )
 {
     m_mainperf->set_screenset( (int) m_adjust_ss->get_value());
@@ -1099,9 +1222,9 @@ mainwnd::adj_callback_ss( )
 void
 mainwnd::adj_callback_bpm( )
 {
-    if(m_mainperf->get_bpm() != (int) m_adjust_bpm->get_value())
+    if(m_mainperf->get_bpm() !=  m_adjust_bpm->get_value())
     {
-        m_mainperf->set_bpm( (int) m_adjust_bpm->get_value());
+        m_mainperf->set_bpm( m_adjust_bpm->get_value());
         global_is_modified = true;
     }
 }
@@ -1173,6 +1296,9 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         if(get_focus()->get_name() == "Screen Name")      // if we are on the screen name
             return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
+        if(get_focus()->get_name() == "BPM Edit")        // if we are on the BPM spin button - allow editing
+           return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
+
         // stop, start, song, jack, menu, edit ,L
         if(a_ev->keyval == GDK_Tab || a_ev->keyval == GDK_Return) // use it for buttons only
             return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
@@ -1202,6 +1328,11 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         {
             m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
             m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
+        }
+
+        if (a_ev->keyval  == m_mainperf->m_key_tap_bpm )
+        {
+            tap();
         }
 
         if ( a_ev->keyval == m_mainperf->m_key_replace )

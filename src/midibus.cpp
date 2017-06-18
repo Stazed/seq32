@@ -90,8 +90,9 @@ midibus::midibus( int a_localclient,
 
     /* copy names */
     char tmp[60];
-    snprintf( tmp, 59, "[%d] seq32 %d",
+    snprintf( tmp, 59, "[%d] %s %d",
               m_id,
+              global_client_name.c_str(),
               m_id );
 
     m_name = tmp;
@@ -109,8 +110,9 @@ midibus::midibus( char a_id, int a_queue )
 
     /* copy names */
     char tmp[60];
-    snprintf( tmp, 59, "[%d] seq32 %d",
+    snprintf( tmp, 59, "[%d] %s %d",
               m_id,
+              global_client_name.c_str(),
               m_id );
 
     m_name = tmp;
@@ -196,10 +198,13 @@ bool midibus::init_in( )
 #ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
+    
+    Glib::ustring tmp = global_client_name;
+    tmp += " in";
 
     /* create ports */
     ret = snd_seq_create_simple_port(m_seq,
-                                     "seq32 in",
+                                     tmp.c_str(),
                                      SND_SEQ_PORT_CAP_NO_EXPORT |
                                      SND_SEQ_PORT_CAP_WRITE,
                                      SND_SEQ_PORT_TYPE_MIDI_GENERIC |
@@ -248,9 +253,12 @@ bool midibus::init_in_sub( )
 #ifdef HAVE_LIBASOUND
     /* temp return */
     int ret;
-
+    
+    Glib::ustring tmp = global_client_name;
+    tmp += " in";
+    
     /* create ports */
-    ret = snd_seq_create_simple_port(m_seq, "seq32 in",
+    ret = snd_seq_create_simple_port(m_seq, tmp.c_str(),
                                      SND_SEQ_PORT_CAP_WRITE |
                                      SND_SEQ_PORT_CAP_SUBS_WRITE,
                                      SND_SEQ_PORT_TYPE_MIDI_GENERIC |
@@ -785,7 +793,7 @@ mastermidibus::set_ppqn( int a_ppqn )
 }
 
 void
-mastermidibus::set_bpm( int a_bpm )
+mastermidibus::set_bpm( double a_bpm )
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -1502,8 +1510,7 @@ mastermidibus::get_midi_event( event *a_in )
     /* we will only get EVENT_SYSEX on the first
        packet of midi data, the rest we have
        to poll for */
-    //if ( buffer[0] == EVENT_SYSEX ){
-    if (0)
+    if (global_use_sysex && buffer[0] == EVENT_SYSEX )
     {
         /* set up for sysex if needed */
         a_in->start_sysex( );

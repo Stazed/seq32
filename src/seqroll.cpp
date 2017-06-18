@@ -93,7 +93,8 @@ seqroll::seqroll(perform *a_perf,
     m_background_sequence(0),
     m_drawing_background_seq(false),
 
-    m_ignore_redraw(false)
+    m_ignore_redraw(false),
+    m_expanded_recording(false)
 {
     using namespace Menu_Helpers;
 
@@ -526,6 +527,7 @@ seqroll::update_pixmap()
 void
 seqroll::draw_progress_on_window()
 {
+    static int last_scroll = 0;   
     m_window->draw_drawable(m_gc,
                             m_pixmap,
                             m_old_progress_x,
@@ -535,7 +537,20 @@ seqroll::draw_progress_on_window()
                             1,
                             m_window_y );
 
+    long last_progress = m_old_progress_x;
+    if(last_scroll < m_scroll_offset_x)
+    {
+        last_progress -= m_scroll_offset_x;
+        last_scroll = m_scroll_offset_x;
+    }
+
     m_old_progress_x = (m_seq->get_last_tick() / m_zoom) - m_scroll_offset_x;
+    
+    if(m_old_progress_x < last_progress)
+    {
+        m_seq->set_loop_reset( true ); // for overwrite recording
+        last_scroll = 0;
+    }
 
     if ( m_old_progress_x != 0 )
     {
@@ -551,23 +566,44 @@ seqroll::draw_progress_on_window()
 void
 seqroll::follow_progress()
 {
-    long progress_tick = m_seq->get_last_tick();
-
-    if (progress_tick > 0)
+    if( m_expanded_recording && m_seq->get_recording())
     {
-        int progress_x = progress_tick / m_zoom + 10;
-        int page = progress_x / m_window_x;
-        if (page != m_scroll_page)
-        {
-            long left_tick = page * m_window_x * m_zoom;
-            m_scroll_page = page;
+        double h_max_value = ( m_seq->get_length() - (m_window_x * m_zoom));
+        m_hadjust->set_value(h_max_value);
+        
+    }else    /* use for non recording */
+    {
+        long progress_tick = m_seq->get_last_tick();
 
-            if((left_tick + m_hadjust->get_page_size()) >= m_hadjust->get_upper()) // don't scroll past upper
-                m_hadjust->set_value(m_hadjust->get_upper() - m_hadjust->get_page_size());
-            else
-                m_hadjust->set_value(double(left_tick));
+        if (progress_tick > 0)
+        {
+            int progress_x = progress_tick / m_zoom + 10;
+            int page = progress_x / m_window_x;
+
+            if (page != m_scroll_page || (page == 0 && m_hadjust->get_value() != 0))
+            {
+                long left_tick = page * m_window_x * m_zoom;
+                m_scroll_page = page;
+
+                if((left_tick + m_hadjust->get_page_size()) >= m_hadjust->get_upper()) // don't scroll past upper
+                    m_hadjust->set_value(m_hadjust->get_upper() - m_hadjust->get_page_size());
+                else
+                    m_hadjust->set_value(double(left_tick));
+            }
         }
     }
+}
+
+void
+seqroll::set_expanded_recording(bool a_record)
+{
+    m_expanded_recording = a_record;
+}
+
+bool
+seqroll::get_expanded_record()
+{
+    return m_expanded_recording;
 }
 
 void seqroll::draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw )

@@ -205,6 +205,18 @@ optionsfile::parse( perform *a_perf )
     next_data_line( &file );
     sscanf( m_line, "%u", &a_perf->m_key_jack );
 #endif // JACK_SUPPORT
+    
+    next_data_line( &file );
+    sscanf( m_line, "%u", &a_perf->m_key_tap_bpm );
+    
+    next_data_line( &file );
+    sscanf( m_line, "%u", &a_perf->m_key_rewind );
+    
+    next_data_line( &file );
+    sscanf( m_line, "%u", &a_perf->m_key_forward );
+    
+    next_data_line( &file );
+    sscanf( m_line, "%u", &a_perf->m_key_pointer );
 
     line_after( &file, "[jack-transport]" );
     long flag = 0;
@@ -526,6 +538,22 @@ optionsfile::write( perform *a_perf  )
          << gdk_keyval_name( a_perf->m_key_jack )
          << " jack sync\n";
 #endif // JACK_SUPPORT
+    
+    file << a_perf->m_key_tap_bpm << "        # "
+         << gdk_keyval_name( a_perf->m_key_tap_bpm )
+         << " tap BPM key\n";
+    
+    file << a_perf->m_key_rewind << "        # "
+         << gdk_keyval_name( a_perf->m_key_rewind )
+         << " rewind key\n";
+    
+    file << a_perf->m_key_forward << "        # "
+         << gdk_keyval_name( a_perf->m_key_forward )
+         << " fast forward key\n";
+
+    file << a_perf->m_key_pointer << "        # "
+         << gdk_keyval_name( a_perf->m_key_pointer )
+         << " pointer key\n";
 
     file << "\n\n\n[jack-transport]\n\n"
 

@@ -58,6 +58,7 @@ static struct
     {"jack_session_uuid", required_argument, 0, 'U'},
     {"manual_alsa_ports", 0, 0, 'm'},
     {"pass_sysex", 0, 0, 'P'},
+    {"use_sysex", 0, 0, 'u'},
     {"version", 0, 0, 'v'},
     {"client_name", required_argument, 0, 'n'},
     {0, 0, 0, 0}
@@ -73,6 +74,7 @@ bool global_device_ignore = false;
 int global_device_ignore_num = 0;
 bool global_stats = false;
 bool global_pass_sysex = false;
+bool global_use_sysex = false;
 Glib::ustring global_filename = "";
 Glib::ustring last_used_dir ="/";
 std::string config_filename = ".seq32rc";
@@ -143,7 +145,7 @@ main (int argc, char *argv[])
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "Chi:jJkmM:pPsSU:vx:X:n:", long_options,
+        c = getopt_long(argc, argv, "Chi:jJkmM:pPsSuU:vx:X:n:", long_options,
                         &option_index);
 
         /* Detect the end of the options. */
@@ -164,6 +166,7 @@ main (int argc, char *argv[])
             printf( "   -s, --showmidi: dumps incoming midi events to screen\n" );
             printf( "   -p, --priority: runs higher priority with FIFO scheduler (must be root)\n" );
             printf( "   -P, --pass_sysex: passes any incoming sysex messages to all outputs \n" );
+            printf( "   -u, --use_sysex: currently only limited support for transport control\n" );
             printf( "   -i, --ignore <number>: ignore ALSA device\n" );
             printf( "   -k, --show_keys: prints pressed key value\n" );
             printf( "   -x, --interaction_method <number>: see .seq32rc for methods to use\n" );
@@ -242,6 +245,10 @@ main (int argc, char *argv[])
         case 'v':
             printf("%s", versiontext);
             return EXIT_SUCCESS;
+            break;
+
+        case 'u':
+            global_use_sysex = true; // only supports YPT-300 (Yamaha)
             break;
 
         case 'U':
@@ -324,13 +331,13 @@ main (int argc, char *argv[])
      *
      * TODO: this function is repeated verbatim in mainwnd.cpp...
      */
-    
+
     if(setlist_mode) // FIXME
     {
         p.set_setlist_mode(setlist_mode);
         p.set_setlist_file((char*)setlist_file.c_str());
     }
-    
+
     while(p.get_setlist_mode())
     {
     	if(Glib::file_test(p.get_setlist_current_file(), Glib::FILE_TEST_EXISTS))

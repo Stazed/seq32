@@ -37,8 +37,8 @@ const char mainwid::m_seq_to_char[c_seqs_in_set] =
 
 // Constructor
 
-mainwid::mainwid( perform *a_p  ):
-    seqmenu( a_p ),
+mainwid::mainwid( perform *a_p, mainwnd *a_main ):
+    seqmenu( a_p, a_main ),
     m_black(Gdk::Color("black")),
     m_white(Gdk::Color("white")),
     m_grey (Gdk::Color("grey")),

@@ -22,7 +22,9 @@
 #include "globals.h"
 #include "perform.h"
 
+/* forward declarations */
 class seqedit;
+class mainwnd;
 
 #pragma once
 
@@ -49,6 +51,7 @@ private:
 
     Menu         *m_menu;
     perform      *m_mainperf;
+    mainwnd      *m_mainwnd;
     sequence     m_clipboard;
 
     void on_realize();
@@ -57,6 +60,8 @@ private:
     void seq_new();
 
     void seq_copy();
+    void seq_export();
+    void track_export();
     void seq_cut();
     void seq_paste();
 
@@ -74,6 +79,6 @@ protected:
 
 public:
 
-    seqmenu( perform *a_p );
+    seqmenu( perform *a_p, mainwnd *a_main );
     virtual ~seqmenu( ) { };
 };

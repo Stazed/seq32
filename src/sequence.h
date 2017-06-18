@@ -92,6 +92,7 @@ private:
 
     list < trigger > m_list_trigger;
     trigger m_trigger_clipboard;
+    trigger *m_export_trigger; 
 
     stack < list < event > >m_list_undo;
     stack < list < event > >m_list_redo;
@@ -131,6 +132,10 @@ private:
     bool m_quanized_rec;
     bool m_thru;
     bool m_queued;
+    bool m_overwrite_recording;
+    
+    /* flag to indicate play marker has gone to beginning of sequence on looping */
+    bool m_loop_reset;
 
     bool m_trigger_copied;
 
@@ -158,6 +163,7 @@ private:
        should be powers of two in bars */
     long m_length;
     long m_snap_tick;
+    long m_unit_measure;
 
     /* these are just for the editor to mark things
        in correct time */
@@ -176,9 +182,10 @@ private:
        places it on our midibus */
     void put_event_on_bus (event * a_e);
 
-    /* resetes the location counters */
+    /* resets the location counters */
     void reset_loop ();
 
+    /* remove all events from sequence */
     void remove_all ();
 
     /* mutex */
@@ -224,8 +231,8 @@ public:
     void set_name (string a_name);
     void set_name (char *a_name);
 
-    void set_measures (long a_length_measures);
-    long get_measures ();
+    void set_unit_measure ();
+    long get_unit_measure ();
 
     void set_bp_measure (long a_beats_per_measure);
     long get_bp_measure ();
@@ -285,6 +292,10 @@ public:
     void set_snap_tick( int a_st );
     void set_quanized_rec( bool a_qr );
     bool get_quanidez_rec( );
+    void set_overwrite_rec( bool a_ov );
+    bool get_overwrite_rec( );    
+    void set_loop_reset( bool a_reset);
+    bool get_loop_reset( );
 
     void set_thru (bool);
     bool get_thru ();
@@ -318,6 +329,10 @@ public:
 
     /* adds event to internal list */
     void add_event (const event * a_e);
+    
+    /* for speed on file load these are used to great benefit */
+    void add_event_no_sort( const event *a_e );     // all events are added first
+    void sort_events();                             // called after all events added, once
 
     void add_trigger (long a_tick, long a_length, long a_offset = 0, bool a_adjust_offset = true);
     void split_trigger( long a_tick );
@@ -342,6 +357,8 @@ public:
     void cut_selected_trigger();
     void copy_selected_trigger();
     void paste_trigger(long a_tick = -1); // -1 default behavior no paste tick
+    void set_trigger_export();
+    trigger *get_trigger_export();
 
     void move_selected_triggers_to(long a_tick, bool a_adjust_offset, trigger_edit editMode = MOVE);
     long get_selected_trigger_start_tick();
@@ -507,12 +524,12 @@ public:
 
     sequence & operator= (const sequence & a_rhs);
 
-    void fill_list (list < char >*a_list, int a_pos);
+    void fill_list (list < char >*a_list, int a_pos, bool write_triggers = true);
     void seq_number_fill_list( list<char> *a_list, int a_pos );
     void seq_name_fill_list( list<char> *a_list );
     void fill_proprietary_list(list < char >*a_list);
     void meta_track_end( list<char> *a_list, long delta_time);
-    long song_fill_list_seq_event( list<char> *a_list, trigger *a_trig, long prev_timestamp );
+    long song_fill_list_seq_event( list<char> *a_list, trigger *a_trig, long prev_timestamp, file_type_e type );
     void song_fill_list_seq_trigger( list<char> *a_list, trigger *a_trig, long a_length, long prev_timestamp );
 
     void select_events (unsigned char a_status, unsigned char a_cc,

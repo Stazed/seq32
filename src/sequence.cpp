@@ -24,6 +24,7 @@
 list < event > sequence::m_list_clipboard;
 
 sequence::sequence( ) :
+    m_export_trigger(nullptr),
     m_midi_channel(0),
     m_bus(0),
 
@@ -37,6 +38,8 @@ sequence::sequence( ) :
     m_quanized_rec(false),
     m_thru(false),
     m_queued(false),
+    m_overwrite_recording(false),
+    m_loop_reset(false),
 
     m_trigger_copied(false),
 
@@ -214,6 +217,20 @@ sequence::pop_trigger_redo()
 }
 
 void
+sequence::set_unit_measure()
+{
+    lock();
+    m_unit_measure = (get_bp_measure() * (c_ppqn * 4)) /  get_bw();
+    unlock();
+}
+
+long
+sequence::get_unit_measure()
+{
+    return m_unit_measure;
+}
+
+void
 sequence::set_master_midi_bus( mastermidibus *a_mmb )
 {
     lock();
@@ -303,6 +320,30 @@ sequence::add_event( const event *a_e )
 
     set_dirty();
 
+    unlock();
+}
+
+/* adds event without sorting - used for file loading */
+void
+sequence::add_event_no_sort( const event *a_e )
+{
+    lock();
+
+    m_list_event.push_front( *a_e );
+ 
+    unlock();
+}
+
+/* sorts events - used by file loading after all events added for speed */
+void
+sequence::sort_events()
+{
+    lock();
+
+    m_list_event.sort();
+    reset_draw_marker();
+    set_dirty();
+    
     unlock();
 }
 
@@ -2193,6 +2234,12 @@ sequence::stream_event(  event *a_ev  )
     /* status comes in with the channel bit - only record matching channel of sequence */
     if(get_midi_channel() == (a_in.m_status & 0x0F))
     {
+        /* if in overwrite record, any events after reset should clear old items from previous pass*/
+        if(m_overwrite_recording && m_loop_reset)
+        {
+            m_loop_reset = false;
+            remove_all(); // clear old items
+        }
         /*
             This clears the channel bit now that we have a match.
             Channel will be appended on bus by midibus::play().
@@ -3217,6 +3264,31 @@ sequence::paste_trigger(long a_tick)
     }
 }
 
+void
+sequence::set_trigger_export()
+{
+    lock();
+
+    list<trigger>::iterator i;
+
+    for ( i = m_list_trigger.begin(); i != m_list_trigger.end(); i++ )
+    {
+        if ( i->m_selected )
+        {
+            m_export_trigger = &*i;
+            break;
+        }
+    }
+
+    unlock();
+}
+
+trigger *
+sequence::get_trigger_export()
+{
+    return m_export_trigger;
+}
+
 /* this refreshes the play marker to the LastTick */
 void
 sequence::reset_draw_marker()
@@ -3610,6 +3682,34 @@ bool
 sequence::get_quanidez_rec( )
 {
     return m_quanized_rec;
+}
+
+void
+sequence::set_overwrite_rec( bool a_ov )
+{
+    lock();
+    m_overwrite_recording = a_ov;
+    unlock();
+}
+
+bool
+sequence::get_overwrite_rec( )
+{
+    return m_overwrite_recording;
+}
+
+void
+sequence::set_loop_reset( bool a_reset )
+{
+    lock();
+    m_loop_reset = a_reset;
+    unlock();
+}
+
+bool
+sequence::get_loop_reset( )
+{
+    return m_loop_reset;
 }
 
 void
@@ -4268,7 +4368,7 @@ sequence::meta_track_end( list<char> *a_list, long delta_time)
 }
 
 void
-sequence::fill_list( list<char> *a_list, int a_pos )
+sequence::fill_list( list<char> *a_list, int a_pos, bool write_triggers )
 {
     lock();
 
@@ -4322,28 +4422,31 @@ sequence::fill_list( list<char> *a_list, int a_pos )
         }
     }
 
-    int num_triggers = m_list_trigger.size();
-    list<trigger>::iterator t = m_list_trigger.begin();
-
-    addListVar( a_list, 0 );
-    a_list->push_front( 0xFF );
-    a_list->push_front( 0x7F );
-    addListVar( a_list, (num_triggers * 3 * 4) + 4);
-    addLongList( a_list, c_triggers_new );
-
-    //printf( "num_triggers[%d]\n", num_triggers );
-
-    for ( int i=0; i<num_triggers; i++ )
+    if(write_triggers)  // default is true, only solo sequence export does not write triggers
     {
-        //printf( "> start[%d] end[%d] offset[%d]\n",
-        //        (*t).m_tick_start, (*t).m_tick_end, (*t).m_offset );
+        int num_triggers = m_list_trigger.size();
+        list<trigger>::iterator t = m_list_trigger.begin();
 
-        addLongList( a_list, (*t).m_tick_start );
-        addLongList( a_list, (*t).m_tick_end );
-        addLongList( a_list, (*t).m_offset );
-        t++;
+        addListVar( a_list, 0 );
+        a_list->push_front( 0xFF );
+        a_list->push_front( 0x7F );
+        addListVar( a_list, (num_triggers * 3 * 4) + 4);
+        addLongList( a_list, c_triggers_new );
+
+        //printf( "num_triggers[%d]\n", num_triggers );
+
+        for ( int i=0; i<num_triggers; i++ )
+        {
+            //printf( "> start[%d] end[%d] offset[%d]\n",
+            //        (*t).m_tick_start, (*t).m_tick_end, (*t).m_offset );
+
+            addLongList( a_list, (*t).m_tick_start );
+            addLongList( a_list, (*t).m_tick_end );
+            addLongList( a_list, (*t).m_offset );
+            t++;
+        }
     }
-
+    
     fill_proprietary_list(a_list);
 
     delta_time = m_length - prev_timestamp;
@@ -4354,25 +4457,47 @@ sequence::fill_list( list<char> *a_list, int a_pos )
 }
 
 long
-sequence::song_fill_list_seq_event( list<char> *a_list, trigger *a_trig, long prev_timestamp )
+sequence::song_fill_list_seq_event( list<char> *a_list, trigger *a_trig, long prev_timestamp, file_type_e type )
 {
     lock();
+    
+    /* these trigger values may be adjusted if solo trigger*/
+    long tick_end = a_trig->m_tick_end;
+    long tick_start = a_trig->m_tick_start;
+    long offset = a_trig->m_offset; 
 
-    long trigger_offset = (a_trig->m_offset % m_length);
-    long start_offset = (a_trig->m_tick_start % m_length);
-    long timestamp_adjust = a_trig->m_tick_start - start_offset + trigger_offset;
+    /* starting calculations */
+    long trigger_offset = (offset % m_length);
+    long start_offset = (tick_start % m_length);
+    long timestamp_adjust = tick_start - start_offset + trigger_offset;
     int times_played = 1;
     int note_is_used[c_midi_notes];
+    
+    /* For solo trigger we essentially adjust the trigger as if it is pushed all the way
+       to the beginning of the track. Then the normal song export routine applies */
+    if(type == E_MIDI_SOLO_TRIGGER)
+    {
+        trigger_offset -= start_offset; // adjust to beginning of track
+        start_offset = 0;               // ditto
+    }
 
     /* initialize to off */
     for (int i=0; i< c_midi_notes; i++ )
         note_is_used[i] = 0;
 
-    times_played += (a_trig->m_tick_end - a_trig->m_tick_start)/ m_length;
+    times_played += (tick_end - tick_start)/ m_length;
 
     if((trigger_offset - start_offset) > 0) // in this case the total offset is m_length too far
         timestamp_adjust -= m_length;
 
+    /* adjust as if the trigger were pushed all the way to the track beginning */
+    if(type == E_MIDI_SOLO_TRIGGER)
+    {
+        timestamp_adjust -= a_trig->m_tick_start;   // if start is other than 0, then it must be subtracted
+        tick_end -= a_trig->m_tick_start;           // ditto
+        tick_start = 0;                             // now set the start to 0 if not already there
+    } 
+     
     //long total_offset = trigger_offset - start_offset;
     //printf("trigger_offset [%ld]: start_offset [%ld]: total_offset [%ld]: timestamp_adjust [%ld]\n",
     //         trigger_offset,start_offset,total_offset,timestamp_adjust);
@@ -4393,14 +4518,14 @@ sequence::song_fill_list_seq_event( list<char> *a_list, trigger *a_trig, long pr
             timestamp += timestamp_adjust;
 
             /* if the event is after the trigger start */
-            if(timestamp >= a_trig->m_tick_start )
+            if(timestamp >= tick_start )
             {
                 // need to save the event note if note_on, then eliminate the note_off if the note_on is NOT used
                 unsigned char note = e.get_note();
 
                 if ( e.is_note_on() )
                 {
-                    if(timestamp > a_trig->m_tick_end)
+                    if(timestamp > tick_end)
                     {
                         continue;                   // skip
                     }
@@ -4416,10 +4541,10 @@ sequence::song_fill_list_seq_event( list<char> *a_list, trigger *a_trig, long pr
                     }
                     else                            // we have a note_on
                     {
-                        if(timestamp >= a_trig->m_tick_end) // if past the end of trigger then use trigger end
+                        if(timestamp >= tick_end)   // if past the end of trigger then use trigger end
                         {
                             note_is_used[note]--;           // turn off the note_on
-                            timestamp = a_trig->m_tick_end;
+                            timestamp = tick_end;
                         }
                         else                                // not past end so just use it
                             note_is_used[note]--;
@@ -4430,7 +4555,7 @@ sequence::song_fill_list_seq_event( list<char> *a_list, trigger *a_trig, long pr
                 continue;
 
             /* if the event is past the trigger end - for non notes - skip */
-            if(timestamp >= a_trig->m_tick_end )
+            if(timestamp >= tick_end )
             {
                 if ( !e.is_note_on() && !e.is_note_off() ) // these were already taken care of...
                     continue;

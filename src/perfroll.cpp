@@ -951,3 +951,9 @@ perfroll::set_zoom (int a_zoom)
         update_sizes();
     }
 }
+
+int 
+perfroll::get_drop_sequence()
+{
+    return m_drop_sequence;
+}

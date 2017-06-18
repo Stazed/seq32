@@ -20,6 +20,7 @@
 
 #include "perfedit.h"
 #include "sequence.h"
+#include "mainwnd.h"
 
 #include "pixmaps/snap.xpm"
 #include "pixmaps/play2.xpm"
@@ -48,9 +49,9 @@ using namespace sigc;
 #   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
 #endif
 
-int FF_RW_button_type = 0;
+ff_rw_type_e FF_RW_button_type = FF_RW_RELEASE;
 
-perfedit::perfedit( perform *a_perf )
+perfedit::perfedit( perform *a_perf, mainwnd *a_main )
 {
     using namespace Menu_Helpers;
 
@@ -60,6 +61,7 @@ perfedit::perfedit( perform *a_perf )
     m_snap = c_ppqn / 4;
 
     m_mainperf = a_perf;
+    m_mainwnd = a_main;
 
     /* main window */
     set_title( "seq32 - Song Editor");
@@ -74,7 +76,7 @@ perfedit::perfedit( perform *a_perf )
     m_vscroll   =  manage(new VScrollbar( *m_vadjust ));
     m_hscroll   =  manage(new HScrollbar( *m_hadjust ));
 
-    m_perfnames = manage( new perfnames( m_mainperf, m_vadjust ));
+    m_perfnames = manage( new perfnames( m_mainperf, a_main, m_vadjust ));
 
     m_perfroll = manage( new perfroll( m_mainperf,
                                        this,
@@ -427,6 +429,14 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 #endif // JACK_SUPPORT
+        if ( a_ev->keyval ==  GDK_F10 )     // FIXME trigger export make configurable
+        {
+            if(m_mainperf->is_active(m_perfroll->get_drop_sequence()))
+            {
+                m_mainperf->get_sequence(m_perfroll->get_drop_sequence())->set_trigger_export();
+                m_mainwnd->export_seq_track_trigger(E_MIDI_SOLO_TRIGGER, m_perfroll->get_drop_sequence());
+            }
+        }
     }
 
     if(!event_was_handled)
@@ -487,9 +497,14 @@ void
 perfedit::rewind(bool a_press)
 {
     if(a_press)
-        FF_RW_button_type = -1;
+    {
+        if(FF_RW_button_type == FF_RW_REWIND) // for key repeat, just ignore repeat
+            return;
+        
+        FF_RW_button_type = FF_RW_REWIND;
+    }
     else
-        FF_RW_button_type = 0;
+        FF_RW_button_type = FF_RW_RELEASE;
 
     gtk_timeout_add(120,FF_RW_timeout,m_mainperf);
 }
@@ -498,9 +513,14 @@ void
 perfedit::fast_forward(bool a_press)
 {
     if(a_press)
-        FF_RW_button_type = 1;
+    {
+        if(FF_RW_button_type == FF_RW_FORWARD) // for key repeat, just ignore repeat
+            return;
+        
+        FF_RW_button_type = FF_RW_FORWARD;
+    }
     else
-        FF_RW_button_type = 0;
+        FF_RW_button_type = FF_RW_RELEASE;
 
     gtk_timeout_add(120,FF_RW_timeout,m_mainperf);
 }
@@ -776,7 +796,7 @@ FF_RW_timeout(void *arg)
 {
     perform *p = (perform *) arg;
 
-    if(FF_RW_button_type != 0)
+    if(FF_RW_button_type != FF_RW_RELEASE)
     {
         p->FF_rewind();
         if(p->m_excell_FF_RW < 60.0f)

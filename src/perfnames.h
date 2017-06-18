@@ -42,6 +42,9 @@ using namespace Gtk;
 
 #include "globals.h"
 
+/* forward declaration */
+class mainwnd;
+
 /* holds the left side piano */
 class perfnames : public virtual Gtk::DrawingArea, public virtual seqmenu
 {
@@ -85,7 +88,7 @@ public:
 
     void redraw_dirty_sequences();
 
-    perfnames( perform *a_perf,
+    perfnames( perform *a_perf, mainwnd *a_main,
                Adjustment *a_vadjust   );
 
 };

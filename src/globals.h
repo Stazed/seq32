@@ -45,6 +45,7 @@ const int c_total_seqs = c_seqs_in_set * c_max_sets;
 /* number of sequences */
 /* 32 screen sets */
 const int c_max_sequence =  c_mainwnd_rows *  c_mainwnd_cols * c_max_sets;
+const int c_no_export_sequence = -1;
 
 const int c_ppqn         = 192;  /* default - dosnt change */
 const int c_ppwn         = c_ppqn * 4;  // whole note
@@ -56,7 +57,11 @@ const int c_note_off_margin = 2;  // # ticks to shave off end of painted notes
 const long c_note_on_velocity_default = 100;
 const long c_note_off_velocity_default = 64;
 
-const int c_bpm          = 120;  /* default */
+const double c_bpm                       = 120.0;   /* default */
+const double c_bpm_scale_factor          = 1000.0;  /* used in midifile for doubles */
+const double c_bpm_minimum               = 1.0;
+const double c_bpm_maximum               = 600.0;
+
 const int c_maxBuses = 32;
 
 /* trigger width in milliseconds */
@@ -148,10 +153,6 @@ const int c_adding = 0;
 const int c_normal = 1;
 const int c_paste  = 2;
 
-/* used for export file type */
-const int c_seq32_midi = 1;
-const int c_song_midi  = 2;
-
 /* redraw when recording ms */
 #ifdef __WIN32__
 const int c_redraw_ms = 20;
@@ -169,6 +170,7 @@ extern bool global_showmidi;
 extern bool global_priority;
 extern bool global_stats;
 extern bool global_pass_sysex;
+extern bool global_use_sysex;
 extern bool global_with_jack_transport;
 extern bool global_with_jack_master;
 extern bool global_with_jack_master_cond;
@@ -473,7 +475,18 @@ extern interaction_method_e global_interactionmethod;
 template <typename T>
 string NumberToString ( T Number )
 {
-	stringstream ss;
-	ss << Number;
-	return ss.str();
+    stringstream ss;
+    ss << Number;
+    return ss.str();
 }
+
+enum file_type_e
+{
+    E_MIDI_SEQ32_FORMAT,
+    E_MIDI_SONG_FORMAT,
+    E_MIDI_SOLO_SEQUENCE,
+    E_MIDI_SOLO_TRIGGER,
+    E_MIDI_SOLO_TRACK
+};
+
+int FF_RW_timeout(void *arg);

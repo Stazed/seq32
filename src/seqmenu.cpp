@@ -21,12 +21,14 @@
 #include "seqmenu.h"
 #include "seqedit.h"
 #include "font.h"
+#include "mainwnd.h"
 
 // Constructor
 
-seqmenu::seqmenu( perform *a_p  ) :
+seqmenu::seqmenu( perform *a_p, mainwnd *a_main ) :
     m_menu(NULL),
-    m_mainperf(a_p)
+    m_mainperf(a_p),
+    m_mainwnd(a_main)
 {
     using namespace Menu_Helpers;
 
@@ -61,6 +63,8 @@ seqmenu::popup_menu()
     {
         m_menu->items().push_back(MenuElem("Cut", mem_fun(*this,&seqmenu::seq_cut)));
         m_menu->items().push_back(MenuElem("Copy", mem_fun(*this,&seqmenu::seq_copy)));
+        m_menu->items().push_back(MenuElem("Export sequence", mem_fun(*this,&seqmenu::seq_export)));
+        m_menu->items().push_back(MenuElem("Export track", mem_fun(*this,&seqmenu::track_export)));       
     }
     else
     {
@@ -192,6 +196,25 @@ seqmenu::seq_copy()
         m_clipboard = *(m_mainperf->get_sequence( m_current_seq ));
 }
 
+// Exports solo sequence to selected midi file
+void
+seqmenu::seq_export()
+{
+    if ( m_mainperf->is_active( m_current_seq ))
+    {
+        m_mainwnd->export_seq_track_trigger(E_MIDI_SOLO_SEQUENCE, m_current_seq);
+    }
+}
+
+// Exports solo track in song format
+void
+seqmenu::track_export()
+{
+    if ( m_mainperf->is_active( m_current_seq ))
+    {
+        m_mainwnd->export_seq_track_trigger(E_MIDI_SOLO_TRACK, m_current_seq);
+    }
+}
 // Deletes and Copies to Clipboard */
 void
 seqmenu::seq_cut()

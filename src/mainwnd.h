@@ -96,6 +96,8 @@ private:
     SpinButton  *m_spinbutton_bpm;
     Adjustment  *m_adjust_bpm;
 
+    Button      *m_button_tap;
+
     SpinButton  *m_spinbutton_ss;
     Adjustment  *m_adjust_ss;
 
@@ -105,6 +107,11 @@ private:
     Entry       *m_entry_notes;
 
     sigc::connection   m_timeout_connect;
+
+    /* tap button - From sequencer64 */
+    int m_current_beats; // value is displayed in the button.
+    long m_base_time_ms; // Indicates the first time the tap button was ... tapped.
+    long m_last_time_ms; // Indicates the last time the tap button was tapped.
 
     void set_song_mode();
     void toggle_song_mode();
@@ -131,12 +138,12 @@ private:
     void file_open();
     void file_open_setlist();//sjh mod
     void file_save();
-    void file_save_as( int type = c_seq32_midi );
+    void file_save_as( file_type_e type, int a_seq );
     void file_exit();
     void new_open_error_dialog();
     void new_file();
     bool save_file();
-    void export_midi(const Glib::ustring& fn);
+    void export_midi(const Glib::ustring& fn, file_type_e type, int a_seq);
     void choose_file(bool setlist_mode = false);
     int query_save_changes();
     bool is_save();
@@ -148,12 +155,18 @@ private:
     void apply_song_transpose ();
     void set_song_mute(mute_op op);
 
+    /* From  sequencer64 tap button */
+    void tap ();
+    void set_tap_button (int beats);
+    double update_bpm ();
+
 public:
 
     mainwnd(perform *a_p);
     ~mainwnd();
 
     bool open_file(const Glib::ustring&, bool setlist_mode = false);
+    void export_seq_track_trigger(file_type_e type, int a_seq);
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);
     bool on_key_release_event(GdkEventKey* a_ev);
