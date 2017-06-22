@@ -464,6 +464,22 @@ mainwnd::timer_callback(  )
             }
         }
     }
+    
+    if(m_mainperf->get_tempo_load())    /* file loading */
+    {
+        m_mainperf->set_tempo_load(false);
+        m_perf_edit->load_tempo_list();
+        /* reset the m_mainperf bpm for display purposes, not changing the list value*/
+        m_mainperf->set_bpm(m_mainperf->get_start_tempo());
+    }
+    
+    if(m_mainperf->get_tempo_reset())   /* play tempo markers */
+    {
+        m_perf_edit->reset_tempo_list(true); // true for updating play_list only, no need to recalc here
+        m_mainperf->set_tempo_reset(false);
+        /* reset the m_mainperf bpm for display purposes, not changing the list value*/
+        m_mainperf->set_bpm(m_mainperf->get_start_tempo());
+    }
 
     return true;
 }
@@ -819,7 +835,7 @@ bool mainwnd::open_file(const Glib::ustring& fn, bool setlist_mode)
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                                     m_mainperf->get_screenset()));
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
-        m_perf_edit->update_start_BPM();
+        m_mainperf->set_start_tempo(m_mainperf->get_bpm());
     }
     else
     {

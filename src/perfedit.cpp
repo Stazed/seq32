@@ -739,6 +739,19 @@ perfedit::toggle_follow_transport()
     m_button_follow->set_active( ! m_button_follow->get_active() );
 }
 
+void 
+perfedit::load_tempo_list()
+{
+    m_tempo->load_tempo_list();
+}
+
+void
+perfedit::reset_tempo_list(bool play_list_only)
+{
+    printf("pefedit reset tempo list\n");
+    m_tempo->reset_tempo_list(play_list_only);
+}
+
 void
 perfedit::on_realize()
 {

@@ -175,6 +175,8 @@ perform::perform()
     m_key_rightarrow = GDK_Right; //NOT GDK_rightarrow;
 
     m_jack_stop_tick = 0;
+    m_reset_tempo_list = false;
+    m_load_tempo_list = false;
 
     m_offset = 0;
     m_control_status = 0;
@@ -1464,6 +1466,55 @@ void perform::stop()
 //    }
 
     inner_stop();
+}
+
+bool
+perform::get_tempo_reset()
+{
+    return m_reset_tempo_list;
+}
+
+void
+perform::set_tempo_reset(bool a_reset)
+{
+    m_reset_tempo_list = a_reset;
+}
+
+bool
+perform::get_tempo_load()
+{
+    return m_load_tempo_list;
+}
+
+void
+perform::set_tempo_load(bool a_load)
+{
+    m_load_tempo_list = a_load;
+}
+
+void
+perform::set_start_tempo(double a_bpm)
+{
+    tempo_mark marker;
+    marker.bpm = a_bpm;
+    marker.tick = STARTING_MARKER;
+    
+    if(!m_list_total_marker.size()) // normal file loading .s32 file size will be zero
+    {
+        m_list_total_marker.push_front(marker);
+    }
+    else                            // midi file import - user wants to change BPM so just load at start
+    {
+        (*m_list_total_marker.begin())= marker;
+    }
+        
+    set_tempo_load(true);
+}
+
+double
+perform::get_start_tempo()
+{
+    return m_list_total_marker.begin()->bpm;
 }
 
 void perform::inner_start(bool a_state)

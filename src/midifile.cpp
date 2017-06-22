@@ -658,6 +658,47 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
         }
     }
     
+    if ((file_size - m_pos) > (int) sizeof (unsigned int))
+    {
+        /* Get ID + Length */
+        ID = read_long ();
+        if (ID == c_tempo_map)
+        {
+            tempo_mark a_marker;
+            long length = read_long();
+            bool use_tempo_map = true;  // true by default, means not imported
+            
+            if(length > 0)
+            {
+                if(a_import)   // always load tempo/time-sig when NOT imported
+                    use_tempo_map = verify_tempo_map();
+                
+                if(use_tempo_map)
+                    a_perf->m_list_total_marker.clear();
+            }
+            
+            /* if use_tempo_map is false we should still run through the reads in case additional tags are added later */
+            for(int i = 0; i < length; ++i)
+            {
+                a_marker.tick = read_long();
+                double a_bpm = (double) read_long ();
+                if(a_bpm != 0)                // stop marker = 0, so don't bother with scale
+                {
+                    if(a_bpm > (c_bpm_scale_factor - 1.0))
+                        a_bpm /= c_bpm_scale_factor;
+                }
+                a_marker.bpm = a_bpm;
+                a_marker.bw = read_long();
+                a_marker.bp_measure = read_long();
+                // we don't need start frame since it will be calculated on reset
+                if(use_tempo_map)
+                    a_perf->m_list_total_marker.push_back(a_marker);
+            }
+            if(use_tempo_map)
+                a_perf->set_tempo_load(true);
+        }
+    }
+
     // *** ADD NEW TAGS AT END **************/
     
     if(!a_import)   // always load tempo/time-sig when NOT imported
@@ -880,6 +921,20 @@ bool midifile::write (perform * a_perf, int a_solo_seq)
         /* write out the beat width */
         write_long(c_perf_bw);
         write_long(a_perf->get_bw());
+        
+        /* write out the tempo map */
+        write_long(c_tempo_map);
+        write_long(a_perf->m_list_total_marker.size());
+        list<tempo_mark>::iterator i;
+        for ( i = a_perf->m_list_total_marker.begin(); i != a_perf->m_list_total_marker.end(); i++ )
+        {
+            write_long((*i).tick);
+            long scaled_bpm = long((*i).bpm * c_bpm_scale_factor);
+            write_long (scaled_bpm);
+            write_long((*i).bw);
+            write_long((*i).bp_measure);
+           // don't need start frame since it will be re-calculated on load
+        }
     }
     /* open binary file */
     ofstream file (m_name.c_str (), ios::out | ios::binary | ios::trunc);
@@ -1172,6 +1227,28 @@ midifile::verify_change_tempo_timesig(double tempo, long bp_measure, long bw)
     
     message += "\n\nTempo or time signature is different from current project!\n\n";
     message += "Do you want to change the current project tempo and time signature to the import values?";
+
+    Gtk::MessageDialog warning(message,
+                           false,
+                           Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
+
+    auto result = warning.run();
+
+    if (result == Gtk::RESPONSE_NO )
+    {
+        return false;
+    }
+    return true;
+}
+
+bool
+midifile::verify_tempo_map()
+{
+    Glib::ustring message = "From Import file:  ";
+    message += m_name.c_str();
+    
+    message += "\n\nFile contains a tempo map!\n\n";
+    message += "Do you want to change the current project tempo map to the import values?";
 
     Gtk::MessageDialog warning(message,
                            false,

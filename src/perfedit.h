@@ -192,6 +192,9 @@ public:
     void toggle_jack();
     void set_follow_transport ();
     void toggle_follow_transport();
+    
+    void load_tempo_list();
+    void reset_tempo_list(bool play_list_only);
 
     friend int FF_RW_timeout(void *arg);
 
