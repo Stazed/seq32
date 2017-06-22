@@ -1203,6 +1203,153 @@ void perform::stop_jack()
 #endif
 }
 
+#ifdef JACK_SUPPORT
+jack_nframes_t tick_to_jack_frame(uint64_t a_tick, double a_bpm, void *arg)
+{
+    perform *perf = (perform *) arg;
+    
+    long current_tick = a_tick;
+    current_tick *= 10;
+
+    int ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
+    double beats_per_minute =  a_bpm;
+
+    uint64_t tick_rate = ((uint64_t)perf->m_jack_frame_rate * current_tick * 60.0);
+    long tpb_bpm = ticks_per_beat * beats_per_minute * 4.0 / perf->m_bw;
+    jack_nframes_t jack_frame = tick_rate / tpb_bpm;
+    return jack_frame;
+}
+
+/** return a stucture containing the BBT info which applies at /frame/ */
+position_info solve_tempomap ( jack_nframes_t frame, void *arg )
+{
+    return render_tempomap( frame, 0, 0, arg );
+}
+
+/* From non-timeline - modified */
+position_info render_tempomap( jack_nframes_t start, jack_nframes_t length, void *cb, void *arg )
+{
+#ifdef RDEBUG
+    printf("start %u\n", start);
+#endif
+    perform *perf = (perform *) arg;
+    const jack_nframes_t end = start + length;
+
+    position_info pos;
+    memset( &pos, 0, sizeof( pos ) );
+
+    BBT &bbt = pos.bbt;
+
+    /* default values */
+    pos.beat_type = 4;
+    pos.beats_per_bar = 4;
+    pos.tempo = 120.0;
+
+    const jack_nframes_t samples_per_minute = perf->m_jack_frame_rate * 60;
+
+    float bpm = 120.0f;
+
+    time_sig sig;
+
+    sig.beats_per_bar = 4;
+    sig.beat_type = 4;
+
+    jack_nframes_t frame = 0;
+    jack_nframes_t next = 0;
+
+    jack_nframes_t frames_per_beat = samples_per_minute / bpm;
+
+    if ( ! perf->m_list_no_stop_markers.size() )
+       return pos;
+    
+    list<tempo_mark>::iterator i;
+    
+    for ( i = perf->m_list_no_stop_markers.begin(); i != perf->m_list_no_stop_markers.end(); ++i )
+    {
+        tempo_mark p = (*i);
+        bpm = p.bpm;
+
+        frames_per_beat = samples_per_minute / bpm;
+
+        sig.beat_type = perf->m_bw;
+        sig.beats_per_bar = perf->m_bp_measure;
+ 
+#ifdef RDEBUG
+        printf("bpm %f: frames_per_beat %u: TOP frames %u\n",bpm, frames_per_beat,f);
+#endif
+            /* Time point resets beat */
+//            bbt.beat = 0; // timeline needed to, because it supported multiple sig markers -- we don't
+
+        {
+            list<tempo_mark>::iterator n = i; 
+            ++n;
+
+            if ( n == perf->m_list_no_stop_markers.end())
+            {
+                next = end;
+            }
+            else
+            {
+                jack_nframes_t end_frame = (*i).start;
+                jack_nframes_t start_frame = (*n).start;
+#ifdef RDEBUG                
+                printf("(*n).tick %ld: (*i).tick %ld\n", (*n).tick, (*i).tick);
+                printf("start_frame(n) %u: end_frame(i) %u\n", start_frame,end_frame);
+#endif
+                /* points may not always be aligned with beat boundaries, so we must align here */
+                next = start_frame - ( ( start_frame - end_frame ) % frames_per_beat );
+            }
+#ifdef RDEBUG
+            printf("next %u: end %u\n",next,end);
+#endif
+        }
+
+        for ( ; frame <= next; ++bbt.beat, frame += frames_per_beat )
+        {
+            if ( bbt.beat == sig.beats_per_bar )
+            {
+                bbt.beat = 0;
+                ++bbt.bar;
+            }
+#ifdef RDEBUG
+            printf("frames %u: next %u: end %u: frames_per_beat %u\n", f, next,end,frames_per_beat);
+            printf("bbt,beat %u: bbt.bar %u: frame %u\n", bbt.beat, bbt.bar, f);
+#endif
+            /* ugliness to avoid failing out at -1 */
+            if ( end > frames_per_beat )
+            {
+                if ( frame > end - frames_per_beat )
+                    goto done;
+            }
+            else if ( frame + frames_per_beat > end )
+                goto done;
+        }
+        /* when frame is == next && not goto done: then one extra frame & beat are added - so subtract them here */
+        frame -= frames_per_beat;
+        --bbt.beat;
+    }
+
+done:
+
+    pos.frame = frame;
+    pos.tempo = bpm;
+    pos.beats_per_bar = sig.beats_per_bar;
+    pos.beat_type = sig.beat_type;
+
+    assert( frame <= end );
+
+    assert( end - frame <= frames_per_beat );
+
+
+    double ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
+    const double frames_per_tick = frames_per_beat / ticks_per_beat;
+    bbt.tick = ( end - frame ) / frames_per_tick;
+
+    return pos;
+}
+#endif // JACK_SUPPORT
+
+
 void perform::position_jack( bool a_state, long a_tick )
 {
     //printf( "perform::position_jack()\n" );
@@ -2847,6 +2994,24 @@ void jack_timebase_callback(jack_transport_state_t state,
         pos->beats_per_minute / ( p->m_jack_frame_rate* 60.0);
 
     p->jack_BBT_position(*pos, jack_tick);
+}
+
+long convert_jack_frame_to_s32_tick(jack_nframes_t a_frame, double a_bpm, void *arg)
+{
+    perform *p = (perform *) arg;
+    double jack_tick;
+    double ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
+    double beat_type = p->get_bw();
+    
+    jack_tick =
+        (a_frame) *
+        ticks_per_beat  *
+        a_bpm / ( p->m_jack_frame_rate* 60.0);
+
+    /* convert ticks */
+    return jack_tick * ((double) c_ppqn /
+                    (ticks_per_beat *
+                     beat_type / 4.0  ));
 }
 
 long get_current_jack_position(void *arg)

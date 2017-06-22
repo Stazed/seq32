@@ -68,6 +68,10 @@ bin_PROGRAMS = %D%/seq32
   %D%/seqtime.h \
   %D%/sequence.cpp \
   %D%/sequence.h \
+  %D%/tempo.cpp \
+  %D%/tempo.h \
+  %D%/tempopopup.cpp \
+  %D%/tempopopup.h \
   %D%/userfile.cpp \
   %D%/userfile.h
 
