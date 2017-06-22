@@ -183,6 +183,7 @@ public:
     int get_bp_measure();
     void set_bw( int a_beat_width );
     int get_bw();
+    void update_start_BPM();
 
     void set_xpose (int a_xpose);
     void set_zoom (int z);

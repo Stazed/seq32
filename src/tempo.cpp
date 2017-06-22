@@ -387,7 +387,7 @@ tempo::set_start_BPM(double a_bpm)
     if ( ! (m_mainperf->is_jack_running() && global_is_running ))
     {
         //push_undo(true);
-        m_mainperf->set_bpm( a_bpm );
+        //m_mainperf->set_bpm( a_bpm );
         m_list_marker.begin()->bpm = a_bpm;
 
         reset_tempo_list();

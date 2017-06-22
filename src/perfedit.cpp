@@ -714,6 +714,12 @@ perfedit::get_bw()
 }
 
 void
+perfedit::update_start_BPM()
+{
+    m_tempo->set_start_BPM(m_mainperf->get_bpm());
+}
+
+void
 perfedit::set_zoom (int z)
 {
     m_perfroll->set_zoom(z);

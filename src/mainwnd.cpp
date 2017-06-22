@@ -819,6 +819,7 @@ bool mainwnd::open_file(const Glib::ustring& fn, bool setlist_mode)
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                                     m_mainperf->get_screenset()));
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
+        m_perf_edit->update_start_BPM();
     }
     else
     {
@@ -1226,6 +1227,7 @@ mainwnd::adj_callback_bpm( )
     {
         m_mainperf->set_bpm( m_adjust_bpm->get_value());
         global_is_modified = true;
+        m_perf_edit->update_start_BPM();
     }
 }
 
@@ -1322,17 +1324,20 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         {
             m_mainperf->set_bpm( m_mainperf->get_bpm() - 1 );
             m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
+            m_perf_edit->update_start_BPM();
         }
 
         if ( a_ev->keyval ==  m_mainperf->m_key_bpm_up )
         {
             m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
             m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
+            m_perf_edit->update_start_BPM();
         }
 
         if (a_ev->keyval  == m_mainperf->m_key_tap_bpm )
         {
             tap();
+            m_perf_edit->update_start_BPM();
         }
 
         if ( a_ev->keyval == m_mainperf->m_key_replace )
