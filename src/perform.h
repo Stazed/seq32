@@ -459,7 +459,7 @@ public:
     void set_tempo_load(bool a_load);
     double get_start_tempo();
     void set_start_tempo(double a_bpm);
-
+    
     void start_jack();
     void stop_jack();
     void position_jack( bool a_state, long a_tick );
@@ -480,6 +480,8 @@ public:
     /* plays all notes to Curent tick */
     void play( long a_tick );
     void set_orig_ticks( long a_tick  );
+    
+    void tempo_change();
 
     sequence * get_sequence( int a_sequence );
 
@@ -586,7 +588,7 @@ public:
     friend void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
                                        jack_position_t *pos, int new_pos, void *arg);
     friend int jack_process_callback(jack_nframes_t nframes, void* arg);
-    friend long get_current_jack_position(void *arg);
+    friend long get_current_jack_position(jack_nframes_t a_frame, void *arg);
 #endif // JACK_SUPPORT
 };
 
@@ -612,7 +614,7 @@ void jack_shutdown(void *arg);
 void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
                             jack_position_t *pos, int new_pos, void *arg);
 int jack_process_callback(jack_nframes_t nframes, void* arg);
-long get_current_jack_position(void *arg);
+long get_current_jack_position(jack_nframes_t a_frame, void *arg);
 #ifdef JACK_SESSION
 void jack_session_callback(jack_session_event_t *ev, void *arg);
 #endif // JACK_SESSION

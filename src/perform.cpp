@@ -999,7 +999,8 @@ void perform::play( long a_tick )
 {
     /* just run down the list of sequences and have them dump */
 
-    //printf( "play [%d]\n", a_tick );
+    if(m_playback_mode && !m_usemidiclock)  // only allow in song mode when not following midi clock
+        tempo_change();
 
     m_tick = a_tick;
     for (int i=0; i< c_max_sequence; i++ )
@@ -1031,6 +1032,28 @@ void perform::set_orig_ticks( long a_tick  )
         {
             assert( m_seqs[i] );
             m_seqs[i]->set_orig_tick( a_tick );
+        }
+    }
+}
+
+void perform::tempo_change()
+{
+    list<tempo_mark>::iterator i;
+
+    for ( i = m_list_play_marker.begin(); i != m_list_play_marker.end(); i++ )
+    {
+        if((uint64_t)m_tick >= (i)->tick)
+        {
+            if((i)->bpm == STOP_MARKER)
+            {
+                stop_playing();
+            }
+            else
+            {
+                m_master_bus.set_bpm((i)->bpm);
+                m_list_play_marker.erase(i);
+                break;
+            }
         }
     }
 }
@@ -1362,6 +1385,108 @@ void perform::position_jack( bool a_state, long a_tick )
 
 #ifdef JACK_SUPPORT
 
+    uint64_t current_tick = 0;
+
+    if(a_state) // master in song mode
+    {
+        current_tick = a_tick;
+    }
+
+    uint32_t hold_frame = 0;
+
+    list<tempo_mark>::iterator i;
+    tempo_mark last_tempo = (*--m_list_no_stop_markers.end());
+
+    for ( i = ++m_list_no_stop_markers.begin(); i != m_list_no_stop_markers.end(); ++i )
+    {
+        if( current_tick >= (*i).tick )
+        {
+            hold_frame = (*i).start;
+        }
+        else
+        {
+            last_tempo = (*--i);
+            break;
+        }
+    }
+
+    uint32_t end_tick = current_tick - last_tempo.tick;
+    uint64_t jack_frame = hold_frame + tick_to_jack_frame(end_tick, last_tempo.bpm, this);
+
+    //printf("end_tick %d: current_tick %d: last tempo.tick %d, bpm %f\n", end_tick, current_tick, last_tempo.tick, last_tempo.bpm);
+    //printf("jack_frame %d: hold_frame %d\n", jack_frame, hold_frame);
+
+    jack_transport_locate(m_jack_client,jack_frame);
+
+
+ #ifdef USE_JACK_BBT_POSITION
+    current_tick *= 10;
+
+    /*  This jack_frame calculation is all that is needed to change jack position
+        The BBT calc can be sent but will be overridden by the first call to
+        jack_timebase_callback() of any master set. If no master is set, then the
+        BBT will display the new position but will not change even if the transport
+        is rolling. There is no need to send BBT on position change - the fact that
+        the function jack_transport_locate() exists and only uses the frame position
+        is proof that BBT is not needed! Upon further reflection, why not send BBT?
+        Because other programs do not.... lets follow convention.
+        The below calculation for jack_transport_locate(), works, is simpler and
+        does not send BBT. The calc for jack_transport_reposition() will be commented
+        out again....
+    */
+
+    int ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
+    double beats_per_minute =  m_master_bus.get_bpm();
+
+    uint64_t tick_rate = ((uint64_t)m_jack_frame_rate * current_tick * 60.0);
+    long tpb_bpm = ticks_per_beat * beats_per_minute * 4.0 / m_bw;
+    uint64_t jack_frame = tick_rate / tpb_bpm;
+
+    jack_transport_locate(m_jack_client,jack_frame);
+
+
+    /* The below BBT call to jack_BBT_position() is not necessary to change jack position!!! */
+
+    jack_position_t pos;
+    double jack_tick = current_tick * 4 / m_bw;
+
+    /* gotta set these here since they are set in timebase */
+    pos.ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
+    pos.beats_per_minute =  m_master_bus.get_bpm();
+
+    jack_BBT_position(pos, jack_tick);
+
+    /* this calculates jack frame to put into pos.frame.
+       it is what really matters for position change */
+
+    uint64_t tick_rate = ((uint64_t)pos.frame_rate * current_tick * 60.0);
+    long tpb_bpm = pos.ticks_per_beat * pos.beats_per_minute / (pos.beat_type / 4.0 );
+    pos.frame = tick_rate / tpb_bpm; // pos.frame is all that is needed for position change!
+
+    /*
+       ticks * 10 = jack ticks;
+       jack ticks / ticks per beat = num beats;
+       num beats / beats per minute = num minutes
+       num minutes * 60 = num seconds
+       num secords * frame_rate  = frame */
+
+    jack_transport_reposition( m_jack_client, &pos );
+#endif // USE_JACK_BBT_POSITION
+
+    if(global_is_running)
+        m_reposition = false;
+
+#endif // JACK_SUPPORT
+}
+
+
+#if 0
+void perform::position_jack( bool a_state, long a_tick )
+{
+    //printf( "perform::position_jack()\n" );
+
+#ifdef JACK_SUPPORT
+
     long current_tick = 0;
 
     if(a_state) // master in song mode
@@ -1428,6 +1553,8 @@ void perform::position_jack( bool a_state, long a_tick )
 #endif // JACK_SUPPORT
 }
 
+#endif // 0
+
 void perform::start(bool a_state)
 {
     if (m_jack_running)
@@ -1469,6 +1596,7 @@ void perform::stop()
 //        return;
 //    }
 
+    m_reset_tempo_list = true; // since we cleared it as we went along
     inner_stop();
 }
 
@@ -1700,7 +1828,8 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
     /* For start or FF/RW/ key-p when not running */
     if(!global_is_running)
     {
-        jack_transport_state_t state = jack_transport_query( m_mainperf->m_jack_client, nullptr );
+        jack_position_t pos;
+        jack_transport_state_t state = jack_transport_query( m_mainperf->m_jack_client, &pos );
 
         /* we are stopped, do we need to start? */
         if(state == JackTransportRolling || state == JackTransportStarting )
@@ -1723,7 +1852,7 @@ int jack_process_callback(jack_nframes_t nframes, void* arg)
         /* we don't need to start - just reposition transport marker */
         else
         {
-            long tick = get_current_jack_position((void *)m_mainperf);
+            long tick = get_current_jack_position(pos.frame, (void *)m_mainperf);
             long diff = tick - m_mainperf->get_jack_stop_tick();
 
             if(diff != 0)
@@ -2389,7 +2518,7 @@ void perform::output_func()
 
 #ifdef JACK_SUPPORT
         if(m_jack_running)
-            m_jack_stop_tick = get_current_jack_position((void *)this);
+             m_jack_stop_tick = get_current_jack_position(jack_get_current_transport_frame( m_jack_client ),(void *)this);
 #endif // JACK_SUPPORT
     }
 
@@ -3029,6 +3158,88 @@ void perform::jack_BBT_position(jack_position_t &pos, double jack_tick)
 }
 
 /*
+    This callback is only called by jack when seq42 is Master and is used to supply jack
+    with BBT information based on frame position and frame_rate. It is called once on
+    startup, and afterwards, only when transport is rolling.
+*/
+void
+jack_timebase_callback
+(
+    jack_transport_state_t state,           // currently unused !!!
+    jack_nframes_t nframes,
+    jack_position_t * pos,
+    int new_pos,
+    void * arg
+)
+{
+    if (pos == nullptr)
+    {
+        printf("jack_timebase_callback(): null position pointer");
+        return;
+    }
+
+    perform *p = (perform *) arg;
+    
+    if(p->m_playback_mode)      // song mode - use tempo map
+    {
+        /* From non-timeline timebase callback */
+        position_info pi = solve_tempomap( pos->frame, arg );
+
+        pos->valid = JackPositionBBT;
+
+        pos->beats_per_bar = pi.beats_per_bar;
+        pos->beat_type = pi.beat_type;
+        pos->beats_per_minute = pi.tempo;
+
+        pos->bar = pi.bbt.bar + 1;
+        pos->beat = pi.bbt.beat + 1;
+        pos->tick = pi.bbt.tick;
+        pos->ticks_per_beat = 1920;     // c_ppqn * 10
+
+        long ticks_per_bar = long(pos->ticks_per_beat * pos->beats_per_bar);
+        pos->bar_start_tick = int(pos->bar * ticks_per_bar);
+    }
+    else                            // live mode - only use start bpm
+    {
+        /* From sequencer64 timebase callback */
+
+        pos->beats_per_minute = p->get_bpm();
+        pos->beats_per_bar = p->m_bp_measure;
+        pos->beat_type = p->m_bw;
+        pos->ticks_per_beat = c_ppqn * 10;
+
+        long ticks_per_bar = long(pos->ticks_per_beat * pos->beats_per_bar);
+        long ticks_per_minute = long(pos->beats_per_minute * pos->ticks_per_beat);
+        double framerate = double(pos->frame_rate * 60.0);
+
+        double minute = pos->frame / framerate;
+        long abs_tick = long(minute * ticks_per_minute);
+        long abs_beat = 0;
+
+        /*
+         *  Handle 0 values of pos->ticks_per_beat and pos->beats_per_bar that
+         *  occur at startup as JACK Master.
+         */
+
+        if (pos->ticks_per_beat > 0)                    // 0 at startup!
+            abs_beat = long(abs_tick / pos->ticks_per_beat);
+
+        if (pos->beats_per_bar > 0)                     // 0 at startup!
+            pos->bar = int(abs_beat / pos->beats_per_bar);
+        else
+            pos->bar = 0;
+
+        pos->beat = int(abs_beat - (pos->bar * pos->beats_per_bar) + 1);
+        pos->tick = int(abs_tick - (abs_beat * pos->ticks_per_beat));
+        pos->bar_start_tick = int(pos->bar * ticks_per_bar);
+        pos->bar++;                             /* adjust start to bar 1 */
+
+        pos->valid = JackPositionBBT;
+    }
+}
+
+#if 0
+/*
     This callback is only called by jack when seq32 is Master and is used to supply jack
     with BBT information based on frame position and frame_rate.
 */
@@ -3054,6 +3265,7 @@ void jack_timebase_callback(jack_transport_state_t state,
 
     p->jack_BBT_position(*pos, jack_tick);
 }
+#endif // 0
 
 long convert_jack_frame_to_s32_tick(jack_nframes_t a_frame, double a_bpm, void *arg)
 {
@@ -3073,6 +3285,58 @@ long convert_jack_frame_to_s32_tick(jack_nframes_t a_frame, double a_bpm, void *
                      beat_type / 4.0  ));
 }
 
+/* returns conversion of jack frame position to seq32 tick */
+long get_current_jack_position(jack_nframes_t a_frame, void *arg)
+{
+    perform *p = (perform *) arg;
+    jack_nframes_t current_frame = a_frame;
+
+    uint32_t hold_frame = 0;
+
+    list<tempo_mark>::iterator i;
+    tempo_mark last_tempo = (*--p->m_list_no_stop_markers.end());
+
+    for ( i = ++p->m_list_no_stop_markers.begin(); i != p->m_list_no_stop_markers.end(); ++i )
+    {
+        if( current_frame >= (*i).start )
+        {
+            hold_frame = (*i).start;
+        }
+        else
+        {
+            last_tempo = (*--i);
+            break;
+        }
+    }
+
+    uint32_t end_frames = current_frame - hold_frame;
+    uint32_t s42_tick = last_tempo.tick + convert_jack_frame_to_s32_tick(end_frames, last_tempo.bpm, arg);
+
+    return s42_tick;
+
+#if 0
+    perform *p = (perform *) arg;
+    jack_nframes_t current_frame = a_frame;
+    double jack_tick;
+    double ticks_per_beat = c_ppqn * 10; // 192 * 10 = 1920
+    double beats_per_minute =  p->get_bpm();
+    double beat_type = p->get_bw();
+
+    jack_tick =
+        (current_frame) *
+        ticks_per_beat  *
+        beats_per_minute / ( p->m_jack_frame_rate* 60.0);
+
+
+    /* convert ticks */
+    return jack_tick * ((double) c_ppqn /
+                    (ticks_per_beat *
+                     beat_type / 4.0  ));
+
+#endif // 0
+}
+
+#if 0
 long get_current_jack_position(void *arg)
 {
     perform *p = (perform *) arg;
@@ -3095,6 +3359,7 @@ long get_current_jack_position(void *arg)
                     (ticks_per_beat *
                      beat_type / 4.0  ));
 }
+#endif // 0
 
 void jack_shutdown(void *arg)
 {
