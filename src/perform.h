@@ -41,6 +41,8 @@ class perform;
 #endif // JACK_SESSION
 #endif // JACK_SUPPORT
 
+#undef USE_JACK_BBT_POSITION                // old code could be used for debug
+
 /* class contains sequences that make up a live set */
 
 class midi_control
@@ -573,12 +575,11 @@ public:
     
 
 #ifdef JACK_SUPPORT
+#ifdef USE_JACK_BBT_POSITION
     void jack_BBT_position(jack_position_t &pos, double jack_tick);
-    /* now using jack_process_callback() ca. 7/10/16    */
-    /*
-        friend int jack_sync_callback(jack_transport_state_t state,
-                                  jack_position_t *pos, void *arg);
-    */
+    friend int jack_sync_callback(jack_transport_state_t state,
+                              jack_position_t *pos, void *arg);
+#endif // USE_JACK_BBT_POSITION
     friend position_info solve_tempomap ( jack_nframes_t frame, void *arg );
     friend position_info render_tempomap( jack_nframes_t start, jack_nframes_t length, void *cb, void *arg );
     friend jack_nframes_t tick_to_jack_frame(uint64_t a_tick, double a_bpm, void *arg);
@@ -600,9 +601,10 @@ extern void *input_thread_func(void *a_p);
 extern ff_rw_type_e FF_RW_button_type;
 
 #ifdef JACK_SUPPORT
-
-//int jack_sync_callback(jack_transport_state_t state,
-//                       jack_position_t *pos, void *arg);
+#ifdef USE_JACK_BBT_POSITION
+int jack_sync_callback(jack_transport_state_t state,
+                       jack_position_t *pos, void *arg);
+#endif // USE_JACK_BBT_POSITION
 
 position_info solve_tempomap ( jack_nframes_t frame, void *arg );
 position_info render_tempomap( jack_nframes_t start, jack_nframes_t length, void *cb, void *arg );
