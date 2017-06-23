@@ -748,7 +748,6 @@ perfedit::load_tempo_list()
 void
 perfedit::reset_tempo_list(bool play_list_only)
 {
-    printf("pefedit reset tempo list\n");
     m_tempo->reset_tempo_list(play_list_only);
 }
 
