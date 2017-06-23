@@ -364,6 +364,10 @@ bool perform::clear_all()
 
     set_have_undo(false);
     set_have_redo(false);
+    
+    m_list_play_marker.clear();
+    m_list_total_marker.clear();
+    m_list_no_stop_markers.clear();
 
     return true;
 }

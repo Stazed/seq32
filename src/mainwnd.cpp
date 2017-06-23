@@ -621,7 +621,7 @@ void mainwnd::new_file()
         m_perf_edit->set_bp_measure(4);
         m_perf_edit->set_bw(4);
         m_perf_edit->set_xpose(0);
-        m_mainperf->set_bpm(c_bpm);
+        m_mainperf->set_start_tempo(c_bpm);
 
         m_main_wid->reset();
         m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
@@ -1087,6 +1087,7 @@ mainwnd::file_import_dialog()
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                                     m_mainperf->get_screenset() ));
         m_adjust_bpm->set_value( m_mainperf->get_bpm() );
+        m_mainperf->set_start_tempo(m_mainperf->get_bpm()); // update tempo list
 
         break;
     }
