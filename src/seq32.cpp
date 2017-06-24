@@ -347,7 +347,7 @@ main (int argc, char *argv[])
     	}
     	else
     	{
-            printf("File not found: %s\n", p.get_setlist_current_file());
+            printf("File not found: %s\n", p.get_setlist_current_file().c_str());
             p.set_setlist_next();
     	}
     }

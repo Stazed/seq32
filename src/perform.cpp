@@ -46,6 +46,12 @@ perform::perform()
         m_was_active_names[i] = false;
     }
 
+    m_setlist_mode = false;
+    m_setlist_file = "";
+    m_setlist_nfiles = 0;
+    m_setlist_current_idx = 0;
+    m_setlist_load_next_file = false;
+    
     m_mute_group_selected = 0;
     m_mode_group = true;
     m_mode_group_learn = false;
@@ -2995,42 +3001,29 @@ bool perform::get_setlist_mode()
     return m_setlist_mode;
 }
 
-void perform::set_setlist_file(char *fn)  // TODO do this the c++ way
-{
-    const int flen = 250; //todo: sjh: set this somewhere
-    
-    if(m_setlist_file == NULL)  // array
+void perform::set_setlist_file(const Glib::ustring& fn)
+{   
+    if(m_setlist_file == "")
     {
-        m_setlist_file = (char *) malloc(flen * sizeof(char));
-        memset(m_setlist_file,0,flen*sizeof(char));
+        printf("Opening setlist %s\n",fn.c_str());
+        m_setlist_file = fn;
     }
     
-    strcpy(m_setlist_file,fn);
-
     /*Now read the file*/
-    FILE *fp;
-    char str[flen];
     int nfiles = 0;
-        
-    if((fp=fopen(m_setlist_file,"r"))!=NULL)
+    std::ifstream openFile(m_setlist_file);    // to load into vector
+
+    if(openFile)
     {
-        //Count the lines:
-        while(fgets(str,flen,fp)!=NULL)
+        std::string strFileLine = "";
+        while(getline(openFile,strFileLine))
         {
-            nfiles++;
+            m_setlist_fileset.push_back(strFileLine);
+             nfiles++;
         }
+        openFile.close();
         
         m_setlist_nfiles = nfiles;
-        m_setlist_fileset = (char **)malloc(m_setlist_nfiles*sizeof(char *));
-        rewind(fp);
-        nfiles = 0;
-        
-        while(fgets(str,flen,fp)!=NULL)
-        {
-            m_setlist_fileset[nfiles] = (char *)malloc(flen*sizeof(char));
-            strncpy(m_setlist_fileset[nfiles],strtok(str, "\n"),flen);//todo: might need to use strtok to strip out newlines.
-            nfiles++;
-        }
     }
     else
     {
@@ -3039,12 +3032,12 @@ void perform::set_setlist_file(char *fn)  // TODO do this the c++ way
         //        "Error reading playlist file: " + m_setlist_file, false,
         //        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
         //errdialog.run();
-        printf("Unable to open playlist file %s\n",m_setlist_file);
+        printf("Unable to open playlist file %s\n",m_setlist_file.c_str());
         set_setlist_mode(false);
     }
 }
 
-char * perform::get_setlist_current_file()
+Glib::ustring perform::get_setlist_current_file()
 {
     return m_setlist_fileset[m_setlist_current_idx];
 }

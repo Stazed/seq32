@@ -353,7 +353,7 @@ void mainwnd::setlist_jump(int jmp)
                 }
                 else
                 {
-                    printf("File not found: %s\n", m_mainperf->get_setlist_current_file());
+                    printf("File not found: %s\n", m_mainperf->get_setlist_current_file().c_str());
                     m_mainperf->set_setlist_next();
                 }
             }
@@ -423,7 +423,7 @@ mainwnd::timer_callback(  )
         if(m_mainperf->get_setlist_load_next_file())
         {
             m_mainperf->set_setlist_next();
-            printf("Can we load file %s?\n",m_mainperf->get_setlist_current_file());
+            printf("Can we load file %s?\n",m_mainperf->get_setlist_current_file().c_str());
             while(m_mainperf->get_setlist_mode())
             {
                 if(Glib::file_test(m_mainperf->get_setlist_current_file(), Glib::FILE_TEST_EXISTS))
@@ -433,7 +433,7 @@ mainwnd::timer_callback(  )
                 }
                 else
                 {
-                    printf("File not found: %s\n", m_mainperf->get_setlist_current_file());
+                    printf("File not found: %s\n", m_mainperf->get_setlist_current_file().c_str());
                     m_mainperf->set_setlist_next();
                 }
                 //todo: need to handle getting to the end of the list etstet.....
@@ -890,14 +890,8 @@ void mainwnd::choose_file(const bool setlist_mode)
     case(Gtk::RESPONSE_OK):
         if(setlist_mode)
         {
-            char fn[250];
-
-            strcpy(fn,dialog.get_filename().c_str());
-
-            printf("Opening setlist %s\n",fn);
-
             m_mainperf->set_setlist_mode(true);
-            m_mainperf->set_setlist_file(fn);
+            m_mainperf->set_setlist_file(dialog.get_filename());
             update_window_title();
         }
         else

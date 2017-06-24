@@ -22,6 +22,7 @@
 
 class perform;
 
+#include <vector>
 #include "globals.h"
 #include "event.h"
 #include "midibus.h"
@@ -101,8 +102,8 @@ public:
     //Setlist mode
     void 	set_setlist_mode(bool mode);
     bool 	get_setlist_mode();
-    void 	set_setlist_file(char *fn);
-    char * 	get_setlist_current_file();
+    void 	set_setlist_file(const Glib::ustring& fn);
+    Glib::ustring get_setlist_current_file();
     void 	set_setlist_next();
     bool	get_setlist_load_next_file();
     void 	set_setlist_load_next_file (bool val);
@@ -118,10 +119,10 @@ private:
 
     //Setlist mode
     bool m_setlist_mode;
-    char *m_setlist_file;   // TODO use vector
+    Glib::ustring m_setlist_file;
     int m_setlist_nfiles;
     int m_setlist_current_idx;
-    char ** m_setlist_fileset;  // TODO use vector
+    std::vector<Glib::ustring> m_setlist_fileset;
     bool m_setlist_load_next_file;
     // end selist private
 
