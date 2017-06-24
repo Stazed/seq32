@@ -46,6 +46,7 @@ perform::perform()
         m_was_active_names[i] = false;
     }
 
+    m_setjump = 0;
     m_setlist_mode = false;
     m_setlist_file = "";
     m_setlist_nfiles = 0;
@@ -3412,14 +3413,16 @@ bool perform::get_setlist_mode()
 
 void perform::set_setlist_file(const Glib::ustring& fn)
 {   
-//    if(m_setlist_file == "")    // FIXME - is this needed, why do we care if a previous file is loaded??
-//    {
-        printf("Opening setlist %s\n",fn.c_str());
-        m_setlist_file = fn;
+    printf("Opening setlist %s\n",fn.c_str());
+    
+    if(m_setlist_file != "")                                // if we have a previous file, then reset everything
+    {
         m_setlist_fileset.clear();
         m_setlist_nfiles = 0;
         m_setlist_current_idx = 0;
-//    }
+    }
+    
+    m_setlist_file = fn;                                    // set the file
     
     /*Now read the file*/
     std::ifstream openFile(m_setlist_file);
@@ -3433,14 +3436,14 @@ void perform::set_setlist_file(const Glib::ustring& fn)
         }
         openFile.close();
         
-        if(m_setlist_fileset.size())
+        if(m_setlist_fileset.size())                        // if we got something
         {
             m_setlist_nfiles = m_setlist_fileset.size();
         }
-        else
+        else                                                // if we did not get anything
         {
             printf("No files listed in playlist!\n");       // FIXME gtk message
-            set_setlist_mode(false);    // abandon ship
+            set_setlist_mode(false);                        // abandon ship
         }
     }
     else

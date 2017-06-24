@@ -417,16 +417,18 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 
-        if(a_ev->keyval == m_mainperf->m_key_leftarrow)
+        if(m_mainperf->get_setlist_mode())
         {
-            m_mainperf->m_setjump = -1;
-        }
+            if(a_ev->keyval == m_mainperf->m_key_leftarrow)
+            {
+                m_mainperf->m_setjump = -1;
+            }
 
-        if(a_ev->keyval == m_mainperf->m_key_rightarrow)
-        {
-            m_mainperf->m_setjump = 1;  // was -1
+            if(a_ev->keyval == m_mainperf->m_key_rightarrow)
+            {
+                m_mainperf->m_setjump = 1;
+            }
         }
-
 #ifdef JACK_SUPPORT
         if ( a_ev->keyval ==  m_mainperf->m_key_jack )
         {

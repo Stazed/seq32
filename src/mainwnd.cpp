@@ -607,6 +607,7 @@ void mainwnd::new_file()
         m_perf_edit->set_bw(4);
         m_perf_edit->set_xpose(0);
         m_mainperf->set_start_tempo(c_bpm);
+        m_mainperf->set_setlist_mode(false);
 
         m_main_wid->reset();
         m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
@@ -788,6 +789,7 @@ bool mainwnd::open_file(const Glib::ustring& fn, bool setlist_mode)
                                          "Error reading file: " + fn, false,
                                          Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
             errdialog.run();
+            global_filename = "";
             return false;
         }
 
@@ -848,6 +850,7 @@ void mainwnd::choose_file(const bool setlist_mode)
 
     if(!setlist_mode)
     {
+        m_mainperf->set_setlist_mode(setlist_mode); // false
         Gtk::FileFilter filter_midi;
         filter_midi.set_name("MIDI files");
         filter_midi.add_pattern("*.MIDI");
@@ -1467,21 +1470,14 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 
         if(m_mainperf->get_setlist_mode())
         {
-            printf("Setlist mode is true, m_key_leftarrow = %d, as an int = %d\n",m_mainperf->m_key_leftarrow,(int) m_mainperf->m_key_leftarrow);
             if ( a_ev->keyval == m_mainperf->m_key_leftarrow )
             {
-            	//printf("left arrow pressed\n");
             	setlist_jump(-1);
             }
             if ( a_ev->keyval == m_mainperf->m_key_rightarrow )
             {
-            	//printf("right arrow pressed\n");
             	setlist_jump(1);
             }
-        }
-        else
-        {
-            printf("Setlist mode is false\n");
         }
     }
 
