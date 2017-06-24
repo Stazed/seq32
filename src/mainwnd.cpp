@@ -353,10 +353,12 @@ void mainwnd::setlist_jump(int jmp)
                 }
                 else
                 {
-                    printf("File not found: %s\n", m_mainperf->get_setlist_current_file().c_str());
+                    printf("Playlist file open error: %s\n", m_mainperf->get_setlist_current_file().c_str());
                     m_mainperf->set_setlist_next();
                 }
             }
+            else
+                printf("Playlist file does not exist: %s\n", m_mainperf->get_setlist_current_file().c_str());
         }
         else
         {
@@ -417,35 +419,6 @@ mainwnd::timer_callback(  )
         m_menubar->set_sensitive(false);
     else if(!global_is_running && (m_menubar->get_sensitive() == m_menu_mode ))
         m_menubar->set_sensitive(!m_menu_mode);
-
-    if(m_mainperf->get_setlist_mode())
-    {
-        if(m_mainperf->get_setlist_load_next_file())
-        {
-            m_mainperf->set_setlist_next();
-            printf("Can we load file %s?\n",m_mainperf->get_setlist_current_file().c_str());
-            while(m_mainperf->get_setlist_mode())
-            {
-                if(Glib::file_test(m_mainperf->get_setlist_current_file(), Glib::FILE_TEST_EXISTS))
-                {
-                    open_file(m_mainperf->get_setlist_current_file(),true);
-                    break;
-                }
-                else
-                {
-                    printf("File not found: %s\n", m_mainperf->get_setlist_current_file().c_str());
-                    m_mainperf->set_setlist_next();
-                }
-                //todo: need to handle getting to the end of the list etstet.....
-            }
-            if(m_mainperf->m_setjump)
-            {
-                setlist_jump(m_mainperf->m_setjump);
-                m_mainperf->m_setjump=0;
-            }
-        }
-    }
-
 
     /* Tap button - sequencer64 */
     if (m_current_beats > 0)
@@ -909,6 +882,7 @@ void mainwnd::choose_file(const bool setlist_mode)
         {
             m_mainperf->set_setlist_mode(true);
             m_mainperf->set_setlist_file(dialog.get_filename());
+            setlist_jump(0);
             update_window_title();
         }
         else

@@ -325,31 +325,11 @@ main (int argc, char *argv[])
             printf("File not found: %s\n", argv[optind]);
     }
 
-    /* sjh: ok, we can load the file from the playlist if we are in that mode
-     * we have to loop through every entry in the list and drop out if its
-     * the end of the list and we haven't loaded a single file yet...
-     *
-     * TODO: this function is repeated verbatim in mainwnd.cpp...
-     */
-
-    if(setlist_mode) // FIXME
+    if(setlist_mode)
     {
         p.set_setlist_mode(setlist_mode);
-        p.set_setlist_file((char*)setlist_file.c_str());
-    }
-
-    while(p.get_setlist_mode())
-    {
-    	if(Glib::file_test(p.get_setlist_current_file(), Glib::FILE_TEST_EXISTS))
-    	{
-            seq32_window.open_file(p.get_setlist_current_file(),true);
-            break;
-    	}
-    	else
-    	{
-            printf("File not found: %s\n", p.get_setlist_current_file().c_str());
-            p.set_setlist_next();
-    	}
+        p.set_setlist_file(setlist_file);
+        seq32_window.setlist_jump(0);
     }
 
     if(p.get_setlist_mode())

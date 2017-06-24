@@ -60,7 +60,6 @@ private:
      * needs refining.
      */
     void set_wsetlist_mode(bool mode);
-    void setlist_jump(int jmp);
 
 /**************************************************/
 
@@ -170,5 +169,6 @@ public:
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);
     bool on_key_release_event(GdkEventKey* a_ev);
+    void setlist_jump(int jmp);
 
 };
