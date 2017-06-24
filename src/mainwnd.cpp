@@ -55,9 +55,6 @@ mainwnd::mainwnd(perform *a_p):
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq32_32_xpm));
 
-    /*sjh stuff...*/
-    set_wsetlist_mode(m_mainperf->get_setlist_mode());
-
     /* register for notification */
     m_mainperf->m_notify.push_back( this );
 
@@ -334,7 +331,7 @@ mainwnd::~mainwnd()
 }
 
 /*
- * move through the setlist (jmp is usually 1, but could be -1 for leftarrow...)
+ * move through the setlist (jmp is 0 on start and 1 if right arrow, -1 for left arrow)
  */
 void mainwnd::setlist_jump(int jmp)
 {
@@ -353,19 +350,27 @@ void mainwnd::setlist_jump(int jmp)
                 }
                 else
                 {
-                    printf("Playlist file open error: %s\n", m_mainperf->get_setlist_current_file().c_str());
-                    m_mainperf->set_setlist_next();
+                    printf("Playlist file open error: %s\n", m_mainperf->get_setlist_current_file().c_str()); // FIXME gtk
+                    m_mainperf->set_setlist_mode(false);    // abandon ship
+                    break;  
                 }
             }
             else
-                printf("Playlist file does not exist: %s\n", m_mainperf->get_setlist_current_file().c_str());
+            {
+                printf("Playlist file does not exist: %s\n", m_mainperf->get_setlist_current_file().c_str()); // FIXME gtk
+                m_mainperf->set_setlist_mode(false);        // abandon ship
+                break;  
+            }
         }
         else
         {
-            printf("Setlist index %d out of range\n",m_mainperf->get_setlist_index() + jmp);
+            printf("Setlist index %d out of range\n",m_mainperf->get_setlist_index() + jmp);    // FIXME - remove when done
             break;
         }
     }
+    
+    if(!m_mainperf->get_setlist_mode())     // if errors occured above
+        update_window_title();
 }
 
 // This is the GTK timer callback, used to draw our current time and bpm
@@ -454,6 +459,13 @@ mainwnd::timer_callback(  )
         m_mainperf->set_bpm(m_mainperf->get_start_tempo());
     }
 
+    /* perfedit left, right arrow keys for setlist */
+    if(m_mainperf->m_setjump)
+    {
+        setlist_jump(m_mainperf->m_setjump);
+        m_mainperf->m_setjump=0;
+    }
+    
     return true;
 }
 
@@ -754,32 +766,11 @@ void mainwnd::new_open_error_dialog()
     errdialog.run();
 }
 
-void mainwnd::set_wsetlist_mode(bool mode)
-{
-
-    /* pass the mode into the performance */
-    m_mainperf->set_setlist_mode(mode);
-
-    /* set up the main window */
-    if(m_mainperf->get_setlist_mode())
-    {
-        //m_s24_pic = new Image(Gdk::Pixbuf::create_from_xpm_data(seq24_xpm_playlist)); // TODO Fixme
-        m_s24_pic = new Image(Gdk::Pixbuf::create_from_xpm_data(seq32_32_xpm));
-    }
-    else
-    {
-        m_s24_pic = new Image(Gdk::Pixbuf::create_from_xpm_data(seq32_xpm));
-    }
-}
-
 bool mainwnd::open_file(const Glib::ustring& fn, bool setlist_mode)
 {
     bool result;
 
     //stop_playing(); // TODO check this
-
-    /*We aren't using a playlist if we've opened a file*/
-    set_wsetlist_mode(setlist_mode);
 
     /* reset everything to default */
     if(m_mainperf->clear_all())

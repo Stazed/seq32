@@ -45,24 +45,6 @@ class mainwnd : public Gtk::Window, public performcallback
 
 private:
 
-
-    /*sjh: setlist stuff */
-    //TRYING:
-    Image 						*m_s24_pic;
-    //NOT WORKING:
-    Glib::RefPtr<Gdk::GC>       m_gc;
-    Glib::RefPtr<Gdk::Window>   m_window;
-    Gdk::Color    				m_black, m_white, m_grey;
-    Glib::RefPtr<Gdk::Pixmap>   m_pixmap;
-    /*TODO: This was an attempt to indicate that we are in setlist mode
-     * by changing the main image. Doesn't work though - need to
-     * rebuild the hbox and add in the image. I think the method is correct - just
-     * needs refining.
-     */
-    void set_wsetlist_mode(bool mode);
-
-/**************************************************/
-
     perform  *m_mainperf;
     bool      m_menu_mode;
     static int m_sigpipe[2];

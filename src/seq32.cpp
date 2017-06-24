@@ -332,16 +332,6 @@ main (int argc, char *argv[])
         seq32_window.setlist_jump(0);
     }
 
-    if(p.get_setlist_mode())
-    {
-    	printf("Playlist mode is true\n");
-    }
-    else
-    {
-    	printf("Playlist mode is false\n");
-    }
-
-
     /* connect to lash daemon and poll events*/
 #ifdef LASH_SUPPORT
     lash_driver->start(&p);

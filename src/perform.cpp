@@ -50,7 +50,6 @@ perform::perform()
     m_setlist_file = "";
     m_setlist_nfiles = 0;
     m_setlist_current_idx = 0;
-    m_setlist_load_next_file = false;
     
     m_mute_group_selected = 0;
     m_mode_group = true;
@@ -3413,27 +3412,36 @@ bool perform::get_setlist_mode()
 
 void perform::set_setlist_file(const Glib::ustring& fn)
 {   
-    if(m_setlist_file == "")
-    {
+//    if(m_setlist_file == "")    // FIXME - is this needed, why do we care if a previous file is loaded??
+//    {
         printf("Opening setlist %s\n",fn.c_str());
         m_setlist_file = fn;
-    }
+        m_setlist_fileset.clear();
+        m_setlist_nfiles = 0;
+        m_setlist_current_idx = 0;
+//    }
     
     /*Now read the file*/
-    int nfiles = 0;
-    std::ifstream openFile(m_setlist_file);    // to load into vector
+    std::ifstream openFile(m_setlist_file);
 
     if(openFile)
     {
         std::string strFileLine = "";
         while(getline(openFile,strFileLine))
         {
-            m_setlist_fileset.push_back(strFileLine);
-             nfiles++;
+            m_setlist_fileset.push_back(strFileLine);       // load into vector
         }
         openFile.close();
         
-        m_setlist_nfiles = nfiles;
+        if(m_setlist_fileset.size())
+        {
+            m_setlist_nfiles = m_setlist_fileset.size();
+        }
+        else
+        {
+            printf("No files listed in playlist!\n");       // FIXME gtk message
+            set_setlist_mode(false);    // abandon ship
+        }
     }
     else
     {
@@ -3443,7 +3451,7 @@ void perform::set_setlist_file(const Glib::ustring& fn)
         //        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
         //errdialog.run();
         printf("Unable to open playlist file %s\n",m_setlist_file.c_str());
-        set_setlist_mode(false);
+        set_setlist_mode(false);        // abandon ship
     }
 }
 
@@ -3452,41 +3460,9 @@ Glib::ustring perform::get_setlist_current_file()
     return m_setlist_fileset[m_setlist_current_idx];
 }
 
-void perform::set_setlist_next()
-{
-    m_setlist_current_idx++;
-    
-    if(m_setlist_current_idx >= m_setlist_nfiles)
-    {
-        /* Now we explicity choose to exit setlist mode */
-        //m_setlist_mode = false;
-        m_setlist_current_idx = m_setlist_nfiles -1;
-        m_setlist_load_next_file = false;
-    }
-    else
-    {
-        m_setlist_load_next_file = false;
-    }
-}
-
-bool perform::get_setlist_load_next_file()
-{
-    return m_setlist_load_next_file;
-}
-
-void perform::set_setlist_load_next_file (bool val)
-{
-    m_setlist_load_next_file = val;
-}
-
 int perform::get_setlist_index()
 {
     return m_setlist_current_idx;
-}
-
-void perform::offset_setlist_index(int offset)
-{
-    m_setlist_current_idx = min(m_setlist_nfiles-1,max(0,m_setlist_current_idx+offset));
 }
 
 bool perform::set_setlist_index(int index)

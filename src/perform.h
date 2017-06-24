@@ -162,16 +162,12 @@ public:
     bool 	get_setlist_mode();
     void 	set_setlist_file(const Glib::ustring& fn);
     Glib::ustring get_setlist_current_file();
-    void 	set_setlist_next();
-    bool	get_setlist_load_next_file();
-    void 	set_setlist_load_next_file (bool val);
     int		get_setlist_index();
     bool 	set_setlist_index(int index);
-    void 	offset_setlist_index(int offset);
 
-    unsigned int 	m_key_leftarrow;
+    unsigned int 	m_key_leftarrow;        // FIXME - configurable
     unsigned int 	m_key_rightarrow;
-    int 			m_setjump;				//flag for passing messages up to mainwnd
+    int 		m_setjump;              //flag for perfedit messages up to mainwnd
     // end selist public
 private:
 
@@ -181,7 +177,6 @@ private:
     int m_setlist_nfiles;
     int m_setlist_current_idx;
     std::vector<Glib::ustring> m_setlist_fileset;
-    bool m_setlist_load_next_file;
     // end selist private
 
     //andy mute group
