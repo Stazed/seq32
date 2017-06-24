@@ -84,6 +84,7 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
                                        m_vadjust ));
 
     m_perftime = manage( new perftime( m_mainperf, this, m_hadjust ));
+    m_tempo = manage( new tempo( m_mainperf, this, m_hadjust ));
 
     /* init table, viewports and scroll bars */
     m_table     = manage( new Table( 6, 3, false));
@@ -103,18 +104,22 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
 
     m_table->attach( *m_hlbox,  0, 3, 0, 1,  Gtk::FILL, Gtk::SHRINK, 2, 0 ); // shrink was 0
 
-    m_table->attach( *m_perfnames,    0, 1, 2, 3, Gtk::SHRINK, Gtk::FILL );
-
-    m_table->attach( *m_perftime, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK );
-    m_table->attach( *m_perfroll, 1, 2, 2, 3,
+    m_table->attach( *m_perfnames,    0, 1, 3, 4, Gtk::SHRINK, Gtk::FILL );
+    m_table->attach( *m_tempo, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK );
+    
+    Label* tempolabel = manage(new Label("TEMPO",0, Gtk::ALIGN_END)); // FIXME
+    m_table->attach( *tempolabel,0,1,1,2, Gtk::SHRINK, Gtk::SHRINK);
+    
+    m_table->attach( *m_perftime, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK );
+    m_table->attach( *m_perfroll, 1, 2, 3, 4,
                      Gtk::FILL | Gtk::SHRINK,
                      Gtk::FILL | Gtk::SHRINK );
 
-    m_table->attach( *m_vscroll, 2, 3, 2, 3, Gtk::SHRINK, Gtk::FILL | Gtk::EXPAND  );
+    m_table->attach( *m_vscroll, 2, 3, 3, 4, Gtk::SHRINK, Gtk::FILL | Gtk::EXPAND  );
 
-    m_table->attach( *m_hbox,  0, 1, 3, 4,  Gtk::FILL, Gtk::SHRINK, 0, 2 );
-    m_table->attach( *m_hscroll, 1, 2, 3, 4, Gtk::FILL | Gtk::EXPAND, Gtk::SHRINK  );
-    m_table->attach( *m_button_grow, 2, 3, 3, 4, Gtk::SHRINK, Gtk::SHRINK  );
+    m_table->attach( *m_hbox,  0, 1, 4, 5,  Gtk::FILL, Gtk::SHRINK, 0, 2 );
+    m_table->attach( *m_hscroll, 1, 2, 4, 5, Gtk::FILL | Gtk::EXPAND, Gtk::SHRINK  );
+    m_table->attach( *m_button_grow, 2, 3, 4, 5, Gtk::SHRINK, Gtk::SHRINK  );
 
     m_menu_snap =   manage( new Menu());
     m_menu_snap->items().push_back(MenuElem("1/1",   sigc::bind(mem_fun(*this,&perfedit::set_snap), 1  )));
@@ -709,6 +714,12 @@ perfedit::get_bw()
 }
 
 void
+perfedit::update_start_BPM()
+{
+    m_tempo->set_start_BPM(m_mainperf->get_bpm());
+}
+
+void
 perfedit::set_zoom (int z)
 {
     m_perfroll->set_zoom(z);
@@ -726,6 +737,18 @@ perfedit::toggle_follow_transport()
 {
     // Note that this will trigger the button signal callback.
     m_button_follow->set_active( ! m_button_follow->get_active() );
+}
+
+void 
+perfedit::load_tempo_list()
+{
+    m_tempo->load_tempo_list();
+}
+
+void
+perfedit::reset_tempo_list(bool play_list_only)
+{
+    m_tempo->reset_tempo_list(play_list_only);
 }
 
 void

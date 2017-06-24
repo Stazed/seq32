@@ -42,6 +42,8 @@ class perform;
 #endif // JACK_SESSION
 #endif // JACK_SUPPORT
 
+#undef USE_JACK_BBT_POSITION                // old code could be used for debug
+
 /* class contains sequences that make up a live set */
 
 class midi_control
@@ -69,6 +71,62 @@ enum ff_rw_type_e
     FF_RW_RELEASE   =  0,
     FF_RW_FORWARD   =  1
 };
+
+struct tempo_mark
+{
+    uint64_t tick;
+    double bpm;
+    uint32_t bw;            // not used
+    uint32_t bp_measure;    // not used
+    uint32_t start;         // calculated frame offset start - jack_nframes_t
+    
+    tempo_mark ( ) : tick ( 0 ), bpm ( 0.0 ), bw ( 0 ), bp_measure ( 0 ), start ( 0 )
+        {
+        }
+};
+
+#ifdef JACK_SUPPORT
+/*  Bar and beat start at 1. */
+struct BBT
+{
+    unsigned short bar;
+    unsigned char beat;
+    unsigned short tick;
+
+    BBT ( ) : bar( 0 ), beat( 0 ), tick( 0 )
+        {
+        }
+};
+
+
+struct position_info
+{
+    jack_nframes_t frame;
+
+    float tempo;
+    int beats_per_bar;
+    int beat_type;
+
+    BBT bbt;
+};
+
+struct time_sig
+{
+    int beats_per_bar;
+    int beat_type;
+
+    time_sig ( ) : beats_per_bar( 0 ), beat_type( 0 )
+        {
+        }
+
+    time_sig ( int bpb, int note ) : beats_per_bar( bpb ), beat_type( note )
+        {
+        }
+};
+#endif // JACK_SUPPORT
+
+#define STOP_MARKER         0.0
+#define STARTING_MARKER     0
 
 const int c_status_replace  = 0x01;
 const int c_status_snapshot = 0x02;
@@ -228,6 +286,9 @@ private:
     bool m_toggle_jack;
     bool m_jack_master;
     long m_jack_stop_tick;
+    
+    bool m_reset_tempo_list;
+    bool m_load_tempo_list;
 
     void inner_start( bool a_state );
     void inner_stop(bool a_midi_clock = false);
@@ -240,6 +301,29 @@ public:
 
     // can register here for events...
     std::vector<performcallback*> m_notify;
+    
+    /* m_list_play_marker is used to trigger bpm or stops when running in play().
+     * As each marker is encountered, it's value is used, then it is erased.
+     * It is reset at stop, or when any new marker is set or removed by user.
+     * Reset value = m_list_marker in the tempo() class. */
+    list < tempo_mark > m_list_play_marker;
+    
+    /* m_list_total_marker contains all markers including stops.
+     * Used for file saving and loading. Contains stop markers.
+     * Should always = m_list_marker in the tempo() class.
+     * Only adjusted when new marker is set or removed by user  */
+    list < tempo_mark > m_list_total_marker;
+    
+    /* m_list_no_stop_markers contains only playing markers (no stops).
+     * It is used by the render_tempomap() (jack) when playing and position_jack().
+     * Also used in output_func() when jack is running.
+     * Only adjusted when new marker is set or removed by user */
+    list < tempo_mark > m_list_no_stop_markers;
+
+    /* for undo/redo */
+    stack < list < tempo_mark > >m_list_undo;
+    stack < list < tempo_mark > >m_list_redo;
+
 
     unsigned int m_key_bpm_up;
     unsigned int m_key_bpm_dn;
@@ -371,7 +455,14 @@ public:
     void unset_mode_group_mute ();
     void start( bool a_state );
     void stop();
-
+    
+    bool get_tempo_reset();
+    void set_tempo_reset(bool a_reset);
+    bool get_tempo_load();
+    void set_tempo_load(bool a_load);
+    double get_start_tempo();
+    void set_start_tempo(double a_bpm);
+    
     void start_jack();
     void stop_jack();
     void position_jack( bool a_state, long a_tick );
@@ -392,6 +483,8 @@ public:
     /* plays all notes to Curent tick */
     void play( long a_tick );
     void set_orig_ticks( long a_tick  );
+    
+    void tempo_change();
 
     sequence * get_sequence( int a_sequence );
 
@@ -483,17 +576,21 @@ public:
     
 
 #ifdef JACK_SUPPORT
+#ifdef USE_JACK_BBT_POSITION
     void jack_BBT_position(jack_position_t &pos, double jack_tick);
-    /* now using jack_process_callback() ca. 7/10/16    */
-    /*
-        friend int jack_sync_callback(jack_transport_state_t state,
-                                  jack_position_t *pos, void *arg);
-    */
+    friend int jack_sync_callback(jack_transport_state_t state,
+                              jack_position_t *pos, void *arg);
+#endif // USE_JACK_BBT_POSITION
+    friend position_info solve_tempomap ( jack_nframes_t frame, void *arg );
+    friend position_info render_tempomap( jack_nframes_t start, jack_nframes_t length, void *cb, void *arg );
+    friend jack_nframes_t tick_to_jack_frame(uint64_t a_tick, double a_bpm, void *arg);
+    friend long convert_jack_frame_to_s32_tick(jack_nframes_t a_frame, double a_bpm, void *arg);
+
     friend void jack_shutdown(void *arg);
     friend void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
                                        jack_position_t *pos, int new_pos, void *arg);
     friend int jack_process_callback(jack_nframes_t nframes, void* arg);
-    friend long get_current_jack_position(void *arg);
+    friend long get_current_jack_position(jack_nframes_t a_frame, void *arg);
 #endif // JACK_SUPPORT
 };
 
@@ -505,15 +602,22 @@ extern void *input_thread_func(void *a_p);
 extern ff_rw_type_e FF_RW_button_type;
 
 #ifdef JACK_SUPPORT
+#ifdef USE_JACK_BBT_POSITION
+int jack_sync_callback(jack_transport_state_t state,
+                       jack_position_t *pos, void *arg);
+#endif // USE_JACK_BBT_POSITION
 
-//int jack_sync_callback(jack_transport_state_t state,
-//                       jack_position_t *pos, void *arg);
+position_info solve_tempomap ( jack_nframes_t frame, void *arg );
+position_info render_tempomap( jack_nframes_t start, jack_nframes_t length, void *cb, void *arg );
+jack_nframes_t tick_to_jack_frame(uint64_t a_tick, double a_bpm, void *arg);
+long convert_jack_frame_to_s32_tick(jack_nframes_t a_frame, double a_bpm, void *arg);
+
 void print_jack_pos( jack_position_t* jack_pos );
 void jack_shutdown(void *arg);
 void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes,
                             jack_position_t *pos, int new_pos, void *arg);
 int jack_process_callback(jack_nframes_t nframes, void* arg);
-long get_current_jack_position(void *arg);
+long get_current_jack_position(jack_nframes_t a_frame, void *arg);
 #ifdef JACK_SESSION
 void jack_session_callback(jack_session_event_t *ev, void *arg);
 #endif // JACK_SESSION

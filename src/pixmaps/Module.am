@@ -35,6 +35,8 @@ EXTRA_DIST += \
   src/snap.xpm \
   src/song-editor.xpm \
   src/stop.xpm \
+  src/stop_marker.xpm \
+  src/tempo_marker.xpm \
   src/thru.xpm \
   src/tools.xpm \
   src/transpose.xpm\

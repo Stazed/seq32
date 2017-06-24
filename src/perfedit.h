@@ -61,12 +61,14 @@
 #include "perfnames.h"
 #include "perfroll.h"
 #include "perftime.h"
+#include "tempo.h"
 
 using namespace Gtk;
 
 /* forward declarations */
 class perfroll;
 class perftime;
+class tempo;
 
 /* has a seqroll and paino roll */
 class perfedit:public Gtk::Window
@@ -88,6 +90,7 @@ private:
     perfnames *m_perfnames;
     perfroll *m_perfroll;
     perftime *m_perftime;
+    tempo *m_tempo;
 
     /* time signature, beats per measure, beat width */
     Menu        *m_menu_bp_measure;
@@ -180,6 +183,7 @@ public:
     int get_bp_measure();
     void set_bw( int a_beat_width );
     int get_bw();
+    void update_start_BPM();
 
     void set_xpose (int a_xpose);
     void set_zoom (int z);
@@ -188,6 +192,9 @@ public:
     void toggle_jack();
     void set_follow_transport ();
     void toggle_follow_transport();
+    
+    void load_tempo_list();
+    void reset_tempo_list(bool play_list_only);
 
     friend int FF_RW_timeout(void *arg);
 

@@ -464,6 +464,22 @@ mainwnd::timer_callback(  )
             }
         }
     }
+    
+    if(m_mainperf->get_tempo_load())    /* file loading */
+    {
+        m_mainperf->set_tempo_load(false);
+        m_perf_edit->load_tempo_list();
+        /* reset the m_mainperf bpm for display purposes, not changing the list value*/
+        m_mainperf->set_bpm(m_mainperf->get_start_tempo());
+    }
+    
+    if(m_mainperf->get_tempo_reset())   /* play tempo markers */
+    {
+        m_perf_edit->reset_tempo_list(true); // true for updating play_list only, no need to recalc here
+        m_mainperf->set_tempo_reset(false);
+        /* reset the m_mainperf bpm for display purposes, not changing the list value*/
+        m_mainperf->set_bpm(m_mainperf->get_start_tempo());
+    }
 
     return true;
 }
@@ -605,7 +621,7 @@ void mainwnd::new_file()
         m_perf_edit->set_bp_measure(4);
         m_perf_edit->set_bw(4);
         m_perf_edit->set_xpose(0);
-        m_mainperf->set_bpm(c_bpm);
+        m_mainperf->set_start_tempo(c_bpm);
 
         m_main_wid->reset();
         m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
@@ -819,6 +835,7 @@ bool mainwnd::open_file(const Glib::ustring& fn, bool setlist_mode)
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                                     m_mainperf->get_screenset()));
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
+        m_mainperf->set_start_tempo(m_mainperf->get_bpm());
     }
     else
     {
@@ -1064,6 +1081,7 @@ mainwnd::file_import_dialog()
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                                     m_mainperf->get_screenset() ));
         m_adjust_bpm->set_value( m_mainperf->get_bpm() );
+        m_mainperf->set_start_tempo(m_mainperf->get_bpm()); // update tempo list
 
         break;
     }
@@ -1220,6 +1238,7 @@ mainwnd::adj_callback_bpm( )
     {
         m_mainperf->set_bpm( m_adjust_bpm->get_value());
         global_is_modified = true;
+        m_perf_edit->update_start_BPM();
     }
 }
 
@@ -1316,17 +1335,20 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         {
             m_mainperf->set_bpm( m_mainperf->get_bpm() - 1 );
             m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
+            m_perf_edit->update_start_BPM();
         }
 
         if ( a_ev->keyval ==  m_mainperf->m_key_bpm_up )
         {
             m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
             m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
+            m_perf_edit->update_start_BPM();
         }
 
         if (a_ev->keyval  == m_mainperf->m_key_tap_bpm )
         {
             tap();
+            m_perf_edit->update_start_BPM();
         }
 
         if ( a_ev->keyval == m_mainperf->m_key_replace )
