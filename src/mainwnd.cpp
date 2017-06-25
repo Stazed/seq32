@@ -470,6 +470,15 @@ mainwnd::timer_callback(  )
         m_mainperf->m_setjump=0;
     }
     
+    /* when in set list mode, tempo stop markers trigger set file increment.
+     We have to let the transport completely stop before doing the 
+     file loading or strange things happen*/
+    if(m_mainperf->m_setlist_stop_mark && !global_is_running)
+    {
+        m_mainperf->m_setlist_stop_mark = false;
+        setlist_jump(1);    // next file
+    }
+        
     return true;
 }
 
@@ -541,30 +550,6 @@ void
 mainwnd::start_playing()
 {
     m_mainperf->start_playing();
-
-/*
-	//TODO: Check the song mode and the setlist mode - and do something else
-	if(m_mainperf->get_setlist_mode()){
-		printf("MAINWND_SETLIST: song mode is: %d\n",global_jack_start_mode);
-		printf("MAINWND_SETLIST: setting position:\n");
-		m_mainperf->position_jack( true );
-		printf("MAINWND_SETLIST: sart_jack:\n");
-		m_mainperf->start_jack( );
-		printf("MAINWND_SETLIST: start:\n");
-		m_mainperf->start( true );
-	}
-	else{
-		printf("MAINWND: song mode is: %d\n",global_jack_start_mode);
-		printf("MAINWND: setting position:\n");
-		m_mainperf->position_jack( false );
-		printf("MAINWND: start:\n");
-		m_mainperf->start( false );
-		printf("MAINWND: start jack:\n");
-		m_mainperf->start_jack( );
-	}
-*/
-
-
 }
 
 void
@@ -1510,7 +1495,7 @@ mainwnd::update_window_title()
     	sprintf(num,"%02d",m_mainperf->get_setlist_index() +1);
     	title =
     		( PACKAGE )
-			+ string(" - Set, song ")
+			+ string(" - Playlist, Song ")
 			+ num
 			+ string(" - [")
             + Glib::filename_to_utf8(global_filename)

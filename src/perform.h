@@ -168,6 +168,7 @@ public:
     unsigned int 	m_key_leftarrow;        // FIXME - configurable
     unsigned int 	m_key_rightarrow;
     int 		m_setjump;              // perfedit messages to mainwnd timeout
+    bool                m_setlist_stop_mark;
     // end selist public
 private:
 

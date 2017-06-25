@@ -48,6 +48,7 @@ perform::perform()
     }
 
     m_setjump = 0;
+    m_setlist_stop_mark = false;
     m_setlist_mode = false;
     m_setlist_file = "";
     m_setlist_nfiles = 0;
@@ -1067,6 +1068,8 @@ void perform::tempo_change()
             if((i)->bpm == STOP_MARKER)
             {
                 stop_playing();
+                if(m_setlist_mode) // if we are in set list mode then increment the file on stop marker
+                    m_setlist_stop_mark = true;
             }
             else
             {
@@ -2459,8 +2462,8 @@ void perform::output_func()
 #ifdef JACK_SUPPORT
         if(m_playback_mode && m_jack_master) // master in song mode
         {
-            if(!m_reposition)                // allows for continue option sysex only for now
-                position_jack(m_playback_mode,m_left_tick);
+           // if(!m_reposition)                // FIXME allows for continue option sysex only for now
+            position_jack(m_playback_mode,m_left_tick);
         }
         if(!m_playback_mode && m_jack_running && m_jack_master) // master in live mode
         {
