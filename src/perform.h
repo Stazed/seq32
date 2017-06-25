@@ -158,16 +158,16 @@ class perform
 public:
 
     //Setlist mode
-    void 	set_setlist_mode(bool mode);
-    bool 	get_setlist_mode();
-    void 	set_setlist_file(const Glib::ustring& fn);
+    void        set_setlist_mode(bool mode);
+    bool        get_setlist_mode();
+    void        set_setlist_file(const Glib::ustring& fn);
     Glib::ustring get_setlist_current_file();
-    int		get_setlist_index();
-    bool 	set_setlist_index(int index);
+    int         get_setlist_index();
+    bool        set_setlist_index(int index);
 
-    unsigned int 	m_key_leftarrow;        // FIXME - configurable
-    unsigned int 	m_key_rightarrow;
-    int 		m_setjump;              // perfedit messages to mainwnd timeout
+    unsigned int        m_key_leftarrow;        // FIXME - configurable
+    unsigned int        m_key_rightarrow;
+    int                 m_setjump;              // perfedit messages to mainwnd timeout
     bool                m_setlist_stop_mark;
     // end selist public
 private:

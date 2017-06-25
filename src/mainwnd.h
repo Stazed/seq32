@@ -146,7 +146,7 @@ public:
     mainwnd(perform *a_p);
     ~mainwnd();
 
-    bool open_file(const Glib::ustring&, bool setlist_mode = false);
+    bool open_file(const Glib::ustring&);
     void export_seq_track_trigger(file_type_e type, int a_seq);
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);

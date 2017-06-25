@@ -343,7 +343,7 @@ void mainwnd::setlist_jump(int jmp)
         {
             if(Glib::file_test(m_mainperf->get_setlist_current_file(), Glib::FILE_TEST_EXISTS))
             {
-                if(open_file(m_mainperf->get_setlist_current_file(),true))
+                if(open_file(m_mainperf->get_setlist_current_file()))
                 {
                     found = 1;
                     break;
@@ -756,11 +756,9 @@ void mainwnd::new_open_error_dialog()
     errdialog.run();
 }
 
-bool mainwnd::open_file(const Glib::ustring& fn, bool setlist_mode)
+bool mainwnd::open_file(const Glib::ustring& fn)
 {
     bool result;
-
-    //stop_playing(); // TODO check this
 
     /* reset everything to default */
     if(m_mainperf->clear_all())
@@ -795,6 +793,7 @@ bool mainwnd::open_file(const Glib::ustring& fn, bool setlist_mode)
     else
     {
         new_open_error_dialog();
+        return false;
     }
 
     return true;
@@ -818,10 +817,7 @@ void mainwnd::file_open_setlist()
 {
     if (is_save())
     {
-    	//todo: stop playing - when?
         choose_file(true);
-        //open_setlist_player();
-
     }
 }
 
