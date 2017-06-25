@@ -29,6 +29,7 @@
 
 //For keys
 #include <gtkmm/accelkey.h>
+#include <gtkmm/messagedialog.h>
 
 
 using namespace Gtk;
@@ -947,6 +948,19 @@ void perform::print()
 //    }
 
 //      m_master_bus.print();
+}
+
+void perform::error_message_gtk( Glib::ustring message)
+{
+    Gtk::MessageDialog errdialog
+    (
+        message,
+        false,
+        Gtk::MESSAGE_ERROR,
+        Gtk::BUTTONS_OK,
+        true
+    );
+    errdialog.run();
 }
 
 void perform::set_screen_set_notepad( int a_screen_set, string *a_notepad )
@@ -3442,19 +3456,16 @@ void perform::set_setlist_file(const Glib::ustring& fn)
         }
         else                                                // if we did not get anything
         {
-            printf("No files listed in playlist!\n");       // FIXME gtk message
+            error_message_gtk("No files listed in playlist!\n");
             set_setlist_mode(false);                        // abandon ship
         }
     }
     else
     {
-        //TODO: sjh: Error box needs to handle bad files..
-        //Gtk::MessageDialog errdialog(*this,
-        //        "Error reading playlist file: " + m_setlist_file, false,
-        //        Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
-        //errdialog.run();
-        printf("Unable to open playlist file %s\n",m_setlist_file.c_str());
-        set_setlist_mode(false);        // abandon ship
+        Glib::ustring message = "Unable to open playlist file\n";
+        message += m_setlist_file; 
+        error_message_gtk(message);
+        set_setlist_mode(false);                            // abandon ship
     }
 }
 

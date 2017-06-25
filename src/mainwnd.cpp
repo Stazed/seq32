@@ -350,21 +350,25 @@ void mainwnd::setlist_jump(int jmp)
                 }
                 else
                 {
-                    printf("Playlist file open error: %s\n", m_mainperf->get_setlist_current_file().c_str()); // FIXME gtk
+                    Glib::ustring message = "Playlist file open error\n";
+                    message += m_mainperf->get_setlist_current_file();
+                    m_mainperf->error_message_gtk(message);
                     m_mainperf->set_setlist_mode(false);    // abandon ship
                     break;  
                 }
             }
             else
             {
-                printf("Playlist file does not exist: %s\n", m_mainperf->get_setlist_current_file().c_str()); // FIXME gtk
+                Glib::ustring message = "Midi playlist file does not exist\n";
+                message += m_mainperf->get_setlist_current_file();
+                m_mainperf->error_message_gtk(message);
                 m_mainperf->set_setlist_mode(false);        // abandon ship
                 break;  
             }
         }
         else
         {
-            printf("Setlist index %d out of range\n",m_mainperf->get_setlist_index() + jmp);    // FIXME - remove when done
+           //printf("Setlist index %d out of range\n",m_mainperf->get_setlist_index() + jmp);
             break;
         }
     }

@@ -117,7 +117,7 @@ private:
     void toLower(basic_string<char>&);
     void file_new();
     void file_open();
-    void file_open_setlist();//sjh mod
+    void file_open_setlist();
     void file_save();
     void file_save_as( file_type_e type, int a_seq );
     void file_exit();

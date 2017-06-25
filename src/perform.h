@@ -167,7 +167,7 @@ public:
 
     unsigned int 	m_key_leftarrow;        // FIXME - configurable
     unsigned int 	m_key_rightarrow;
-    int 		m_setjump;              //flag for perfedit messages up to mainwnd
+    int 		m_setjump;              // perfedit messages to mainwnd timeout
     // end selist public
 private:
 
@@ -422,6 +422,7 @@ public:
     float m_excell_FF_RW;
 
     void print();
+    void error_message_gtk( Glib::ustring message);
 
     midi_control *get_midi_control_toggle( unsigned int a_seq );
     midi_control *get_midi_control_on( unsigned int a_seq );

@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include "midifile.h"
-#include <gtkmm.h>
+#include <gtkmm/messagedialog.h>
 
 midifile::midifile(const Glib::ustring& a_name) :
     m_pos(0),
