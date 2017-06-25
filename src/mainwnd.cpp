@@ -1516,6 +1516,14 @@ mainwnd::update_window_title()
     }
 
     set_title ( title.c_str());
+    
+    if(m_perf_edit != nullptr)
+    {
+        if(m_mainperf->get_setlist_mode())
+            m_perf_edit->set_title( title.c_str());
+        else
+            m_perf_edit->set_title("seq32 - Song Editor");
+    }  
 }
 
 int mainwnd::m_sigpipe[2];
