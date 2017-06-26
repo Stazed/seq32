@@ -274,6 +274,7 @@ tempo::on_button_press_event(GdkEventButton* p0)
             {
                 if((i)->tick != STARTING_MARKER)    // Don't allow erase of first start marker
                 {
+                    global_is_modified = true;
 //                    push_undo();
                     m_list_marker.erase(i);
                     reset_tempo_list();
@@ -328,6 +329,7 @@ void
 tempo::set_BPM(double a_bpm)
 {
 //    push_undo();
+    global_is_modified = true;
     m_current_mark.bpm = a_bpm;
     add_marker(m_current_mark);
     queue_draw();
