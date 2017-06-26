@@ -92,7 +92,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
 
     if (!file.is_open ())
     {
-        error_message_gtk("Error opening MIDI file");
+        a_perf->error_message_gtk("Error opening MIDI file");
         return false;
     }
 
@@ -102,7 +102,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
     {
         Glib::ustring message = "Error - Invalid file size: ";
         message += NumberToString(file_size);
-        error_message_gtk(message);
+        a_perf->error_message_gtk(message);
         file.close ();
         return false;
     }
@@ -117,7 +117,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
     }
     catch(std::bad_alloc& ex)
     {
-        error_message_gtk("Memory allocation failed");
+        a_perf->error_message_gtk("Memory allocation failed");
         return false;
     }
     file.read ((char *) &m_d[0], file_size);
@@ -170,7 +170,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
     {
         Glib::ustring message = "Invalid MIDI header detected: ";
         message += Ulong_To_String_Hex(ID);
-        error_message_gtk(message);
+        a_perf->error_message_gtk(message);
         return false;
     }
 
@@ -179,7 +179,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
     {
         Glib::ustring message = "Unsupported MIDI format detected: ";
         message += NumberToString(Format);
-        error_message_gtk(message);
+        a_perf->error_message_gtk(message);
         return false;
     }
 
@@ -208,7 +208,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
             seq = new sequence ();
             if (seq == NULL)
             {
-                error_message_gtk("Memory allocation failed");
+                a_perf->error_message_gtk("Memory allocation failed");
                 return false;
             }
             seq->set_master_midi_bus (&a_perf->m_master_bus);
@@ -496,7 +496,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
                     {
                         Glib::ustring message = "Unexpected system event : ";
                         message += Ulong_To_String_Hex((unsigned long)status);
-                        error_message_gtk(message);
+                        a_perf->error_message_gtk(message);
                         return false;
                     }
 
@@ -505,7 +505,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
                 default:
                     Glib::ustring message = "Unsupported MIDI event:  ";
                     message += Ulong_To_String_Hex((unsigned long)status);
-                    error_message_gtk(message);
+                    a_perf->error_message_gtk(message);
                     return false;
                     break;
                 }
@@ -966,7 +966,7 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
     {
         if(a_solo_track == c_no_export_sequence) // sanity check - should only happen with song export
         {
-            error_message_gtk("Cannot export track or trigger - none selected");
+            a_perf->error_message_gtk("Cannot export track or trigger - none selected");
             return true;    // true so we don't generate a second error about "Error writing file".
         }
     }
@@ -985,7 +985,7 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
     case E_MIDI_SOLO_TRIGGER:
         if(a_perf->get_sequence(a_solo_track)->get_trigger_export() == nullptr)
         {
-            error_message_gtk("Cannot export trigger - none selected!");
+            a_perf->error_message_gtk("Cannot export trigger - none selected!");
             return true;    // true so we don't generate a second error about "Error writing file".
         }
         numtracks = 1;
@@ -998,7 +998,7 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
         }
         else
         {
-            error_message_gtk("Cannot export track!\nDoes it have triggers?\nIs it muted?");
+            a_perf->error_message_gtk("Cannot export track!\nDoes it have triggers?\nIs it muted?");
             return true;    // true so we don't generate a second error about "Error writing file".
         }
         break;
@@ -1010,7 +1010,7 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
 
     if(numtracks == 0)
     {
-        error_message_gtk("There are NO exportable tracks!\nDo any have triggers?\nAre all tracks muted?\n");
+        a_perf->error_message_gtk("There are NO exportable tracks!\nDo any have triggers?\nAre all tracks muted?\n");
         return true;    // true so we don't generate a second error message "Error writing file.".
     }
 
@@ -1193,20 +1193,6 @@ midifile::Ulong_To_String_Hex ( unsigned long Number )
 
     Glib::ustring str(bus_num);
     return str;
-}
-
-void
-midifile::error_message_gtk( Glib::ustring message)
-{
-    Gtk::MessageDialog errdialog
-    (
-        message,
-        false,
-        Gtk::MESSAGE_ERROR,
-        Gtk::BUTTONS_OK,
-        true
-    );
-    errdialog.run();
 }
 
 bool
