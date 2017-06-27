@@ -333,11 +333,16 @@ mainwnd::~mainwnd()
 /*
  * move through the setlist (jmp is 0 on start and 1 if right arrow, -1 for left arrow)
  */
-void mainwnd::setlist_jump(int jmp)
+bool mainwnd::setlist_jump(int jmp, bool a_verify)
 {
-    int found = 0;
+    bool result = false;
+    if(a_verify)                                // we will run through all the files
+    {
+        m_mainperf->set_setlist_index(0);       // start at zero
+        jmp = 0;                                // to get the first one
+    }
 
-    while(!found)
+    while(1)
     {
         if(m_mainperf->set_setlist_index(m_mainperf->get_setlist_index() + jmp))
         {
@@ -345,36 +350,81 @@ void mainwnd::setlist_jump(int jmp)
             {
                 if(open_file(m_mainperf->get_setlist_current_file()))
                 {
-                    found = 1;
+                    if(a_verify)    // verify whole setlist
+                    {
+                        jmp = 1;    // after the first one set to 1 for jump
+                        continue;   // keep going till the end of list
+                    }
+                    result = true;
                     break;
                 }
                 else
                 {
-                    Glib::ustring message = "Playlist file open error\n";
+                    Glib::ustring message = "Setlist file open error\n";
                     message += m_mainperf->get_setlist_current_file();
                     m_mainperf->error_message_gtk(message);
                     m_mainperf->set_setlist_mode(false);    // abandon ship
+                    result = false;
                     break;  
                 }
             }
             else
             {
-                Glib::ustring message = "Midi playlist file does not exist\n";
+                Glib::ustring message = "Midi setlist file does not exist\n";
                 message += m_mainperf->get_setlist_current_file();
                 m_mainperf->error_message_gtk(message);
                 m_mainperf->set_setlist_mode(false);        // abandon ship
+                result = false;
                 break;  
             }
         }
-        else
+        else                                                // end of file list
         {
-           //printf("Setlist index %d out of range\n",m_mainperf->get_setlist_index() + jmp);
+            result = true;                  // means we got to the end or beginning, without error
             break;
         }
     }
     
     if(!m_mainperf->get_setlist_mode())     // if errors occured above
         update_window_title();
+    
+    return result;
+}
+
+bool
+mainwnd::verify_setlist_dialog()
+{
+    Gtk::MessageDialog warning("Do you wish the verify the setlist?\n",
+                       false,
+                       Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
+
+    auto result = warning.run();
+
+    if (result == Gtk::RESPONSE_NO || result == Gtk::RESPONSE_DELETE_EVENT)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+void
+mainwnd::setlist_verify()
+{
+    bool result = false;
+    
+    result = setlist_jump(0,true);              // true is verify mode
+    
+    if(result)                                  // everything loaded
+    {
+        m_mainperf->set_setlist_index(0);       // set to start
+        setlist_jump(0);                        // load the first file
+        printf("Setlist verification was successful!\n");
+    }
+    else                                        // verify failed somewhere
+    {
+        new_file();                             // clear and start clean
+    }
 }
 
 // This is the GTK timer callback, used to draw our current time and bpm
@@ -828,14 +878,13 @@ void mainwnd::choose_file(const bool setlist_mode)
     dialog.set_transient_for(*this);
 
     if(setlist_mode)
-    	dialog.set_title("Open Playlist file");
+    	dialog.set_title("Open Setlist file");
 
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
 
     if(!setlist_mode)
     {
-        m_mainperf->set_setlist_mode(setlist_mode); // false
         Gtk::FileFilter filter_midi;
         filter_midi.set_name("MIDI files");
         filter_midi.add_pattern("*.MIDI");
@@ -861,11 +910,20 @@ void mainwnd::choose_file(const bool setlist_mode)
         {
             m_mainperf->set_setlist_mode(true);
             m_mainperf->set_setlist_file(dialog.get_filename());
-            setlist_jump(0);
+            if(verify_setlist_dialog())
+            {
+                setlist_verify();
+            }
+            else
+            {
+                setlist_jump(0);
+            }
+            
             update_window_title();
         }
         else
         {
+            m_mainperf->set_setlist_mode(setlist_mode); // setlist_mode is false to clear flag
             open_file(dialog.get_filename());
         }
         break;
@@ -1491,7 +1549,7 @@ mainwnd::update_window_title()
     	sprintf(num,"%02d",m_mainperf->get_setlist_index() +1);
     	title =
     		( PACKAGE )
-			+ string(" - Playlist, Song ")
+			+ string(" - Setlist, Song ")
 			+ num
 			+ string(" - [")
             + Glib::filename_to_utf8(global_filename)
