@@ -380,12 +380,12 @@ bool mainwnd::setlist_jump(int jmp, bool a_verify)
         }
         else                                                // end of file list
         {
-            result = true;                  // means we got to the end or beginning, without error
+            result = true;   // means we got to the end or beginning, without error
             break;
         }
     }
     
-    if(!m_mainperf->get_setlist_mode())     // if errors occured above
+    if(!result)                                             // if errors occured above
         update_window_title();
     
     return result;
@@ -924,7 +924,8 @@ void mainwnd::choose_file(const bool setlist_mode)
         else
         {
             m_mainperf->set_setlist_mode(setlist_mode); // setlist_mode is false to clear flag
-            open_file(dialog.get_filename());
+            if(!open_file(dialog.get_filename()))
+                update_window_title();                  // since we cleared flag above but fail does not update
         }
         break;
     default:
