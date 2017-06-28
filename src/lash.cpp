@@ -94,7 +94,7 @@ lash::handle_event(lash_event_t* ev)
     if (type == LASH_Save_File)
     {
         midifile f(str + "/seq32.mid");
-        f.write(m_perform);
+        f.write(m_perform, c_no_export_sequence);
         lash_send_event(m_client, lash_event_new_with_type(LASH_Save_File));
     }
     else if (type == LASH_Restore_File)
