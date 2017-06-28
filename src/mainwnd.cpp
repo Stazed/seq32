@@ -1511,16 +1511,17 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             sequence_key(m_mainperf->lookup_keyevent_seq( a_ev->keyval));
         }
 
-
         if(m_mainperf->get_setlist_mode())
         {
             if ( a_ev->keyval == m_mainperf->m_key_leftarrow )
             {
             	setlist_jump(-1);
+                return true;
             }
             if ( a_ev->keyval == m_mainperf->m_key_rightarrow )
             {
             	setlist_jump(1);
+                return true;
             }
         }
     }
