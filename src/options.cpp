@@ -531,13 +531,16 @@ options::input_callback (int a_bus, Button * i_button)
 {
     CheckButton *a_button = (CheckButton *) i_button;
     bool input = a_button->get_active ();
-    if (9999 == a_bus)
+    if (e_keylabelsonsequence == a_bus)
     {
         m_perf->m_show_ui_sequence_key = input;
         for (int i=0; i< c_max_sequence; i++ )
         {
             if (m_perf->get_sequence( i ))
-                m_perf->get_sequence( i )->set_dirty();
+            {
+                if(m_perf->is_active(i))
+                    m_perf->get_sequence( i )->set_dirty();
+            }
         }
         return;
     }
