@@ -232,6 +232,12 @@ options::add_keyboard_page()
     controltable->attach(*label, 0, 1, 4, 5);
     controltable->attach(*entry, 1, 2, 4, 5);
     
+    label = manage(new Label("Setlist next", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                                    &m_perf->m_key_setlist_next));
+    controltable->attach(*label, 0, 1, 5, 6);
+    controltable->attach(*entry, 1, 2, 5, 6);
+    
     label = manage(new Label("Snapshot 1", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_snapshot_1));
@@ -260,7 +266,13 @@ options::add_keyboard_page()
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_rewind));
     controltable->attach(*label, 2, 3, 4, 5);
-    controltable->attach(*entry, 3, 4, 4, 5);  
+    controltable->attach(*entry, 3, 4, 4, 5);
+    
+    label = manage(new Label("Setlist previous", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                                    &m_perf->m_key_setlist_prev));
+    controltable->attach(*label, 2, 3, 5, 6);
+    controltable->attach(*entry, 3, 4, 5, 6);  
     
     label = manage(new Label("Replace", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
@@ -291,6 +303,12 @@ options::add_keyboard_page()
                                     &m_perf->m_key_forward));
     controltable->attach(*label, 4, 5, 4, 5);
     controltable->attach(*entry, 5, 6, 4, 5);
+    
+    label = manage(new Label("Export trigger", Gtk::ALIGN_RIGHT));
+    entry = manage(new KeyBindEntry(KeyBindEntry::location,
+                                    &m_perf->m_key_export_trigger));
+    controltable->attach(*label, 4, 5, 5, 6);
+    controltable->attach(*entry, 5, 6, 5, 6);
 
     label = manage(new Label("Screenset up", Gtk::ALIGN_RIGHT));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,

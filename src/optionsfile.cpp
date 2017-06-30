@@ -217,6 +217,15 @@ optionsfile::parse( perform *a_perf )
     
     next_data_line( &file );
     sscanf( m_line, "%u", &a_perf->m_key_pointer );
+    
+    next_data_line( &file );
+    sscanf( m_line, "%u", &a_perf->m_key_setlist_next );
+    
+    next_data_line( &file );
+    sscanf( m_line, "%u", &a_perf->m_key_setlist_prev );
+    
+    next_data_line( &file );
+    sscanf( m_line, "%u", &a_perf->m_key_export_trigger );
 
     line_after( &file, "[jack-transport]" );
     long flag = 0;
@@ -555,6 +564,18 @@ optionsfile::write( perform *a_perf  )
          << gdk_keyval_name( a_perf->m_key_pointer )
          << " pointer key\n";
 
+    file << a_perf->m_key_setlist_next << "        # "
+         << gdk_keyval_name( a_perf->m_key_setlist_next )
+         << " setlist next key\n";
+    
+    file << a_perf->m_key_setlist_prev << "        # "
+         << gdk_keyval_name( a_perf->m_key_setlist_prev )
+         << " setlist previous key\n";
+    
+    file << a_perf->m_key_export_trigger << "        # "
+         << gdk_keyval_name( a_perf->m_key_export_trigger )
+         << " trigger export key\n";
+    
     file << "\n\n\n[jack-transport]\n\n"
 
          << "# jack_transport - Enable sync with JACK Transport.\n"

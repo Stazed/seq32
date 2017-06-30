@@ -177,10 +177,11 @@ perform::perform()
     m_key_jack   = GDK_F2;
     m_key_menu   = GDK_F3;
     m_key_follow_trans  = GDK_F4;
+    m_key_export_trigger = GDK_F10;
 
     //setlist next/prev keys:
-    m_key_leftarrow = GDK_Left;
-    m_key_rightarrow = GDK_Right;
+    m_key_setlist_next = GDK_Right;
+    m_key_setlist_prev = GDK_Left;
 
     m_jack_stop_tick = 0;
     m_reset_tempo_list = false;

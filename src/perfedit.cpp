@@ -419,13 +419,13 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
 
         if(m_mainperf->get_setlist_mode())
         {
-            if(a_ev->keyval == m_mainperf->m_key_leftarrow)
+            if(a_ev->keyval == m_mainperf->m_key_setlist_prev)
             {
                 m_mainperf->m_setjump = -1;
                 return true;
             }
 
-            if(a_ev->keyval == m_mainperf->m_key_rightarrow)
+            if(a_ev->keyval == m_mainperf->m_key_setlist_next)
             {
                 m_mainperf->m_setjump = 1;
                 return true;
@@ -438,7 +438,7 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 #endif // JACK_SUPPORT
-        if ( a_ev->keyval ==  GDK_F10 )     // FIXME trigger export make configurable
+        if ( a_ev->keyval ==  m_mainperf->m_key_export_trigger )
         {
             if(m_mainperf->is_active(m_perfroll->get_drop_sequence()))
             {

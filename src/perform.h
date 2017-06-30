@@ -165,8 +165,8 @@ public:
     int         get_setlist_index();
     bool        set_setlist_index(int index);
 
-    unsigned int        m_key_leftarrow;        // FIXME - configurable
-    unsigned int        m_key_rightarrow;
+    unsigned int        m_key_setlist_next;
+    unsigned int        m_key_setlist_prev;
     int                 m_setjump;              // perfedit messages to mainwnd timeout
     bool                m_setlist_stop_mark;
     // end selist public
@@ -349,6 +349,7 @@ public:
     unsigned int m_key_jack;
     unsigned int m_key_menu;
     unsigned int m_key_follow_trans;
+    unsigned int m_key_export_trigger;
 
     bool show_ui_sequence_key() const
     {
