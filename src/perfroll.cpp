@@ -631,7 +631,7 @@ perfroll::draw_drawable_row( Glib::RefPtr<Gdk::Drawable> a_dest, Glib::RefPtr<Gd
 bool
 perfroll::on_button_press_event(GdkEventButton* a_ev)
 {
-    if(!trans_button_press) // to avoid double button press on normal seq42 method
+    if(!trans_button_press) // to avoid double button press on normal seq32 method
     {
         transport_follow = m_mainperf->get_follow_transport();
         m_mainperf->set_follow_transport(false);

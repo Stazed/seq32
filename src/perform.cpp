@@ -1517,12 +1517,12 @@ void perform::start(bool a_state)
 /*
     stop(); This function's sole purpose was to prevent inner_stop() from being called
     internally when jack was running...potentially twice?. inner_stop() was called by output_func()
-    when jack sent a JackTransportStopped message. If seq42 initiated the stop, then
+    when jack sent a JackTransportStopped message. If seq32 initiated the stop, then
     stop_jack() was called which then triggered the JackTransportStopped message
     to output_func() which then triggered the bool stop_jack to call inner_stop().
     The output_func() call to inner_stop() is only necessary when some other jack
     client sends a jack_transport_stop message to jack, not when it is initiated
-    by seq42.  The method of relying on jack to call inner_stop() when internally initiated
+    by seq32.  The method of relying on jack to call inner_stop() when internally initiated
     caused a (very) obscure apparent freeze if you press and hold the start/stop key
     if set to toggle. This occurs because of the delay between JackTransportStarting and
     JackTransportStopped if both triggered in rapid succession by holding the toggle key
@@ -2081,11 +2081,11 @@ void perform::output_func()
 
                 /*
                     Another note about jack....
-                    If another jack client is supplying tempo/BBT info that is different from seq42 (as Master),
+                    If another jack client is supplying tempo/BBT info that is different from seq32 (as Master),
                     the perfroll grid will be incorrect. Perfroll uses internal temp/BBT and cannot update on
-                    the fly. Even if seq42 could support tempo/BBT changes, all info would have to be available
+                    the fly. Even if seq32 could support tempo/BBT changes, all info would have to be available
                     before the transport start, to work. For this reason, the tempo/BBT info will be plugged from
-                    the seq42 internal settings here... always. This is the method used by probably all other jack
+                    the seq32 internal settings here... always. This is the method used by probably all other jack
                     clients with some sort of time-line. The jack API indicates that BBT is optional and AFIK,
                     other sequencers only use frame & frame_rate from jack for internal calculations. The tempo
                     and BBT info is always internal. Also, if there is no Master set, then we would need to plug

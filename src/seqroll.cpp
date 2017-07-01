@@ -1033,7 +1033,7 @@ seqroll::start_paste( )
 bool
 seqroll::on_button_press_event(GdkEventButton* a_ev)
 {
-    if(!trans_button_press) // to avoid double button press on normal seq42 method
+    if(!trans_button_press) // to avoid double button press on normal seq32 method
     {
         transport_follow = m_perform->get_follow_transport();
         m_perform->set_follow_transport(false);
