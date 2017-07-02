@@ -1,3 +1,23 @@
+seq32-1.0.9 (2017-07-02)
+  * Fix FF/Rewind to work with key-repeat properly.
+  * Add CAPS to midi file extension checks.
+  * Add export individual solo sequence to seqmenu pop-up.
+    Right click on mainwnd sequence for 'export' selection and user will be
+    prompted for file location. Also can be invoked from perfedit pop-up.
+    Export will not include song triggers, or proprietary performance tags.
+  * Add user verification pop-up on imported files when tempo and or time signature is different from
+    main performance values.
+  * Optimized code in midifile to greatly speed up file loading.
+  * Add solo track export (song format).
+  * Add solo trigger export (F10 configurable).
+  * Add very limited support for using sysex for transport control.
+  * Fix midi song position change when sync midiclock (no jack).
+  * Add Tempo change to song editor (See SEQ32 document for details).
+  * Add Stop markers to tempo change (See SEQ32 document for details).
+  * Add setlist file support (See SEQ32 document for details).
+  * Fix intermittent segfault on keylabel setting.
+  * Clean up and beautify the LFO window.
+
 seq32-1.0.8 (2017-04-19)
   * Add expanded recording and overwrite recording. New 'Rec' button in seqedit window.
   * Add user key configuration for rewind, fast forward and pointer keys.
