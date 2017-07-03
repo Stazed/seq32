@@ -86,7 +86,6 @@ tempopopup::tempopopup(tempo *a_tempo) :
     add(*hbox);
     set_modal();                            // keep focus until done
     set_transient_for(*m_tempo->m_perfedit); // always on top
-    //set_transient_for(*m_tempo->m_mainwnd); // always on top
     set_decorated(false);                   // don't show title bar
     
     add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );

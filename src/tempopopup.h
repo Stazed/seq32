@@ -18,14 +18,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
-/* 
- * File:   tempopopup.h
- * Author: sspresto
- *
- * Created on May 29, 2017, 1:36 PM
- */
-
 #pragma once
 
 #include <gtkmm.h>

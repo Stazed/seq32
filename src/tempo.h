@@ -18,16 +18,10 @@
 //
 //-----------------------------------------------------------------------------
 
-/* 
- * File:   tempo.h
- * Author: sspresto
- *
- * Created on May 28, 2017, 11:54 AM
- */
-
 #pragma once
 
-//#include "mainwnd.h"
+#undef SEQ42_UNDO_TEMPO     // Seq42 type undo - not currently used
+
 #include "perfedit.h"
 #include "perform.h"
 #include "seqtime.h"
@@ -55,10 +49,8 @@
 using namespace Gtk;
 using std::list;
 
-//class mainwnd;
 class perfedit;
 
-/* piano time*/
 class tempo: public Gtk::DrawingArea
 {
 
@@ -72,7 +64,6 @@ private:
 
     perform      * const m_mainperf;
     perfedit     * const m_perfedit;
-//    mainwnd      * const m_mainwnd;
     Adjustment   * const m_hadjust;
     
     /* holds the markers */
@@ -146,7 +137,7 @@ public:
     friend tempopopup;
 };
 
-#if 0
+#ifdef SEQ42_UNDO_TEMPO
 /* Modified spinbutton for using the mainwnd bpm spinner to allow for better undo support.
  * This allows user to spin and won't push to undo on every changed value, but will only
  * push undo when user leaves the widget. Modified to work with typed entries as well.
@@ -179,4 +170,4 @@ private:
     void set_hold_bpm(double a_bpm = 0.0);
     double get_hold_bpm();
 };
-#endif // 0
+#endif // SEQ42_UNDO_TEMPO

@@ -274,8 +274,11 @@ tempo::on_button_press_event(GdkEventButton* p0)
             {
                 if((i)->tick != STARTING_MARKER)    // Don't allow erase of first start marker
                 {
+#ifdef SEQ42_UNDO_TEMPO
+                    push_undo();
+#else
                     global_is_modified = true;
-//                    push_undo();
+#endif // SEQ42_UNDO_TEMPO
                     m_list_marker.erase(i);
                     reset_tempo_list();
                     queue_draw();
@@ -328,8 +331,11 @@ tempo::set_tempo_marker(long a_tick)
 void
 tempo::set_BPM(double a_bpm)
 {
-//    push_undo();
+#ifdef SEQ42_UNDO_TEMPO
+    push_undo();
+#else
     global_is_modified = true;
+#endif // SEQ42_UNDO_TEMPO
     m_current_mark.bpm = a_bpm;
     add_marker(m_current_mark);
     queue_draw();
@@ -388,8 +394,10 @@ tempo::set_start_BPM(double a_bpm)
     
     if ( ! (m_mainperf->is_jack_running() && global_is_running ))
     {
-        //push_undo(true);
-        //m_mainperf->set_bpm( a_bpm );
+#ifdef SEQ42_UNDO_TEMPO
+        push_undo(true);
+        m_mainperf->set_bpm( a_bpm );
+#endif
         m_list_marker.begin()->bpm = a_bpm;
 
         reset_tempo_list();
@@ -488,7 +496,7 @@ tempo::calculate_marker_start()
     unlock();
 }
 
-#if 0
+#ifdef SEQ42_UNDO_TEMPO
 void
 tempo::push_undo(bool a_hold)
 {
@@ -571,7 +579,7 @@ tempo::get_hold_undo ()
 {
     return m_list_undo_hold.size();
 }
-#endif
+#endif // SEQ42_UNDO_TEMPO
 
 void
 tempo::print_marker_info(list<tempo_mark> a_list)
@@ -584,7 +592,7 @@ tempo::print_marker_info(list<tempo_mark> a_list)
     printf("\n\n");
 }
 
-#if 0
+#ifdef SEQ42_UNDO_TEMPO
 /* Modified spinbutton for using the mainwnd bpm spinner to allow for better undo support.
  * This allows user to spin and won't push to undo on every changed value, but will only
  * push undo when user leaves the widget. Modified to work with typed entries as well.
@@ -678,4 +686,4 @@ Bpm_spinbutton::get_hold_bpm()
 {
     return m_hold_bpm;
 }
-#endif // 0
+#endif // SEQ42_UNDO_TEMPO
