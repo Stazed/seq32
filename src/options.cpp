@@ -424,11 +424,11 @@ options::add_mouse_page()
     interactionframe->add(*interactionbox);
 
     Gtk::RadioButton *rb_seq32 = manage(new RadioButton(
-                                            "se_q32 (original style)", true));
+                                            "SE_Q32 (original style)", true));
     interactionbox->pack_start(*rb_seq32, Gtk::PACK_SHRINK);
 
     Gtk::RadioButton * rb_fruity = manage(new RadioButton(
-            "_fruity (similar to a certain well known sequencer)", true));
+            "_Fruity (similar to a certain well known sequencer)", true));
     interactionbox->pack_start(*rb_fruity, Gtk::PACK_SHRINK);
 
     Gtk::RadioButton::Group group = rb_seq32->get_group();
