@@ -377,6 +377,16 @@ bool perform::clear_all()
     m_list_play_marker.clear();
     m_list_total_marker.clear();
     m_list_no_stop_markers.clear();
+    
+    /* For legacy seq24 files, the bp_measure and bw were not saved, so all
+     * of them had only 4 / 4 time signature on perfedit. We need to clear any
+     * existing value and load the default for those legacy files since the
+     * midi parse will not load any saved values and legacy always assumed 4 / 4.
+     * The old files, both seq24 legacy, and some old seq32 files should be
+     * re-saved. But this set to default will catch those that were missed.
+     */
+    set_bp_measure(4);              // default
+    set_bw(4);                      // default
 
     return true;
 }
