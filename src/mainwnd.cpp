@@ -51,6 +51,7 @@ bool global_is_modified = false;
 mainwnd::mainwnd(perform *a_p):
     m_mainperf(a_p),
     m_menu_mode(false),
+    m_perf_edit(NULL),
     m_options(NULL)
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq32_32_xpm));
