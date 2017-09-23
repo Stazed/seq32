@@ -68,7 +68,9 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     set_size_request(750, 400);
 
     /* tooltips */
-    m_tooltips = manage( new Tooltips( ) );
+#if GTK_MINOR_VERSION < 12
+    m_tooltips = manage( new Tooltips() );
+#endif
 
     m_vadjust = manage( new Adjustment(0,0,1,1,1,1 ));
     m_hadjust = manage( new Adjustment(0,0,1,1,1,1 ));

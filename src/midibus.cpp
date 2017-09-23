@@ -1072,6 +1072,13 @@ mastermidibus::~mastermidibus()
 {
     for ( int i=0; i<m_num_out_buses; i++ )
         delete m_buses_out[i];
+    
+    for ( int i=0; i<m_num_in_buses; i++ )
+        delete m_buses_in[i];
+    
+    delete m_bus_announce;
+    delete[] m_poll_descriptors;
+    
 #ifdef HAVE_LIBASOUND
     snd_seq_event_t ev;
 
@@ -1500,6 +1507,7 @@ mastermidibus::get_midi_event( event *a_in )
 
     if (bytes <= 0)
     {
+        snd_midi_event_free( midi_ev );
         unlock();
         return false;
     }
