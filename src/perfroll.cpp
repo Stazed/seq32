@@ -24,11 +24,13 @@ perfroll::perfroll( perform *a_perf,
                     perfedit * a_perf_edit,
                     Adjustment * a_hadjust,
                     Adjustment * a_vadjust  ) :
+    m_window(NULL),
     m_black(Gdk::Color("black")),
     m_white(Gdk::Color("white")),
     m_grey(Gdk::Color("grey")),
     m_lt_grey(Gdk::Color("light grey")),
 
+    m_pixmap(NULL),
     m_mainperf(a_perf),
     m_perfedit(a_perf_edit),
 
@@ -39,6 +41,7 @@ perfroll::perfroll( perform *a_perf,
     m_4bar_offset(0),
     m_sequence_offset(0),
     m_roll_length_ticks(0),
+    m_drop_y(0),
     m_drop_sequence(0),
 
     m_vadjust(a_vadjust),
