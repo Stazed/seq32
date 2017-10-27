@@ -730,6 +730,7 @@ perfedit::set_zoom (int z)
 {
     m_perfroll->set_zoom(z);
     m_perftime->set_zoom(z);
+    m_tempo->set_zoom(z);
 }
 
 void
