@@ -54,6 +54,7 @@ private:
 #endif
     MenuBar  *m_menubar;
     Menu     *m_menu_file;
+    Menu     *m_menu_recent;          /**< File/Recent menu popup.    */
     Menu     *m_menu_edit;
     Menu     *m_menu_help;
 
@@ -88,7 +89,7 @@ private:
     Entry       *m_entry_notes;
 
     sigc::connection   m_timeout_connect;
-
+    
     /* tap button - From sequencer64 */
     int m_current_beats; // value is displayed in the button.
     long m_base_time_ms; // Indicates the first time the tap button was ... tapped.
@@ -128,6 +129,9 @@ private:
     void choose_file(bool setlist_mode = false);
     int query_save_changes();
     bool is_save();
+    void update_recent_files_menu ();
+    void load_recent_file (int index);
+    
     static void handle_signal(int sig);
     bool install_signal_handlers();
     bool signal_action(Glib::IOCondition condition);
@@ -154,5 +158,5 @@ public:
     bool setlist_jump(int jmp, bool a_verify = false);
     bool verify_setlist_dialog();
     void setlist_verify();
-
+    
 };
