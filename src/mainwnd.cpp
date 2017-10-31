@@ -843,8 +843,13 @@ bool mainwnd::open_file(const Glib::ustring& fn)
 
         last_used_dir = fn.substr(0, fn.rfind("/") + 1);
         global_filename = fn;
-        m_mainperf->add_recent_file(fn);           /* from Oli Kester's Kepler34/Sequencer 64       */
-        update_recent_files_menu();
+        
+        if(!m_mainperf->get_setlist_mode())            /* don't list files from setlist */
+        {
+            m_mainperf->add_recent_file(fn);           /* from Oli Kester's Kepler34/Sequencer 64       */
+            update_recent_files_menu();
+        }
+        
         update_window_title();
 
         m_main_wid->reset();
@@ -960,12 +965,12 @@ bool mainwnd::save_file()
 
     result = f.write(m_mainperf, c_no_export_sequence);
 
-    if (result)
+    if (result && !m_mainperf->get_setlist_mode())            /* don't list files from setlist */
     {
         m_mainperf->add_recent_file(global_filename);
         update_recent_files_menu();
     }
-    else
+    else if (!result)
     {
         Gtk::MessageDialog errdialog(*this,
                                      "Error writing file.", false,
