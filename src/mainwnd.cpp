@@ -88,13 +88,18 @@ mainwnd::mainwnd(perform *a_p):
     m_menu_file->items().push_back(MenuElem("_Open...",
                                             Gtk::AccelKey("<control>O"),
                                             mem_fun(*this, &mainwnd::file_open)));
+    update_recent_files_menu();
+    
+    m_menu_file->items().push_back(MenuElem("Open _setlist...",
+                                            mem_fun(*this, &mainwnd::file_open_setlist)));
+    
+    m_menu_file->items().push_back(SeparatorElem());
+    
     m_menu_file->items().push_back(MenuElem("_Save",
                                             Gtk::AccelKey("<control>S"),
                                             mem_fun(*this, &mainwnd::file_save)));
     m_menu_file->items().push_back(MenuElem("Save _as...",
                                             sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ32_FORMAT, c_no_export_sequence)));
-    m_menu_file->items().push_back(MenuElem("Open _setlist...",
-                                            mem_fun(*this, &mainwnd::file_open_setlist)));
 
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("O_ptions...",
@@ -318,7 +323,6 @@ mainwnd::mainwnd(perform *a_p):
     m_sigpipe[0] = -1;
     m_sigpipe[1] = -1;
     install_signal_handlers();
-    update_recent_files_menu();
 }
 
 
