@@ -2236,6 +2236,7 @@ void perform::output_func()
                  * then reset to adjusted starting  */
                 if ( m_playback_mode && !m_jack_running && !m_usemidiclock && m_reposition)
                 {
+                    current_tick = clock_tick;      // needed if looping unchecked while global_is_running
                     delta_tick = m_starting_tick - clock_tick;
                     init_clock=true;                // must set to send EVENT_MIDI_SONG_POS
                     m_starting_tick = m_left_tick;  // restart at left marker
