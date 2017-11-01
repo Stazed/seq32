@@ -1510,7 +1510,7 @@ void perform::position_jack( bool a_state, long a_tick )
 
     if(global_is_running)
         m_reposition = false;
-
+    
 #endif // JACK_SUPPORT
 }
 
@@ -2240,6 +2240,7 @@ void perform::output_func()
                     init_clock=true;                // must set to send EVENT_MIDI_SONG_POS
                     m_starting_tick = m_left_tick;  // restart at left marker
                     m_reposition = false;
+                    m_reset_tempo_list = true;      // since we cleared it as we went along
                 }  
                 
                 /* default if jack is not compiled in, or not running */
@@ -2291,6 +2292,9 @@ void perform::output_func()
 
                         set_orig_ticks( get_left_tick() );
                         current_tick = (double) get_left_tick() + leftover_tick;
+                        
+                        if(!m_jack_running)
+                            m_reset_tempo_list = true; // since we cleared it as we went along
                     }
 #ifdef JACK_SUPPORT
                     else
@@ -3178,6 +3182,11 @@ jack_timebase_callback
 
         long ticks_per_bar = long(pos->ticks_per_beat * pos->beats_per_bar);
         pos->bar_start_tick = int(pos->bar * ticks_per_bar);
+        
+        if(new_pos)
+        {
+            p->set_tempo_reset(true);
+        }
     }
     else                            // live mode - only use start bpm
     {
