@@ -513,6 +513,7 @@ public:
     };
 
     void set_reposition(bool a_pos_type = true);
+    bool get_reposition();
 
     void set_sequence_control_status( int a_status );
     void unset_sequence_control_status( int a_status );

@@ -539,6 +539,15 @@ mainwnd::timer_callback(  )
         m_mainperf->m_setlist_stop_mark = false;
         setlist_jump(1);    // next file
     }
+    
+    /* Shut off the reposition flag after the reposition */
+    if (!global_is_running)
+    {
+        if((m_mainperf->get_starting_tick() == m_mainperf->get_tick()) && m_mainperf->get_reposition())
+        {
+            m_mainperf->set_reposition(false);
+        }
+    }
         
     return true;
 }

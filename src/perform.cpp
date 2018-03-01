@@ -509,6 +509,11 @@ void perform::set_reposition(bool a_pos_type)
     m_reposition = a_pos_type;
 }
 
+bool perform::get_reposition()
+{
+    return m_reposition;
+}
+
 void perform::set_song_mute( mute_op op  )
 {
     for (int i=0; i< c_max_sequence; i++ )
@@ -562,7 +567,7 @@ perform::start_playing()
         // song mode
         if(m_jack_master)
         {
-           if(!m_reposition)    // allow to start at key-p position if set
+           if(m_reposition)    // allow to start at key-p position if set
                 position_jack(true, m_left_tick);     // for cosmetic reasons - to stop transport line flicker on start
         }
         start_jack( );
@@ -1979,10 +1984,8 @@ void perform::output_func()
         double jack_ticks_delta = 0.0;
         if(m_jack_running && m_jack_master && m_playback_mode) // song mode master start left tick marker
         {
-            if(!m_reposition)                                  // allow to start if key-p set
+            if(m_reposition)                                  // allow to start if key-p set
                 position_jack(true, m_left_tick);
-            else
-                m_reposition = false;
         }
 
         if(m_jack_running && m_jack_master && !m_playback_mode)// live mode master start at zero
@@ -2228,13 +2231,13 @@ void perform::output_func()
                     /* printf( "current_tick[%lf] delta[%lf]\n", current_tick, jack_ticks_delta ); */
 
                 } /* end if dumping / sane state */
-            } /* if jack running */
+            } /* if m_jack_running */
             else
             {
 #endif // JACK_SUPPORT
                 /* if we reposition key-p, FF, rewind, adjust delta_tick for change
                  * then reset to adjusted starting  */
-                if ( m_playback_mode && !m_jack_running && !m_usemidiclock && m_reposition)
+                if ( m_playback_mode && !m_usemidiclock && m_reposition)
                 {
                     current_tick = clock_tick;      // needed if looping unchecked while global_is_running
                     delta_tick = m_starting_tick - clock_tick;
@@ -2489,7 +2492,10 @@ void perform::output_func()
         if(!m_usemidiclock) // will be true if stopped by midi event
         {
             if(m_playback_mode && !m_jack_running) // song mode default
-                m_tick = m_left_tick;
+            {
+                set_starting_tick(m_left_tick);
+                set_reposition();
+            }
 
             if(!m_playback_mode && !m_jack_running) // live mode default
                 m_tick = 0;
