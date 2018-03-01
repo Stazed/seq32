@@ -286,6 +286,9 @@ private:
     bool m_reset_tempo_list;
     bool m_load_tempo_list;
     
+    /* Allow continue on stop for sysex control */
+    bool m_sysex_continue;
+    
     /**
      *  Holds a few MIDI file-names most recently used.  Although this is a
      *  vector, we do not let it grow past c_max_recent_files.

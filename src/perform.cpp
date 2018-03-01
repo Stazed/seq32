@@ -186,6 +186,7 @@ perform::perform()
     m_jack_stop_tick = 0;
     m_reset_tempo_list = false;
     m_load_tempo_list = false;
+    m_sysex_continue = false;
 
     m_offset = 0;
     m_control_status = 0;
@@ -617,7 +618,7 @@ perform::FF_rewind()
     else
     {
         set_starting_tick(a_tick);          // this will set progress line
-        set_reposition();
+        set_reposition();                   // this is needed for ff/rw when running (global_is_running)
     }
 }
 
@@ -2488,8 +2489,11 @@ void perform::output_func()
 #ifdef JACK_SUPPORT
         if(m_playback_mode && m_jack_master) // master in song mode
         {
-           // if(!m_reposition)                // FIXME allows for continue option sysex only for now
-            position_jack(m_playback_mode,m_left_tick);
+            if(!m_sysex_continue)
+                position_jack(m_playback_mode,m_left_tick);
+            else
+                m_sysex_continue = false;
+            
         }
         if(!m_playback_mode && m_jack_running && m_jack_master) // master in live mode
         {
@@ -2500,8 +2504,16 @@ void perform::output_func()
         {
             if(m_playback_mode && !m_jack_running) // song mode default
             {
-                set_starting_tick(m_left_tick);
-                set_reposition();
+                if(!m_sysex_continue)
+                {
+                    set_starting_tick(m_left_tick);
+                //    set_reposition();
+                }
+                else
+                {
+                    m_sysex_continue = false;
+                    set_starting_tick(m_tick);
+                }
             }
 
             if(!m_playback_mode && !m_jack_running) // live mode default
@@ -2916,7 +2928,7 @@ void perform::parse_sysex(event a_e)
         break;
 
     case SYS_YPT300_STOP:
-        set_reposition(true);                   // allow to continue where stopped
+        m_sysex_continue = true;                // allow to continue where stopped
         stop_playing();
         break;
 
