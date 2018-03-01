@@ -656,6 +656,11 @@ bool perform::is_jack_running()
     return m_jack_running;
 }
 
+bool perform::is_jack_master()
+{
+    return m_jack_master;
+}
+
 void perform::set_follow_transport(bool a_set)
 {
     m_follow_transport = a_set;
@@ -1423,6 +1428,8 @@ void perform::position_jack( bool a_state, long a_tick )
     //printf( "perform::position_jack()\n" );
 
 #ifdef JACK_SUPPORT
+    if(m_list_no_stop_markers.empty())
+        return;
 
     uint64_t current_tick = 0;
 
