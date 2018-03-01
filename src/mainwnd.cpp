@@ -1553,6 +1553,7 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 
                 // we miss the keyup msg for learn, force set it off
                 m_mainperf->unset_mode_group_learn();
+                global_is_modified = true;
             }
             else
             {
