@@ -115,7 +115,7 @@ perfnames::draw_sequence( int sequence )
 
         if ( sequence % c_seqs_in_set == 0 )
         {
-            char ss[3];
+            char ss[10];
             snprintf(ss, sizeof(ss), "%2d", sequence / c_seqs_in_set );
 
             m_gc->set_foreground(m_white);
