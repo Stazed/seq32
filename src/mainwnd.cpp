@@ -1536,43 +1536,46 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         if (m_mainperf->is_learn_mode() &&
                 a_ev->keyval != m_mainperf->m_key_group_learn)
         {
-            if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
+            if (a_ev->state & GDK_SHIFT_MASK )
             {
-                std::ostringstream os;
-                os << "Key \""
-                   << gdk_keyval_name(a_ev->keyval)
-                   << "\" (code = "
-                   << a_ev->keyval
-                   << ") successfully mapped.";
+                if( m_mainperf->get_key_groups()->count( a_ev->keyval ) != 0 )
+                {
+                    std::ostringstream os;
+                    os << "Key \""
+                       << gdk_keyval_name(a_ev->keyval)
+                       << "\" (code = "
+                       << a_ev->keyval
+                       << ") successfully mapped.";
 
-                Gtk::MessageDialog dialog(*this,
-                                          "MIDI mute group learn success", false,
-                                          Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
-                dialog.set_secondary_text(os.str(), false);
-                dialog.run();
+                    Gtk::MessageDialog dialog(*this,
+                                              "MIDI mute group learn success", false,
+                                              Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+                    dialog.set_secondary_text(os.str(), false);
+                    dialog.run();
 
-                // we miss the keyup msg for learn, force set it off
-                m_mainperf->unset_mode_group_learn();
-                global_is_modified = true;
-            }
-            else
-            {
-                std::ostringstream os;
-                os << "Key \""
-                   << gdk_keyval_name(a_ev->keyval)
-                   << "\" (code = "
-                   << a_ev->keyval
-                   << ") is not one of the configured mute-group keys.\n"
-                   << "To change this see File/Options menu or .seq32rc";
+                    // we miss the keyup msg for learn, force set it off
+                    m_mainperf->unset_mode_group_learn();
+                    global_is_modified = true;
+                }
+                else
+                {
+                    std::ostringstream os;
+                    os << "Key \""
+                       << gdk_keyval_name(a_ev->keyval)
+                       << "\" (code = "
+                       << a_ev->keyval
+                       << ") is not one of the configured mute-group keys.\n"
+                       << "To change this see File/Options menu or .seq32rc";
 
-                Gtk::MessageDialog dialog(*this,
-                                          "MIDI mute group learn failed", false,
-                                          Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+                    Gtk::MessageDialog dialog(*this,
+                                              "MIDI mute group learn failed", false,
+                                              Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
 
-                dialog.set_secondary_text(os.str(), false);
-                dialog.run();
-                // we miss the keyup msg for learn, force set it
-                m_mainperf->unset_mode_group_learn();
+                    dialog.set_secondary_text(os.str(), false);
+                    dialog.run();
+                    // we miss the keyup msg for learn, force set it
+                    m_mainperf->unset_mode_group_learn();
+                }
             }
         }
 
