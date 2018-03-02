@@ -108,6 +108,7 @@ private:
     Button      *m_button_stop;
     Button      *m_button_play;
 
+    ToggleButton *m_button_continue;
     ToggleButton *m_button_loop;
     ToggleButton *m_button_jack;
     ToggleButton *m_button_follow;
@@ -148,6 +149,7 @@ private:
     void on_realize ();
 
     void start_playing ();
+    void set_continue_callback();
     void stop_playing ();
     void rewind(bool a_press);
     void fast_forward(bool a_press);

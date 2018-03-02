@@ -186,7 +186,7 @@ perform::perform()
     m_jack_stop_tick = 0;
     m_reset_tempo_list = false;
     m_load_tempo_list = false;
-    m_sysex_continue = false;
+    m_continue = false;
 
     m_offset = 0;
     m_control_status = 0;
@@ -589,6 +589,12 @@ perform::stop_playing()
 {
     stop_jack();
     stop();
+}
+
+void
+perform::set_continue(bool a_set)
+{
+    m_continue = a_set;
 }
 
 void
@@ -2489,11 +2495,8 @@ void perform::output_func()
 #ifdef JACK_SUPPORT
         if(m_playback_mode && m_jack_master) // master in song mode
         {
-            if(!m_sysex_continue)
+            if(!m_continue)
                 position_jack(m_playback_mode,m_left_tick);
-            else
-                m_sysex_continue = false;
-            
         }
         if(!m_playback_mode && m_jack_running && m_jack_master) // master in live mode
         {
@@ -2504,14 +2507,13 @@ void perform::output_func()
         {
             if(m_playback_mode && !m_jack_running) // song mode default
             {
-                if(!m_sysex_continue)
+                if(!m_continue)
                 {
                     set_starting_tick(m_left_tick);
-                //    set_reposition();
+                    set_reposition();
                 }
                 else
                 {
-                    m_sysex_continue = false;
                     set_starting_tick(m_tick);
                 }
             }
@@ -2928,7 +2930,6 @@ void perform::parse_sysex(event a_e)
         break;
 
     case SYS_YPT300_STOP:
-        m_sysex_continue = true;                // allow to continue where stopped
         stop_playing();
         break;
 

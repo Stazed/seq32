@@ -286,8 +286,8 @@ private:
     bool m_reset_tempo_list;
     bool m_load_tempo_list;
     
-    /* Allow continue on stop for sysex control */
-    bool m_sysex_continue;
+    /* Allow continue on stop */
+    bool m_continue;
     
     /**
      *  Holds a few MIDI file-names most recently used.  Although this is a
@@ -374,6 +374,7 @@ public:
 
     void start_playing();
     void stop_playing();
+    void set_continue(bool a_set);
 
     void FF_rewind();
 

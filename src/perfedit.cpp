@@ -261,16 +261,24 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_button_loop->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( loop_xpm ))));
     m_button_loop->signal_toggled().connect(  mem_fun( *this, &perfedit::set_looped ));
     add_tooltip( m_button_loop, "Play looped between L and R." );
-
+    
+    m_button_continue = manage( new ToggleButton( "S" ) );
+    m_button_continue->signal_toggled().connect(  mem_fun( *this, &perfedit::set_continue_callback ));
+    add_tooltip( m_button_continue, "Toggle to set 'Stop/Pause' button method.\n"
+            "If set to 'S', stopping transport will reposition to 'L' mark.\n"
+            "If set to 'P', stopping transport will not reposition to 'L' mark." );
+    
+    m_button_continue->set_active( false );
+    
     m_button_stop = manage( new Button() );
     m_button_stop->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( stop_xpm ))));
     m_button_stop->signal_clicked().connect( mem_fun( *this, &perfedit::stop_playing));
-    add_tooltip( m_button_stop, "Stop playing." );
+    add_tooltip( m_button_stop, "Stop/Pause playing." );
 
     m_button_play = manage( new Button() );
     m_button_play->add(*manage( new Image(Gdk::Pixbuf::create_from_xpm_data( play2_xpm ))));
     m_button_play->signal_clicked().connect(  mem_fun( *this, &perfedit::start_playing));
-    add_tooltip( m_button_play, "Begin playing at L marker." );
+    add_tooltip( m_button_play, "Begin/Continue playing." );
 
 #ifdef JACK_SUPPORT
     m_button_jack = manage( new ToggleButton() );
@@ -295,6 +303,7 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_hlbox->pack_end( *m_button_redo, false, false );
     m_hlbox->pack_end( *m_button_undo, false, false );
 
+    m_hlbox->pack_start( *m_button_continue, false, false );
     m_hlbox->pack_start( *m_button_stop, false, false );
     m_hlbox->pack_start( *m_button_play, false, false );
     m_hlbox->pack_start( *m_button_loop, false, false );
@@ -496,6 +505,21 @@ perfedit::start_playing()
 {
     m_mainperf->set_start_from_perfedit(true);
     m_mainperf->start_playing();
+}
+
+void
+perfedit::set_continue_callback()
+{
+    m_mainperf->set_continue(m_button_continue->get_active());
+    bool is_active = m_button_continue->get_active();
+    
+    std::string label = is_active ? "P" : "S";
+    Gtk::Label * lblptr(dynamic_cast<Gtk::Label *>
+    (
+         m_button_continue->get_child())
+    );
+    if (lblptr != NULL)
+        lblptr->set_text(label);
 }
 
 void
