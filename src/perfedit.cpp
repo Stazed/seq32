@@ -122,22 +122,16 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
         m_button_time_type,
         "Toggles between B:B:T and H:M:S format, showing the selected format."
     );
- 
-    hbox4->pack_start(*m_button_time_type, false, false);
 
-    Gtk::Label * timedummy = manage(new Gtk::Label("   "));
-    hbox4->pack_start(*timedummy, false, false, 0);
-    hbox4->pack_start(*m_tick_time, false, false, 0);
+    hbox4->pack_start(*m_button_time_type, false, false, 5);
+    hbox4->pack_start(*m_tick_time, false, false, 10);
 
     m_table->attach( *m_hlbox,  0, 3, 0, 1,  Gtk::FILL, Gtk::SHRINK, 2, 0 ); // shrink was 0
 
     m_table->attach( *m_perfnames,    0, 1, 3, 4, Gtk::SHRINK, Gtk::FILL );
     m_table->attach( *m_tempo, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK );
     
-//    Label* tempolabel = manage(new Label("TEMPO")); // FIXME
-//    m_table->attach( *tempolabel,0,1,1,2, Gtk::SHRINK, Gtk::SHRINK);
-    
-    m_table->attach( *hbox4, 0,1,1,3, Gtk::SHRINK, Gtk::SHRINK);
+    m_table->attach( *hbox4, 0,1,1,3, Gtk::FILL, Gtk::SHRINK);
     
     m_table->attach( *m_perftime, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK );
     m_table->attach( *m_perfroll, 1, 2, 3, 4,
