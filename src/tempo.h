@@ -104,6 +104,19 @@ private:
 
     void change_horz();
     void set_tempo_marker(long a_tick);
+    
+    /* Sequencer64 */
+    inline double
+    ticks_to_delta_time_us (long delta_ticks, double bpm, int ppqn)
+    {
+        return double(delta_ticks) * pulse_length_us(bpm, ppqn);
+    }
+    
+    inline double
+    pulse_length_us (double bpm, int ppqn)
+    {
+        return 60000000.0 / ppqn / bpm;
+    }
 
 public:
 

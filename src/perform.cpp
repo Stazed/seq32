@@ -633,6 +633,11 @@ void perform::set_start_from_perfedit( bool a_start )
     m_start_from_perfedit = a_start;
 }
 
+bool perform::get_start_from_perfedit()
+{
+    return m_start_from_perfedit;
+}
+
 void perform::toggle_song_mode()
 {
     if(global_song_start_mode)

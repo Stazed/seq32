@@ -545,6 +545,7 @@ mainwnd::timer_callback(  )
     {
         if((m_mainperf->get_starting_tick() == m_mainperf->get_tick()) && m_mainperf->get_reposition())
         {
+            m_perf_edit->update_clock();        // for reposition update
             m_mainperf->set_reposition(false);
         }
     }

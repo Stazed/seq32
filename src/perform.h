@@ -79,8 +79,9 @@ struct tempo_mark
     uint32_t bw;            // not used
     uint32_t bp_measure;    // not used
     uint32_t start;         // calculated frame offset start - jack_nframes_t
+    double microseconds_start; // calculated offset for clock display
     
-    tempo_mark ( ) : tick ( 0 ), bpm ( 0.0 ), bw ( 0 ), bp_measure ( 0 ), start ( 0 )
+    tempo_mark ( ) : tick ( 0 ), bpm ( 0.0 ), bw ( 0 ), bp_measure ( 0 ), start ( 0 ), microseconds_start( 0.0 )
         {
         }
 };
@@ -379,6 +380,7 @@ public:
     void FF_rewind();
 
     void set_start_from_perfedit(bool a_start);
+    bool get_start_from_perfedit();
     void toggle_song_mode();
     void toggle_jack_mode();
     void set_jack_mode(bool a_mode);

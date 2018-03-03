@@ -136,6 +136,27 @@ private:
     int m_snap;
     int m_bp_measure;
     int m_bw;
+    
+    /** From sequencer64
+     *  Shows the current time into the song performance.
+     */
+
+    Gtk::Label * m_tick_time;
+    /**
+     *  This button will toggle the m_tick_time_as_bbt member.
+     */
+
+    Gtk::Button * m_button_time_type;
+
+    /**
+     *  Indicates whether to show the time as bar:beats:ticks or as
+     *  hours:minutes:seconds.  The default is true:  bar:beats:ticks.
+     */
+
+    bool m_tick_time_as_bbt;
+    
+    /* Flag used when time type is toggled when stopped to update gui */
+    bool m_toggle_time_type;
 
     void bp_measure_button_callback(int a_beats_per_measure);
     void bw_button_callback(int a_beat_width);
@@ -158,6 +179,8 @@ private:
     void set_jack_mode();
 
     void xpose_button_callback( int a_xpose);
+    
+    void toggle_time_format( );
 
     void expand ();
     void collapse ();
@@ -168,6 +191,25 @@ private:
     void popup_menu (Menu * a_menu);
 
     bool timeout ();
+  
+    double tempo_map_microseconds(unsigned long a_tick);
+    
+    /* Sequencer64 */
+    inline double
+    ticks_to_delta_time_us (long delta_ticks, double bpm, int ppqn)
+    {
+        return double(delta_ticks) * pulse_length_us(bpm, ppqn);
+    }
+    
+    inline double
+    pulse_length_us (double bpm, int ppqn)
+    {
+        return 60000000.0 / ppqn / bpm;
+    }
+    
+    std::string tick_to_timestring(long a_tick);
+    std::string tick_to_measurestring (long a_tick);
+    void tick_to_midi_measures (long a_tick, int &measures, int &beats, int &divisions);
 
     bool on_delete_event (GdkEventAny * a_event);
     bool on_key_press_event(GdkEventKey* a_ev);
@@ -197,6 +239,8 @@ public:
     
     void load_tempo_list();
     void reset_tempo_list(bool play_list_only);
+    
+    void update_clock();
 
     friend int FF_RW_timeout(void *arg);
 

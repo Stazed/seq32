@@ -62,6 +62,8 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
 
     m_mainperf = a_perf;
     m_mainwnd = a_main;
+    m_tick_time_as_bbt = false;
+    m_toggle_time_type = true;      // set true to show clock on start
 
     /* main window */
     set_title( "seq32 - Song Editor");
@@ -103,14 +105,39 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     add_tooltip( m_button_grow, "Increase size of Grid." );
 
     /* fill table */
+    
+    m_tick_time = manage(new Gtk::Label(""));
+    m_button_time_type = manage(new Gtk::Button("HMS"));
+    Gtk::HBox * hbox4 = manage(new Gtk::HBox(false, 0));
+    m_tick_time->set_justify(Gtk::JUSTIFY_LEFT);
+    
+    m_button_time_type->set_focus_on_click(false);
+    
+    m_button_time_type->signal_clicked().connect
+    (
+        mem_fun(*this, &perfedit::toggle_time_format)
+    );
+    add_tooltip
+    (
+        m_button_time_type,
+        "Toggles between B:B:T and H:M:S format, showing the selected format."
+    );
+ 
+    hbox4->pack_start(*m_button_time_type, false, false);
+
+    Gtk::Label * timedummy = manage(new Gtk::Label("   "));
+    hbox4->pack_start(*timedummy, false, false, 0);
+    hbox4->pack_start(*m_tick_time, false, false, 0);
 
     m_table->attach( *m_hlbox,  0, 3, 0, 1,  Gtk::FILL, Gtk::SHRINK, 2, 0 ); // shrink was 0
 
     m_table->attach( *m_perfnames,    0, 1, 3, 4, Gtk::SHRINK, Gtk::FILL );
     m_table->attach( *m_tempo, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK );
     
-    Label* tempolabel = manage(new Label("TEMPO",0, Gtk::ALIGN_END)); // FIXME
-    m_table->attach( *tempolabel,0,1,1,2, Gtk::SHRINK, Gtk::SHRINK);
+//    Label* tempolabel = manage(new Label("TEMPO")); // FIXME
+//    m_table->attach( *tempolabel,0,1,1,2, Gtk::SHRINK, Gtk::SHRINK);
+    
+    m_table->attach( *hbox4, 0,1,1,3, Gtk::SHRINK, Gtk::SHRINK);
     
     m_table->attach( *m_perftime, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK );
     m_table->attach( *m_perfroll, 1, 2, 3, 4,
@@ -834,6 +861,13 @@ perfedit::timeout()
         m_button_redo->set_sensitive(true);
     else
         m_button_redo->set_sensitive(false);
+    
+    /* Calculate the current time/BBT, and display it. */
+    if (global_is_running /*|| m_mainperf->get_reposition() */|| m_toggle_time_type)
+    {
+        m_toggle_time_type = false;
+        update_clock();
+    }
 
     return true;
 }
@@ -848,6 +882,127 @@ perfedit::on_delete_event(GdkEventAny *a_event)
 {
     return false;
 }
+
+void 
+perfedit::update_clock()
+{
+    long ticks = m_mainperf->get_tick();
+    if (m_tick_time_as_bbt)
+    {
+        std::string t = tick_to_measurestring(ticks);
+        m_tick_time->set_text(t);
+    }
+    else
+    {
+        std::string t = tick_to_timestring(ticks); 
+        m_tick_time->set_text(t);
+    }
+}
+
+double
+perfedit::tempo_map_microseconds(unsigned long a_tick)
+{
+    /* live mode - we ignore tempo changes so use the first tempo only */
+    if(!global_song_start_mode && !m_mainperf->get_start_from_perfedit())
+    {
+        tempo_mark first_tempo = (* m_mainperf->m_list_no_stop_markers.begin());
+        return ticks_to_delta_time_us (a_tick, first_tempo.bpm, c_ppqn);
+    }
+    
+    /* song mode - cycle through tempo map */
+    double hold_microseconds = 0;
+    
+    list<tempo_mark>::iterator i;
+    tempo_mark last_tempo = (*--m_mainperf->m_list_no_stop_markers.end());
+    
+    for ( i = ++m_mainperf->m_list_no_stop_markers.begin(); i != m_mainperf->m_list_no_stop_markers.end(); ++i )
+    {
+        if( a_tick >= (*i).tick )
+        {
+            hold_microseconds = (*i).microseconds_start;
+        }
+        else
+        {
+            last_tempo = (*--i);
+            break;
+        }
+    }
+    
+    uint64_t end_tick = a_tick - last_tempo.tick;
+   
+    return hold_microseconds + ticks_to_delta_time_us (end_tick, last_tempo.bpm, c_ppqn);
+}
+
+std::string
+perfedit::tick_to_timestring (long a_tick)
+{
+    unsigned long microseconds = tempo_map_microseconds(a_tick);
+    int seconds = int(microseconds / 1000000UL);
+    int minutes = seconds / 60;
+    int hours = seconds / (60 * 60);
+    minutes -= hours * 60;
+    seconds -= (hours * 60 * 60) + (minutes * 60);
+    microseconds -= (hours * 60 * 60 + minutes * 60 + seconds) * 1000000UL;
+
+    char tmp[32];
+    snprintf(tmp, sizeof tmp, "%03d:%d:%02d   ", hours, minutes, seconds);
+    return std::string(tmp);
+}
+
+void
+perfedit::tick_to_midi_measures ( long a_tick, int &measures, int &beats, int &divisions )
+{
+    static const double s_epsilon = 0.000001;   /* HMMMMMMMMMMMMMMMMMMMMMMM */
+    int W = m_mainperf->get_bw();
+    int P = c_ppqn;
+    int B = m_mainperf->get_bp_measure();
+    bool result = (W > 0) && (P > 0) && (B > 0);
+    if (result)
+    {
+        double m = a_tick * W / (4.0 * P * B);       /* measures, whole.frac     */
+        double m_whole = floor(m);              /* holds integral measures  */
+        m -= m_whole;                           /* get fractional measure   */
+        double b = m * B;                       /* beats, whole.frac        */
+        double b_whole = floor(b);              /* get integral beats       */
+        b -= b_whole;                           /* get fractional beat      */
+        double pulses_per_beat = 4 * P / W;     /* pulses/qn * qn/beat      */
+        measures = (int(m_whole + s_epsilon) + 1);
+        beats = (int(b_whole + s_epsilon) + 1);
+        divisions = (int(b * pulses_per_beat + s_epsilon));
+    }
+}
+
+std::string
+perfedit::tick_to_measurestring (long a_tick )
+{
+    int measures = 0;
+    int beats = 0;
+    int divisions = 0;
+
+    char tmp[32];
+
+    tick_to_midi_measures( a_tick, measures, beats, divisions );
+    snprintf
+    (
+        tmp, sizeof tmp, "%03d:%d:%03d",
+        measures, beats, divisions
+    );
+    return std::string(tmp);
+}
+
+void
+perfedit::toggle_time_format ()
+{
+    m_tick_time_as_bbt = ! m_tick_time_as_bbt;
+    std::string label = m_tick_time_as_bbt ? "BBT" : "HMS" ;
+    Gtk::Label * lbl(dynamic_cast<Gtk::Label *>(m_button_time_type->get_child()));
+    if (lbl != NULL)
+    {
+        lbl->set_text(label);
+        m_toggle_time_type = true;
+    }
+}
+
 
 int
 FF_RW_timeout(void *arg)
