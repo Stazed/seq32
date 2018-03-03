@@ -124,7 +124,7 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     );
 
     hbox4->pack_start(*m_button_time_type, false, false, 5);
-    hbox4->pack_start(*m_tick_time, false, false, 10);
+    hbox4->pack_start(*m_tick_time, false, false, 5);
 
     m_table->attach( *m_hlbox,  0, 3, 0, 1,  Gtk::FILL, Gtk::SHRINK, 2, 0 ); // shrink was 0
 
@@ -897,7 +897,7 @@ double
 perfedit::tempo_map_microseconds(unsigned long a_tick)
 {
     /* live mode - we ignore tempo changes so use the first tempo only */
-    if(!global_song_start_mode && !m_mainperf->get_start_from_perfedit())
+    if(!global_song_start_mode && !m_mainperf->get_start_from_perfedit() && !m_mainperf->get_reposition())
     {
         tempo_mark first_tempo = (* m_mainperf->m_list_no_stop_markers.begin());
         return ticks_to_delta_time_us (a_tick, first_tempo.bpm, c_ppqn);
