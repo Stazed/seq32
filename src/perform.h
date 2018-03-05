@@ -21,6 +21,7 @@
 #pragma once
 
 class perform;
+class mainwnd;
 
 #include <vector>
 #include "globals.h"
@@ -193,6 +194,9 @@ private:
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
     
+    /* mainwnd pointer */
+    mainwnd *m_mainwnd;
+    
     bool m_seqs_active[ c_max_sequence ];
 
     bool m_was_active_main[ c_max_sequence ];
@@ -308,6 +312,9 @@ public:
     {
         return m_mode_group_learn;
     }
+    
+    void set_mainwnd(mainwnd * a_main);
+    void update_bpm_main();
 
     // can register here for events...
     std::vector<performcallback*> m_notify;

@@ -320,6 +320,7 @@ mainwnd::mainwnd(perform *a_p):
                             mem_fun(*this, &mainwnd::timer_callback), 25);
 
     m_perf_edit = new perfedit( m_mainperf, this );
+    m_mainperf->set_mainwnd(this);
 
     m_sigpipe[0] = -1;
     m_sigpipe[1] = -1;

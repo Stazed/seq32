@@ -21,6 +21,7 @@
 #include "perform.h"
 #include "midibus.h"
 #include "event.h"
+#include "mainwnd.h"
 #include <stdio.h>
 #ifndef __WIN32__
 #  include <time.h>
@@ -47,6 +48,7 @@ perform::perform()
         m_was_active_names[i] = false;
     }
 
+    m_mainwnd = NULL;
     m_setjump = 0;
     m_setlist_stop_mark = false;
     m_setlist_mode = false;
@@ -2578,11 +2580,13 @@ void perform::handle_midi_control( int a_control, bool a_state )
     case c_midi_control_bpm_up:
         //printf ( "bpm up\n" );
         set_bpm( get_bpm() + 1 );
+        update_bpm_main();
         break;
 
     case c_midi_control_bpm_dn:
         //printf ( "bpm dn\n" );
         set_bpm( get_bpm() - 1 );
+        update_bpm_main();
         break;
 
     case c_midi_control_ss_up:
@@ -3595,3 +3599,13 @@ bool perform::set_setlist_index(int index)
     return true;
 }
 
+void perform::set_mainwnd(mainwnd * a_main)
+{
+    m_mainwnd = a_main;
+}
+
+void perform::update_bpm_main()
+{
+    if(m_mainwnd != NULL)
+        m_mainwnd->update_start_BPM();
+}
