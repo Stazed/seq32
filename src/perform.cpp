@@ -378,6 +378,7 @@ bool perform::clear_all()
     m_list_play_marker.clear();
     m_list_total_marker.clear();
     m_list_no_stop_markers.clear();
+    m_list_file_load_marker.clear();
     
     /* For legacy seq24 files, the bp_measure and bw were not saved, so all
      * of them had only 4 / 4 time signature on perfedit. We need to clear any
@@ -891,6 +892,7 @@ mastermidibus* perform::get_master_midi_bus( )
 
 void perform::set_bpm(double a_bpm)
 {
+    //printf("set bpm perform %f\n", a_bpm);
     if ( a_bpm < c_bpm_minimum ) a_bpm = c_bpm_minimum;
     if ( a_bpm > c_bpm_maximum ) a_bpm = c_bpm_maximum;
 
@@ -1595,18 +1597,8 @@ perform::set_tempo_reset(bool a_reset)
     m_reset_tempo_list = a_reset;
 }
 
-bool
-perform::get_tempo_load()
-{
-    return m_load_tempo_list;
-}
-
-void
-perform::set_tempo_load(bool a_load)
-{
-    m_load_tempo_list = a_load;
-}
-
+/* set_start_tempo - used for file loading by mainwnd open_file() and
+ * file_import_dialog(). Also new_file() sets this to default value. */
 void
 perform::set_start_tempo(double a_bpm)
 {
@@ -1622,13 +1614,12 @@ perform::set_start_tempo(double a_bpm)
     {
         (*m_list_total_marker.begin())= marker;
     }
-        
-    set_tempo_load(true);
 }
 
 double
 perform::get_start_tempo()
 {
+    //printf("get_start_tempo - perform %f\n",m_list_total_marker.begin()->bpm);
     return m_list_total_marker.begin()->bpm;
 }
 

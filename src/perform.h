@@ -319,9 +319,10 @@ public:
     list < tempo_mark > m_list_play_marker;
     
     /* m_list_total_marker contains all markers including stops.
-     * Used for file saving and loading. Contains stop markers.
      * Should always = m_list_marker in the tempo() class.
-     * Only adjusted when new marker is set or removed by user  */
+     * Adjusted when new marker is set or removed by user
+     * from file loading. Updated from the tempo class function,
+     * reset_tempo_list() and perform set_start_tempo(). */
     list < tempo_mark > m_list_total_marker;
     
     /* m_list_no_stop_markers contains only playing markers (no stops).
@@ -329,6 +330,11 @@ public:
      * Also used in output_func() when jack is running.
      * Only adjusted when new marker is set or removed by user */
     list < tempo_mark > m_list_no_stop_markers;
+    
+    /* m_list_file_load_marker is used exclusively for file loading to
+     * update the tempo class tempo map > m_list_marker. The items loaded
+     * come from the midifile class, parse() function. */
+    list < tempo_mark > m_list_file_load_marker;
 
     /* for undo/redo */
     stack < list < tempo_mark > >m_list_undo;
@@ -473,8 +479,6 @@ public:
     
     bool get_tempo_reset();
     void set_tempo_reset(bool a_reset);
-    bool get_tempo_load();
-    void set_tempo_load(bool a_load);
     double get_start_tempo();
     void set_start_tempo(double a_bpm);
     

@@ -385,10 +385,11 @@ tempo::add_marker(tempo_mark a_mark)
     unlock();
 }
 
-/* Called by mainwnd spinbutton callback & key-bind */
+/* Called by non native midifile &  mainwnd spinbutton callback & key-bind */
 void
 tempo::set_start_BPM(double a_bpm)
 {
+    //printf("set_start_BPM - Tempo %f\n", a_bpm);
     if ( a_bpm < c_bpm_minimum ) a_bpm = c_bpm_minimum;
     if ( a_bpm > c_bpm_maximum ) a_bpm = c_bpm_maximum;
     
@@ -432,12 +433,25 @@ tempo::reset_tempo_list(bool play_list_only)
 void
 tempo::load_tempo_list()
 {
-    m_list_marker = m_mainperf->m_list_total_marker;    // update tempo class
-    reset_tempo_list();                                 // needed to update m_list_no_stop_markers & calculate start frames
+    m_list_marker = m_mainperf->m_list_file_load_marker;    // update tempo class
+    reset_tempo_list();                                     // needed to update m_list_no_stop_markers & calculate start frames
+    //printf("load_tempo_list bpm %f\n", m_list_marker.begin()->bpm);
+    m_mainperf->set_bpm(m_list_marker.begin()->bpm);
     queue_draw();
 }
 
-/* calculates for jack frame */
+/* Clear the tempo map and set default start bpm.
+   Called by mainwnd->perfedit, new file and load file to clear previous tempo items */
+void
+tempo::clear_tempo_list()
+{
+    m_list_marker.clear();
+    m_current_mark.bpm = c_bpm;
+    m_current_mark.tick = STARTING_MARKER;
+    add_marker(m_current_mark);
+}
+
+/* calculates for jack frame marker start offset and wall clock display microsecond start offset. */
 void
 tempo::calculate_marker_start()
 {

@@ -133,6 +133,7 @@ public:
     void set_start_BPM(double a_bpm);
     void reset_tempo_list(bool play_list_only = false);
     void load_tempo_list();
+    void clear_tempo_list();
     void calculate_marker_start();
     
     void push_undo(bool a_hold = false);

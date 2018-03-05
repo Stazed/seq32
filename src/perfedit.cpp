@@ -776,6 +776,12 @@ perfedit::update_start_BPM()
 }
 
 void
+perfedit::clear_tempo_list()
+{
+    m_tempo->clear_tempo_list();
+}
+
+void
 perfedit::set_zoom (int z)
 {
     m_perfroll->set_zoom(z);

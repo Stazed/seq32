@@ -26,6 +26,8 @@
 #include <list>
 #include <vector>
 
+class mainwnd;
+
 class midifile
 {
 private:
@@ -63,7 +65,7 @@ public:
 
     ~midifile();
 
-    bool parse( perform *a_perf, int a_screen_set, bool a_import = false );
+    bool parse( perform *a_perf, mainwnd *a_main ,int a_screen_set, bool a_import = false );
     bool write( perform *a_perf, int a_seq );
     bool write_song (perform * a_perf,file_type_e type, int a_solo_track);
 

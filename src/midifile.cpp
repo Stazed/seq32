@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include "midifile.h"
+#include "mainwnd.h"
 #include <gtkmm/messagedialog.h>
 
 midifile::midifile(const Glib::ustring& a_name) :
@@ -85,7 +86,7 @@ midifile::read_var ()
     return ret;
 }
 
-bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
+bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool a_import)
 {
     /* open binary file */
     ifstream file(m_name.c_str(), ios::in | ios::binary | ios::ate);
@@ -658,6 +659,8 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
         }
     }
     
+    bool use_tempo_map = false;  // false for non native files
+    
     if ((file_size - m_pos) > (int) sizeof (unsigned int))
     {
         /* Get ID + Length */
@@ -666,7 +669,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
         {
             tempo_mark a_marker;
             long length = read_long();
-            bool use_tempo_map = true;  // true by default, means not imported
+            use_tempo_map = true;  // true means not imported, native seq32 file
             
             if(length > 0)
             {
@@ -674,7 +677,7 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
                     use_tempo_map = verify_tempo_map();
                 
                 if(use_tempo_map)
-                    a_perf->m_list_total_marker.clear();
+                    a_perf->m_list_file_load_marker.clear();
             }
             
             /* if use_tempo_map is false we should still run through the reads in case additional tags are added later */
@@ -692,10 +695,13 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
                 a_marker.bp_measure = read_long();
                 // we don't need start frame since it will be calculated on reset
                 if(use_tempo_map)
-                    a_perf->m_list_total_marker.push_back(a_marker);
+                    a_perf->m_list_file_load_marker.push_back(a_marker);
             }
             if(use_tempo_map)
-                a_perf->set_tempo_load(true);
+            {
+                //printf("midifile load tempo list\n");
+                a_main->load_tempo_list();      // updates perfedit > tempo marker list.
+            }
         }
     }
 
@@ -703,9 +709,14 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
     
     if(!a_import)   // always load tempo/time-sig when NOT imported
     {
-        a_perf->set_bpm(bpm);
-        a_perf->set_bp_measure(bp_measure);
-        a_perf->set_bw(bw);
+        if(!use_tempo_map)          // not native seq32 and older seq32 files without tempo map
+        {
+            //printf("!use_tempo_map - midifile\n");
+            a_perf->set_bpm(bpm);           // this updates perform midibus
+            a_main->update_start_BPM();     // this updates perfedit start tempo mark
+        }
+        a_main->set_bp_measure(bp_measure);
+        a_main->set_bw(bw);
     }
     else    // imported file - verify if user wants to change project tempo/time-sig
     {
@@ -721,9 +732,14 @@ bool midifile::parse (perform * a_perf, int a_screen_set, bool a_import)
         {
             if(verify_change_tempo_timesig(bpm, bp_measure, bw))
             {
-                a_perf->set_bpm(bpm);
-                a_perf->set_bp_measure(bp_measure);
-                a_perf->set_bw(bw);
+                if(!use_tempo_map)  // not native seq32 and older seq32 files without tempo map
+                {
+                    //printf("!use_tempo_map - midifile\n");
+                    a_perf->set_bpm(bpm);           // this updates perform midibus
+                    a_main->update_start_BPM();     // this updates perfedit start tempo mark
+                }
+                a_main->set_bp_measure(bp_measure);
+                a_main->set_bw(bw);
             }
         }
     }

@@ -456,16 +456,6 @@ mainwnd::timer_callback(  )
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
     }
 
-    if ( m_perf_edit->get_bp_measure() != m_mainperf->get_bp_measure())
-    {
-        m_perf_edit->set_bp_measure(m_mainperf->get_bp_measure());
-    }
-
-    if ( m_perf_edit->get_bw() != m_mainperf->get_bw())
-    {
-        m_perf_edit->set_bw( m_mainperf->get_bw());
-    }
-
     if ( m_adjust_ss->get_value() !=  m_mainperf->get_screenset() )
     {
         m_main_wid->set_screenset(m_mainperf->get_screenset());
@@ -511,16 +501,9 @@ mainwnd::timer_callback(  )
         }
     }
     
-    if(m_mainperf->get_tempo_load())    /* file loading */
-    {
-        m_mainperf->set_tempo_load(false);
-        m_perf_edit->load_tempo_list();
-        /* reset the m_mainperf bpm for display purposes, not changing the list value*/
-        m_mainperf->set_bpm(m_mainperf->get_start_tempo());
-    }
-    
     if(m_mainperf->get_tempo_reset())   /* play tempo markers */
     {
+        //printf("tempo reset main - set bpm\n");
         m_perf_edit->reset_tempo_list(true); // true for updating play_list only, no need to recalc here
         m_mainperf->set_tempo_reset(false);
         /* reset the m_mainperf bpm for display purposes, not changing the list value*/
@@ -552,7 +535,7 @@ mainwnd::timer_callback(  )
             m_mainperf->set_reposition(false);
         }
     }
-        
+    
     return true;
 }
 
@@ -669,7 +652,10 @@ void mainwnd::new_file()
         m_perf_edit->set_bp_measure(4);
         m_perf_edit->set_bw(4);
         m_perf_edit->set_xpose(0);
-        m_mainperf->set_start_tempo(c_bpm);
+        m_perf_edit->clear_tempo_list();
+        m_mainperf->set_start_tempo(c_bpm);     // update tempo map start marker
+        m_mainperf->set_bpm(c_bpm);             // update perform midibus - need this to update perfedit tempo mark
+        update_start_BPM();                     // update perfedit tempo markers - this loads based on perform midi bus setting above
         m_mainperf->set_setlist_mode(false);
 
         m_main_wid->reset();
@@ -839,10 +825,11 @@ bool mainwnd::open_file(const Glib::ustring& fn)
     /* reset everything to default */
     if(m_mainperf->clear_all())
     {
+        m_perf_edit->clear_tempo_list();
         m_perf_edit->set_xpose(0);
 
         midifile f(fn);
-        result = f.parse(m_mainperf, 0);
+        result = f.parse(m_mainperf, this, 0);
 
         global_is_modified = !result; /* this means good file = NOT modified and bad = modified?? */
 
@@ -1195,7 +1182,7 @@ mainwnd::file_import_dialog()
              * The flag is used to trigger the verification pop-up on changed tempo/time-sig
              * for imported files only */
 
-            if(f.parse( m_mainperf, (int) m_adjust_load_offset->get_value(), true ))
+            if(f.parse( m_mainperf, this, (int) m_adjust_load_offset->get_value(), true ))
                 last_used_dir = dialog.get_filename().substr(0, dialog.get_filename().rfind("/") + 1);
             else return;
         }
@@ -1368,6 +1355,7 @@ mainwnd::adj_callback_bpm( )
 {
     if(m_mainperf->get_bpm() !=  m_adjust_bpm->get_value())
     {
+        //printf("adj_callback_bpm - mainwnd\n");
         m_mainperf->set_bpm( m_adjust_bpm->get_value());
         global_is_modified = true;
         m_perf_edit->update_start_BPM();
@@ -1810,4 +1798,28 @@ mainwnd::signal_action(Glib::IOCondition condition)
         break;
     }
     return true;
+}
+
+void
+mainwnd::load_tempo_list()
+{
+    m_perf_edit->load_tempo_list();
+}
+
+void
+mainwnd::set_bp_measure(int bp_measure)
+{
+    m_perf_edit->set_bp_measure(bp_measure);
+}
+
+void
+mainwnd::set_bw(int bw)
+{
+    m_perf_edit->set_bw(bw);
+}
+
+void
+mainwnd::update_start_BPM()
+{
+    m_perf_edit->update_start_BPM();
 }
