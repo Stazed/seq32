@@ -36,6 +36,7 @@
 #include "pixmaps/perfedit.xpm"
 #include "pixmaps/seq32.xpm"
 #include "pixmaps/seq32_32.xpm"
+#include "pixmaps/seq32_setlist.xpm"
 #include "pixmaps/menu.xpm"
 
 bool global_is_running = false;
@@ -139,10 +140,10 @@ mainwnd::mainwnd(perform *a_p):
                                             mem_fun(*this, &mainwnd::about_dialog)));
 
     /* top line items */
-    HBox *tophbox = manage( new HBox( false, 0 ) );
-    tophbox->pack_start(*manage(new Image(
-                                    Gdk::Pixbuf::create_from_xpm_data(seq32_xpm))),
-                        false, false);
+    tophbox = manage( new HBox( false, 0 ) );
+    
+    m_image_seq32 = manage(new Image( Gdk::Pixbuf::create_from_xpm_data(seq32_xpm)));
+    tophbox->pack_start(*m_image_seq32, false, false);
 
     m_button_mode = manage( new ToggleButton( " Live " ) );
     m_button_mode->set_can_focus(false);
@@ -397,8 +398,10 @@ bool mainwnd::setlist_jump(int jmp, bool a_verify)
     }
     
     if(!result)                                             // if errors occured above
+    {
         update_window_title();
-    
+        update_window_xpm();
+    }
     return result;
 }
 
@@ -675,6 +678,7 @@ void mainwnd::new_file()
 
         global_filename = "";
         update_window_title();
+        update_window_xpm();
         global_is_modified = false;
     }
     else
@@ -773,6 +777,7 @@ void mainwnd::file_save_as( file_type_e type, int a_seq )
         {
             global_filename = fname;
             update_window_title();
+            update_window_xpm();
             save_file();
         }
         else                            // export song triggers, solo track or solo trigger
@@ -861,6 +866,7 @@ bool mainwnd::open_file(const Glib::ustring& fn)
         }
         
         update_window_title();
+        update_window_xpm();
 
         m_main_wid->reset();
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
@@ -948,12 +954,17 @@ void mainwnd::choose_file(const bool setlist_mode)
             }
             
             update_window_title();
+            update_window_xpm();
         }
         else
         {
             m_mainperf->set_setlist_mode(setlist_mode); // setlist_mode is false to clear flag
             if(!open_file(dialog.get_filename()))
+            {
                 update_window_title();                  // since we cleared flag above but fail does not update
+                update_window_xpm();
+            }
+                
         }
         break;
     default:
@@ -1111,6 +1122,7 @@ mainwnd::load_recent_file (int index)
         if (is_save())
         {
             std::string filepath = m_mainperf->recent_file(index, false);
+            m_mainperf->set_setlist_mode(false);  // shut off setlist when new file is loaded outside of setlist
             open_file(filepath);
         }
     }
@@ -1692,6 +1704,29 @@ mainwnd::update_window_title()
         else
             m_perf_edit->set_title("seq32 - Song Editor");
     }  
+}
+
+/* This changes the main window logo .xpm when in setlist mode and back */
+void
+mainwnd::update_window_xpm()
+{
+    tophbox->remove(*m_image_seq32);
+    
+    if(m_mainperf->get_setlist_mode())
+    {
+        m_image_seq32 = manage(new Image( Gdk::Pixbuf::create_from_xpm_data(seq32_xpm_setlist)));
+    }
+    else
+    {
+        m_image_seq32 = manage(new Image( Gdk::Pixbuf::create_from_xpm_data(seq32_xpm)));
+    }
+
+    if(m_image_seq32 != NULL)
+    {
+        tophbox->pack_start(*m_image_seq32, false, false);
+        tophbox->reorder_child(*m_image_seq32, 0);
+        m_image_seq32->show();
+    }
 }
 
 int mainwnd::m_sigpipe[2];

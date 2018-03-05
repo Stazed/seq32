@@ -54,9 +54,12 @@ private:
 #endif
     MenuBar  *m_menubar;
     Menu     *m_menu_file;
-    Menu     *m_menu_recent;          /**< File/Recent menu popup.    */
+    Menu     *m_menu_recent;        /* File/Recent menu popup.    */
     Menu     *m_menu_edit;
     Menu     *m_menu_help;
+    
+    Gtk::HBox *tophbox;
+    Gtk::Image * m_image_seq32;     /* Image for Mainwindow logo.   */
 
     mainwid  *m_main_wid;
     maintime *m_main_time;
@@ -115,6 +118,7 @@ private:
     void open_performance_edit();
     void sequence_key( int a_seq );
     void update_window_title();
+    void update_window_xpm();
     void toLower(basic_string<char>&);
     void file_new();
     void file_open();
