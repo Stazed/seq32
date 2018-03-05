@@ -499,6 +499,12 @@ tempo::calculate_marker_start()
     unlock();
 }
 
+double
+tempo::pulse_length_us (double bpm, int ppqn)
+{
+    return 60000000.0 / ppqn / bpm / ( 4.0 / m_perfedit->get_bw());
+}
+
 #ifdef SEQ42_UNDO_TEMPO
 void
 tempo::push_undo(bool a_hold)

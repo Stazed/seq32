@@ -204,7 +204,7 @@ private:
     inline double
     pulse_length_us (double bpm, int ppqn)
     {
-        return 60000000.0 / ppqn / bpm;
+        return 60000000.0 / ppqn / bpm / ( 4.0 / m_bw);
     }
     
     std::string tick_to_timestring(long a_tick);
