@@ -26,11 +26,12 @@
 #include "config.h"
 #endif
 
+#ifdef LASH_SUPPORT     // after config above which defines this
 #include "perform.h"
 
-#ifdef LASH_SUPPORT
+class mainwnd;
 #include <lash/lash.h>
-#endif // LASH_SUPPORT
+
 
 /* all the ifdef skeleton work is done in this class in such a way that any
  * other part of the code can use this class whether or not lash support is
@@ -39,19 +40,18 @@
 class lash
 {
 private:
-#ifdef LASH_SUPPORT
     perform       *m_perform;
+    mainwnd       *m_mainwnd;
     lash_client_t *m_client;
 
     bool process_events();
     void handle_event(lash_event_t* conf);
     void handle_config(lash_config_t* conf);
 
-#endif // LASH_SUPPORT
 
 public:
     lash(int *argc, char ***argv);
-
+    void set_mainwnd(mainwnd * a_main);
     void set_alsa_client_id(int id);
     void start(perform* perform);
 };
@@ -59,3 +59,4 @@ public:
 
 /* global lash driver, defined in seq32.cpp and used in midibus.cpp*/
 extern lash *lash_driver;
+#endif // LASH_SUPPORT

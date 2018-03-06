@@ -18,17 +18,16 @@
 //
 //-----------------------------------------------------------------------------
 
+#include "lash.h"       // for config file which defines LASH_SUPPORT
+
+#ifdef LASH_SUPPORT
 #include <string>
 #include <sigc++/slot.h>
 #include <gtkmm.h>
-
-#include "lash.h"
 #include "midifile.h"
-
 
 lash::lash(int *argc, char ***argv)
 {
-#ifdef LASH_SUPPORT
     m_perform = NULL;
 
     m_client = lash_init(lash_extract_args(argc, argv), PACKAGE_NAME,
@@ -46,28 +45,27 @@ lash::lash(int *argc, char ***argv)
         lash_send_event(m_client, event);
         printf("[Connected to LASH]\n");
     }
-#endif // LASH_SUPPORT
+}
+
+void
+lash::set_mainwnd(mainwnd * a_main)
+{
+    m_mainwnd = a_main;
 }
 
 void
 lash::set_alsa_client_id(int id)
 {
-#ifdef LASH_SUPPORT
     lash_alsa_client_id(m_client, id);
-#endif
 }
 
 void
 lash::start(perform* perform)
 {
-#ifdef LASH_SUPPORT
     m_perform = perform;
     /* Process any LASH events every 250 msec (arbitrarily chosen interval) */
     Glib::signal_timeout().connect(sigc::mem_fun(*this, &lash::process_events), 250);
-#endif // LASH_SUPPORT
 }
-
-#ifdef LASH_SUPPORT
 
 bool
 lash::process_events()
@@ -100,7 +98,7 @@ lash::handle_event(lash_event_t* ev)
     else if (type == LASH_Restore_File)
     {
         midifile f(str + "/seq32.mid");
-        f.parse(m_perform, 0);
+        f.parse(m_perform, m_mainwnd, 0 );
         lash_send_event(m_client, lash_event_new_with_type(LASH_Restore_File));
     }
     else if (type == LASH_Quit)
