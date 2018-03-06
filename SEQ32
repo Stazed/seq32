@@ -63,7 +63,8 @@ on the list, in order, and if errors are encountered, will stop and indicate the
 Select 'No' or escape key if the setlist has previously been verified. If the verification is
 successful, no pop-up errors will occur, and the first file on the list will be loaded.
 
-When setlist mode is in effect, the main window title and song editor title will indicate "Setlist" and
+When setlist mode is in effect, the main window SEQ32 logo will turn blue with a red "PLAYLIST" overlay.
+In addition, the main window title and song editor title will indicate "Setlist" and
 the current song and numeric value listed in the setlist file ex:
 
     "seq32 - Setlist, Song 03 - [/home/username/seq32dir/file3.midi]"
@@ -81,9 +82,9 @@ in your home directory. Go to File/Options/Keyboard to set the 'Setlist next' an
 During setlist play, when the transport is stopped by a Stop marker, the setlist song will 
 automatically be incremented down by one song. (See STOP markers above).
 
-To shut off setlist mode, simply load a new file from the main menu, File, New or
-File, Open. You could also quit and restart. The main window title will no longer
-show the "Setlist, Song XX" listing.
+To shut off setlist mode, simply load a new file from the main menu, File/New or
+File/Open. You could also quit and restart. The main window title will no longer
+show the "Setlist, Song XX" listing, and the main window SEQ32 logo will reset to black.
 
 If editing while in setlist mode, you will NOT be prompted to save changes when moving
 to a new song on the list. If unsaved, all editing will be lost! So if editing in setlist
