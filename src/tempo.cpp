@@ -509,7 +509,8 @@ tempo::calculate_marker_start()
 double
 tempo::pulse_length_us (double bpm, int ppqn)
 {
-    return 60000000.0 / ppqn / bpm / ( 4.0 / m_perfedit->get_bw());
+    double bw = (double) m_perfedit->get_bw();
+    return 60000000.0 / ppqn / bpm * ( bw / 4.0 );
 }
 
 #ifdef SEQ42_UNDO_TEMPO
