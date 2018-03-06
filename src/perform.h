@@ -288,9 +288,6 @@ private:
     bool m_jack_master;
     long m_jack_stop_tick;
     
-    bool m_reset_tempo_list;
-    bool m_load_tempo_list;
-    
     /* Allow continue on stop */
     bool m_continue;
     
@@ -483,9 +480,9 @@ public:
     void unset_mode_group_mute ();
     void start( bool a_state );
     void stop();
+ 
+    void reset_tempo_play_marker_list();
     
-    bool get_tempo_reset();
-    void set_tempo_reset(bool a_reset);
     double get_start_tempo();
     void set_start_tempo(double a_bpm);
     

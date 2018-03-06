@@ -809,12 +809,6 @@ perfedit::load_tempo_list()
 }
 
 void
-perfedit::reset_tempo_list(bool play_list_only)
-{
-    m_tempo->reset_tempo_list(play_list_only);
-}
-
-void
 perfedit::on_realize()
 {
     // we need to do the default realize

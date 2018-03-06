@@ -239,7 +239,6 @@ public:
     void toggle_follow_transport();
     
     void load_tempo_list();
-    void reset_tempo_list(bool play_list_only);
     
     void update_clock();
 

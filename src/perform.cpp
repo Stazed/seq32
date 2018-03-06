@@ -186,8 +186,6 @@ perform::perform()
     m_key_setlist_prev = GDK_Left;
 
     m_jack_stop_tick = 0;
-    m_reset_tempo_list = false;
-    m_load_tempo_list = false;
     m_continue = false;
 
     m_offset = 0;
@@ -1583,20 +1581,15 @@ void perform::stop()
 //        return;
 //    }
 
-    m_reset_tempo_list = true; // since we cleared it as we went along
+    reset_tempo_play_marker_list();
     inner_stop();
 }
 
-bool
-perform::get_tempo_reset()
-{
-    return m_reset_tempo_list;
-}
-
 void
-perform::set_tempo_reset(bool a_reset)
+perform::reset_tempo_play_marker_list()
 {
-    m_reset_tempo_list = a_reset;
+    m_list_play_marker = m_list_total_marker;
+    set_bpm(get_start_tempo());         // set midibus to starting value
 }
 
 /* set_start_tempo - used for file loading by mainwnd open_file() and
@@ -2256,7 +2249,7 @@ void perform::output_func()
                     init_clock=true;                // must set to send EVENT_MIDI_SONG_POS
                     m_starting_tick = m_left_tick;  // restart at left marker
                     m_reposition = false;
-                    m_reset_tempo_list = true;      // since we cleared it as we went along
+                    reset_tempo_play_marker_list();  // since we cleared it as we went along
                 }  
                 
                 /* default if jack is not compiled in, or not running */
@@ -2310,7 +2303,9 @@ void perform::output_func()
                         current_tick = (double) get_left_tick() + leftover_tick;
                         
                         if(!m_jack_running)
-                            m_reset_tempo_list = true; // since we cleared it as we went along
+                        {
+                            reset_tempo_play_marker_list();  // since we cleared it as we went along
+                        }
                     }
 #ifdef JACK_SUPPORT
                     else
@@ -2580,13 +2575,13 @@ void perform::handle_midi_control( int a_control, bool a_state )
     case c_midi_control_bpm_up:
         //printf ( "bpm up\n" );
         set_bpm( get_bpm() + 1 );
-        update_bpm_main();
+        update_bpm_main();          // update tempo marker list & perfedit markers
         break;
 
     case c_midi_control_bpm_dn:
         //printf ( "bpm dn\n" );
         set_bpm( get_bpm() - 1 );
-        update_bpm_main();
+        update_bpm_main();          // update tempo marker list & perfedit markers
         break;
 
     case c_midi_control_ss_up:
@@ -3212,7 +3207,7 @@ jack_timebase_callback
         
         if(new_pos)
         {
-            p->set_tempo_reset(true);
+            p->reset_tempo_play_marker_list();
         }
     }
     else                            // live mode - only use start bpm

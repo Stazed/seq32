@@ -411,22 +411,15 @@ tempo::set_start_BPM(double a_bpm)
  * the start marker bpm spin. Also on initial file loading, undo / redo.
  * also when measures are changed */
 void
-tempo::reset_tempo_list(bool play_list_only)
+tempo::reset_tempo_list()
 {
-    if(play_list_only)
-    {
-        m_mainperf->m_list_play_marker = m_list_marker;
-    }
-    else
-    {
-        lock();
-        calculate_marker_start();
+    lock();
+    calculate_marker_start();
 
-        m_mainperf->m_list_play_marker = m_list_marker;
-        m_mainperf->m_list_total_marker = m_list_marker;
-        m_mainperf->m_list_no_stop_markers = m_list_no_stop_markers;
-        unlock();
-    }
+    m_mainperf->m_list_play_marker = m_list_marker;
+    m_mainperf->m_list_total_marker = m_list_marker;
+    m_mainperf->m_list_no_stop_markers = m_list_no_stop_markers;
+    unlock();
 }
 
 /* file loading & undo / redo on import */

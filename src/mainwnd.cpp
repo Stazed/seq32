@@ -452,6 +452,7 @@ mainwnd::timer_callback(  )
     m_main_time->idle_progress( ticks );
     m_main_wid->update_markers( ticks );
 
+    /* this is used in 2 places:  midi bpm update and reset_tempo_play_marker_list() */
     if ( m_adjust_bpm->get_value() != m_mainperf->get_bpm())
     {
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
@@ -500,15 +501,6 @@ mainwnd::timer_callback(  )
                 set_tap_button(0);
             }
         }
-    }
-    
-    if(m_mainperf->get_tempo_reset())   /* play tempo markers */
-    {
-        //printf("tempo reset main - set bpm\n");
-        m_perf_edit->reset_tempo_list(true); // true for updating play_list only, no need to recalc here
-        m_mainperf->set_tempo_reset(false);
-        /* reset the m_mainperf bpm for display purposes, not changing the list value*/
-        m_mainperf->set_bpm(m_mainperf->get_start_tempo());
     }
 
     /* perfedit left, right arrow keys for setlist */
@@ -657,6 +649,7 @@ void mainwnd::new_file()
         m_mainperf->set_start_tempo(c_bpm);     // update tempo map start marker
         m_mainperf->set_bpm(c_bpm);             // update perform midibus - need this to update perfedit tempo mark
         update_start_BPM();                     // update perfedit tempo markers - this loads based on perform midi bus setting above
+        m_adjust_bpm->set_value( m_mainperf->get_bpm());    // update the mainwnd BPM spinner to start
         m_mainperf->set_setlist_mode(false);
 
         m_main_wid->reset();
@@ -1801,6 +1794,7 @@ mainwnd::signal_action(Glib::IOCondition condition)
     return true;
 }
 
+/* update tempo class thru perfedit for file loading of tempo map */
 void
 mainwnd::load_tempo_list()
 {
