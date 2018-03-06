@@ -449,15 +449,15 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 
-        if(m_mainperf->get_setlist_mode())
+        if(m_mainperf->get_playlist_mode())
         {
-            if(a_ev->keyval == m_mainperf->m_key_setlist_prev)
+            if(a_ev->keyval == m_mainperf->m_key_playlist_prev)
             {
                 m_mainperf->m_setjump = -1;
                 return true;
             }
 
-            if(a_ev->keyval == m_mainperf->m_key_setlist_next)
+            if(a_ev->keyval == m_mainperf->m_key_playlist_next)
             {
                 m_mainperf->m_setjump = 1;
                 return true;

@@ -36,7 +36,7 @@
 #include "pixmaps/perfedit.xpm"
 #include "pixmaps/seq32.xpm"
 #include "pixmaps/seq32_32.xpm"
-#include "pixmaps/seq32_setlist.xpm"
+#include "pixmaps/seq32_playlist.xpm"
 #include "pixmaps/menu.xpm"
 
 bool global_is_running = false;
@@ -91,8 +91,8 @@ mainwnd::mainwnd(perform *a_p):
                                             mem_fun(*this, &mainwnd::file_open)));
     update_recent_files_menu();
     
-    m_menu_file->items().push_back(MenuElem("Open _setlist...",
-                                            mem_fun(*this, &mainwnd::file_open_setlist)));
+    m_menu_file->items().push_back(MenuElem("Open _playlist...",
+                                            mem_fun(*this, &mainwnd::file_open_playlist)));
     
     m_menu_file->items().push_back(SeparatorElem());
     
@@ -341,9 +341,9 @@ mainwnd::~mainwnd()
 }
 
 /*
- * move through the setlist (jmp is 0 on start and 1 if right arrow, -1 for left arrow)
+ * move through the playlist (jmp is 0 on start and 1 if right arrow, -1 for left arrow)
  */
-bool mainwnd::setlist_jump(int jmp, bool a_verify)
+bool mainwnd::playlist_jump(int jmp, bool a_verify)
 {
     if(global_is_running)                       // don't allow jump if running
         return false;
@@ -351,19 +351,19 @@ bool mainwnd::setlist_jump(int jmp, bool a_verify)
     bool result = false;
     if(a_verify)                                // we will run through all the files
     {
-        m_mainperf->set_setlist_index(0);       // start at zero
+        m_mainperf->set_playlist_index(0);      // start at zero
         jmp = 0;                                // to get the first one
     }
 
     while(1)
     {
-        if(m_mainperf->set_setlist_index(m_mainperf->get_setlist_index() + jmp))
+        if(m_mainperf->set_playlist_index(m_mainperf->get_playlist_index() + jmp))
         {
-            if(Glib::file_test(m_mainperf->get_setlist_current_file(), Glib::FILE_TEST_EXISTS))
+            if(Glib::file_test(m_mainperf->get_playlist_current_file(), Glib::FILE_TEST_EXISTS))
             {
-                if(open_file(m_mainperf->get_setlist_current_file()))
+                if(open_file(m_mainperf->get_playlist_current_file()))
                 {
-                    if(a_verify)    // verify whole setlist
+                    if(a_verify)    // verify whole playlist
                     {
                         jmp = 1;    // after the first one set to 1 for jump
                         continue;   // keep going till the end of list
@@ -373,20 +373,20 @@ bool mainwnd::setlist_jump(int jmp, bool a_verify)
                 }
                 else
                 {
-                    Glib::ustring message = "Setlist file open error\n";
-                    message += m_mainperf->get_setlist_current_file();
+                    Glib::ustring message = "Playlist file open error\n";
+                    message += m_mainperf->get_playlist_current_file();
                     m_mainperf->error_message_gtk(message);
-                    m_mainperf->set_setlist_mode(false);    // abandon ship
+                    m_mainperf->set_playlist_mode(false);    // abandon ship
                     result = false;
                     break;  
                 }
             }
             else
             {
-                Glib::ustring message = "Midi setlist file does not exist\n";
-                message += m_mainperf->get_setlist_current_file();
+                Glib::ustring message = "Midi playlist file does not exist\n";
+                message += m_mainperf->get_playlist_current_file();
                 m_mainperf->error_message_gtk(message);
-                m_mainperf->set_setlist_mode(false);        // abandon ship
+                m_mainperf->set_playlist_mode(false);        // abandon ship
                 result = false;
                 break;  
             }
@@ -407,9 +407,9 @@ bool mainwnd::setlist_jump(int jmp, bool a_verify)
 }
 
 bool
-mainwnd::verify_setlist_dialog()
+mainwnd::verify_playlist_dialog()
 {
-    Gtk::MessageDialog warning("Do you wish the verify the setlist?\n",
+    Gtk::MessageDialog warning("Do you wish the verify the playlist?\n",
                        false,
                        Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
 
@@ -424,17 +424,17 @@ mainwnd::verify_setlist_dialog()
 }
 
 void
-mainwnd::setlist_verify()
+mainwnd::playlist_verify()
 {
     bool result = false;
     
-    result = setlist_jump(0,true);              // true is verify mode
+    result = playlist_jump(0,true);             // true is verify mode
     
     if(result)                                  // everything loaded
     {
-        m_mainperf->set_setlist_index(0);       // set to start
-        setlist_jump(0);                        // load the first file
-        printf("Setlist verification was successful!\n");
+        m_mainperf->set_playlist_index(0);      // set to start
+        playlist_jump(0);                       // load the first file
+        printf("Playlist verification was successful!\n");
     }
     else                                        // verify failed somewhere
     {
@@ -503,20 +503,20 @@ mainwnd::timer_callback(  )
         }
     }
 
-    /* perfedit left, right arrow keys for setlist */
+    /* perfedit left, right arrow keys for playlist */
     if(m_mainperf->m_setjump)
     {
-        setlist_jump(m_mainperf->m_setjump);
+        playlist_jump(m_mainperf->m_setjump);
         m_mainperf->m_setjump=0;
     }
     
     /* when in set list mode, tempo stop markers trigger set file increment.
      We have to let the transport completely stop before doing the 
      file loading or strange things happen*/
-    if(m_mainperf->m_setlist_stop_mark && !global_is_running)
+    if(m_mainperf->m_playlist_stop_mark && !global_is_running)
     {
-        m_mainperf->m_setlist_stop_mark = false;
-        setlist_jump(1);    // next file
+        m_mainperf->m_playlist_stop_mark = false;
+        playlist_jump(1);    // next file
     }
     
     /* Shut off the reposition flag after the reposition */
@@ -650,7 +650,7 @@ void mainwnd::new_file()
         m_mainperf->set_bpm(c_bpm);             // update perform midibus - need this to update perfedit tempo mark
         update_start_BPM();                     // update perfedit tempo markers - this loads based on perform midi bus setting above
         m_adjust_bpm->set_value( m_mainperf->get_bpm());    // update the mainwnd BPM spinner to start
-        m_mainperf->set_setlist_mode(false);
+        m_mainperf->set_playlist_mode(false);
 
         m_main_wid->reset();
         m_entry_notes->set_text( * m_mainperf->get_screen_set_notepad(
@@ -840,7 +840,7 @@ bool mainwnd::open_file(const Glib::ustring& fn)
         last_used_dir = fn.substr(0, fn.rfind("/") + 1);
         global_filename = fn;
         
-        if(!m_mainperf->get_setlist_mode())            /* don't list files from setlist */
+        if(!m_mainperf->get_playlist_mode())           /* don't list files from playlist */
         {
             m_mainperf->add_recent_file(fn);           /* from Oli Kester's Kepler34/Sequencer 64       */
             update_recent_files_menu();
@@ -878,7 +878,7 @@ void mainwnd::file_open()
 }
 
 /*callback function*/
-void mainwnd::file_open_setlist()
+void mainwnd::file_open_playlist()
 {
     if (is_save())
     {
@@ -886,19 +886,19 @@ void mainwnd::file_open_setlist()
     }
 }
 
-void mainwnd::choose_file(const bool setlist_mode)
+void mainwnd::choose_file(const bool playlist_mode)
 {
     Gtk::FileChooserDialog dialog("Open MIDI file",
                                   Gtk::FILE_CHOOSER_ACTION_OPEN);
     dialog.set_transient_for(*this);
 
-    if(setlist_mode)
-    	dialog.set_title("Open Setlist file");
+    if(playlist_mode)
+    	dialog.set_title("Open Playlist file");
 
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
 
-    if(!setlist_mode)
+    if(!playlist_mode)
     {
         Gtk::FileFilter filter_midi;
         filter_midi.set_name("MIDI files");
@@ -921,20 +921,20 @@ void mainwnd::choose_file(const bool setlist_mode)
     switch(result)
     {
     case(Gtk::RESPONSE_OK):
-        if(setlist_mode)
+        if(playlist_mode)
         {
-            m_mainperf->set_setlist_mode(true);
-            m_mainperf->set_setlist_file(dialog.get_filename());
+            m_mainperf->set_playlist_mode(true);
+            m_mainperf->set_playlist_file(dialog.get_filename());
             
-            if(m_mainperf->get_setlist_mode())  // true means file load with no errors
+            if(m_mainperf->get_playlist_mode())  // true means file load with no errors
             {
-                if(verify_setlist_dialog())
+                if(verify_playlist_dialog())
                 {
-                    setlist_verify();
+                    playlist_verify();
                 }
                 else
                 {
-                    setlist_jump(0);
+                    playlist_jump(0);
                 }
 
                 update_window_title();
@@ -943,7 +943,7 @@ void mainwnd::choose_file(const bool setlist_mode)
         }
         else
         {
-            m_mainperf->set_setlist_mode(setlist_mode); // setlist_mode is false to clear flag
+            m_mainperf->set_playlist_mode(playlist_mode); // playlist_mode is false to clear flag
             if(!open_file(dialog.get_filename()))
             {
                 update_window_title();                  // since we cleared flag above but fail does not update
@@ -971,7 +971,7 @@ bool mainwnd::save_file()
 
     result = f.write(m_mainperf, c_no_export_sequence);
 
-    if (result && !m_mainperf->get_setlist_mode())            /* don't list files from setlist */
+    if (result && !m_mainperf->get_playlist_mode())            /* don't list files from playlist */
     {
         m_mainperf->add_recent_file(global_filename);
         update_recent_files_menu();
@@ -1107,7 +1107,7 @@ mainwnd::load_recent_file (int index)
         if (is_save())
         {
             std::string filepath = m_mainperf->recent_file(index, false);
-            m_mainperf->set_setlist_mode(false);  // shut off setlist when new file is loaded outside of setlist
+            m_mainperf->set_playlist_mode(false);  // shut off playlist when new file is loaded outside of playlist
             open_file(filepath);
         }
     }
@@ -1621,16 +1621,16 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             sequence_key(m_mainperf->lookup_keyevent_seq( a_ev->keyval));
         }
 
-        if(m_mainperf->get_setlist_mode())
+        if(m_mainperf->get_playlist_mode())
         {
-            if ( a_ev->keyval == m_mainperf->m_key_setlist_prev )
+            if ( a_ev->keyval == m_mainperf->m_key_playlist_prev )
             {
-            	setlist_jump(-1);
+            	playlist_jump(-1);
                 return true;
             }
-            if ( a_ev->keyval == m_mainperf->m_key_setlist_next )
+            if ( a_ev->keyval == m_mainperf->m_key_playlist_next )
             {
-            	setlist_jump(1);
+            	playlist_jump(1);
                 return true;
             }
         }
@@ -1655,13 +1655,13 @@ mainwnd::update_window_title()
 {
     std::string title;
 
-    if(m_mainperf->get_setlist_mode())
+    if(m_mainperf->get_playlist_mode())
     {
     	char num[20];
-    	sprintf(num,"%02d",m_mainperf->get_setlist_index() +1);
+    	sprintf(num,"%02d",m_mainperf->get_playlist_index() +1);
     	title =
     		( PACKAGE )
-			+ string(" - Setlist, Song ")
+			+ string(" - Playlist, Song ")
 			+ num
 			+ string(" - [")
             + Glib::filename_to_utf8(global_filename)
@@ -1685,22 +1685,22 @@ mainwnd::update_window_title()
     
     if(m_perf_edit != nullptr)
     {
-        if(m_mainperf->get_setlist_mode())
+        if(m_mainperf->get_playlist_mode())
             m_perf_edit->set_title( title.c_str());
         else
             m_perf_edit->set_title("seq32 - Song Editor");
     }  
 }
 
-/* This changes the main window logo .xpm when in setlist mode and back */
+/* This changes the main window logo .xpm when in playlist mode and back */
 void
 mainwnd::update_window_xpm()
 {
     tophbox->remove(*m_image_seq32);
     
-    if(m_mainperf->get_setlist_mode())
+    if(m_mainperf->get_playlist_mode())
     {
-        m_image_seq32 = manage(new Image( Gdk::Pixbuf::create_from_xpm_data(seq32_xpm_setlist)));
+        m_image_seq32 = manage(new Image( Gdk::Pixbuf::create_from_xpm_data(seq32_xpm_playlist)));
     }
     else
     {

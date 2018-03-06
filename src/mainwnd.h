@@ -122,7 +122,7 @@ private:
     void toLower(basic_string<char>&);
     void file_new();
     void file_open();
-    void file_open_setlist();
+    void file_open_playlist();
     void file_save();
     void file_save_as( file_type_e type, int a_seq );
     void file_exit();
@@ -130,7 +130,7 @@ private:
     void new_file();
     bool save_file();
     void export_midi(const Glib::ustring& fn, file_type_e type, int a_seq);
-    void choose_file(bool setlist_mode = false);
+    void choose_file(bool playlist_mode = false);
     int query_save_changes();
     bool is_save();
     void update_recent_files_menu ();
@@ -159,9 +159,9 @@ public:
     bool on_delete_event(GdkEventAny *a_e);
     bool on_key_press_event(GdkEventKey* a_ev);
     bool on_key_release_event(GdkEventKey* a_ev);
-    bool setlist_jump(int jmp, bool a_verify = false);
-    bool verify_setlist_dialog();
-    void setlist_verify();
+    bool playlist_jump(int jmp, bool a_verify = false);
+    bool verify_playlist_dialog();
+    void playlist_verify();
     void load_tempo_list();
     void set_bp_measure(int bp_measure);
     void set_bw(int bw);

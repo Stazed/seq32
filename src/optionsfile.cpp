@@ -224,10 +224,10 @@ optionsfile::parse( perform *a_perf )
     sscanf( m_line, "%u", &a_perf->m_key_pointer );
     
     next_data_line( &file );
-    sscanf( m_line, "%u", &a_perf->m_key_setlist_next );
+    sscanf( m_line, "%u", &a_perf->m_key_playlist_next );
     
     next_data_line( &file );
-    sscanf( m_line, "%u", &a_perf->m_key_setlist_prev );
+    sscanf( m_line, "%u", &a_perf->m_key_playlist_prev );
     
     next_data_line( &file );
     sscanf( m_line, "%u", &a_perf->m_key_export_trigger );
@@ -581,13 +581,13 @@ optionsfile::write( perform *a_perf  )
          << gdk_keyval_name( a_perf->m_key_pointer )
          << " pointer key\n";
 
-    file << a_perf->m_key_setlist_next << "        # "
-         << gdk_keyval_name( a_perf->m_key_setlist_next )
-         << " setlist next key\n";
+    file << a_perf->m_key_playlist_next << "        # "
+         << gdk_keyval_name( a_perf->m_key_playlist_next )
+         << " playlist next key\n";
     
-    file << a_perf->m_key_setlist_prev << "        # "
-         << gdk_keyval_name( a_perf->m_key_setlist_prev )
-         << " setlist previous key\n";
+    file << a_perf->m_key_playlist_prev << "        # "
+         << gdk_keyval_name( a_perf->m_key_playlist_prev )
+         << " playlist previous key\n";
     
     file << a_perf->m_key_export_trigger << "        # "
          << gdk_keyval_name( a_perf->m_key_export_trigger )
