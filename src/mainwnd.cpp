@@ -925,17 +925,21 @@ void mainwnd::choose_file(const bool setlist_mode)
         {
             m_mainperf->set_setlist_mode(true);
             m_mainperf->set_setlist_file(dialog.get_filename());
-            if(verify_setlist_dialog())
-            {
-                setlist_verify();
-            }
-            else
-            {
-                setlist_jump(0);
-            }
             
-            update_window_title();
-            update_window_xpm();
+            if(m_mainperf->get_setlist_mode())  // true means file load with no errors
+            {
+                if(verify_setlist_dialog())
+                {
+                    setlist_verify();
+                }
+                else
+                {
+                    setlist_jump(0);
+                }
+
+                update_window_title();
+                update_window_xpm();
+            }
         }
         else
         {

@@ -329,13 +329,17 @@ main (int argc, char *argv[])
     {
         p.set_setlist_mode(setlist_mode);
         p.set_setlist_file(setlist_file);
-        if(seq32_window.verify_setlist_dialog())
+        
+        if(p.get_setlist_mode())    // true means file load with no errors
         {
-            seq32_window.setlist_verify();
-        }
-        else
-        {
-            seq32_window.setlist_jump(0);
+            if(seq32_window.verify_setlist_dialog())
+            {
+                seq32_window.setlist_verify();
+            }
+            else
+            {
+                seq32_window.setlist_jump(0);
+            }
         }
     }
 
