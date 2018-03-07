@@ -218,7 +218,7 @@ mainwnd::mainwnd(perform *a_p):
     HBox *bpmhbox = manage(new HBox(false, 4));
     bottomhbox->pack_start(*bpmhbox, Gtk::PACK_SHRINK);
 
-    m_adjust_bpm = manage(new Adjustment(m_mainperf->get_bpm(), c_bpm_minimum, c_bpm_maximum, 1));
+    m_adjust_bpm = manage(new Adjustment(c_bpm, c_bpm_minimum, c_bpm_maximum, 1));
     m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
     m_spinbutton_bpm->set_name( "BPM Edit" );
     m_spinbutton_bpm->set_editable( true );

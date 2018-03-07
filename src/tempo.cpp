@@ -57,7 +57,7 @@ tempo::tempo( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust ) :
 
     set_double_buffered( false );
     
-    m_current_mark.bpm = m_mainperf->get_bpm();
+    m_current_mark.bpm = c_bpm;
     m_current_mark.tick = STARTING_MARKER;
     add_marker(m_current_mark);
 }

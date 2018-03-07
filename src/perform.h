@@ -324,7 +324,7 @@ public:
     
     /* m_list_total_marker contains all markers including stops.
      * Should always = m_list_marker in the tempo() class.
-     * Adjusted when new marker is set or removed by user
+     * Adjusted when new marker is set or removed by user or
      * from file loading. Updated from the tempo class function,
      * reset_tempo_list() and perform set_start_tempo(). */
     list < tempo_mark > m_list_total_marker;
