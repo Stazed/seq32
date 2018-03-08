@@ -48,7 +48,6 @@ perform::perform()
         m_was_active_names[i] = false;
     }
 
-    m_mainwnd = NULL;
     m_setjump = 0;
     m_playlist_stop_mark = false;
     m_playlist_mode = false;
@@ -187,6 +186,7 @@ perform::perform()
 
     m_jack_stop_tick = 0;
     m_continue = false;
+    m_update_perf_edit_tempo_markers = false;
 
     m_offset = 0;
     m_control_status = 0;
@@ -1592,25 +1592,6 @@ perform::reset_tempo_play_marker_list()
     set_bpm(get_start_tempo());         // set midibus to starting value
 }
 
-/* set_start_tempo - used for file loading by mainwnd open_file() and
- * file_import_dialog(). Also new_file() sets this to default value. */
-void
-perform::set_start_tempo(double a_bpm)
-{
-    tempo_mark marker;
-    marker.bpm = a_bpm;
-    marker.tick = STARTING_MARKER;
-    
-    if(!m_list_total_marker.size()) // normal file loading .s32 file size will be zero
-    {
-        m_list_total_marker.push_front(marker);
-    }
-    else                            // midi file import - user wants to change BPM so just load at start
-    {
-        (*m_list_total_marker.begin())= marker;
-    }
-}
-
 double
 perform::get_start_tempo()
 {
@@ -2575,13 +2556,13 @@ void perform::handle_midi_control( int a_control, bool a_state )
     case c_midi_control_bpm_up:
         //printf ( "bpm up\n" );
         set_bpm( get_bpm() + 1 );
-        update_bpm_main();          // update tempo marker list & perfedit markers
+        set_update_perfedit_markers(true);  // used by mainwnd timeout
         break;
 
     case c_midi_control_bpm_dn:
         //printf ( "bpm dn\n" );
         set_bpm( get_bpm() - 1 );
-        update_bpm_main();          // update tempo marker list & perfedit markers
+        set_update_perfedit_markers(true);  // used by mainwnd timeout
         break;
 
     case c_midi_control_ss_up:
@@ -3592,15 +3573,4 @@ bool perform::set_playlist_index(int index)
     m_playlist_current_idx = index;
     
     return true;
-}
-
-void perform::set_mainwnd(mainwnd * a_main)
-{
-    m_mainwnd = a_main;
-}
-
-void perform::update_bpm_main()
-{
-    if(m_mainwnd != NULL)
-        m_mainwnd->update_start_BPM();
 }

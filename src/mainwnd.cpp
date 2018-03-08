@@ -320,7 +320,6 @@ mainwnd::mainwnd(perform *a_p):
                             mem_fun(*this, &mainwnd::timer_callback), 25);
 
     m_perf_edit = new perfedit( m_mainperf, this );
-    m_mainperf->set_mainwnd(this);
 
     m_sigpipe[0] = -1;
     m_sigpipe[1] = -1;
@@ -456,6 +455,13 @@ mainwnd::timer_callback(  )
     if ( m_adjust_bpm->get_value() != m_mainperf->get_bpm())
     {
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
+    }
+    
+    /* For midi control to update perfedit markers on bpm change */
+    if(m_mainperf->get_update_perfedit_markers())
+    {
+        m_mainperf->set_update_perfedit_markers(false);
+        update_start_BPM();
     }
 
     if ( m_adjust_ss->get_value() !=  m_mainperf->get_screenset() )
@@ -646,7 +652,6 @@ void mainwnd::new_file()
         m_perf_edit->set_bw(4);
         m_perf_edit->set_xpose(0);
         m_perf_edit->clear_tempo_list();
-        m_mainperf->set_start_tempo(c_bpm);     // update tempo map start marker
         m_mainperf->set_bpm(c_bpm);             // update perform midibus - need this to update perfedit tempo mark
         update_start_BPM();                     // update perfedit tempo markers - this loads based on perform midi bus setting above
         m_adjust_bpm->set_value( m_mainperf->get_bpm());    // update the mainwnd BPM spinner to start
@@ -852,8 +857,6 @@ bool mainwnd::open_file(const Glib::ustring& fn)
         m_main_wid->reset();
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                                     m_mainperf->get_screenset()));
-        m_adjust_bpm->set_value( m_mainperf->get_bpm());
-        m_mainperf->set_start_tempo(m_mainperf->get_bpm());
     }
     else
     {
@@ -1197,8 +1200,6 @@ mainwnd::file_import_dialog()
         m_main_wid->reset();
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                                     m_mainperf->get_screenset() ));
-        m_adjust_bpm->set_value( m_mainperf->get_bpm() );
-        m_mainperf->set_start_tempo(m_mainperf->get_bpm()); // update tempo list
 
         break;
     }

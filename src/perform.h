@@ -21,7 +21,6 @@
 #pragma once
 
 class perform;
-class mainwnd;
 
 #include <vector>
 #include "globals.h"
@@ -194,9 +193,6 @@ private:
     /* vector of sequences */
     sequence *m_seqs[c_max_sequence];
     
-    /* mainwnd pointer */
-    mainwnd *m_mainwnd;
-    
     bool m_seqs_active[ c_max_sequence ];
 
     bool m_was_active_main[ c_max_sequence ];
@@ -291,6 +287,9 @@ private:
     /* Allow continue on stop */
     bool m_continue;
     
+    /* For midi control to update start bpm of perfedit tempo mark */
+    bool m_update_perf_edit_tempo_markers;
+    
     /**
      *  Holds a few MIDI file-names most recently used.  Although this is a
      *  vector, we do not let it grow past c_max_recent_files.
@@ -310,8 +309,15 @@ public:
         return m_mode_group_learn;
     }
     
-    void set_mainwnd(mainwnd * a_main);
-    void update_bpm_main();
+    void set_update_perfedit_markers(bool a_set)
+    {
+        m_update_perf_edit_tempo_markers = a_set;
+    }
+    
+    bool get_update_perfedit_markers()
+    {
+        return m_update_perf_edit_tempo_markers;
+    }
 
     // can register here for events...
     std::vector<performcallback*> m_notify;
@@ -482,9 +488,7 @@ public:
     void stop();
  
     void reset_tempo_play_marker_list();
-    
     double get_start_tempo();
-    void set_start_tempo(double a_bpm);
     
     void start_jack();
     void stop_jack();
