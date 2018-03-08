@@ -398,11 +398,11 @@ tempo::set_start_BPM(double a_bpm)
     {
 #ifdef SEQ42_UNDO_TEMPO
         push_undo(true);
-        m_mainperf->set_bpm( a_bpm );
 #endif
         m_list_marker.begin()->bpm = a_bpm;
 
         reset_tempo_list();
+        m_mainperf->set_bpm( a_bpm );
         queue_draw();
     }
 }

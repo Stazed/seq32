@@ -451,7 +451,7 @@ mainwnd::timer_callback(  )
     m_main_time->idle_progress( ticks );
     m_main_wid->update_markers( ticks );
 
-    /* this is used in 2 places:  midi bpm update and reset_tempo_play_marker_list() */
+    /* this will trigger the button callback */
     if ( m_adjust_bpm->get_value() != m_mainperf->get_bpm())
     {
         m_adjust_bpm->set_value( m_mainperf->get_bpm());
@@ -652,9 +652,9 @@ void mainwnd::new_file()
         m_perf_edit->set_bw(4);
         m_perf_edit->set_xpose(0);
         m_perf_edit->clear_tempo_list();
-        m_mainperf->set_bpm(c_bpm);             // update perform midibus to default = c_bpm
-        m_perf_edit->update_start_BPM(c_bpm);   // update perfedit tempo markers and tempo class markers
-        m_adjust_bpm->set_value(c_bpm);         // update the mainwnd BPM spinner to start
+        /* The call to update_start_BPM below will set tempo markers, perform midibus,
+         * and update the mainwnd bpm spinner from the mainwnd timeout. */
+        m_perf_edit->update_start_BPM(c_bpm);
         m_mainperf->set_playlist_mode(false);
 
         m_main_wid->reset();
@@ -1355,9 +1355,10 @@ mainwnd::adj_callback_bpm( )
     if(m_mainperf->get_bpm() !=  m_adjust_bpm->get_value())
     {
         //printf("adj_callback_bpm - mainwnd\n");
-        m_mainperf->set_bpm( m_adjust_bpm->get_value());
+
+        /* update_start_BPM() will set perform midibus. */
+        m_perf_edit->update_start_BPM(m_adjust_bpm->get_value());
         global_is_modified = true;
-        m_perf_edit->update_start_BPM(m_mainperf->get_bpm());
     }
 }
 
@@ -1452,22 +1453,21 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 
         if ( a_ev->keyval == m_mainperf->m_key_bpm_dn )
         {
-            m_mainperf->set_bpm( m_mainperf->get_bpm() - 1 );
-            m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
-            m_perf_edit->update_start_BPM(m_mainperf->get_bpm());
+            /* update_start_BPM() will set tempo markers, set perform midibus
+             * and trigger mainwnd timeout to update the mainwnd bpm spinner */
+            m_perf_edit->update_start_BPM(m_mainperf->get_bpm() -1);
         }
 
         if ( a_ev->keyval ==  m_mainperf->m_key_bpm_up )
         {
-            m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
-            m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
-            m_perf_edit->update_start_BPM(m_mainperf->get_bpm());
+            /* update_start_BPM() will set tempo markers, set perform midibus
+             * and trigger mainwnd timeout to update the mainwnd bpm spinner */
+            m_perf_edit->update_start_BPM(m_mainperf->get_bpm() +1);
         }
 
         if (a_ev->keyval  == m_mainperf->m_key_tap_bpm )
         {
             tap();
-            m_perf_edit->update_start_BPM(m_adjust_bpm->get_value());
         }
 
         if ( a_ev->keyval == m_mainperf->m_key_replace )

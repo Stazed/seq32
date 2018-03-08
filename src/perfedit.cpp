@@ -802,6 +802,7 @@ perfedit::toggle_follow_transport()
     m_button_follow->set_active( ! m_button_follow->get_active() );
 }
 
+/* File loading of tempo class tempo markers */
 void 
 perfedit::load_tempo_list()
 {

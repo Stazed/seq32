@@ -699,8 +699,9 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
             }
             if(use_tempo_map)
             {
-                //printf("midifile load tempo list\n");
-                a_main->load_tempo_list();      // updates perfedit > tempo marker list.
+                /* load_tempo_list() will set tempo markers, set perform midibus
+                * and trigger mainwnd timeout to update the mainwnd bpm spinner */
+                a_main->load_tempo_list();
             }
         }
     }
@@ -711,9 +712,9 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
     {
         if(!use_tempo_map)          // not native seq32 and older seq32 files without tempo map
         {
-            //printf("!use_tempo_map - midifile\n");
-            a_perf->set_bpm(bpm);           // this updates perform midibus
-            a_main->update_start_BPM(bpm);     // this updates perfedit start tempo mark
+            /* update_start_BPM() will set tempo markers, set perform midibus
+             * and trigger mainwnd timeout to update the mainwnd bpm spinner */
+            a_main->update_start_BPM(bpm);
         }
         a_main->set_bp_measure(bp_measure);
         a_main->set_bw(bw);
@@ -734,9 +735,9 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
             {
                 if(!use_tempo_map)  // not native seq32 and older seq32 files without tempo map
                 {
-                    //printf("!use_tempo_map - midifile\n");
-                    a_perf->set_bpm(bpm);           // this updates perform midibus
-                    a_main->update_start_BPM(bpm);     // this updates perfedit start tempo mark
+                    /* update_start_BPM() will set tempo markers, set perform midibus
+                    * and trigger mainwnd timeout to update the mainwnd bpm spinner */
+                    a_main->update_start_BPM(bpm);
                 }
                 a_main->set_bp_measure(bp_measure);
                 a_main->set_bw(bw);
