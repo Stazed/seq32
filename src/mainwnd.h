@@ -165,6 +165,6 @@ public:
     void load_tempo_list();
     void set_bp_measure(int bp_measure);
     void set_bw(int bw);
-    void update_start_BPM();
+    void update_start_BPM(double bpm);
     
 };

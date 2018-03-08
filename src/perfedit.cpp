@@ -770,9 +770,9 @@ perfedit::get_bw()
 }
 
 void
-perfedit::update_start_BPM()
+perfedit::update_start_BPM(double bpm)
 {
-    m_tempo->set_start_BPM(m_mainperf->get_bpm());
+    m_tempo->set_start_BPM(bpm);
 }
 
 void

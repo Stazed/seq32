@@ -896,7 +896,8 @@ void perform::set_bpm(double a_bpm)
     if ( a_bpm < c_bpm_minimum ) a_bpm = c_bpm_minimum;
     if ( a_bpm > c_bpm_maximum ) a_bpm = c_bpm_maximum;
 
-    if ( ! (m_jack_running && global_is_running ))
+    /* do not allow start bpm change when sequencer is running, in song mode or when connected to jack transport */
+    if ( ! ( global_is_running && (m_jack_running || m_playback_mode)))
     {
         m_master_bus.set_bpm( a_bpm );
     }
@@ -1449,7 +1450,7 @@ void perform::position_jack( bool a_state, long a_tick )
 
     if(a_state) // master in song mode
     {
-        set_playback_mode(a_state);  // If we are repositioning, then we are on the perfedit - so this must be set if stopped.
+        m_playback_mode = a_state;   // song or live mode - If we are repositioning, then we are on the perfedit, so this must be set if stopped.
         current_tick = a_tick;
     }
 
@@ -1605,7 +1606,7 @@ void perform::inner_start(bool a_state)
 
     if (!global_is_running)
     {
-        set_playback_mode( a_state );
+        m_playback_mode = a_state;
 
         if (a_state)
             off_sequences();
@@ -1686,9 +1687,9 @@ void perform::launch_output_thread()
         m_out_thread_launched= true;
 }
 
-void perform::set_playback_mode( bool a_playback_mode )
+bool perform::get_playback_mode()
 {
-    m_playback_mode = a_playback_mode;
+    return m_playback_mode;
 }
 
 void perform::launch_input_thread()
@@ -2555,14 +2556,14 @@ void perform::handle_midi_control( int a_control, bool a_state )
     {
     case c_midi_control_bpm_up:
         //printf ( "bpm up\n" );
-        set_bpm( get_bpm() + 1 );
-        set_update_perfedit_markers(true);  // used by mainwnd timeout
+        set_bpm( get_bpm() + 1 );           // change midi bus - will trigger mainwnd timeout to update bpm spinner
+        set_update_perfedit_markers(true);  // used by mainwnd timeout to adjust start tempo marker
         break;
 
     case c_midi_control_bpm_dn:
         //printf ( "bpm dn\n" );
-        set_bpm( get_bpm() - 1 );
-        set_update_perfedit_markers(true);  // used by mainwnd timeout
+        set_bpm( get_bpm() - 1 );           // change midi bus - will trigger mainwnd timeout to update bpm spinner
+        set_update_perfedit_markers(true);  // used by mainwnd timeout to adjust start tempo marker
         break;
 
     case c_midi_control_ss_up:

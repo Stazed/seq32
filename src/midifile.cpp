@@ -713,7 +713,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
         {
             //printf("!use_tempo_map - midifile\n");
             a_perf->set_bpm(bpm);           // this updates perform midibus
-            a_main->update_start_BPM();     // this updates perfedit start tempo mark
+            a_main->update_start_BPM(bpm);     // this updates perfedit start tempo mark
         }
         a_main->set_bp_measure(bp_measure);
         a_main->set_bw(bw);
@@ -736,7 +736,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                 {
                     //printf("!use_tempo_map - midifile\n");
                     a_perf->set_bpm(bpm);           // this updates perform midibus
-                    a_main->update_start_BPM();     // this updates perfedit start tempo mark
+                    a_main->update_start_BPM(bpm);     // this updates perfedit start tempo mark
                 }
                 a_main->set_bp_measure(bp_measure);
                 a_main->set_bw(bw);

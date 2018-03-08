@@ -461,7 +461,7 @@ mainwnd::timer_callback(  )
     if(m_mainperf->get_update_perfedit_markers())
     {
         m_mainperf->set_update_perfedit_markers(false);
-        update_start_BPM();
+        m_perf_edit->update_start_BPM(m_mainperf->get_bpm());
     }
 
     if ( m_adjust_ss->get_value() !=  m_mainperf->get_screenset() )
@@ -652,9 +652,9 @@ void mainwnd::new_file()
         m_perf_edit->set_bw(4);
         m_perf_edit->set_xpose(0);
         m_perf_edit->clear_tempo_list();
-        m_mainperf->set_bpm(c_bpm);             // update perform midibus - need this to update perfedit tempo mark
-        update_start_BPM();                     // update perfedit tempo markers - this loads based on perform midi bus setting above
-        m_adjust_bpm->set_value( m_mainperf->get_bpm());    // update the mainwnd BPM spinner to start
+        m_mainperf->set_bpm(c_bpm);             // update perform midibus to default = c_bpm
+        m_perf_edit->update_start_BPM(c_bpm);   // update perfedit tempo markers and tempo class markers
+        m_adjust_bpm->set_value(c_bpm);         // update the mainwnd BPM spinner to start
         m_mainperf->set_playlist_mode(false);
 
         m_main_wid->reset();
@@ -1357,7 +1357,7 @@ mainwnd::adj_callback_bpm( )
         //printf("adj_callback_bpm - mainwnd\n");
         m_mainperf->set_bpm( m_adjust_bpm->get_value());
         global_is_modified = true;
-        m_perf_edit->update_start_BPM();
+        m_perf_edit->update_start_BPM(m_mainperf->get_bpm());
     }
 }
 
@@ -1454,20 +1454,20 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         {
             m_mainperf->set_bpm( m_mainperf->get_bpm() - 1 );
             m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
-            m_perf_edit->update_start_BPM();
+            m_perf_edit->update_start_BPM(m_mainperf->get_bpm());
         }
 
         if ( a_ev->keyval ==  m_mainperf->m_key_bpm_up )
         {
             m_mainperf->set_bpm( m_mainperf->get_bpm() + 1 );
             m_adjust_bpm->set_value(  m_mainperf->get_bpm() );
-            m_perf_edit->update_start_BPM();
+            m_perf_edit->update_start_BPM(m_mainperf->get_bpm());
         }
 
         if (a_ev->keyval  == m_mainperf->m_key_tap_bpm )
         {
             tap();
-            m_perf_edit->update_start_BPM();
+            m_perf_edit->update_start_BPM(m_adjust_bpm->get_value());
         }
 
         if ( a_ev->keyval == m_mainperf->m_key_replace )
@@ -1819,7 +1819,7 @@ mainwnd::set_bw(int bw)
 }
 
 void
-mainwnd::update_start_BPM()
+mainwnd::update_start_BPM(double bpm)
 {
-    m_perf_edit->update_start_BPM();
+    m_perf_edit->update_start_BPM(bpm);
 }

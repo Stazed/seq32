@@ -393,7 +393,8 @@ tempo::set_start_BPM(double a_bpm)
     if ( a_bpm < c_bpm_minimum ) a_bpm = c_bpm_minimum;
     if ( a_bpm > c_bpm_maximum ) a_bpm = c_bpm_maximum;
     
-    if ( ! (m_mainperf->is_jack_running() && global_is_running ))
+    /* do not allow start bpm change when sequencer is running, in song mode or when connected to jack transport */
+    if ( ! ( global_is_running && (m_mainperf->is_jack_running() || m_mainperf->get_playback_mode() )))
     {
 #ifdef SEQ42_UNDO_TEMPO
         push_undo(true);

@@ -227,7 +227,7 @@ public:
     int get_bp_measure();
     void set_bw( int a_beat_width );
     int get_bw();
-    void update_start_BPM();
+    void update_start_BPM(double bpm);
     void clear_tempo_list();
 
     void set_xpose (int a_xpose);

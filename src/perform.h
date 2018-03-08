@@ -241,8 +241,6 @@ private:
 
     bool m_show_ui_sequence_key;
 
-    void set_playback_mode( bool a_playback_mode );
-
     string m_screen_set_notepad[c_max_sets];
 
     midi_control m_midi_cc_toggle[ c_midi_controls ];
@@ -397,6 +395,7 @@ public:
 
     void set_start_from_perfedit(bool a_start);
     bool get_start_from_perfedit();
+    bool get_playback_mode();
     void toggle_song_mode();
     void toggle_jack_mode();
     void set_jack_mode(bool a_mode);
