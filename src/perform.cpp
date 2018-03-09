@@ -1057,8 +1057,11 @@ void perform::play( long a_tick )
     /* just run down the list of sequences and have them dump */
 
     if(m_playback_mode && !m_usemidiclock)  // only allow in song mode when not following midi clock
-        tempo_change();
-
+    {
+        if(!tempo_change())                 // false means we got a stop marker, so do not play after stop
+            return;
+    }
+    
     m_tick = a_tick;
     for (int i=0; i< c_max_sequence; i++ )
     {
@@ -1093,7 +1096,7 @@ void perform::set_orig_ticks( long a_tick  )
     }
 }
 
-void perform::tempo_change()
+bool perform::tempo_change()
 {
     list<tempo_mark>::iterator i;
 
@@ -1104,8 +1107,11 @@ void perform::tempo_change()
             if((i)->bpm == STOP_MARKER)
             {
                 stop_playing();
+
                 if(m_playlist_mode) // if we are in playlist mode then increment the file on stop marker
                     m_playlist_stop_mark = true;
+
+                return false;       // do not play anything after this
             }
             else
             {
@@ -1115,6 +1121,8 @@ void perform::tempo_change()
             }
         }
     }
+    
+    return true;                    // keep playing
 }
 
 void perform::clear_sequence_triggers( int a_seq  )

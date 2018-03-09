@@ -510,7 +510,7 @@ public:
     void play( long a_tick );
     void set_orig_ticks( long a_tick  );
     
-    void tempo_change();
+    bool tempo_change();
 
     sequence * get_sequence( int a_sequence );
 
