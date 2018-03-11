@@ -375,11 +375,6 @@ bool perform::clear_all()
     set_have_undo(false);
     set_have_redo(false);
     
-    m_list_play_marker.clear();
-    m_list_total_marker.clear();
-    m_list_no_stop_markers.clear();
-    m_list_file_load_marker.clear();
-    
     /* For legacy seq24 files, the bp_measure and bw were not saved, so all
      * of them had only 4 / 4 time signature on perfedit. We need to clear any
      * existing value and load the default for those legacy files since the

@@ -648,13 +648,11 @@ void mainwnd::new_file()
     /* reset everything to default */
     if(m_mainperf->clear_all())
     {
+        m_perf_edit->clear_tempo_list();
+        m_perf_edit->update_start_BPM(c_bpm);
         m_perf_edit->set_bp_measure(4);
         m_perf_edit->set_bw(4);
         m_perf_edit->set_xpose(0);
-        m_perf_edit->clear_tempo_list();
-        /* The call to update_start_BPM below will set tempo markers, perform midibus,
-         * and update the mainwnd bpm spinner from the mainwnd timeout. */
-        m_perf_edit->update_start_BPM(c_bpm);
         m_mainperf->set_playlist_mode(false);
 
         m_main_wid->reset();
@@ -839,6 +837,7 @@ bool mainwnd::open_file(const Glib::ustring& fn)
                                          Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
             errdialog.run();
             global_filename = "";
+            new_file();
             return false;
         }
 

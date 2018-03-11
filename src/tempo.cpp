@@ -399,7 +399,19 @@ tempo::set_start_BPM(double a_bpm)
 #ifdef SEQ42_UNDO_TEMPO
         push_undo(true);
 #endif
-        m_list_marker.begin()->bpm = a_bpm;
+        
+        tempo_mark marker;
+        marker.bpm = a_bpm;
+        marker.tick = STARTING_MARKER;
+
+        if(!m_list_marker.size())
+        {
+            m_list_marker.push_front(marker);
+        }
+        else
+        {
+            (*m_list_marker.begin())= marker;
+        }
 
         reset_tempo_list();
         m_mainperf->set_bpm( a_bpm );
@@ -407,10 +419,16 @@ tempo::set_start_BPM(double a_bpm)
     }
 }
 
-/* update marker jack start ticks and perform class lists.
- * triggered any time user adds or deletes a marker or adjusts
- * the start marker bpm spin. Also on initial file loading, undo / redo.
- * also when measures are changed */
+/* reset_tempo_list()
+ * update marker jack start ticks, microseconds start and perform class lists.
+ * Triggered any time user adds or deletes a marker or adjusts
+ * the start marker bpm spin. Also on initial file loading.
+ * Also when measures are changed.
+ * This should be called directly when the tempo class m_list_marker is
+ * adjusted and then is pushed to m_mainperf class.
+ * 
+ * Use load_tempo_list() for pushing m_mainperf to the tempo class
+ * m_list_marker. */
 void
 tempo::reset_tempo_list()
 {
@@ -423,13 +441,17 @@ tempo::reset_tempo_list()
     unlock();
 }
 
-/* file loading & undo / redo on import */
+/* load_tempo_list()
+ * This should be called when the m_mainperf->m_list_total_marker is
+ * correct and the tempo class m_list_marker needs to be adjusted to it.
+ * Use for file loading.
+ * Use reset_tempo_list() above directly when m_list_marker is correct
+ * and m_mainperf needs to be adjusted. */
 void
 tempo::load_tempo_list()
 {
-    m_list_marker = m_mainperf->m_list_file_load_marker;    // update tempo class
+    m_list_marker = m_mainperf->m_list_total_marker;        // update tempo class
     reset_tempo_list();                                     // needed to update m_list_no_stop_markers & calculate start frames
-    //printf("load_tempo_list bpm %f\n", m_list_marker.begin()->bpm);
     m_mainperf->set_bpm(m_list_marker.begin()->bpm);
     queue_draw();
 }
@@ -440,9 +462,9 @@ void
 tempo::clear_tempo_list()
 {
     m_list_marker.clear();
-    m_current_mark.bpm = c_bpm;
-    m_current_mark.tick = STARTING_MARKER;
-    add_marker(m_current_mark);
+    m_mainperf->m_list_play_marker.clear();
+    m_mainperf->m_list_total_marker.clear();
+    m_mainperf->m_list_no_stop_markers.clear();
 }
 
 /* calculates for jack frame marker start offset and wall clock display microsecond start offset. */

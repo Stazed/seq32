@@ -677,7 +677,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                     use_tempo_map = verify_tempo_map();
                 
                 if(use_tempo_map)
-                    a_perf->m_list_file_load_marker.clear();
+                    a_perf->m_list_total_marker.clear();
             }
             
             /* if use_tempo_map is false we should still run through the reads in case additional tags are added later */
@@ -695,7 +695,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                 a_marker.bp_measure = read_long();
                 // we don't need start frame since it will be calculated on reset
                 if(use_tempo_map)
-                    a_perf->m_list_file_load_marker.push_back(a_marker);
+                    a_perf->m_list_total_marker.push_back(a_marker);
             }
             if(use_tempo_map)
             {

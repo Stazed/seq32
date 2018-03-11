@@ -338,11 +338,6 @@ public:
      * Also used in output_func() when jack is running.
      * Only adjusted when new marker is set or removed by user */
     list < tempo_mark > m_list_no_stop_markers;
-    
-    /* m_list_file_load_marker is used exclusively for file loading to
-     * update the tempo class tempo map > m_list_marker. The items loaded
-     * come from the midifile class, parse() function. */
-    list < tempo_mark > m_list_file_load_marker;
 
     /* for undo/redo */
     stack < list < tempo_mark > >m_list_undo;
