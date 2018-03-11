@@ -2601,10 +2601,10 @@ void perform::handle_midi_control( int a_control, bool a_state )
             set_sequence_control_status( c_status_queue );
         else
             unset_sequence_control_status( c_status_queue );
-
+        break;
     //andy cases
     case c_midi_control_mod_gmute:
-        printf ( "gmute\n" );
+        //printf ( "gmute\n" );
         if (a_state)
             set_mode_group_mute();
         else
