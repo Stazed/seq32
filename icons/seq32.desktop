@@ -2,8 +2,8 @@
 Name=Seq32
 GenericName=
 Comment=MIDI Sequencer
-Icon=/usr/share/pixmaps/seq32.svg
+Icon=seq32_48.png
 Type=Application
-Categories=AudioVideo;Audio;
+Categories=AudioVideo;Audio;X-Jack;Midi;X-MIDI;
 Exec=seq32
 Terminal=false

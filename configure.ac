@@ -141,5 +141,5 @@ else
 fi
 
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile icons/Makefile)
 
