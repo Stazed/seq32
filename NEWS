@@ -1,3 +1,36 @@
+seq32-1.1.1 (2018-03-13)
+  * Add .desktop and icon to install.
+    Add seq32.png screenshot.
+  * Fix midi control gmute set by missing break fall through.
+  * Increase song trigger grow box sizes for higher resolution monitors.
+  * Adjust default tempo popup window size for some displays.
+  * Fix continue play after stop marker for last cycle.
+  * Cleanup redundant calls to set midibus.
+  * Stop allowing change of start tempo when sequencer is running while in song mode.
+  * Cleanup midi control bpm tempo marker update.
+  * Fix intermittent incorrect initial bpm load on startup.
+  * Rename setlist to playlist for consistency and clarity.
+  * Change SEQ32 logo color to blue when in setlist mode.
+    Update SEQ32 help file for change.
+  * Fix erroneous setlist verification request after file load failure.
+  * Cleanup resetting of playing markers on position change.
+  * Fix update tempo map when bpm changed by midi control.
+  * Fix file loading with & without tempo map.
+  * Add seq24+ style logo update for playlist mode.
+  * Fix clear playlist mode when file loading from recent files menu.
+  * Fix reposition update from perfedit when transport is not rolling.
+  * Add HMS & BBT clock display to perfedit. Thanks to Chris Ahlstrom.
+    Modified for tempo changes and beat width.
+  * Add Stop/Pause toggle button to perfedit to allow for continue mode.
+  * Fix mute group learn for shift mask
+  * Fix sscanf format warning.
+  * Add mute groups change to global_is_modified.
+  * Fix sysex continue.
+  * Fix progress marker to reset when re-connect with jack.
+  * Set LFO button to toggle show and hide.
+  * Fix compiler warning snprintf maybe truncation.
+  * Fix reposition to shut off correctly
+
 seq32-1.1.0 (2017-11-02)
   * Fix key-p reposition if looping unchecked while running, without jack.
   * Fix tempo reset for looping.
