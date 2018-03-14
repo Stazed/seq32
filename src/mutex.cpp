@@ -20,22 +20,25 @@
 
 #include "mutex.h"
 
-const pthread_mutex_t seq32_mutex::recmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+namespace seq32
+{
+
+const pthread_mutex_t mutex::recmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 const pthread_cond_t condition_var::cond  = PTHREAD_COND_INITIALIZER;
 
-seq32_mutex::seq32_mutex( )
+mutex::mutex( )
 {
     m_mutex_lock = recmutex;
 }
 
 void
-seq32_mutex::lock( )
+mutex::lock( )
 {
     pthread_mutex_lock( &m_mutex_lock );
 }
 
 void
-seq32_mutex::unlock( )
+mutex::unlock( )
 {
     pthread_mutex_unlock( &m_mutex_lock );
 }
@@ -56,3 +59,5 @@ condition_var::wait( )
 {
     pthread_cond_wait( &m_cond, &m_mutex_lock );
 }
+
+} // namespace seq32

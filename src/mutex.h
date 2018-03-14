@@ -24,8 +24,10 @@
 
 #include <pthread.h>
 
-class seq32_mutex
+namespace seq32
 {
+
+class mutex {
 private:
 
     static const pthread_mutex_t recmutex;
@@ -37,14 +39,14 @@ protected:
 
 public:
 
-    seq32_mutex();
+    mutex();
 
     void lock();
     void unlock();
 
 };
 
-class condition_var : public seq32_mutex {
+class condition_var : public mutex {
 
 private:
 
@@ -60,3 +62,5 @@ public:
     void signal();
 
 };
+
+} // namespace seq32

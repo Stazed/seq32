@@ -83,7 +83,7 @@ private:
     int m_snap, m_measure_length;
     
     /* locking */
-    seq32_mutex m_mutex;
+    seq32::mutex m_mutex;
     void lock ();
     void unlock ();
 

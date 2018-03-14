@@ -251,7 +251,7 @@ private:
     int m_control_status;
     int m_screen_set;
 
-    condition_var m_condition_var;
+    seq32::condition_var m_condition_var;
 
     // do not access these directly, use set/lookup below
     std::map<unsigned int,long> key_events;
