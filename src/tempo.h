@@ -82,6 +82,10 @@ private:
 
     int m_snap, m_measure_length;
     
+    bool m_init_move;
+    bool m_moving;
+    tempo_mark m_move_marker;
+    
     /* locking */
     seq32::mutex m_mutex;
     void lock ();
@@ -92,6 +96,7 @@ private:
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_ev);
+    bool on_leave_notify_event(GdkEventCrossing* a_ev);
     void on_size_allocate(Gtk::Allocation &a_r );
     
     void draw_background();
@@ -113,6 +118,8 @@ private:
     }
     
     double pulse_length_us (double bpm, int ppqn);
+    
+    bool check_above_marker(uint64_t mouse_tick, bool a_delete, bool exact );
 
 public:
 
@@ -133,8 +140,8 @@ public:
     void set_start_BPM(double a_bpm);
     void reset_tempo_list();
     void load_tempo_list();
-    void clear_tempo_list();
     void calculate_marker_start();
+    void clear_tempo_list();
     
     void push_undo(bool a_hold = false);
     void pop_undo();
