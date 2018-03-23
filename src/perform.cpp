@@ -2786,7 +2786,7 @@ void perform::input_func()
                                 }
                             }
                         }
-                        
+#ifdef USE_SYSEX
                         /* To fix the FF/RW sysex on the YPT that only sends on - this is the off key */
                         if (global_use_sysex)
                         {
@@ -2800,13 +2800,15 @@ void perform::input_func()
                                 }
                             }
                         }
+#endif // USE_SYSEX
                     }
 
                     if (ev.get_status() == EVENT_SYSEX)
                     {
+#ifdef USE_SYSEX
                         if (global_use_sysex)
                             parse_sysex(ev);
-                        
+#endif // USE_SYSEX
                         if (global_showmidi)
                             ev.print();
 
@@ -2840,6 +2842,7 @@ unsigned short perform::combine_bytes(unsigned char First, unsigned char Second)
    return(_14bit);
 }
 
+#ifdef USE_SYSEX
 void perform::parse_sysex(event a_e)
 {
 /*  http://www.indiana.edu/~emusic/etext/MIDI/chapter3_MIDI9.shtml 
@@ -2941,6 +2944,7 @@ void perform::parse_sysex(event a_e)
         break;
     }
 }
+#endif // USE_SYSEX
 
 void perform::save_playing_state()
 {
