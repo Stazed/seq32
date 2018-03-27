@@ -479,6 +479,7 @@ public:
     midi_control *get_midi_control_on( unsigned int a_seq );
     midi_control *get_midi_control_off( unsigned int a_seq );
 
+    void check_midi_control(event ev);
     void handle_midi_control( int a_control, bool a_state );
 #ifdef MIDI_CONTROL_SUPPORT    
     bool check_midi_control(event ev, bool is_recording);

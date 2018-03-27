@@ -2768,6 +2768,74 @@ bool perform::get_sequence_record()
     return m_recording_set;
 }
 
+#else  // original code MIDI_CONTROL_SUPPORT
+
+void perform::check_midi_control(event ev)
+{
+    for (int i = 0; i < c_midi_controls; i++)
+    {
+        unsigned char data[2] = {0,0};
+        unsigned char status = ev.get_status();
+
+        ev.get_data( &data[0], &data[1] );
+
+        if (get_midi_control_toggle(i)->m_active &&
+                status  == get_midi_control_toggle(i)->m_status &&
+                data[0] == get_midi_control_toggle(i)->m_data )
+        {
+            if (data[1] >= get_midi_control_toggle(i)->m_min_value &&
+                    data[1] <= get_midi_control_toggle(i)->m_max_value )
+            {
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_toggle( i + m_offset );
+            }
+        }
+
+        if ( get_midi_control_on(i)->m_active &&
+                status  == get_midi_control_on(i)->m_status &&
+                data[0] == get_midi_control_on(i)->m_data )
+        {
+            if ( data[1] >= get_midi_control_on(i)->m_min_value &&
+                    data[1] <= get_midi_control_on(i)->m_max_value )
+            {
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_on( i  + m_offset);
+                else
+                    handle_midi_control( i, true );
+
+            }
+            else if (  get_midi_control_on(i)->m_inverse_active )
+            {
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_off(  i + m_offset );
+                else
+                    handle_midi_control( i, false );
+            }
+        }
+
+        if ( get_midi_control_off(i)->m_active &&
+                status  == get_midi_control_off(i)->m_status &&
+                data[0] == get_midi_control_off(i)->m_data )
+        {
+            if ( data[1] >= get_midi_control_off(i)->m_min_value &&
+                    data[1] <= get_midi_control_off(i)->m_max_value )
+            {
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_off(  i + m_offset );
+                else
+                    handle_midi_control( i, false );
+            }
+            else if ( get_midi_control_off(i)->m_inverse_active )
+            {
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_on(  i + m_offset );
+                else
+                    handle_midi_control( i, true );
+            }
+        }
+    }
+}
+
 #endif // MIDI_CONTROL_SUPPORT
 
 void perform::handle_midi_control( int a_control, bool a_state )
@@ -2949,73 +3017,14 @@ void perform::input_func()
 #ifdef MIDI_CONTROL_SUPPORT
                         /* use it to control our sequencer */
                         else
+                        {
                             (void)check_midi_control(ev, false);
-#endif // MIDI_CONTROL_SUPPORT
+#else  // original code 
                         /* use it to control our sequencer */
                         else
                         {
-                            for (int i = 0; i < c_midi_controls; i++)
-                            {
-                                unsigned char data[2] = {0,0};
-                                unsigned char status = ev.get_status();
-
-                                ev.get_data( &data[0], &data[1] );
-
-                                if (get_midi_control_toggle(i)->m_active &&
-                                        status  == get_midi_control_toggle(i)->m_status &&
-                                        data[0] == get_midi_control_toggle(i)->m_data )
-                                {
-                                    if (data[1] >= get_midi_control_toggle(i)->m_min_value &&
-                                            data[1] <= get_midi_control_toggle(i)->m_max_value )
-                                    {
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_toggle( i + m_offset );
-                                    }
-                                }
-
-                                if ( get_midi_control_on(i)->m_active &&
-                                        status  == get_midi_control_on(i)->m_status &&
-                                        data[0] == get_midi_control_on(i)->m_data )
-                                {
-                                    if ( data[1] >= get_midi_control_on(i)->m_min_value &&
-                                            data[1] <= get_midi_control_on(i)->m_max_value )
-                                    {
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_on( i  + m_offset);
-                                        else
-                                            handle_midi_control( i, true );
-
-                                    }
-                                    else if (  get_midi_control_on(i)->m_inverse_active )
-                                    {
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_off(  i + m_offset );
-                                        else
-                                            handle_midi_control( i, false );
-                                    }
-                                }
-
-                                if ( get_midi_control_off(i)->m_active &&
-                                        status  == get_midi_control_off(i)->m_status &&
-                                        data[0] == get_midi_control_off(i)->m_data )
-                                {
-                                    if ( data[1] >= get_midi_control_off(i)->m_min_value &&
-                                            data[1] <= get_midi_control_off(i)->m_max_value )
-                                    {
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_off(  i + m_offset );
-                                        else
-                                            handle_midi_control( i, false );
-                                    }
-                                    else if ( get_midi_control_off(i)->m_inverse_active )
-                                    {
-                                        if ( i <  c_seqs_in_set )
-                                            sequence_playing_on(  i + m_offset );
-                                        else
-                                            handle_midi_control( i, true );
-                                    }
-                                }
-                            }
+                            (void)check_midi_control(ev);
+#endif // MIDI_CONTROL_SUPPORT
                         }
 #ifdef USE_SYSEX
                         /* To fix the FF/RW sysex on the YPT that only sends on - this is the off key */
