@@ -206,6 +206,10 @@ perform::perform()
 
     m_bp_measure = 4;
     m_bw = 4;
+    
+#ifdef MIDI_CONTROL_SUPPORT
+    m_recording_set = false;
+#endif
     m_excell_FF_RW = 1.0;
 
     m_have_undo = false;
@@ -2553,6 +2557,219 @@ void* input_thread_func(void *a_pef )
     return 0;
 }
 
+#ifdef MIDI_CONTROL_SUPPORT
+
+bool perform::check_midi_control(event ev, bool is_recording)
+{
+    bool was_control_used = false;
+    
+    /* Adjusted midi controls offset -2 for the two reserved and not used. 
+     * If the reserved controls are used then this offset must be changed. */
+    int midi_controls = c_midi_controls - 2;
+    
+    /* If we are recording, we only need start, stop and record controls 
+       so we skip the controls after record */
+    if(is_recording)
+        midi_controls = c_midi_control_record + 1;
+    
+    for (int i = 0; i < midi_controls; i++)
+    {
+        unsigned char data[2] = {0,0};
+        unsigned char status = ev.get_status();
+
+        ev.get_data( &data[0], &data[1] );
+
+        if (get_midi_control_toggle(i)->m_active &&
+                status  == get_midi_control_toggle(i)->m_status &&
+                data[0] == get_midi_control_toggle(i)->m_data )
+        {
+            was_control_used = true;
+            
+            if (data[1] >= get_midi_control_toggle(i)->m_min_value &&
+                    data[1] <= get_midi_control_toggle(i)->m_max_value )
+            {
+                /* The only time toggle uses inverse is for start/stop
+                 * to indicate that we should toggle play mode.
+                 * For playlist, we want to send and use the actual data value. 
+                 * For all other cases, the data is ignored. */
+                if(get_midi_control_toggle(i)->m_inverse_active)
+                {
+                    handle_midi_control( i, INVERSE_TOGGLE, data[1]);
+                }
+                else
+                {
+                    handle_midi_control( i, true, data[1]);
+                }
+            }
+        }
+
+        if ( get_midi_control_on(i)->m_active &&
+                status  == get_midi_control_on(i)->m_status &&
+                data[0] == get_midi_control_on(i)->m_data )
+        {
+            was_control_used = true;
+            
+            if ( data[1] >= get_midi_control_on(i)->m_min_value &&
+                    data[1] <= get_midi_control_on(i)->m_max_value )
+            {
+                handle_midi_control( i, true );
+            }
+            else if ( get_midi_control_on(i)->m_inverse_active )
+            {
+                handle_midi_control( i, false );
+            }
+        }
+
+        if ( get_midi_control_off(i)->m_active &&
+                status  == get_midi_control_off(i)->m_status &&
+                data[0] == get_midi_control_off(i)->m_data )
+        {
+            was_control_used = true;
+            
+            if ( data[1] >= get_midi_control_off(i)->m_min_value &&
+                    data[1] <= get_midi_control_off(i)->m_max_value )
+            {
+                handle_midi_control( i, false );
+            }
+            else if ( get_midi_control_off(i)->m_inverse_active )
+            {
+                handle_midi_control( i, true );
+            }
+        }
+    }
+    
+    return was_control_used;
+}
+
+void perform::handle_midi_control( int a_control, uint a_state, int a_value )
+{
+    /* INVERSE_TOGGLE is used for special cases. Currently only used by 
+     * c_midi_control_play. For play, we need a flag to indicate when 
+     * we should toggle play/stop, but we cannot use the true/false 
+     * since it is used by on/off for out of range values on inverse. 
+     * So for play we set INVERSE_TOGGLE when the user uses the toggle group.
+     * This means the user must set the inverse flag for toggle to work 
+     * from the toggle group. 
+     * For the playlist, we support both an adjustment by single increment,
+     * forward and back, using on/off. The toggle group supports a value
+     * adjustment and if a_value is != NONE then we use the value. */
+    switch (a_control)
+    {
+    case c_midi_control_play:
+        //printf ( "play\n" );
+        if(a_state == true)
+            start_playing();
+        else if (a_state == false)
+            stop_playing();
+        else if (a_state == INVERSE_TOGGLE)
+        {
+            if(global_is_running)
+                stop_playing();
+            else
+                start_playing();
+        }
+        break;
+        
+    case c_midi_control_stop:
+        //printf ( "stop\n );
+        stop_playing();
+        break;
+
+    case c_midi_control_record:
+        set_sequence_record(true);                      // this will toggle on/off always
+        break;
+
+    case c_midi_control_FF:
+        if(a_state)
+        {
+            if(FF_RW_button_type != FF_RW_FORWARD)
+            {
+                FF_RW_button_type = FF_RW_FORWARD;
+                gtk_timeout_add(120,FF_RW_timeout,this);
+            }
+        }
+        else
+            FF_RW_button_type = FF_RW_RELEASE;
+            
+        break;
+        
+    case c_midi_control_rewind:
+        if(a_state)
+        {
+            if(FF_RW_button_type != FF_RW_REWIND)
+            {
+                FF_RW_button_type = FF_RW_REWIND;
+                gtk_timeout_add(120,FF_RW_timeout,this);
+            }
+        }
+        else
+            FF_RW_button_type = FF_RW_RELEASE;
+        break;
+        
+    case c_midi_control_top:                            // beginning of song or left marker
+        if(global_song_start_mode)                      // don't bother reposition in 'Live' mode
+        {
+            if(is_jack_running())
+            {
+                set_reposition();
+                set_starting_tick(m_left_tick);
+                position_jack(true, m_left_tick);
+            }
+            else
+            {
+                set_reposition();
+                set_starting_tick(m_left_tick);
+            }
+        }
+        break;
+        
+    case c_midi_control_playlist:
+        if(!get_playlist_mode())                        // ignore if not in playlist mode
+            break;
+        
+        if(a_value != NONE)                             // toggle group sends data value
+        {
+            if(!set_playlist_index(a_value - 1))        // offset for user (returns validity check)
+                break;
+            
+            m_playlist_midi_jump_value = PLAYLIST_ZERO; // jump value is set to zero since we just set the correct index above.
+            m_playlist_midi_control_set = true;         // this is used in mainwnd timeout to trigger playlist_jump(0)
+        }
+        else if (a_state)                               // On group in range, Off inverse
+        {
+            m_playlist_midi_jump_value = PLAYLIST_NEXT; // this is the value used by mainwnd to use for playlist_jump(1)
+            m_playlist_midi_control_set = true;         // this is used in mainwnd timeout to trigger playlist_jump(1)
+        }
+        else                                            // Off group in range, On inverse
+        {
+            m_playlist_midi_jump_value = PLAYLIST_PREVIOUS; // this is the value used by mainwnd to use for playlist_jump(-1)
+            m_playlist_midi_control_set = true;         // this is used in mainwnd timeout to trigger playlist_jump(-1)
+        }
+        
+        break;
+        
+    case c_midi_control_reserved1:
+        break;
+        
+    case c_midi_control_reserved2:
+        break;
+        
+    default:
+        break;
+    }
+}
+
+void perform::set_sequence_record(bool a_record)
+{
+    m_recording_set = a_record;
+}
+bool perform::get_sequence_record()
+{
+    return m_recording_set;
+}
+
+#endif // MIDI_CONTROL_SUPPORT
+
 void perform::handle_midi_control( int a_control, bool a_state )
 {
     switch (a_control)
@@ -2714,12 +2931,26 @@ void perform::input_func()
                         /* is there at least one sequence set ? */
                         if (m_master_bus.is_dumping())
                         {
+#ifdef MIDI_CONTROL_SUPPORT
+                            /* The true flag will limit the controls to start, stop
+                             * and  record only. The function returns a a bool flag
+                             * indicating whether the event was used or not. The flag
+                             * could be used to exclude from recording (dumping). This
+                             * could work for CC but not for linked events, i.e. notes. */
+                            check_midi_control(ev, true);
+                            
+#endif // MIDI_CONTROL_SUPPORT
                             ev.set_timestamp(m_tick);
 
                             /* dump to it - possibly multiple sequences set */
                             m_master_bus.dump_midi_input(ev);
                         }
 
+#ifdef MIDI_CONTROL_SUPPORT
+                        /* use it to control our sequencer */
+                        else
+                            (void)check_midi_control(ev, false);
+#endif // MIDI_CONTROL_SUPPORT
                         /* use it to control our sequencer */
                         else
                         {

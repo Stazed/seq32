@@ -363,7 +363,35 @@ optionsfile::write( perform *a_perf  )
         case c_midi_control_play_ss      :
             file << "# screen set play\n";
             break;
-
+#ifdef MIDI_CONTROL_SUPPORT
+        case c_midi_control_play         :
+            file << "# start playing\n";
+            break;
+        case c_midi_control_stop         :
+            file << "# stop playing\n";
+            break;
+        case c_midi_control_FF           :
+            file << "# fast forward\n";
+            break;
+        case c_midi_control_rewind       :
+            file << "# rewind\n";
+            break;
+        case c_midi_control_top          :
+            file << "# beginning of song \n";
+            break;
+        case c_midi_control_record       :
+            file << "# record\n";
+            break;
+        case c_midi_control_playlist     :
+            file << "# playlist\n";
+            break;
+        case c_midi_control_reserved1    :
+            file << "# reserved for expansion\n";
+            break;
+        case c_midi_control_reserved2    :
+            file << "# reserved for expansion\n";
+            break;
+#endif // MIDI_CONTROL_SUPPORT
         default:
             break;
         }
