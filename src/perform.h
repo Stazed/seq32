@@ -152,23 +152,20 @@ const int c_midi_control_mod_gmute    = c_midi_track_ctrl + 7;
 const int c_midi_control_mod_glearn   = c_midi_track_ctrl + 8;
 //andy play only this screen set
 const int c_midi_control_play_ss      = c_midi_track_ctrl + 9;
-const int c_midi_controls             = c_midi_track_ctrl + 10;//7
-
 #ifdef MIDI_CONTROL_SUPPORT
-
-const int c_midi_total_ctrl = 0;
-const int c_midi_control_play       = c_midi_total_ctrl;
-const int c_midi_control_stop       = c_midi_total_ctrl + 1;
-const int c_midi_control_record     = c_midi_total_ctrl + 2;
-const int c_midi_control_FF         = c_midi_total_ctrl + 3;
-const int c_midi_control_rewind     = c_midi_total_ctrl + 4;
-const int c_midi_control_top        = c_midi_total_ctrl + 5;
-const int c_midi_control_playlist   = c_midi_total_ctrl + 6;
-const int c_midi_control_reserved1  = c_midi_total_ctrl + 7;    // if this becomes used, you must adjust the offset in check_midi_control()
-const int c_midi_control_reserved2  = c_midi_total_ctrl + 8;    // if this becomes used, you must adjust the offset in check_midi_control()
-const int c_midi_controls           = c_midi_total_ctrl + 9;
-
-#endif // MIDI_CONTROL_SUPPORT
+const int c_midi_control_play         = c_midi_track_ctrl + 10;
+const int c_midi_control_stop         = c_midi_track_ctrl + 11;
+const int c_midi_control_record       = c_midi_track_ctrl + 12;
+const int c_midi_control_FF           = c_midi_track_ctrl + 13;
+const int c_midi_control_rewind       = c_midi_track_ctrl + 14;
+const int c_midi_control_top          = c_midi_track_ctrl + 15;
+const int c_midi_control_playlist     = c_midi_track_ctrl + 16;
+const int c_midi_control_reserved1    = c_midi_track_ctrl + 17;    // if this becomes used, you must adjust the offset in check_midi_control()
+const int c_midi_control_reserved2    = c_midi_track_ctrl + 18;    // if this becomes used, you must adjust the offset in check_midi_control()
+const int c_midi_controls             = c_midi_track_ctrl + 19;
+#else // MIDI_CONTROL_SUPPORT
+const int c_midi_controls             = c_midi_track_ctrl + 10;//7
+#endif
 
 struct performcallback
 {
