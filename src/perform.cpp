@@ -2594,9 +2594,10 @@ bool perform::check_midi_control(event ev, bool is_recording)
             if (data[1] >= get_midi_control_toggle(i)->m_min_value &&
                     data[1] <= get_midi_control_toggle(i)->m_max_value )
             {
-                /* The only time toggle uses inverse is for start/stop
+                /* The toggle for start/stop uses the data
                  * to indicate that we should toggle play mode.
-                 * For playlist, we want to send and use the actual data value. 
+                 * For playlist and ss_up we send and use the actual
+                 * data to adjust by value. 
                  * For all other cases, the data is ignored. */
                 if ( i <  c_seqs_in_set )
                     sequence_playing_toggle( i + m_offset );
@@ -2659,14 +2660,7 @@ bool perform::check_midi_control(event ev, bool is_recording)
 
 void perform::handle_midi_control( int a_control, bool a_state, int a_value )
 {
-    /* INVERSE_TOGGLE is used for special cases. Currently only used by 
-     * c_midi_control_play. For play, we need a flag to indicate when 
-     * we should toggle play/stop, but we cannot use the true/false 
-     * since it is used by on/off for out of range values on inverse. 
-     * So for play we set INVERSE_TOGGLE when the user uses the toggle group.
-     * This means the user must set the inverse flag for toggle to work 
-     * from the toggle group. 
-     * For the playlist, we support both an adjustment by single increment,
+    /* For the playlist, we support both an adjustment by single increment,
      * forward and back, using on/off. The toggle group supports a value
      * adjustment and if a_value is != NONE then we use the value. */
     
