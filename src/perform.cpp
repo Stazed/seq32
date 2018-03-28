@@ -48,6 +48,8 @@ perform::perform()
         m_was_active_names[i] = false;
     }
 
+    m_playlist_midi_jump_value = 0;
+    m_playlist_midi_control_set = false;
     m_setjump = 0;
     m_playlist_stop_mark = false;
     m_playlist_mode = false;
@@ -2596,13 +2598,18 @@ bool perform::check_midi_control(event ev, bool is_recording)
                  * to indicate that we should toggle play mode.
                  * For playlist, we want to send and use the actual data value. 
                  * For all other cases, the data is ignored. */
-                if(get_midi_control_toggle(i)->m_inverse_active)
-                {
-                    handle_midi_control( i, INVERSE_TOGGLE, data[1]);
-                }
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_toggle( i + m_offset );
                 else
                 {
-                    handle_midi_control( i, true, data[1]);
+                    if(get_midi_control_toggle(i)->m_inverse_active)
+                    {
+                        handle_midi_control( i, INVERSE_TOGGLE, data[1]);
+                    }
+                    else
+                    {
+                        handle_midi_control( i, true, data[1]);
+                    }
                 }
             }
         }
@@ -2616,11 +2623,17 @@ bool perform::check_midi_control(event ev, bool is_recording)
             if ( data[1] >= get_midi_control_on(i)->m_min_value &&
                     data[1] <= get_midi_control_on(i)->m_max_value )
             {
-                handle_midi_control( i, true );
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_on( i  + m_offset);
+                else
+                    handle_midi_control( i, true );
             }
             else if ( get_midi_control_on(i)->m_inverse_active )
             {
-                handle_midi_control( i, false );
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_off( i  + m_offset);
+                else
+                    handle_midi_control( i, false );
             }
         }
 
@@ -2633,11 +2646,17 @@ bool perform::check_midi_control(event ev, bool is_recording)
             if ( data[1] >= get_midi_control_off(i)->m_min_value &&
                     data[1] <= get_midi_control_off(i)->m_max_value )
             {
-                handle_midi_control( i, false );
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_off( i  + m_offset);
+                else
+                    handle_midi_control( i, false );
             }
             else if ( get_midi_control_off(i)->m_inverse_active )
             {
-                handle_midi_control( i, true );
+                if ( i <  c_seqs_in_set )
+                    sequence_playing_on( i  + m_offset);
+                else
+                    handle_midi_control( i, true );
             }
         }
     }
@@ -2779,19 +2798,16 @@ void perform::handle_midi_control( int a_control, uint a_state, int a_value )
         break;
         
     case c_midi_control_top:                            // beginning of song or left marker
-        if(global_song_start_mode)                      // don't bother reposition in 'Live' mode
+        if(is_jack_running())
         {
-            if(is_jack_running())
-            {
-                set_reposition();
-                set_starting_tick(m_left_tick);
-                position_jack(true, m_left_tick);
-            }
-            else
-            {
-                set_reposition();
-                set_starting_tick(m_left_tick);
-            }
+            set_reposition();
+            set_starting_tick(m_left_tick);
+            position_jack(true, m_left_tick);
+        }
+        else
+        {
+            set_reposition();
+            set_starting_tick(m_left_tick);
         }
         break;
         
@@ -2817,7 +2833,6 @@ void perform::handle_midi_control( int a_control, uint a_state, int a_value )
             m_playlist_midi_jump_value = PLAYLIST_PREVIOUS; // this is the value used by mainwnd to use for playlist_jump(-1)
             m_playlist_midi_control_set = true;         // this is used in mainwnd timeout to trigger playlist_jump(-1)
         }
-        
         break;
         
     case c_midi_control_reserved1:

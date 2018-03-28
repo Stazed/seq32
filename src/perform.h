@@ -134,6 +134,10 @@ struct time_sig
 #define STOP_MARKER         0.0
 #define STARTING_MARKER     0
 
+#define PLAYLIST_ZERO       0
+#define PLAYLIST_NEXT       1
+#define PLAYLIST_PREVIOUS   -1
+
 const int c_status_replace  = 0x01;
 const int c_status_snapshot = 0x02;
 const int c_status_queue    = 0x04;
@@ -162,9 +166,9 @@ const int c_midi_control_top          = c_midi_track_ctrl + 15;
 const int c_midi_control_playlist     = c_midi_track_ctrl + 16;
 const int c_midi_control_reserved1    = c_midi_track_ctrl + 17;    // if this becomes used, you must adjust the offset in check_midi_control()
 const int c_midi_control_reserved2    = c_midi_track_ctrl + 18;    // if this becomes used, you must adjust the offset in check_midi_control()
-const int c_midi_controls             = c_midi_track_ctrl + 19;
+const int c_midi_controls             = c_midi_track_ctrl + 19;    // 83
 #else // MIDI_CONTROL_SUPPORT
-const int c_midi_controls             = c_midi_track_ctrl + 10;//7
+const int c_midi_controls             = c_midi_track_ctrl + 10;    // 74
 #endif
 
 struct performcallback
@@ -187,6 +191,8 @@ public:
     unsigned int        m_key_playlist_next;
     unsigned int        m_key_playlist_prev;
     int                 m_setjump;              // perfedit messages to mainwnd timeout
+    unsigned int        m_playlist_midi_jump_value;
+    bool                m_playlist_midi_control_set;
     bool                m_playlist_stop_mark;
     // end playlist public
 private:

@@ -47,6 +47,12 @@ optionsfile::parse( perform *a_perf )
 
     unsigned int sequences = 0;
     sscanf( m_line, "%u", &sequences );
+    
+    /* Sanity check - if use reverts back to legacy from MIDI_CONTROL_SUPPORT, 
+       scanning > c_midi_controls will cause segfault. */
+    if (sequences > c_midi_controls)
+        sequences = c_midi_controls;
+
     next_data_line( &file );
 
     for (unsigned int i = 0; i < sequences; ++i)
