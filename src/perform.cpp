@@ -2692,8 +2692,13 @@ void perform::handle_midi_control( int a_control, uint a_state, int a_value )
         break;
 
     case c_midi_control_ss_up:
-        //printf ( "ss up\n" );
-        set_screenset( get_screenset() + 1 );
+        //printf ( "ss up value %d\n", a_value );
+        if(a_value != NONE)                 // toggle group sends data value
+        {
+            set_screenset(a_value);         // this does a range check
+        }
+        else
+            set_screenset( get_screenset() + 1 );
         break;
 
     case c_midi_control_ss_dn:
