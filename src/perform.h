@@ -479,13 +479,14 @@ public:
     midi_control *get_midi_control_on( unsigned int a_seq );
     midi_control *get_midi_control_off( unsigned int a_seq );
 
-    void check_midi_control(event ev);
-    void handle_midi_control( int a_control, bool a_state );
 #ifdef MIDI_CONTROL_SUPPORT    
     bool check_midi_control(event ev, bool is_recording);
     void handle_midi_control( int a_control, uint a_state, int a_value = NONE );
     void set_sequence_record(bool a_record);
     bool get_sequence_record();
+#else
+    void check_midi_control(event ev);
+    void handle_midi_control( int a_control, bool a_state );
 #endif // MIDI_CONTROL_SUPPORT
 
     void set_screen_set_notepad( int a_screen_set, string *a_note );

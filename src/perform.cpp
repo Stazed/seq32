@@ -2565,14 +2565,18 @@ bool perform::check_midi_control(event ev, bool is_recording)
     
     /* Adjusted midi controls offset -2 for the two reserved and not used. 
      * If the reserved controls are used then this offset must be changed. */
-    int midi_controls = c_midi_controls - 2;
+    int midi_control_start = 0;                     // default
+    int midi_control_end = c_midi_controls - 2;     // default
     
-    /* If we are recording, we only need start, stop and record controls 
-       so we skip the controls after record */
+    /* If we are recording, we only need play, stop and record controls 
+       so we skip the controls before play and after record */
     if(is_recording)
-        midi_controls = c_midi_control_record + 1;
+    {
+        midi_control_start = c_midi_control_play;
+        midi_control_end = c_midi_control_record + 1;
+    }
     
-    for (int i = 0; i < midi_controls; i++)
+    for (int i = midi_control_start; i < midi_control_end; i++)
     {
         unsigned char data[2] = {0,0};
         unsigned char status = ev.get_status();
@@ -2653,8 +2657,76 @@ void perform::handle_midi_control( int a_control, uint a_state, int a_value )
      * For the playlist, we support both an adjustment by single increment,
      * forward and back, using on/off. The toggle group supports a value
      * adjustment and if a_value is != NONE then we use the value. */
+    
     switch (a_control)
     {
+    case c_midi_control_bpm_up:
+        //printf ( "bpm up\n" );
+        set_bpm( get_bpm() + 1 );           // change midi bus - will trigger mainwnd timeout to update bpm spinner
+        set_update_perfedit_markers(true);  // used by mainwnd timeout to adjust start tempo marker
+        break;
+
+    case c_midi_control_bpm_dn:
+        //printf ( "bpm dn\n" );
+        set_bpm( get_bpm() - 1 );           // change midi bus - will trigger mainwnd timeout to update bpm spinner
+        set_update_perfedit_markers(true);  // used by mainwnd timeout to adjust start tempo marker
+        break;
+
+    case c_midi_control_ss_up:
+        //printf ( "ss up\n" );
+        set_screenset( get_screenset() + 1 );
+        break;
+
+    case c_midi_control_ss_dn:
+        //printf ( "ss dn\n" );
+        set_screenset( get_screenset() - 1 );
+        break;
+
+    case c_midi_control_mod_replace:
+        //printf ( "replace\n" );
+        if ( a_state )
+            set_sequence_control_status( c_status_replace );
+        else
+            unset_sequence_control_status( c_status_replace );
+        break;
+
+    case c_midi_control_mod_snapshot:
+        //printf ( "snapshot\n" );
+        if ( a_state )
+            set_sequence_control_status( c_status_snapshot );
+        else
+            unset_sequence_control_status( c_status_snapshot );
+        break;
+
+    case c_midi_control_mod_queue:
+        //printf ( "queue\n" );
+        if ( a_state )
+            set_sequence_control_status( c_status_queue );
+        else
+            unset_sequence_control_status( c_status_queue );
+        break;
+    //andy cases
+    case c_midi_control_mod_gmute:
+        //printf ( "gmute\n" );
+        if (a_state)
+            set_mode_group_mute();
+        else
+            unset_mode_group_mute();
+        break;
+
+    case c_midi_control_mod_glearn:
+        //printf ( "glearn\n" );
+        if (a_state)
+            set_mode_group_learn();
+        else
+            unset_mode_group_learn();
+        break;
+
+    case c_midi_control_play_ss:
+        //printf ( "play_ss\n" );
+        set_playing_screenset();
+        break;
+    
     case c_midi_control_play:
         //printf ( "play\n" );
         if(a_state == true)
@@ -2755,6 +2827,11 @@ void perform::handle_midi_control( int a_control, uint a_state, int a_value )
         break;
         
     default:
+        if ((a_control >= c_seqs_in_set) && (a_control < c_midi_track_ctrl))
+        {
+            //printf ( "group mute\n" );
+            select_and_mute_group(a_control - c_seqs_in_set);
+        }
         break;
     }
 }
@@ -2836,7 +2913,6 @@ void perform::check_midi_control(event ev)
     }
 }
 
-#endif // MIDI_CONTROL_SUPPORT
 
 void perform::handle_midi_control( int a_control, bool a_state )
 {
@@ -2918,6 +2994,7 @@ void perform::handle_midi_control( int a_control, bool a_state )
         break;
     }
 }
+#endif // MIDI_CONTROL_SUPPORT
 
 void perform::input_func()
 {
