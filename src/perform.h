@@ -60,7 +60,6 @@ public:
 
 #ifdef MIDI_CONTROL_SUPPORT
 #define NONE -1
-#define INVERSE_TOGGLE 2
 #endif // MIDI_CONTROL_SUPPORT
 
 enum mute_op
@@ -487,7 +486,7 @@ public:
 
 #ifdef MIDI_CONTROL_SUPPORT    
     bool check_midi_control(event ev, bool is_recording);
-    void handle_midi_control( int a_control, uint a_state, int a_value = NONE );
+    void handle_midi_control( int a_control, bool a_state, int a_value = NONE );
     void set_sequence_record(bool a_record);
     bool get_sequence_record();
 #else
