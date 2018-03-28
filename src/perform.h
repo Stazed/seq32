@@ -580,9 +580,7 @@ public:
     void input_func();
 
     unsigned short combine_bytes(unsigned char First, unsigned char Second);
-#ifdef USE_SYSEX
-    void parse_sysex(event a_e);
-#endif // USE_SYSEX
+
     long get_max_trigger();
 
     void set_offset( int a_offset );

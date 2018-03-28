@@ -172,11 +172,6 @@ extern bool global_priority;
 extern bool global_stats;
 extern bool global_pass_sysex;
 
-/* use sysex will be replace by generic midi control */
-#ifdef USE_SYSEX
-extern bool global_use_sysex;
-#endif // USE_SYSEX
-
 extern bool global_with_jack_transport;
 extern bool global_with_jack_master;
 extern bool global_with_jack_master_cond;
