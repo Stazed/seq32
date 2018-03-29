@@ -58,9 +58,7 @@ public:
     long m_max_value;
 };
 
-#ifdef MIDI_CONTROL_SUPPORT
-#define NONE -1
-#endif // MIDI_CONTROL_SUPPORT
+#define NONE -1     // for midi control to indicate no data sent
 
 enum mute_op
 {
@@ -155,7 +153,7 @@ const int c_midi_control_mod_gmute    = c_midi_track_ctrl + 7;
 const int c_midi_control_mod_glearn   = c_midi_track_ctrl + 8;
 //andy play only this screen set
 const int c_midi_control_play_ss      = c_midi_track_ctrl + 9;
-#ifdef MIDI_CONTROL_SUPPORT
+//midi transport and playlist added 3,2018
 const int c_midi_control_play         = c_midi_track_ctrl + 10;
 const int c_midi_control_stop         = c_midi_track_ctrl + 11;
 const int c_midi_control_record       = c_midi_track_ctrl + 12;
@@ -166,9 +164,7 @@ const int c_midi_control_playlist     = c_midi_track_ctrl + 16;
 const int c_midi_control_reserved1    = c_midi_track_ctrl + 17;    // if this becomes used, you must adjust the offset in check_midi_control()
 const int c_midi_control_reserved2    = c_midi_track_ctrl + 18;    // if this becomes used, you must adjust the offset in check_midi_control()
 const int c_midi_controls             = c_midi_track_ctrl + 19;    // 83
-#else // MIDI_CONTROL_SUPPORT
-const int c_midi_controls             = c_midi_track_ctrl + 10;    // 74
-#endif
+
 
 struct performcallback
 {
@@ -270,9 +266,7 @@ private:
     midi_control m_midi_cc_on[ c_midi_controls ];
     midi_control m_midi_cc_off[ c_midi_controls ];
     
-#ifdef MIDI_CONTROL_SUPPORT
     bool m_recording_set;
-#endif // MIDI_CONTROL_SUPPORT
 
     int m_offset;
     int m_control_status;
@@ -483,16 +477,11 @@ public:
     midi_control *get_midi_control_toggle( unsigned int a_seq );
     midi_control *get_midi_control_on( unsigned int a_seq );
     midi_control *get_midi_control_off( unsigned int a_seq );
-
-#ifdef MIDI_CONTROL_SUPPORT    
+  
     bool check_midi_control(event ev, bool is_recording);
     void handle_midi_control( int a_control, bool a_state, int a_value = NONE );
     void set_sequence_record(bool a_record);
     bool get_sequence_record();
-#else
-    void check_midi_control(event ev);
-    void handle_midi_control( int a_control, bool a_state );
-#endif // MIDI_CONTROL_SUPPORT
 
     void set_screen_set_notepad( int a_screen_set, string *a_note );
     string *get_screen_set_notepad( int a_screen_set );

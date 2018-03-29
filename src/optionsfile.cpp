@@ -48,8 +48,7 @@ optionsfile::parse( perform *a_perf )
     unsigned int sequences = 0;
     sscanf( m_line, "%u", &sequences );
     
-    /* Sanity check - if use reverts back to legacy from MIDI_CONTROL_SUPPORT, 
-       scanning > c_midi_controls will cause segfault. */
+    /* Sanity check. */
     if (sequences > c_midi_controls)
         sequences = c_midi_controls;
 
@@ -369,7 +368,6 @@ optionsfile::write( perform *a_perf  )
         case c_midi_control_play_ss      :
             file << "# screen set play\n";
             break;
-#ifdef MIDI_CONTROL_SUPPORT
         case c_midi_control_play         :
             file << "# start playing (toggle, start, stop)\n";
             break;
@@ -397,7 +395,6 @@ optionsfile::write( perform *a_perf  )
         case c_midi_control_reserved2    :
             file << "# reserved for expansion\n";
             break;
-#endif // MIDI_CONTROL_SUPPORT
         default:
             break;
         }

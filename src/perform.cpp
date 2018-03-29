@@ -209,9 +209,8 @@ perform::perform()
     m_bp_measure = 4;
     m_bw = 4;
     
-#ifdef MIDI_CONTROL_SUPPORT
     m_recording_set = false;
-#endif
+
     m_excell_FF_RW = 1.0;
 
     m_have_undo = false;
@@ -2559,8 +2558,6 @@ void* input_thread_func(void *a_pef )
     return 0;
 }
 
-#ifdef MIDI_CONTROL_SUPPORT
-
 bool perform::check_midi_control(event ev, bool is_recording)
 {
     bool was_control_used = false;
@@ -2857,157 +2854,6 @@ bool perform::get_sequence_record()
     return m_recording_set;
 }
 
-#else  // original code MIDI_CONTROL_SUPPORT
-
-void perform::check_midi_control(event ev)
-{
-    for (int i = 0; i < c_midi_controls; i++)
-    {
-        unsigned char data[2] = {0,0};
-        unsigned char status = ev.get_status();
-
-        ev.get_data( &data[0], &data[1] );
-
-        if (get_midi_control_toggle(i)->m_active &&
-                status  == get_midi_control_toggle(i)->m_status &&
-                data[0] == get_midi_control_toggle(i)->m_data )
-        {
-            if (data[1] >= get_midi_control_toggle(i)->m_min_value &&
-                    data[1] <= get_midi_control_toggle(i)->m_max_value )
-            {
-                if ( i <  c_seqs_in_set )
-                    sequence_playing_toggle( i + m_offset );
-            }
-        }
-
-        if ( get_midi_control_on(i)->m_active &&
-                status  == get_midi_control_on(i)->m_status &&
-                data[0] == get_midi_control_on(i)->m_data )
-        {
-            if ( data[1] >= get_midi_control_on(i)->m_min_value &&
-                    data[1] <= get_midi_control_on(i)->m_max_value )
-            {
-                if ( i <  c_seqs_in_set )
-                    sequence_playing_on( i  + m_offset);
-                else
-                    handle_midi_control( i, true );
-
-            }
-            else if (  get_midi_control_on(i)->m_inverse_active )
-            {
-                if ( i <  c_seqs_in_set )
-                    sequence_playing_off(  i + m_offset );
-                else
-                    handle_midi_control( i, false );
-            }
-        }
-
-        if ( get_midi_control_off(i)->m_active &&
-                status  == get_midi_control_off(i)->m_status &&
-                data[0] == get_midi_control_off(i)->m_data )
-        {
-            if ( data[1] >= get_midi_control_off(i)->m_min_value &&
-                    data[1] <= get_midi_control_off(i)->m_max_value )
-            {
-                if ( i <  c_seqs_in_set )
-                    sequence_playing_off(  i + m_offset );
-                else
-                    handle_midi_control( i, false );
-            }
-            else if ( get_midi_control_off(i)->m_inverse_active )
-            {
-                if ( i <  c_seqs_in_set )
-                    sequence_playing_on(  i + m_offset );
-                else
-                    handle_midi_control( i, true );
-            }
-        }
-    }
-}
-
-
-void perform::handle_midi_control( int a_control, bool a_state )
-{
-    switch (a_control)
-    {
-    case c_midi_control_bpm_up:
-        //printf ( "bpm up\n" );
-        set_bpm( get_bpm() + 1 );           // change midi bus - will trigger mainwnd timeout to update bpm spinner
-        set_update_perfedit_markers(true);  // used by mainwnd timeout to adjust start tempo marker
-        break;
-
-    case c_midi_control_bpm_dn:
-        //printf ( "bpm dn\n" );
-        set_bpm( get_bpm() - 1 );           // change midi bus - will trigger mainwnd timeout to update bpm spinner
-        set_update_perfedit_markers(true);  // used by mainwnd timeout to adjust start tempo marker
-        break;
-
-    case c_midi_control_ss_up:
-        //printf ( "ss up\n" );
-        set_screenset( get_screenset() + 1 );
-        break;
-
-    case c_midi_control_ss_dn:
-        //printf ( "ss dn\n" );
-        set_screenset( get_screenset() - 1 );
-        break;
-
-    case c_midi_control_mod_replace:
-        //printf ( "replace\n" );
-        if ( a_state )
-            set_sequence_control_status( c_status_replace );
-        else
-            unset_sequence_control_status( c_status_replace );
-        break;
-
-    case c_midi_control_mod_snapshot:
-        //printf ( "snapshot\n" );
-        if ( a_state )
-            set_sequence_control_status( c_status_snapshot );
-        else
-            unset_sequence_control_status( c_status_snapshot );
-        break;
-
-    case c_midi_control_mod_queue:
-        //printf ( "queue\n" );
-        if ( a_state )
-            set_sequence_control_status( c_status_queue );
-        else
-            unset_sequence_control_status( c_status_queue );
-        break;
-    //andy cases
-    case c_midi_control_mod_gmute:
-        //printf ( "gmute\n" );
-        if (a_state)
-            set_mode_group_mute();
-        else
-            unset_mode_group_mute();
-        break;
-
-    case c_midi_control_mod_glearn:
-        //printf ( "glearn\n" );
-        if (a_state)
-            set_mode_group_learn();
-        else
-            unset_mode_group_learn();
-        break;
-
-    case c_midi_control_play_ss:
-        //printf ( "play_ss\n" );
-        set_playing_screenset();
-        break;
-
-    default:
-        if ((a_control >= c_seqs_in_set) && (a_control < c_midi_track_ctrl))
-        {
-            //printf ( "group mute\n" );
-            select_and_mute_group(a_control - c_seqs_in_set);
-        }
-        break;
-    }
-}
-#endif // MIDI_CONTROL_SUPPORT
-
 void perform::input_func()
 {
     event ev;
@@ -3088,32 +2934,23 @@ void perform::input_func()
                         /* is there at least one sequence set ? */
                         if (m_master_bus.is_dumping())
                         {
-#ifdef MIDI_CONTROL_SUPPORT
                             /* The true flag will limit the controls to start, stop
                              * and  record only. The function returns a a bool flag
                              * indicating whether the event was used or not. The flag
                              * could be used to exclude from recording (dumping). This
                              * could work for CC but not for linked events, i.e. notes. */
                             check_midi_control(ev, true);
-                            
-#endif // MIDI_CONTROL_SUPPORT
+                        
                             ev.set_timestamp(m_tick);
 
                             /* dump to it - possibly multiple sequences set */
                             m_master_bus.dump_midi_input(ev);
                         }
 
-#ifdef MIDI_CONTROL_SUPPORT
                         /* use it to control our sequencer */
                         else
                         {
                             (void)check_midi_control(ev, false);
-#else  // original code 
-                        /* use it to control our sequencer */
-                        else
-                        {
-                            (void)check_midi_control(ev);
-#endif // MIDI_CONTROL_SUPPORT
                         }
                     }
 
