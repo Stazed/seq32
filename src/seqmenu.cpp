@@ -175,6 +175,7 @@ seqmenu::seq_edit()
                      m_current_seq
                    );
     }
+    m_mainperf->set_sequence_editing_list(true);
 }
 
 // Makes a New sequence

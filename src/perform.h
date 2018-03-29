@@ -266,7 +266,9 @@ private:
     midi_control m_midi_cc_on[ c_midi_controls ];
     midi_control m_midi_cc_off[ c_midi_controls ];
     
-    bool m_recording_set;
+    bool m_recording_set;           // flag for notifying seqedit to toggle record midi control
+    int m_list_sequence_editing;    // the number of sequences to toggle recording
+    int m_list_sequence_recording_set;  // the number of sequences that have been set
 
     int m_offset;
     int m_control_status;
@@ -435,6 +437,7 @@ public:
     void add_sequence( sequence *a_seq, int a_perf );
     void delete_sequence( int a_num );
     bool is_sequence_in_edit( int a_num );
+    void set_sequence_editing_list(bool a_set);
 
     void clear_sequence_triggers( int a_seq  );
 
