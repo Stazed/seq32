@@ -265,6 +265,8 @@ private:
     midi_control m_midi_cc_toggle[ c_midi_controls ];
     midi_control m_midi_cc_on[ c_midi_controls ];
     midi_control m_midi_cc_off[ c_midi_controls ];
+
+    int m_note_is_used[c_midi_notes];   // Used to exclude linked note offs from being recorded
     
     bool m_recording_set;           // flag for notifying seqedit to toggle record midi control
     int m_list_sequence_editing;    // the number of sequences to toggle recording
