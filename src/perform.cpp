@@ -2575,7 +2575,7 @@ bool perform::check_midi_control(event ev, bool is_recording)
     int midi_control_start = 0;                     // default
     int midi_control_end = c_midi_controls - 2;     // default
     
-    /* If we are recording, we only need play, stop and record controls 
+    /* If we are recording, we only need play/stop and record controls 
        so we skip the controls before play and after record */
     if(is_recording)
     {
@@ -2790,11 +2790,6 @@ void perform::handle_midi_control( int a_control, bool a_state, int a_value )
 
         break;
         
-    case c_midi_control_stop:
-        //printf ( "stop\n );
-        stop_playing();
-        break;
-
     case c_midi_control_record:
         set_sequence_record(true);                      // this will toggle on/off always
         break;

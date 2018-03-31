@@ -155,15 +155,14 @@ const int c_midi_control_mod_glearn   = c_midi_track_ctrl + 8;
 const int c_midi_control_play_ss      = c_midi_track_ctrl + 9;
 //midi transport and playlist added 3,2018
 const int c_midi_control_play         = c_midi_track_ctrl + 10;
-const int c_midi_control_stop         = c_midi_track_ctrl + 11;
-const int c_midi_control_record       = c_midi_track_ctrl + 12;
-const int c_midi_control_FF           = c_midi_track_ctrl + 13;
-const int c_midi_control_rewind       = c_midi_track_ctrl + 14;
-const int c_midi_control_top          = c_midi_track_ctrl + 15;
-const int c_midi_control_playlist     = c_midi_track_ctrl + 16;
-const int c_midi_control_reserved1    = c_midi_track_ctrl + 17;    // if this becomes used, you must adjust the offset in check_midi_control()
-const int c_midi_control_reserved2    = c_midi_track_ctrl + 18;    // if this becomes used, you must adjust the offset in check_midi_control()
-const int c_midi_controls             = c_midi_track_ctrl + 19;    // 83
+const int c_midi_control_record       = c_midi_track_ctrl + 11;
+const int c_midi_control_FF           = c_midi_track_ctrl + 12;
+const int c_midi_control_rewind       = c_midi_track_ctrl + 13;
+const int c_midi_control_top          = c_midi_track_ctrl + 14;
+const int c_midi_control_playlist     = c_midi_track_ctrl + 15;
+const int c_midi_control_reserved1    = c_midi_track_ctrl + 16;    // if this becomes used, you must adjust the offset in check_midi_control()
+const int c_midi_control_reserved2    = c_midi_track_ctrl + 17;    // if this becomes used, you must adjust the offset in check_midi_control()
+const int c_midi_controls             = c_midi_track_ctrl + 18;    // 82
 
 
 struct performcallback
