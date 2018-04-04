@@ -524,6 +524,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
     {
         m_moving = false;
 
+        /* If we did not land on another sequence, then move to new location */
         if ( ! m_mainperf->is_active( m_current_seq ) && m_current_seq != -1 )
         {
             m_mainperf->new_sequence( m_current_seq  );
@@ -532,6 +533,24 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
             draw_sequence_on_pixmap( m_current_seq  );
             draw_sequence_pixmap_on_window( m_current_seq );
         }
+        /* If we did land on another sequence and it is not being edited, then swap places. */
+        else if ( !m_mainperf->is_sequence_in_edit( m_current_seq ) )
+        {
+            m_clipboard = *(m_mainperf->get_sequence( m_current_seq ));     // hold the current for swap to old location
+            m_mainperf->new_sequence( m_old_seq  );                         // The old location
+            *(m_mainperf->get_sequence( m_old_seq )) = m_clipboard;         // put the current seq into the old location
+
+            m_mainperf->delete_sequence( m_current_seq );                   // delete the current for replacement
+            m_mainperf->new_sequence( m_current_seq  );                     // add a new blank one
+            *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;    // replace with the old
+            
+            draw_sequence_on_pixmap( m_old_seq  );
+            draw_sequence_pixmap_on_window( m_old_seq );
+            draw_sequence_on_pixmap( m_current_seq  );
+            draw_sequence_pixmap_on_window( m_current_seq );
+        }
+        /* They landed on another sequence but it is being edited, so ignore the move 
+         * and put the old sequence back to original location. */
         else
         {
             m_mainperf->new_sequence( m_old_seq  );
