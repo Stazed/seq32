@@ -29,6 +29,7 @@ sequence::sequence( ) :
     m_bus(0),
 
     m_song_mute(false),
+    m_song_solo(false),
     m_transposable(true),
 
     m_masterbus(NULL),
@@ -253,6 +254,18 @@ sequence::get_song_mute()
 }
 
 void
+sequence::set_song_solo( bool a_solo )
+{
+    m_song_solo = a_solo;
+}
+
+bool
+sequence::get_song_solo()
+{
+    return m_song_solo;
+}
+
+void
 sequence::set_transposable( bool a_xpose )
 {
     m_transposable = a_xpose;
@@ -411,74 +424,96 @@ sequence::play( long a_tick, bool a_playback_mode )
     long trigger_offset = 0;
 
     /* if we are using our in sequence on/off triggers (song mode) */
-    if ( a_playback_mode && !m_song_mute)
+    if( a_playback_mode )
     {
-        bool trigger_state = false;
-        long trigger_tick = 0;
-
-        list<trigger>::iterator i = m_list_trigger.begin();
-
-        while ( i != m_list_trigger.end())
+        bool play_song_trigger = false;
+        
+        /* do we have at least one solo set? */
+        if( global_solo_track_set )
         {
-            if ( (*i).m_tick_start <= end_tick )
+            /* if this is a solo track that is set - then play it */
+            if( m_song_solo )
             {
-                trigger_state = true;
-                trigger_tick = (*i).m_tick_start;
-                trigger_offset = (*i).m_offset;
+                play_song_trigger = true;
             }
-
-            if ( (*i).m_tick_end <= end_tick )
-            {
-                trigger_state = false;
-                trigger_tick = (*i).m_tick_end;
-                trigger_offset = (*i).m_offset;
-            }
-
-            if ( (*i).m_tick_start >  end_tick ||
-                    (*i).m_tick_end   >  end_tick )
-            {
-                break;
-            }
-
-            i++;
+        }
+        /* no solo is set, so is this one not muted - then play it */
+        else if ( !m_song_mute )
+        {
+            play_song_trigger = true;
         }
 
-        /* we had triggers in our slice and its not equal to current state */
-        if ( trigger_state != m_playing )
+        /* play only the solos if any are set, or just the not muted ones. */
+        if( play_song_trigger )
         {
-            //printf( "trigger %d\n", trigger_state );
+            bool trigger_state = false;
+            long trigger_tick = 0;
 
-            /* we are turning on */
-            if ( trigger_state )
+            list<trigger>::iterator i = m_list_trigger.begin();
+
+            while ( i != m_list_trigger.end())
             {
-                if ( trigger_tick < m_last_tick )
-                    start_tick = m_last_tick;
+                if ( (*i).m_tick_start <= end_tick )
+                {
+                    trigger_state = true;
+                    trigger_tick = (*i).m_tick_start;
+                    trigger_offset = (*i).m_offset;
+                }
+
+                if ( (*i).m_tick_end <= end_tick )
+                {
+                    trigger_state = false;
+                    trigger_tick = (*i).m_tick_end;
+                    trigger_offset = (*i).m_offset;
+                }
+
+                if ( (*i).m_tick_start >  end_tick ||
+                        (*i).m_tick_end   >  end_tick )
+                {
+                    break;
+                }
+
+                i++;
+            }
+
+            /* we had triggers in our slice and its not equal to current state */
+            if ( trigger_state != m_playing )
+            {
+                //printf( "trigger %d\n", trigger_state );
+
+                /* we are turning on */
+                if ( trigger_state )
+                {
+                    if ( trigger_tick < m_last_tick )
+                        start_tick = m_last_tick;
+                    else
+                        start_tick = trigger_tick;
+
+                    set_playing( true );
+                }
                 else
-                    start_tick = trigger_tick;
-
-                set_playing( true );
+                {
+                    /* we are on and turning off */
+                    end_tick = trigger_tick;
+                    trigger_turning_off = true;
+                }
             }
-            else
+
+            if( m_list_trigger.size() == 0 &&
+                    m_playing )
             {
-                /* we are on and turning off */
-                end_tick = trigger_tick;
-                trigger_turning_off = true;
+                set_playing(false);
+
             }
         }
-
-        if( m_list_trigger.size() == 0 &&
-                m_playing )
+        /* Song mode and this track is either muted or 
+         * not one of the solos that were set, so don't play it. */
+        else
         {
             set_playing(false);
-
-        }
+        }  
     }
-    /* Song mode with muted track - don't play */
-    else if (a_playback_mode && m_song_mute)
-    {
-        set_playing(false);
-    }
-
+    
     set_trigger_offset(trigger_offset);
 
     long start_tick_offset = (start_tick + m_length - m_trigger_offset);

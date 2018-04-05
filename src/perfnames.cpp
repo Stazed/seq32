@@ -28,6 +28,8 @@ perfnames::perfnames( perform *a_perf, mainwnd *a_main, Adjustment *a_vadjust ):
     m_black(Gdk::Color( "black" )),
     m_white(Gdk::Color( "white" )),
     m_grey(Gdk::Color( "grey" )),
+    m_orange(Gdk::Color( "Orange Red")),    // mute
+    m_green(Gdk::Color( "Lawn Green")),     // solo
     m_mainperf(a_perf),
     m_vadjust(a_vadjust),
     m_sequence_offset(0)
@@ -45,6 +47,8 @@ perfnames::perfnames( perform *a_perf, mainwnd *a_main, Adjustment *a_vadjust ):
     colormap->alloc_color( m_black );
     colormap->alloc_color( m_white );
     colormap->alloc_color( m_grey );
+    colormap->alloc_color( m_orange );
+    colormap->alloc_color( m_green );
 
     m_vadjust->signal_value_changed().connect( mem_fun( *(this), &perfnames::change_vert ));
 
@@ -175,10 +179,21 @@ perfnames::draw_sequence( int sequence )
                     c_names_y * i + 12,
                     m_window, str, font::BLACK );
 
+            bool fill = false;
+            bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
+            
+            if(solo || muted)
+                fill = true;
 
             m_gc->set_foreground(m_black);
-            m_window->draw_rectangle(m_gc,muted,
+            
+            if(muted)
+                m_gc->set_foreground(m_orange);
+            if(solo)
+                m_gc->set_foreground(m_green);
+            
+            m_window->draw_rectangle(m_gc,fill,
                                      6*2 + 6 * 20 + 2,
                                      (c_names_y * i),
                                      10,
@@ -191,12 +206,19 @@ perfnames::draw_sequence( int sequence )
                         c_names_y * i + 2,
                         m_window, "M", font::WHITE );
             }
+            else if ( solo )
+            {
+                p_font_renderer->render_string_on_drawable(m_gc,
+                        5 + 6*2 + 6 * 20,
+                        c_names_y * i + 2,
+                        m_window, "S", font::WHITE );
+            }
             else
             {
                 p_font_renderer->render_string_on_drawable(m_gc,
                         5 + 6*2 + 6 * 20,
                         c_names_y * i + 2,
-                        m_window, "M", font::BLACK );
+                        m_window, "P", font::BLACK );
             }
         }
     }
@@ -250,7 +272,7 @@ perfnames::on_button_press_event(GdkEventButton *a_e)
 
     m_current_seq = sequence;
 
-    /*      left mouse button     */
+    /* left mouse button - mute track */
     if ( a_e->button == 1 )
     {
         if ( m_mainperf->is_active( sequence ))
@@ -258,8 +280,28 @@ perfnames::on_button_press_event(GdkEventButton *a_e)
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
             m_mainperf->get_sequence(sequence)->set_song_mute( !muted );
 
+            /* we want to shut off solo if we are setting mute, so if mute was
+              * off (false) then we are turning it on(toggle), so unset the solo. */
+            if (!muted)
+                m_mainperf->get_sequence(sequence)->set_song_solo( muted );
+
+            check_global_solo_tracks();
             queue_draw();
         }
+    }
+    
+    /* Middle mouse button toggle solo track */
+    if ( a_e->button == 2 &&  m_mainperf->is_active( sequence ) )
+    {
+        bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
+        m_mainperf->get_sequence(sequence)->set_song_solo( !solo );
+        /* we want to shut off mute if we are setting solo, so if solo was
+         * off (false) then we are turning it on(toggle), so unset the mute. */
+        if (!solo)
+            m_mainperf->get_sequence(sequence)->set_song_mute( solo );
+        
+        check_global_solo_tracks();
+        queue_draw();
     }
 
     return true;
@@ -321,6 +363,23 @@ perfnames::redraw_dirty_sequences()
             if (dirty)
             {
                 draw_sequence( seq );
+            }
+        }
+    }
+}
+
+void
+perfnames::check_global_solo_tracks()
+{
+    global_solo_track_set = false;
+    for (int i = 0; i < c_max_sequence; i++)
+    {
+        if (m_mainperf->is_active(i))
+        {
+            if (m_mainperf->get_sequence(i)->get_song_solo())
+            {
+                global_solo_track_set = true;
+                break;
             }
         }
     }

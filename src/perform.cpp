@@ -35,6 +35,10 @@
 
 using namespace Gtk;
 
+/* Flag to let sequence.cpp know that at least one solo track is set on the 
+ * song editor (perfroll, perfnames) */
+bool global_solo_track_set = false;
+
 perform::perform()
 {
     for (int i=0; i< c_max_sequence; i++)
