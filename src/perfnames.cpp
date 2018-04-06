@@ -20,9 +20,6 @@
 #include "perfnames.h"
 #include "font.h"
 
-//class mainwnd;
-
-
 perfnames::perfnames( perform *a_perf, mainwnd *a_main, Adjustment *a_vadjust ):
     seqmenu(a_perf, a_main ),
     m_black(Gdk::Color( "black" )),
@@ -32,16 +29,20 @@ perfnames::perfnames( perform *a_perf, mainwnd *a_main, Adjustment *a_vadjust ):
     m_green(Gdk::Color( "Lawn Green")),     // solo
     m_mainperf(a_perf),
     m_vadjust(a_vadjust),
-    m_sequence_offset(0)
+    m_sequence_offset(0),
+    m_button_down(false),
+    m_moving(false),
+    m_old_seq(0)
 {
     add_events( Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
+                Gdk::BUTTON_MOTION_MASK |
                 Gdk::SCROLL_MASK );
 
     /* set default size */
     set_size_request( c_names_x, 100 );
 
-    // in the construor you can only allocate colors,
+    // in the constructor you can only allocate colors,
     // get_window() returns 0 because we have not be realized
     Glib::RefPtr<Gdk::Colormap>  colormap= get_default_colormap();
     colormap->alloc_color( m_black );
@@ -264,32 +265,17 @@ bool
 perfnames::on_button_press_event(GdkEventButton *a_e)
 {
     int sequence;
-
-    /*int x = (int) a_e->x;*/
     int y = (int) a_e->y;
-
     convert_y( y, &sequence );
 
     m_current_seq = sequence;
-
-    /* left mouse button - mute track */
-    if ( a_e->button == 1 )
-    {
-        if ( m_mainperf->is_active( sequence ))
-        {
-            bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
-            m_mainperf->get_sequence(sequence)->set_song_mute( !muted );
-
-            /* we want to shut off solo if we are setting mute, so if mute was
-              * off (false) then we are turning it on(toggle), so unset the solo. */
-            if (!muted)
-                m_mainperf->get_sequence(sequence)->set_song_solo( muted );
-
-            check_global_solo_tracks();
-            queue_draw();
-        }
-    }
     
+    /*      left mouse button     */
+    if ( a_e->button == 1 &&  m_mainperf->is_active( sequence ) )
+    {
+        m_button_down = true;
+    }
+
     /* Middle mouse button toggle solo track */
     if ( a_e->button == 2 &&  m_mainperf->is_active( sequence ) )
     {
@@ -310,13 +296,98 @@ perfnames::on_button_press_event(GdkEventButton *a_e)
 bool
 perfnames::on_button_release_event(GdkEventButton* p0)
 {
-    /*     right mouse button      */
+    int sequence;
+    int y = (int) p0->y;
+
+    convert_y( y, &sequence );
+    m_current_seq = sequence;
+    
+    m_button_down = false;
+    
+    /* left mouse button & not moving - toggle mute  */
+    if ( p0->button == 1 && m_mainperf->is_active( m_current_seq ) && !m_moving )
+    {
+        bool muted = m_mainperf->get_sequence(m_current_seq)->get_song_mute();
+        m_mainperf->get_sequence(m_current_seq)->set_song_mute( !muted );
+       /* we want to shut off solo if we are setting mute, so if mute was
+         * off (false) then we are turning it on(toggle), so unset the solo. */
+        if (!muted)
+            m_mainperf->get_sequence(m_current_seq)->set_song_solo( muted );
+        
+        check_global_solo_tracks();
+        queue_draw();
+    }
+    
+    /* Left button and moving */
+    if ( p0->button == 1 && m_moving )
+    {
+        m_moving = false;
+        
+        /* If we did not land on another active track, then move to new location */
+        if ( ! m_mainperf->is_active( m_current_seq ) )
+        {
+            m_mainperf->new_sequence( m_current_seq  );
+            *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;
+            m_mainperf->get_sequence(m_current_seq)->set_dirty();
+        }
+        /* If we did land on an active track and it is not being edited, then swap places. */
+        else if ( !m_mainperf->is_sequence_in_edit( m_current_seq ) )
+        {
+            m_clipboard = *(m_mainperf->get_sequence( m_current_seq ));      // hold the current for swap to old location
+            m_mainperf->new_sequence( m_old_seq  );                          // The old location
+            *(m_mainperf->get_sequence( m_old_seq )) = m_clipboard;          // put the current track into the old location
+            m_mainperf->get_sequence(m_old_seq)->set_dirty();
+
+            m_mainperf->delete_sequence( m_current_seq );                    // delete the current for replacement
+            m_mainperf->new_sequence( m_current_seq  );                      // add a new blank one
+            *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;     // replace with the old
+            m_mainperf->get_sequence(m_current_seq)->set_dirty();
+        }
+       /* They landed on another track but it is being edited, so ignore the move 
+         * and put the old track back to original location. */
+        else
+        {
+            m_mainperf->new_sequence( m_old_seq  );
+            *(m_mainperf->get_sequence( m_old_seq )) = m_moving_seq;
+            m_mainperf->get_sequence(m_old_seq)->set_dirty();
+        }  
+    }
+    
+    /* launch menu - right mouse button  */
     if ( p0->button == 3 )
     {
         popup_menu();
     }
 
     return false;
+}
+
+bool
+perfnames::on_motion_notify_event(GdkEventMotion* a_ev)
+{
+    int sequence;
+    int y = (int) a_ev->y;
+
+    convert_y( y, &sequence );
+    
+    /* If we are dragging off the original sequence then we are trying to move. */
+    if ( m_button_down )
+    {
+        if ( sequence != m_current_seq && !m_moving &&
+                !m_mainperf->is_sequence_in_edit( m_current_seq ) )
+        {
+            if ( m_mainperf->is_active( m_current_seq ))
+            {
+                m_old_seq = m_current_seq;
+                m_moving = true;
+
+                m_moving_seq = *(m_mainperf->get_sequence( m_current_seq ));
+                m_mainperf->delete_sequence( m_current_seq );
+            }
+        }
+    }  
+
+    return true;
 }
 
 bool
