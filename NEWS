@@ -1,3 +1,31 @@
+seq32-1.1.2 (2018-04-08)
+  * Add move track and swap track to perfedit (song editor).
+    Left mouse button and drag.
+  * Add solo track play (song editor).
+    Middle mouse button toggles solo playing.
+    Mute and solo are not used when in live mode.
+    Add orange and green colors for mute box.
+    Changed mute label based on the status.
+  * Set perfedit (song editor) mute to only be active when in song mode.
+    Song editor mute no longer applies to live sequence toggling.
+  * Allow mainwid sequences to swap locations if moved to an existing active sequence location.
+  * Update SEQ32 document for midi control and tempo marker moving.
+  * Exclude from recording (dumping) all events that are used by midi control.
+    This includes note offs that are not used but are linked to note ons that are used.
+  * Allow multiple sequences to set/unset when midi recording is toggled.
+  * Remove sysex code, replaced by midi control.
+  * Add adjusting screen set by value to ss up toggle group.
+  * Complete playlist increment/decrement and set by number.
+    Add back original sequence triggers.
+    Add sanity check for revert to legacy use.
+  * Move original midi control to separate function.
+  * Add additional midi transport control.
+  * Fix failure to unset midi record dumping when recording is shut off.
+  * Macro out use sysex to be replaced by generic midi control.
+  * Fix cursor update when button released off tempo grid.
+  * Add tempo marker move.
+  * Use namespace for mutex name clash.
+
 seq32-1.1.1 (2018-03-13)
   * Add .desktop and icon to install.
     Add seq32.png screenshot.
