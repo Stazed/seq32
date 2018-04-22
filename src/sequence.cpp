@@ -33,6 +33,7 @@ sequence::sequence( ) :
     m_transposable(true),
 
     m_masterbus(NULL),
+    m_have_solo(false),
     m_was_playing(false),
     m_playing(false),
     m_recording(false),
@@ -69,9 +70,12 @@ sequence::sequence( ) :
     m_have_undo(false),
     m_have_redo(false)
 {
-    /* no notes are playing */
+    /* no notes are playing & no solo/muted notes */
     for (int i=0; i< c_midi_notes; i++ )
+    {
         m_playing_notes[i] = 0;
+        m_mute_solo_notes[i] = NOTE_PLAY;
+    }
 }
 
 void
@@ -537,22 +541,33 @@ sequence::play( long a_tick, bool a_playback_mode )
             if ( ((*e).get_timestamp() + offset_base ) >= (start_tick_offset) &&
                     ((*e).get_timestamp() + offset_base ) <= (end_tick_offset) )
             {
-                if( transpose &&
-                   ((*e).is_note_on() ||
-                   (*e).is_note_off() ||
-                   ((*e).get_status() == EVENT_AFTERTOUCH)))
+                /* Check for note on/off and compare to mute/solo.
+                 * If we have any solo for this seq, then only solo notes are sent. 
+                 * Otherwise only notes without mute are sent*/
+                
+                if((*e).is_note_on() ||(*e).is_note_off())
                 {
-                    transposed_event.set_timestamp((*e).get_timestamp());
-                    transposed_event.set_status((*e).get_status());
-                    transposed_event.set_note((*e).get_note()+transpose);
-                    transposed_event.set_note_velocity((*e).get_note_velocity());
-                    put_event_on_bus( &transposed_event );
-                    //printf( "transposed_event: ");transposed_event.print();
+                    unsigned char note = (*e).get_note();
+                    if(m_have_solo)
+                    {
+                        if(m_mute_solo_notes[ (int)note ] == NOTE_SOLO )
+                        {
+                            send_note_to_bus(transpose, transposed_event, (*e));
+                        }
+                    }
+                    else if(m_mute_solo_notes[ (int)note ] != NOTE_MUTE )
+                    {
+                        send_note_to_bus(transpose, transposed_event, (*e));
+                    }   
                 }
-                else
+                else if((*e).get_status() == EVENT_AFTERTOUCH)
+                {
+                    send_note_to_bus(transpose, transposed_event, (*e));
+                }
+                else    /* Not a note or aftertouch - just send it */
                 {
                     put_event_on_bus( &(*e) );
-                    //printf( "bus: ");(*e).print();
+                    //printf( "event: ");(*e).print();
                 }
             }
             else if ( ((*e).get_timestamp() + offset_base) >  end_tick_offset )
@@ -583,6 +598,22 @@ sequence::play( long a_tick, bool a_playback_mode )
     m_was_playing = m_playing;
 
     unlock();
+}
+
+/* Also used for aftertouch */
+void
+sequence::send_note_to_bus(int transpose, event transposed_event, event note)
+{
+    if(transpose)
+    {
+        transposed_event.set_timestamp(note.get_timestamp());
+        transposed_event.set_status(note.get_status());
+        transposed_event.set_note(note.get_note()+transpose);
+        transposed_event.set_note_velocity(note.get_note_velocity());
+        put_event_on_bus( &transposed_event );
+    }
+    else
+        put_event_on_bus( &note );
 }
 
 void
@@ -3678,6 +3709,66 @@ sequence::get_playing( )
 {
     return m_playing;
 }
+
+bool
+sequence::check_any_solo_notes()
+{
+    m_have_solo = false;
+    for (int i=0; i< c_midi_notes; i++ )
+    {
+        if(m_mute_solo_notes[i] == NOTE_SOLO )
+        {
+            m_have_solo = true;
+            return true;
+        }
+    }
+    return m_have_solo;
+}
+
+void
+sequence::set_solo_note(int a_note)
+{
+    if(m_mute_solo_notes[a_note] == NOTE_SOLO )
+    {
+        m_mute_solo_notes[a_note] = NOTE_PLAY;
+    }
+    else
+        m_mute_solo_notes[a_note] = NOTE_SOLO;
+        
+    check_any_solo_notes();
+}
+
+void
+sequence::set_mute_note(int a_note)
+{
+    if(m_mute_solo_notes[a_note] == NOTE_MUTE )
+    {
+        m_mute_solo_notes[a_note] = NOTE_PLAY;
+    }
+    else
+        m_mute_solo_notes[a_note] = NOTE_MUTE;
+    
+    check_any_solo_notes();
+}
+
+bool
+sequence::is_note_solo(int a_note)
+{
+    if(m_mute_solo_notes[a_note] == NOTE_SOLO)
+        return true;
+    
+    return false;
+}
+
+bool
+sequence::is_note_mute(int a_note)
+{
+    if(m_mute_solo_notes[a_note] == NOTE_MUTE)
+        return true;
+    
+    return false;
+}
+
 
 void
 sequence::set_recording( bool a_r )

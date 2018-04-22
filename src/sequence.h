@@ -40,6 +40,13 @@ enum draw_type
     DRAW_NOTE_OFF
 };
 
+enum note_play_state
+{
+    NOTE_PLAY = 0,
+    NOTE_MUTE,
+    NOTE_SOLO
+};
+
 enum trigger_edit
 {
     GROW_START = 0, //grow the start of the trigger
@@ -125,6 +132,10 @@ private:
     /* map for noteon, used when muting, to shut off current
        messages */
     int m_playing_notes[c_midi_notes];
+    
+    /* flags for solo/mute notes */
+    bool m_have_solo;
+    note_play_state m_mute_solo_notes[c_midi_notes];
 
     /* states */
     bool m_was_playing;
@@ -285,6 +296,13 @@ public:
     void set_playing (bool);
     bool get_playing ();
     void toggle_playing ();
+    
+    /* for solo / muting of notes */
+    bool check_any_solo_notes();
+    void set_solo_note(int a_note);
+    void set_mute_note(int a_note);
+    bool is_note_solo(int a_note);
+    bool is_note_mute(int a_note);
 
     void toggle_queued ();
     void off_queued ();
@@ -325,6 +343,8 @@ public:
     /* dumps notes from tick and prebuffers to
        ahead.  Called by sequencer thread - performance */
     void play (long a_tick, bool a_playback_mode);
+    void send_note_to_bus(int transpose, event transposed_event, event note);
+    
     void set_orig_tick (long a_tick);
 
     //
