@@ -4077,8 +4077,6 @@ sequence::transpose_notes( int a_steps, int a_scale )
 
     verify_and_link();
     unlock();
-    
-    set_dirty();    /* to update perfedit */
 }
 
 void

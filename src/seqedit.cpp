@@ -738,10 +738,12 @@ seqedit::do_action( int a_action, int a_var )
 
     case transpose:
         m_seq->transpose_notes(a_var, 0);
+        m_seq->set_dirty();    /* to update perfedit */
         break;
 
     case transpose_h:
         m_seq->transpose_notes(a_var, m_scale);
+        m_seq->set_dirty();    /* to update perfedit */
         break;
 
     case expand_pattern:
