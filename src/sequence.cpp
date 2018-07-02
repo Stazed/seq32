@@ -4077,6 +4077,8 @@ sequence::transpose_notes( int a_steps, int a_scale )
 
     verify_and_link();
     unlock();
+    
+    set_dirty();    /* to update perfedit */
 }
 
 void
@@ -4128,6 +4130,8 @@ sequence::shift_notes( int a_ticks )
 
     verify_and_link();
     unlock();
+    
+    set_dirty();    /* to update perfedit */
 }
 
 /* if a note event then the status is EVENT_NOTE_ON */
@@ -4245,6 +4249,8 @@ sequence::quanize_events( unsigned char a_status, unsigned char a_cc,
 
     verify_and_link();
     unlock();
+    
+    set_dirty();    /* to update perfedit */
 }
 
 void
@@ -4289,6 +4295,8 @@ sequence::multiply_pattern( float a_multiplier )
     {
         set_length(new_length);
     }
+    
+    set_dirty();    /* to update perfedit */
 }
 
 void
@@ -4344,6 +4352,8 @@ sequence::reverse_pattern()
     m_list_event.merge(reversed_events);
     verify_and_link();
     unlock();
+    
+    set_dirty();    /* to update perfedit */
 }
 
 void
