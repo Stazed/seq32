@@ -1,3 +1,14 @@
+seq32-1.1.3 (2019-06-28)
+  * Add expand and replace recording as suggested by Chris Ahlstrom. Also remove the
+    menu box image since we are now changing the button label to show the selected item.
+  * Add button label change to seqedit midi record volume and record type. Enhancement
+    from sequencer64. Thanks to Chris Ahlstrom.
+  * Fix duplicate dirty setting on transpose from keys.
+  * Fix duplicate pushes to undo on quantize events, transpose.
+    Set sequences dirty to update perfedit on menu change items,
+    quantize, transpose, expand, compress, reverse.
+  * Add mute/solo of individual notes for sequences.
+
 seq32-1.1.2 (2018-04-08)
   * Add move track and swap track to perfedit (song editor).
     Left mouse button and drag.
