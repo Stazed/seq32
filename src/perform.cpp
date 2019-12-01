@@ -1190,6 +1190,11 @@ void perform::push_trigger_undo(int a_track)
 
 void perform::pop_trigger_undo()
 {
+    if(undo_vect.size() == 0)
+    {
+        return;
+    }
+    
     int a_track = undo_vect[undo_vect.size()-1];
     undo_vect.pop_back();
     redo_vect.push_back(a_track);
