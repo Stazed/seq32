@@ -130,12 +130,12 @@ struct time_sig
     int beat_type;
 
     time_sig () :
-    beats_per_bar(0),
-    beat_type(0) {}
+        beats_per_bar(0),
+        beat_type(0) {}
 
     time_sig ( int bpb, int note ) :
-    beats_per_bar( bpb ),
-    beat_type( note ) {}
+        beats_per_bar( bpb ),
+        beat_type( note ) {}
 };
 
 #endif // JACK_SUPPORT
