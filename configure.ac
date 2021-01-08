@@ -89,10 +89,13 @@ AC_ARG_ENABLE(jack,
     [jack=$enableval],
     [jack=yes])
 
+dnl
+dnl JACK_SESSION is disabled by default - Deprecated
+dnl
 AC_ARG_ENABLE(jack-session,
     [AS_HELP_STRING(--disable-jack-session, [Disable JACK session support])],
     [jack_session=$enableval],
-    [jack_session=yes])
+    [jack_session=no])
 
 if test "$jack" != "no"; then
     PKG_CHECK_MODULES(JACK, jack >= 0.90.0, jack_found="yes", jack_found="no")
@@ -125,7 +128,7 @@ dnl
 AC_ARG_ENABLE(lash,
     [AS_HELP_STRING(--disable-lash, [Disable LASH support])],
     [lash=$enableval],
-    [lash=yes])
+    [lash=no])
 
 if test "$lash" != "no"; then
     PKG_CHECK_MODULES(LASH, lash-1.0 >= 0.5.0, lash_found="yes", lash_found="no")
