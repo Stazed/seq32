@@ -89,31 +89,12 @@ AC_ARG_ENABLE(jack,
     [jack=$enableval],
     [jack=yes])
 
-dnl
-dnl JACK_SESSION is disabled by default - Deprecated
-dnl
-AC_ARG_ENABLE(jack-session,
-    [AS_HELP_STRING(--disable-jack-session, [Disable JACK session support])],
-    [jack_session=$enableval],
-    [jack_session=no])
-
 if test "$jack" != "no"; then
     PKG_CHECK_MODULES(JACK, jack >= 0.90.0, jack_found="yes", jack_found="no")
     if test "$jack_found" = "yes"; then
         AC_DEFINE(JACK_SUPPORT, 1, [Define to enable JACK driver])
         AC_SUBST(JACK_CFLAGS)
         AC_SUBST(JACK_LIBS)
-
-        dnl JACK session        
-        if test "$jack_session" != "no"; then
-            AC_CHECK_HEADER(jack/session.h, jack_session_found="yes",
-                            jack_session_found="no")
-            if test "$jack_session_found" = "yes"; then
-                AC_DEFINE(JACK_SESSION, 1,
-                          [Define to enable JACK session support])
-            fi
-        fi
-
     else
         AC_MSG_WARN([*** Could not find JACK library, disabling JACK support])
     fi
@@ -156,21 +137,24 @@ if test "$ac_nsm" != "no"; then
     AC_DEFINE(NSM_SUPPORT, 1, [Define if NSM support is available.])
     AC_DEFINE(NSM_SUPPORT, 1, [Define to enable NSM])
     AC_MSG_RESULT([Sessions/NSM support enabled.]);
+else
+    AC_MSG_WARN([*** NSM support not enabled.]);
 fi
 
 dnl Check for now-required LIBLO library, needed for NSM support.
 
-PKG_CHECK_MODULES([LIBLO], [liblo], [ac_liblo="yes"], [ac_liblo="no"])
-if test "x$ac_liblo" = "xyes"; then
-    AC_DEFINE(LIBLO_SUPPORT, 1, [Define if LIBLO library is available.])
-    AC_SUBST(LIBLO_CFLAGS)
-    AC_SUBST(LIBLO_LIBS)
-    AC_MSG_RESULT([LIBLO support enabled.]);
-else
-    AC_MSG_ERROR([LIBLO library not found, OSC dev package required.])
-    ac_nsm="no"
+if test "$ac_nsm" != "no"; then
+    PKG_CHECK_MODULES([LIBLO], [liblo], [ac_liblo="yes"], [ac_liblo="no"])
+    if test "x$ac_liblo" = "xyes"; then
+        AC_DEFINE(LIBLO_SUPPORT, 1, [Define if LIBLO library is available.])
+        AC_SUBST(LIBLO_CFLAGS)
+        AC_SUBST(LIBLO_LIBS)
+        AC_MSG_RESULT([LIBLO support enabled.]);
+    else
+        AC_MSG_ERROR([LIBLO library not found, OSC dev package required.])
+        ac_nsm="no"
+    fi
 fi
-
 
 AC_OUTPUT(Makefile icons/Makefile)
 
