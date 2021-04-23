@@ -1,13 +1,13 @@
 # Maintainer: stazed<stazed@mapson.com>
 _pkgbasename=seq32
 pkgname=${_pkgbasename}-git
-pkgver=Release.1.1.3.
+pkgver=1.1.4
 pkgrel=1
 pkgdesc="A live-looping MIDI sequencer"
 arch=('i686' 'x86_64')
 url="http//github.com/Stazed/seq32.git"
 license=('GPL')
-depends=('gtkmm' 'jack')
+depends=('gtkmm' 'jack' 'liblo')
 makedepends=('git')
 provides=("${_pkgbasename}")
 conflicts=("${_pkgbasename}")
