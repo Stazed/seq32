@@ -54,6 +54,9 @@ mainwnd::mainwnd(perform *a_p):
     m_menu_mode(false),
     m_perf_edit(NULL),
     m_options(NULL)
+#ifdef NSM_SUPPORT
+    ,m_nsm(NULL)
+#endif
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq32_32_xpm));
 
@@ -478,6 +481,13 @@ mainwnd::timer_callback(  )
         m_perf_edit->toggle_jack();
 #endif // JACK_SUPPORT
 
+#ifdef NSM_SUPPORT
+    if(m_nsm != NULL)
+    {
+        poll_nsm(0);
+    }
+#endif
+
     if (m_button_mode->get_active() != global_song_start_mode)
         m_button_mode->set_active(global_song_start_mode);
 
@@ -680,6 +690,14 @@ void mainwnd::new_file()
 /* callback function */
 void mainwnd::file_save()
 {
+#ifdef NSM_SUPPORT
+    // Do not save if in NSM session
+    if(m_mainperf->get_playlist_mode() && (m_nsm != NULL))
+    {
+        fprintf(stderr, "Seq32 playlist mode cannot save!!\n" );
+        return;
+    }
+#endif
     save_file();
 }
 
@@ -1059,6 +1077,11 @@ bool mainwnd::is_save()
 void
 mainwnd::update_recent_files_menu ()
 {
+#ifdef NSM_SUPPORT
+    if(m_nsm != NULL)
+        return;
+#endif
+
     if (m_menu_recent != nullptr)
     {
         /*
@@ -1829,3 +1852,44 @@ mainwnd::update_start_BPM(double bpm)
 {
     m_perf_edit->update_start_BPM(bpm);
 }
+
+#ifdef NSM_SUPPORT
+void
+mainwnd::poll_nsm(void *)
+{
+    if ( m_nsm != NULL )
+    {
+        nsm_check_nowait( m_nsm );
+        return;
+    }
+}
+
+void
+mainwnd::set_nsm_menu()
+{
+    if(m_menu_file != nullptr)
+    {
+        m_menu_file->items().clear();
+    }
+    else
+    {
+        m_menu_file = manage(new Gtk::Menu());
+        m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
+    }
+
+    m_menu_file->items().push_back(MenuElem("Open _playlist...",
+                                            mem_fun(*this, &mainwnd::file_open_playlist)));
+
+    m_menu_file->items().push_back(MenuElem("_Save",
+                                            Gtk::AccelKey("<control>S"),
+                                            mem_fun(*this, &mainwnd::file_save)));
+
+    m_menu_file->items().push_back(MenuElem("O_ptions...",
+                                            mem_fun(*this,&mainwnd::options_dialog)));
+
+    m_menu_file->items().push_back(SeparatorElem());
+    m_menu_file->items().push_back(MenuElem("E_xit",
+                                            Gtk::AccelKey("<control>Q"),
+                                            mem_fun(*this, &mainwnd::file_exit)));      
+}
+#endif

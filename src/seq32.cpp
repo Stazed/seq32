@@ -38,6 +38,40 @@
 #include "perform.h"
 #include "userfile.h"
 
+Glib::ustring global_client_name = "seq32"; // default
+Glib::ustring global_filename = "";
+
+#ifdef NSM_SUPPORT
+#include "nsm.h"
+
+static nsm_client_t *nsm = 0;
+static int wait_nsm = 1;
+
+int                                                                  
+cb_nsm_open ( const char *save_file_path,   // See API Docs 2.2.2 
+              const char *,                 // display_name
+              const char *client_id,        // Use as JACK Client Name
+              char **,                      // out_msg
+              void *)                       // userdata
+{
+    global_filename = save_file_path;
+    global_filename += ".midi";
+    global_client_name = strdup(client_id);
+
+    wait_nsm = 0;
+    return ERR_OK;
+}                                                                    
+                                                                     
+int
+cb_nsm_save ( char **,  void *userdata)
+{
+    mainwnd *seq32_window =  (mainwnd*) userdata;
+    seq32_window->file_save();
+
+    return ERR_OK;
+}                                                          
+#endif  // NSM_SUPPORT
+
 /* struct for command parsing */
 static struct
     option long_options[] =
@@ -73,11 +107,9 @@ bool global_device_ignore = false;
 int global_device_ignore_num = 0;
 bool global_stats = false;
 bool global_pass_sysex = false;
-Glib::ustring global_filename = "";
 Glib::ustring last_used_dir ="/";
 std::string config_filename = ".seq32rc";
 std::string user_filename = ".seq32usr";
-Glib::ustring global_client_name = "seq32"; // default
 Glib::ustring playlist_file = "";
 bool global_print_keys = false;
 interaction_method_e global_interactionmethod = e_seq32_interaction;
@@ -301,6 +333,35 @@ main (int argc, char *argv[])
     else
         printf( "Error calling getenv( \"%s\" )\n", HOME );
 
+#ifdef NSM_SUPPORT
+    // Initialize NSM before creation of alsa ports with p.init()
+    // so we can get the global_client_name for setting the port names.
+    // Also gets the global_filename so it can be loaded or created on startup.
+    const char *nsm_url = getenv( "NSM_URL" );
+    
+    if ( nsm_url )
+    {
+        nsm = nsm_new();
+
+        nsm_set_open_callback( nsm, cb_nsm_open, 0 );
+
+        if ( 0 == nsm_init( nsm, nsm_url ) )
+        {
+            nsm_send_announce( nsm, "seq32", "", argv[0] );
+        }
+
+        int timeout = 0;
+        while ( wait_nsm )
+        {
+            nsm_check_wait( nsm, 500 );
+            timeout += 1;
+
+            if ( timeout > 200 )
+                exit ( 1 );
+        }
+    }
+#endif // NSM_SUPPORT
+
     p.init();
     p.launch_input_thread();
     p.launch_output_thread();
@@ -309,13 +370,45 @@ main (int argc, char *argv[])
     p_font_renderer = new font();
 
     mainwnd seq32_window( &p );
-    if (optind < argc)
+
+#ifdef NSM_SUPPORT
+    if ( nsm_url )
     {
-        if (Glib::file_test(argv[optind], Glib::FILE_TEST_EXISTS))
-            seq32_window.open_file(argv[optind]);
-        else
-            printf("File not found: %s\n", argv[optind]);
+        // Set the save callback and nsm client now that the mainwnd is created.
+        nsm_set_save_callback( nsm, cb_nsm_save, (void*) &seq32_window );
+        seq32_window.set_nsm_client(nsm);
+        
+        // Set limited file menu for session
+        seq32_window.set_nsm_menu();
+        
+        // Open the NSM session file
+        if (Glib::file_test(global_filename, Glib::FILE_TEST_EXISTS))
+        {
+            seq32_window.open_file(global_filename);
+        }
+        else    // file does not exists, so create it.
+        {
+            seq32_window.file_save();
+            seq32_window.update_window_title();
+        }
     }
+#endif // NSM_SUPPORT
+
+    // Do not use command line file if if in NSM session
+#ifdef NSM_SUPPORT
+    if(!nsm)
+    {
+#endif
+        if (optind < argc)
+        {
+            if (Glib::file_test(argv[optind], Glib::FILE_TEST_EXISTS))
+                seq32_window.open_file(argv[optind]);
+            else
+                printf("File not found: %s\n", argv[optind]);
+        }
+#ifdef NSM_SUPPORT
+    }
+#endif
 
     if(playlist_mode)
     {
@@ -362,6 +455,14 @@ main (int argc, char *argv[])
 
 #ifdef LASH_SUPPORT
     delete lash_driver;
+#endif
+
+#ifdef NSM_SUPPORT
+    if(nsm)
+    {
+        nsm_free( nsm );
+        nsm = NULL;
+    }
 #endif
 
     return EXIT_SUCCESS;

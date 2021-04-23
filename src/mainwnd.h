@@ -28,6 +28,10 @@
 
 #pragma once
 
+#ifdef NSM_SUPPORT
+#include "nsm.h"
+#endif
+
 #include <map>
 #include <gtkmm.h>
 #include <string>
@@ -117,13 +121,27 @@ private:
     void learn_toggle();
     void open_performance_edit();
     void sequence_key( int a_seq );
+public:
     void update_window_title();
+private:
     void update_window_xpm();
     void toLower(basic_string<char>&);
     void file_new();
     void file_open();
     void file_open_playlist();
+
+#ifdef NSM_SUPPORT
+    nsm_client_t *m_nsm;
+    void poll_nsm(void *);
+public:
+    void set_nsm_client(nsm_client_t *nsm){m_nsm = nsm;};
+    void set_nsm_menu();
+private:
+#endif
+
+public:
     void file_save();
+private:
     void file_save_as( file_type_e type, int a_seq );
     void file_exit();
     void new_open_error_dialog();

@@ -1,8 +1,8 @@
 # Makefile.am for seq32
 
 include %D%/pixmaps/Module.am
-AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) -Wall
-%C%_seq32_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS)
+AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) $(LIBLO_LIBS) -Wall
+%C%_seq32_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS) $(LIBLO_LIBS)
 
 bin_PROGRAMS = %D%/seq32
 
@@ -73,7 +73,8 @@ bin_PROGRAMS = %D%/seq32
   %D%/tempopopup.cpp \
   %D%/tempopopup.h \
   %D%/userfile.cpp \
-  %D%/userfile.h
+  %D%/userfile.h \
+  %D%/nsm.h
 
 EXTRA_DIST += %D%/configwin32.h
 
