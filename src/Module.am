@@ -1,7 +1,7 @@
 # Makefile.am for seq32
 
 include %D%/pixmaps/Module.am
-AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) $(LIBLO_LIBS) -Wall
+AM_CXXFLAGS = $(GTKMM_CFLAGS) $(JACK_CFLAGS) $(LASH_CFLAGS) $(LIBLO_LIBS) -Wall -Wno-deprecated-declarations
 %C%_seq32_LDADD = $(GTKMM_LIBS) $(ALSA_LIBS) $(JACK_LIBS) $(LASH_LIBS) $(LIBLO_LIBS)
 
 bin_PROGRAMS = %D%/seq32
