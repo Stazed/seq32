@@ -131,6 +131,7 @@ private:
     void file_open_playlist();
 
 #ifdef NSM_SUPPORT
+    bool m_dirty_flag;
     nsm_client_t *m_nsm;
     void poll_nsm(void *);
 public:

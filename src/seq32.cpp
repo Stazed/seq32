@@ -347,7 +347,7 @@ main (int argc, char *argv[])
 
         if ( 0 == nsm_init( nsm, nsm_url ) )
         {
-            nsm_send_announce( nsm, "seq32", "", argv[0] );
+            nsm_send_announce( nsm, "seq32", ":dirty:", argv[0] );
         }
 
         int timeout = 0;

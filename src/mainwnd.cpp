@@ -55,7 +55,8 @@ mainwnd::mainwnd(perform *a_p):
     m_perf_edit(NULL),
     m_options(NULL)
 #ifdef NSM_SUPPORT
-    ,m_nsm(NULL)
+    ,m_dirty_flag(false),
+    m_nsm(NULL)
 #endif
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq32_32_xpm));
@@ -484,6 +485,19 @@ mainwnd::timer_callback(  )
 #ifdef NSM_SUPPORT
     if(m_nsm != NULL)
     {
+        if (m_dirty_flag != global_is_modified)
+        {
+            m_dirty_flag = global_is_modified;
+            if (m_dirty_flag)
+            {
+                nsm_send_is_dirty ( m_nsm );
+            }
+            else
+            {
+                nsm_send_is_clean ( m_nsm );
+            }
+        }
+
         poll_nsm(0);
     }
 #endif
