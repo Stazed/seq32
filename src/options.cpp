@@ -18,12 +18,8 @@
 //
 //-----------------------------------------------------------------------------
 
-_Pragma("GCC diagnostic push")
-_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
-_Pragma("GCC diagnostic pop")
-
 #include <sstream>
 
 #include "options.h"

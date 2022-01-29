@@ -28,8 +28,6 @@
 #include "seqevent.h"
 #include "perform.h"
 
-_Pragma("GCC diagnostic push")
-_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #include <gtkmm/adjustment.h>
 #include <gtkmm/button.h>
 #include <gtkmm/window.h>
@@ -56,7 +54,6 @@ _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #include <gtkmm/tooltips.h>
 #include <gtkmm/invisible.h>
 #include <gtkmm/image.h>
-_Pragma("GCC diagnostic pop")
 
 #include <sigc++/bind.h>
 
