@@ -67,7 +67,7 @@ seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust):
 void
 seqdata::update_sizes()
 {
-    if( is_realized() )
+    if( get_realized() )
     {
         /* create pixmaps with window dimensions */
 

@@ -198,7 +198,7 @@ perfroll::update_sizes()
         m_vadjust->set_value(v_max_value);
     }
 
-    if ( is_realized() )
+    if ( get_realized() )
     {
         m_pixmap = Gdk::Pixmap::create( m_window,
                                         m_window_x,
@@ -300,7 +300,7 @@ perfroll::set_guides( int a_snap, int a_measure, int a_beat )
     m_measure_length = a_measure;
     m_beat_length = a_beat;
 
-    if ( is_realized() )
+    if ( get_realized() )
     {
         fill_background_pixmap();
     }
