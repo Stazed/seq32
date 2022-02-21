@@ -53,9 +53,6 @@ private:
     bool      m_menu_mode;
     static int m_sigpipe[2];
 
-#if GTK_MINOR_VERSION < 12
-    Tooltips *m_tooltips;
-#endif
     MenuBar  *m_menubar;
     Menu     *m_menu_file;
     Menu     *m_menu_recent;        /* File/Recent menu popup.    */

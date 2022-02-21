@@ -49,12 +49,7 @@
 #include "pixmaps/transpose.xpm"
 #include "pixmaps/chord.xpm"
 
-// tooltip helper, for old vs new gtk...
-#if GTK_MINOR_VERSION >= 12
-#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
-#else
-#   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
-#endif
+#define add_tooltip( obj, text ) obj->set_tooltip_text( text);
 
 int seqedit::m_initial_zoom = 2;
 int seqedit::m_initial_snap = c_ppqn / 4;
@@ -184,11 +179,6 @@ seqedit::seqedit( sequence *a_seq,
     m_menu_data = NULL;
 
     create_menus();
-
-    /* tooltips */
-#if GTK_MINOR_VERSION < 12
-    m_tooltips = manage( new Tooltips() );
-#endif
 
     /* init table, viewports and scroll bars */
     m_table     = manage( new Table( 7, 4, false));

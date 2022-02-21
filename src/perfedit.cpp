@@ -42,12 +42,7 @@
 
 using namespace sigc;
 
-// tooltip helper, for old vs new gtk...
-#if GTK_MINOR_VERSION >= 12
-#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
-#else
-#   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
-#endif
+#define add_tooltip( obj, text ) obj->set_tooltip_text( text);
 
 ff_rw_type_e FF_RW_button_type = FF_RW_RELEASE;
 
@@ -68,11 +63,6 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     /* main window */
     set_title( "seq32 - Song Editor");
     set_size_request(750, 400);
-
-    /* tooltips */
-#if GTK_MINOR_VERSION < 12
-    m_tooltips = manage( new Tooltips() );
-#endif
 
     m_vadjust = manage( new Adjustment(0,0,1,1,1,1 ));
     m_hadjust = manage( new Adjustment(0,0,1,1,1,1 ));

@@ -42,12 +42,7 @@
 bool global_is_running = false;
 bool global_is_modified = false;
 
-// tooltip helper, for old vs new gtk...
-#if GTK_MINOR_VERSION >= 12
-#   define add_tooltip( obj, text ) obj->set_tooltip_text( text);
-#else
-#   define add_tooltip( obj, text ) m_tooltips->set_tip( *obj, text );
-#endif
+#define add_tooltip( obj, text ) obj->set_tooltip_text( text);
 
 mainwnd::mainwnd(perform *a_p):
     m_mainperf(a_p),
@@ -67,9 +62,6 @@ mainwnd::mainwnd(perform *a_p):
     /* main window */
     update_window_title();
 
-#if GTK_MINOR_VERSION < 12
-    m_tooltips = manage( new Tooltips() );
-#endif
     m_main_wid = manage( new mainwid( m_mainperf, this));
     m_main_time = manage( new maintime( ));
 

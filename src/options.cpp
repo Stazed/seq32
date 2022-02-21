@@ -25,12 +25,8 @@
 #include "options.h"
 #include "keybindentry.h"
 
-// tooltip helper, for old vs new gtk...
-#if GTK_MINOR_VERSION >= 12
-#   define add_tooltip(obj, text) obj->set_tooltip_text(text);
-#else
-#   define add_tooltip(obj, text) m_tooltips->set_tip(*obj, text);
-#endif
+
+#define add_tooltip(obj, text) obj->set_tooltip_text(text);
 
 const int c_status = 0;
 const int c_status_inv = 1;
@@ -44,10 +40,6 @@ options::options (Gtk::Window & parent, perform * a_p):
     Gtk::Dialog ("Options", parent, true, true),
     m_perf(a_p)
 {
-#if GTK_MINOR_VERSION < 12
-    m_tooltips = manage(new Tooltips());
-#endif
-
     HBox *hbox = manage (new HBox ());
     get_vbox ()->pack_start (*hbox, false, false);
 
