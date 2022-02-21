@@ -25,11 +25,6 @@
 
 
 tempo::tempo( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust ) :
-    m_black(Gdk::Color("black")),
-    m_white(Gdk::Color("white")),
-    m_grey(Gdk::Color("green")),
-    //m_grey(Gdk::Color("grey")),
-
     m_mainperf(a_perf),
     m_perfedit(a_perf_edit),
     m_hadjust(a_hadjust),
@@ -41,19 +36,20 @@ tempo::tempo( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust ) :
     m_snap(c_ppqn),
     m_measure_length(c_ppqn * 4),
     m_init_move(false),
-    m_moving(false)
+    m_moving(false),
+    m_draw_background(false)
 {
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
+
     add_events( Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
                 Gdk::POINTER_MOTION_MASK |
                 Gdk::LEAVE_NOTIFY_MASK );
-
-    // in the constructor you can only allocate colors,
-    // get_window() returns 0 because we have not been realized
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-    colormap->alloc_color( m_black );
-    colormap->alloc_color( m_white );
-    colormap->alloc_color( m_grey );
 
     m_popup_tempo_wnd =  new tempopopup(this);
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &tempo::change_horz ));
@@ -83,24 +79,13 @@ tempo::unlock( )
 }
 
 void
-tempo::increment_size()
-{
-
-}
-
-void
-tempo::update_sizes()
-{
-
-}
-
-void
 tempo::set_zoom (int a_zoom)
 {
     if (m_perfedit->zoom_check(a_zoom))
     {
         m_perf_scale_x = a_zoom;
-        draw_background();
+        m_draw_background = true;
+        queue_draw();
     }
 }
 
@@ -112,8 +97,9 @@ tempo::on_realize()
 
     // Now we can allocate any additional resources we need
     m_window = get_window();
-    m_gc = Gdk::GC::create( m_window );
     m_window->clear();
+    
+    m_surface_window = m_window->create_cairo_context();
 
     set_size_request( 10, c_timearea_y );
 }
@@ -124,6 +110,8 @@ tempo::change_horz( )
     if ( m_4bar_offset != (int) m_hadjust->get_value() )
     {
         m_4bar_offset = (int) m_hadjust->get_value();
+
+        m_draw_background = true;
         queue_draw();
     }
 }
@@ -137,55 +125,85 @@ tempo::set_guides( int a_snap, int a_measure )
         m_measure_length = a_measure;
         reset_tempo_list();
     }
+
+    m_draw_background = true;
     queue_draw();
 }
 
 int
 tempo::idle_progress( )
 {
+    if(m_draw_background)
+    {
+        m_draw_background = false;
+        draw_background();
+        on_draw(m_surface_window);
+    }
     return true;
-}
-
-void
-tempo::update_pixmap()
-{
-
-}
-
-void
-tempo::draw_pixmap_on_window()
-{
-
 }
 
 bool
 tempo::on_expose_event (GdkEventExpose * /* ev */ )
 {
-    draw_background();
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+        m_surface_window = m_window->create_cairo_context();
+        m_draw_background = true;
+    }
+
+
+  //  draw_background();
     return true;
 }
 
 void
 tempo::draw_background()
 {
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+
+    Pango::FontDescription font;
+    int text_width;
+    int text_height;
+
+    font.set_family(c_font);
+    font.set_size((c_key_fontsize - 1) * Pango::SCALE);
+    font.set_weight(Pango::WEIGHT_BOLD);
+
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(-1, -1, width + 2, height + 2);
+    cr->paint_with_alpha(0.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
+
     /* clear background */
-    m_gc->set_foreground(m_white);
-    m_window->draw_rectangle(m_gc,true,
-                             0,
-                             0,
-                             m_window_x,
-                             m_window_y );
+    cr->set_source_rgb( 1.0, 1.0, 1.0);            // white FIXME
+    cr->set_line_width( 1);
+    cr->rectangle( 0, 0, m_window_x, m_window_y);
+    cr->stroke_preserve();
+    cr->fill();
 
-    m_gc->set_foreground(m_black);
-    m_window->draw_line(m_gc,
-                        0,
-                        m_window_y - 1,
-                        m_window_x,
-                        m_window_y - 1 );
+    cr->set_source_rgb( 0.0, 0.0, 0.0);            // black  FIXME
+    cr->set_line_width( 2.0);
+    cr->move_to( 0, m_window_y - 1);
+    cr->line_to( m_window_x, m_window_y - 1);
+    cr->stroke();
 
-
-    /* draw vert lines */
-    m_gc->set_foreground(m_grey);
+    /* draw vertical lines */
+    cr->set_source_rgb( 0.6, 0.6, 0.6);            // Grey  FIXME
+    cr->set_line_width( 1);
 
     long tick_offset = (m_4bar_offset * 16 * c_ppqn);
     long first_measure = tick_offset / m_measure_length;
@@ -196,20 +214,17 @@ tempo::draw_background()
         int x_pos = ((i * m_measure_length) - tick_offset) / m_perf_scale_x;
 
         /* beat */
-        m_window->draw_line(m_gc,
-                            x_pos,
-                            0,
-                            x_pos,
-                            m_window_y );
-
+        cr->move_to( x_pos, 0);
+        cr->line_to( x_pos, m_window_y);
+        cr->stroke();
     }
-    
+
     /* Draw the markers */
     list<tempo_mark>::iterator i;
     for ( i = m_list_marker.begin(); i != m_list_marker.end(); i++ )
     {
         tempo_mark current_marker = *(i);
-        
+
         if(m_moving)
         {
             if(current_marker.tick == m_move_marker.tick)
@@ -218,7 +233,7 @@ tempo::draw_background()
                 current_marker = m_current_mark;
             }
         }
-        
+
         long tempo_marker = current_marker.tick;
         tempo_marker -= (m_4bar_offset * 16 * c_ppqn);
         tempo_marker /= m_perf_scale_x;
@@ -228,10 +243,12 @@ tempo::draw_background()
             // Load the xpm image
             char str[10];
 
-            if(current_marker.bpm == STOP_MARKER)         // Stop marker
+            if(current_marker.bpm == STOP_MARKER) // Stop marker
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(stop_marker_xpm);
-                m_window->draw_pixbuf(m_pixbuf,0,0,tempo_marker -4,0, -1,-1,Gdk::RGB_DITHER_NONE, 0, 0);
+
+                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, tempo_marker -4, 0.0);
+                cr->paint();
 
                 snprintf
                 (
@@ -242,7 +259,8 @@ tempo::draw_background()
             else                                // tempo marker
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(tempo_marker_xpm);
-                m_window->draw_pixbuf(m_pixbuf,0,0,tempo_marker -4,0, -1,-1,Gdk::RGB_DITHER_NONE, 0, 0);
+                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, tempo_marker -4, 0.0);
+                cr->paint();
 
                 // set the tempo BPM value
                 snprintf
@@ -253,14 +271,61 @@ tempo::draw_background()
                 );
             }
 
-            // print the tempo or 'Stop'
-            m_gc->set_foreground(m_white);
-            p_font_renderer->render_string_on_drawable(m_gc,
-                    tempo_marker + 5,
-                    0,
-                    m_window, str, font::WHITE );
+            // set background for tempo labels to black
+            cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black FIXME
+
+            auto t = create_pango_layout(str);
+            t->set_font_description(font);
+            t->get_pixel_size(text_width, text_height);
+
+            // draw the black background for the labels
+            cr->rectangle(tempo_marker + 5, 0, text_width, text_height);
+            cr->stroke_preserve();
+            cr->fill();
+
+            // print the BPM or [Stop] label in white
+            cr->set_source_rgb( 1.0, 1.0, 1.0);    // White FIXME
+            cr->move_to( tempo_marker + 5, (m_window_y * .5) - (text_height * .5) - 3 );
+
+            t->show_in_cairo_context(cr);
         }
     }
+}
+
+bool
+tempo::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+        m_draw_background = true;
+    }
+
+    if (m_draw_background)
+    {
+        m_draw_background = false;
+        draw_background();
+    }
+
+    cr->set_source_rgb(1.0, 1.0, 1.0);  // White FIXME
+    cr->rectangle (0.0, 0.0, width, height);
+    cr->stroke_preserve();
+    cr->fill();
+
+    /* Draw the new background */
+    cr->set_source(m_surface, 0.0, 0.0);
+    cr->paint();
+
+    return true;
 }
 
 bool
@@ -278,6 +343,8 @@ tempo::on_button_press_event(GdkEventButton* p0)
         {
             m_init_move = false;
             m_moving = true;
+            m_draw_background = true;
+            queue_draw();
             return true;
         }
         
@@ -292,6 +359,8 @@ tempo::on_button_press_event(GdkEventButton* p0)
             m_current_mark.tick = tick;
             m_init_move = false;
             m_moving = true;
+            m_draw_background = true;
+            queue_draw();
             return true;
         }
         
@@ -306,7 +375,12 @@ tempo::on_button_press_event(GdkEventButton* p0)
     /* right mouse button delete marker */
     if ( p0->button == 3 )
     {
-        check_above_marker(tick, true, false);
+        if (check_above_marker(tick, true, false))
+        {
+            m_draw_background = true;
+            queue_draw();
+        }
+
         return true;
     }
 
@@ -325,6 +399,7 @@ tempo::on_button_release_event(GdkEventButton* p0)
         {
             /* Clear the move marker */
             m_move_marker.tick = 0; 
+            m_draw_background = true;
             queue_draw();
             return false;
         }
@@ -339,6 +414,7 @@ tempo::on_button_release_event(GdkEventButton* p0)
         {
             /* Clear the move marker */
             m_move_marker.tick = 0; 
+            m_draw_background = true;
             queue_draw();
             return false;
         }
@@ -360,7 +436,10 @@ tempo::on_button_release_event(GdkEventButton* p0)
          * active, so we adjust it here. */
         this->get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
     }
-    
+
+    m_draw_background = true;
+    queue_draw();
+
     return true;
 }
 
@@ -391,6 +470,7 @@ tempo::on_motion_notify_event(GdkEventMotion* a_ev)
         tick = tick - (tick % m_snap);
         /* m_current_mark is used to show the movement in draw background */
         m_current_mark.tick = tick;
+        m_draw_background = true;
         queue_draw();
     }
     else /* we are not over a marker and not moving so reset everything if not done already */
@@ -443,6 +523,7 @@ tempo::set_BPM(double a_bpm)
 #endif // SEQ42_UNDO_TEMPO
     m_current_mark.bpm = a_bpm;
     add_marker(m_current_mark);
+    m_draw_background = true;
     queue_draw();
 }
 
@@ -520,6 +601,7 @@ tempo::set_start_BPM(double a_bpm)
 
         reset_tempo_list();
         m_mainperf->set_bpm( a_bpm );
+        m_draw_background = true;
         queue_draw();
     }
 }
@@ -558,6 +640,7 @@ tempo::load_tempo_list()
     m_list_marker = m_mainperf->m_list_total_marker;        // update tempo class
     reset_tempo_list();                                     // needed to update m_list_no_stop_markers & calculate start frames
     m_mainperf->set_bpm(m_list_marker.begin()->bpm);
+    m_draw_background = true;
     queue_draw();
 }
 
@@ -692,6 +775,7 @@ tempo::check_above_marker(uint64_t mouse_tick, bool a_delete, bool exact )
                 
                 m_list_marker.erase(i);
                 reset_tempo_list();
+                m_draw_background = true;
                 queue_draw();
                 ret = true;
                 break;
@@ -743,6 +827,7 @@ tempo::pop_undo()
         m_mainperf->m_list_undo.pop();
         reset_tempo_list();
         m_mainperf->set_bpm(m_mainperf->get_start_tempo());
+        m_draw_background = true;
         queue_draw();
     }
 
@@ -762,6 +847,7 @@ tempo::pop_redo()
         m_mainperf->m_list_redo.pop();
         reset_tempo_list();
         m_mainperf->set_bpm(m_mainperf->get_start_tempo());
+        m_draw_background = true;
         queue_draw();
     }
 

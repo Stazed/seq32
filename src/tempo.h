@@ -56,9 +56,9 @@ class tempo: public Gtk::DrawingArea
 
 private:
 
-    Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;
-    Gdk::Color    m_black, m_white, m_grey;
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface;
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
 
     Glib::RefPtr<Gdk::Pixbuf> m_pixbuf;
 
@@ -84,6 +84,7 @@ private:
     
     bool m_init_move;
     bool m_moving;
+    bool m_draw_background;
     tempo_mark m_move_marker;
     
     /* locking */
@@ -100,12 +101,6 @@ private:
     void on_size_allocate(Gtk::Allocation &a_r );
     
     void draw_background();
-    void update_sizes();
-    void draw_pixmap_on_window();
-    void draw_progress_on_window();
-    void update_pixmap();
-
-    int idle_progress();
 
     void change_horz();
     void set_tempo_marker(long a_tick);
@@ -121,18 +116,21 @@ private:
     
     bool check_above_marker(uint64_t mouse_tick, bool a_delete, bool exact );
 
+protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+
 public:
 
     tempo( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust );
     ~tempo();
 
+    int idle_progress();
     void set_zoom (int a_zoom);
 
     void reset();
     void set_scale( int a_scale );
     void set_guides( int a_snap, int a_measure );
 
-    void increment_size();
     void set_BPM(double a_bpm);
     static bool sort_tempo_mark(const tempo_mark &a, const tempo_mark &b);
     static bool reverse_sort_tempo_mark(const tempo_mark &a, const tempo_mark &b);

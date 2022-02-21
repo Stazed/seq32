@@ -95,6 +95,8 @@ const int c_data_x = 2;
 /* size of handle */
 const int c_data_handle_x = 8;
 const int c_data_handle_y = 4;
+const char * const c_font = "monospace";
+const int c_key_fontsize = 8;
 
 /* keyboard */
 const int c_key_x = 16;
