@@ -633,13 +633,13 @@ mainwid::~mainwid( )
 bool
 mainwid::on_focus_in_event(GdkEventFocus*)
 {
-    set_flags(Gtk::HAS_FOCUS);
+    grab_focus();
     return false;
 }
 
 bool
 mainwid::on_focus_out_event(GdkEventFocus*)
 {
-    unset_flags(Gtk::HAS_FOCUS);
+   // unset_flags(Gtk::HAS_FOCUS);
     return false;
 }

@@ -901,14 +901,14 @@ perfroll::convert_xy( int a_x, int a_y, long *a_tick, int *a_seq)
 bool
 perfroll::on_focus_in_event(GdkEventFocus*)
 {
-    set_flags(Gtk::HAS_FOCUS);
+    grab_focus();
     return false;
 }
 
 bool
 perfroll::on_focus_out_event(GdkEventFocus*)
 {
-    unset_flags(Gtk::HAS_FOCUS);
+  //  unset_flags(Gtk::HAS_FOCUS);
     return false;
 }
 

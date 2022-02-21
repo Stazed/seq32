@@ -620,14 +620,14 @@ seqevent::snap_x( int *a_x )
 bool
 seqevent::on_focus_in_event(GdkEventFocus*)
 {
-    set_flags(Gtk::HAS_FOCUS);
+    grab_focus();
     return false;
 }
 
 bool
 seqevent::on_focus_out_event(GdkEventFocus*)
 {
-    unset_flags(Gtk::HAS_FOCUS);
+   // unset_flags(Gtk::HAS_FOCUS);
     return false;
 }
 

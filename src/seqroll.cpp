@@ -1136,14 +1136,14 @@ seqroll::on_leave_notify_event(GdkEventCrossing* a_p0)
 bool
 seqroll::on_focus_in_event(GdkEventFocus*)
 {
-    set_flags(Gtk::HAS_FOCUS);
+    grab_focus();
     return false;
 }
 
 bool
 seqroll::on_focus_out_event(GdkEventFocus*)
 {
-    unset_flags(Gtk::HAS_FOCUS);
+   // unset_flags(Gtk::HAS_FOCUS);
     return false;
 }
 
