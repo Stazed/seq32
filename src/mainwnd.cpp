@@ -173,7 +173,8 @@ mainwnd::mainwnd(perform *a_p):
     /* group learn button */
     m_button_learn = manage( new Button( ));
     m_button_learn->set_focus_on_click( false );
-    m_button_learn->set_flags( m_button_learn->get_flags() & ~Gtk::CAN_FOCUS );
+    m_button_learn->set_can_focus(false);   // FIXME check this
+  //  m_button_learn->set_flags( m_button_learn->get_flags() & ~Gtk::CAN_FOCUS );
     m_button_learn->set_image(*manage(new Image(
                                           Gdk::Pixbuf::create_from_xpm_data( learn_xpm ))));
     m_button_learn->signal_clicked().connect(
