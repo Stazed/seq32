@@ -1437,12 +1437,12 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
         {
             if ( a_ev->state & GDK_MOD1_MASK ) // alt key
             {
-                if ((a_ev->keyval == GDK_b || a_ev->keyval == GDK_B) || // bpm
-                        (a_ev->keyval == GDK_f || a_ev->keyval == GDK_F) || // file
-                        (a_ev->keyval == GDK_h || a_ev->keyval == GDK_H) || // help
-                        (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // name
-                        (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) || // set
-                        (a_ev->keyval == GDK_v || a_ev->keyval == GDK_V))   // view
+                if ((a_ev->keyval == GDK_KEY_b || a_ev->keyval == GDK_KEY_B) || // bpm
+                        (a_ev->keyval == GDK_KEY_f || a_ev->keyval == GDK_KEY_F) || // file
+                        (a_ev->keyval == GDK_KEY_h || a_ev->keyval == GDK_KEY_H) || // help
+                        (a_ev->keyval == GDK_KEY_n || a_ev->keyval == GDK_KEY_N) || // name
+                        (a_ev->keyval == GDK_KEY_s || a_ev->keyval == GDK_KEY_S) || // set
+                        (a_ev->keyval == GDK_KEY_v || a_ev->keyval == GDK_KEY_V))   // view
                 {
                     return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
                 }
@@ -1450,11 +1450,11 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
 
             if ( a_ev->state & GDK_CONTROL_MASK ) // ctrl key
             {
-                if ((a_ev->keyval == GDK_e || a_ev->keyval == GDK_E) || // song editor
-                        (a_ev->keyval == GDK_n || a_ev->keyval == GDK_N) || // new file
-                        (a_ev->keyval == GDK_o || a_ev->keyval == GDK_O) || // open file
-                        (a_ev->keyval == GDK_q || a_ev->keyval == GDK_Q) || // quit
-                        (a_ev->keyval == GDK_s || a_ev->keyval == GDK_S) )  // save
+                if ((a_ev->keyval == GDK_KEY_e || a_ev->keyval == GDK_KEY_E) || // song editor
+                        (a_ev->keyval == GDK_KEY_n || a_ev->keyval == GDK_KEY_N) || // new file
+                        (a_ev->keyval == GDK_KEY_o || a_ev->keyval == GDK_KEY_O) || // open file
+                        (a_ev->keyval == GDK_KEY_q || a_ev->keyval == GDK_KEY_Q) || // quit
+                        (a_ev->keyval == GDK_KEY_s || a_ev->keyval == GDK_KEY_S) )  // save
                 {
                     return Gtk::Window::on_key_press_event(a_ev); // return =  don't do anything else
                 }
@@ -1469,11 +1469,11 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
            return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
         // stop, start, song, jack, menu, edit ,L
-        if(a_ev->keyval == GDK_Tab || a_ev->keyval == GDK_Return) // use it for buttons only
+        if(a_ev->keyval == GDK_KEY_Tab || a_ev->keyval == GDK_KEY_Return) // use it for buttons only
             return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
         // bpm, screen set
-        if(a_ev->keyval == GDK_Up || a_ev->keyval == GDK_Down) // use it for spin buttons only
+        if(a_ev->keyval == GDK_KEY_Up || a_ev->keyval == GDK_KEY_Down) // use it for spin buttons only
             return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
         if (a_ev->state & GDK_SHIFT_MASK ) // use it for reverse tab

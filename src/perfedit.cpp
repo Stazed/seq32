@@ -369,30 +369,30 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
     if ( a_ev->state & GDK_CONTROL_MASK )
     {
         /* Ctrl-Z: Undo */
-        if ( a_ev->keyval == GDK_z || a_ev->keyval == GDK_Z )
+        if ( a_ev->keyval == GDK_KEY_z || a_ev->keyval == GDK_KEY_Z )
         {
             undo();
             return true;
         }
         /* Ctrl-R: Redo */
-        if ( a_ev->keyval == GDK_r || a_ev->keyval == GDK_R )
+        if ( a_ev->keyval == GDK_KEY_r || a_ev->keyval == GDK_KEY_R )
         {
             redo();
             return true;
         }
     }
 
-    if (a_ev->keyval == GDK_Z)         /* zoom in              */
+    if (a_ev->keyval == GDK_KEY_Z)         /* zoom in              */
     {
         set_zoom(m_perfroll->m_zoom / 2);
         return true;
     }
-    else if (a_ev->keyval == GDK_0)         /* reset to normal zoom */
+    else if (a_ev->keyval == GDK_KEY_0)         /* reset to normal zoom */
     {
         set_zoom(c_perf_scale_x);
         return true;
     }
-    else if (a_ev->keyval == GDK_z)         /* zoom out             */
+    else if (a_ev->keyval == GDK_KEY_z)         /* zoom out             */
     {
         set_zoom(m_perfroll->m_zoom * 2);
         return true;

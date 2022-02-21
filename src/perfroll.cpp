@@ -811,7 +811,7 @@ perfroll::on_key_press_event(GdkEventKey* a_p0)
     {
         if ( a_p0->type == GDK_KEY_PRESS )
         {
-            if ( a_p0->keyval ==  GDK_Delete || a_p0->keyval == GDK_BackSpace )
+            if ( a_p0->keyval ==  GDK_KEY_Delete || a_p0->keyval == GDK_KEY_BackSpace )
             {
                 m_mainperf->push_trigger_undo(m_drop_sequence);
                 m_mainperf->get_sequence( m_drop_sequence )->del_selected_trigger();
@@ -822,21 +822,21 @@ perfroll::on_key_press_event(GdkEventKey* a_p0)
             if ( a_p0->state & GDK_CONTROL_MASK )
             {
                 /* cut */
-                if ( a_p0->keyval == GDK_x || a_p0->keyval == GDK_X )
+                if ( a_p0->keyval == GDK_KEY_x || a_p0->keyval == GDK_KEY_X )
                 {
                     m_mainperf->push_trigger_undo(m_drop_sequence);
                     m_mainperf->get_sequence( m_drop_sequence )->cut_selected_trigger();
                     ret = true;
                 }
                 /* copy */
-                if ( a_p0->keyval == GDK_c || a_p0->keyval == GDK_C )
+                if ( a_p0->keyval == GDK_KEY_c || a_p0->keyval == GDK_KEY_C )
                 {
                     m_mainperf->get_sequence( m_drop_sequence )->copy_selected_trigger();
                     ret = true;
                 }
 
                 /* paste */
-                if ( a_p0->keyval == GDK_v || a_p0->keyval == GDK_V )
+                if ( a_p0->keyval == GDK_KEY_v || a_p0->keyval == GDK_KEY_V )
                 {
                     m_mainperf->push_trigger_undo(m_drop_sequence);
                     m_mainperf->get_sequence( m_drop_sequence )->paste_trigger();
