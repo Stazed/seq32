@@ -193,140 +193,140 @@ options::add_keyboard_page()
     controltable->set_spacings(4);
     controlframe->add(*controltable);
 
-    label = manage(new Label("Start", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Start", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_start));
     controltable->attach(*label, 0, 1, 0, 1);
     controltable->attach(*entry, 1, 2, 0, 1);
 
-    label = manage(new Label("Stop", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Stop", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_stop));
     controltable->attach(*label, 0, 1, 1, 2);
     controltable->attach(*entry, 1, 2, 1, 2);
 
-    label = manage(new Label("Song", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Song", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_song));
     controltable->attach(*label, 0, 1, 2, 3);
     controltable->attach(*entry, 1, 2, 2, 3);
 #ifdef JACK_SUPPORT
-    label = manage(new Label("Jack", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Jack", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_jack));
     controltable->attach(*label, 0, 1, 3, 4);
     controltable->attach(*entry, 1, 2, 3, 4);
 #endif // JACK_SUPPORT
 
-    label = manage(new Label("Tap BPM", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Tap BPM", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_tap_bpm));
     controltable->attach(*label, 0, 1, 4, 5);
     controltable->attach(*entry, 1, 2, 4, 5);
     
-    label = manage(new Label("Playlist next", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Playlist next", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_playlist_next));
     controltable->attach(*label, 0, 1, 5, 6);
     controltable->attach(*entry, 1, 2, 5, 6);
     
-    label = manage(new Label("Snapshot 1", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Snapshot 1", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_snapshot_1));
     controltable->attach(*label, 2, 3, 0, 1);
     controltable->attach(*entry, 3, 4, 0, 1);
 
-    label = manage(new Label("Snapshot 2", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Snapshot 2", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_snapshot_2));
     controltable->attach(*label, 2, 3, 1, 2);
     controltable->attach(*entry, 3, 4, 1, 2);
 
-    label = manage(new Label("BPM up", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("BPM up", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_bpm_up));
     controltable->attach(*label, 2, 3, 2, 3);
     controltable->attach(*entry, 3, 4, 2, 3);
     
-    label = manage(new Label("BPM down", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("BPM down", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_bpm_dn));
     controltable->attach(*label, 2, 3, 3, 4);
     controltable->attach(*entry, 3, 4, 3, 4);
 
-    label = manage(new Label("Rewind", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Rewind", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_rewind));
     controltable->attach(*label, 2, 3, 4, 5);
     controltable->attach(*entry, 3, 4, 4, 5);
     
-    label = manage(new Label("Playlist previous", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Playlist previous", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_playlist_prev));
     controltable->attach(*label, 2, 3, 5, 6);
     controltable->attach(*entry, 3, 4, 5, 6);  
     
-    label = manage(new Label("Replace", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Replace", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_replace));
     controltable->attach(*label, 4, 5, 0, 1);
     controltable->attach(*entry, 5, 6, 0, 1);
 
-    label = manage(new Label("Queue", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Queue", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_queue));
     controltable->attach(*label, 4, 5, 1, 2);
     controltable->attach(*entry, 5, 6, 1, 2);
 
-    label = manage(new Label("Keep queue", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Keep queue", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_keep_queue));
     controltable->attach(*label, 4, 5, 2, 3);
     controltable->attach(*entry, 5, 6, 2, 3);
 
-    label = manage(new Label("Menu mode", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Menu mode", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_menu));
     controltable->attach(*label, 4, 5, 3, 4);
     controltable->attach(*entry, 5, 6, 3, 4);
     
-    label = manage(new Label("Fast forward", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Fast forward", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_forward));
     controltable->attach(*label, 4, 5, 4, 5);
     controltable->attach(*entry, 5, 6, 4, 5);
     
-    label = manage(new Label("Export trigger", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Export trigger", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_export_trigger));
     controltable->attach(*label, 4, 5, 5, 6);
     controltable->attach(*entry, 5, 6, 5, 6);
 
-    label = manage(new Label("Screenset up", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Screenset up", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_screenset_up));
     controltable->attach(*label, 6, 7, 0, 1);
     controltable->attach(*entry, 7, 8, 0, 1);
 
-    label = manage(new Label("Screenset down", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Screenset down", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_screenset_dn));
     controltable->attach(*label, 6, 7, 1, 2);
     controltable->attach(*entry, 7, 8, 1, 2);
 
-    label = manage(new Label("Set playing screenset", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Set playing screenset", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_set_playing_screenset));
     controltable->attach(*label, 6, 7, 2, 3);
     controltable->attach(*entry, 7, 8, 2, 3);
 
-    label = manage(new Label("Follow transport", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Follow transport", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_follow_trans));
     controltable->attach(*label, 6, 7, 3, 4);
     controltable->attach(*entry, 7, 8, 3, 4);
     
-    label = manage(new Label("Pointer key", Gtk::ALIGN_RIGHT));
+    label = manage(new Label("Pointer key", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_pointer));
     controltable->attach(*label, 6, 7, 4, 5);
@@ -353,7 +353,7 @@ options::add_keyboard_page()
         int slot = x * 2 + y; // count this way: 0, 4, 8, 16...
         char buf[16];
         snprintf(buf, sizeof(buf), "%d", slot);
-        numlabel = manage(new Label(buf, Gtk::ALIGN_RIGHT));
+        numlabel = manage(new Label(buf, Gtk::ALIGN_END));
         entry = manage(new KeyBindEntry(KeyBindEntry::events, NULL,
                                         m_perf, slot));
         toggletable->attach(*numlabel, x, x + 1, y, y + 1);
@@ -376,7 +376,7 @@ options::add_keyboard_page()
         y = i/8;
         char buf[16];
         snprintf(buf, sizeof(buf), "%d", i);
-        numlabel = manage(new Label(buf, Gtk::ALIGN_RIGHT));
+        numlabel = manage(new Label(buf, Gtk::ALIGN_END));
         entry = manage(new KeyBindEntry(KeyBindEntry::groups, NULL,
                                         m_perf, i));
         mutegrouptable->attach(*numlabel, x, x + 1, y, y + 1);
