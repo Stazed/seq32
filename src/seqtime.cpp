@@ -23,10 +23,6 @@
 
 seqtime::seqtime(sequence *a_seq, int a_zoom,
                  Gtk::Adjustment   *a_hadjust):
-    m_black(Gdk::Color("black")),
-    m_white(Gdk::Color("white")),
-    m_grey(Gdk::Color("grey")),
-
     m_hadjust(a_hadjust),
 
     m_scroll_offset_ticks(0),
@@ -35,15 +31,15 @@ seqtime::seqtime(sequence *a_seq, int a_zoom,
     m_seq(a_seq),
     m_zoom(a_zoom)
 {
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
+
     add_events( Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK );
-
-    // in the construor you can only allocate colors,
-    // get_window() returns 0 because we have not be realized
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-    colormap->alloc_color( m_black );
-    colormap->alloc_color( m_white );
-    colormap->alloc_color( m_grey );
 
     /* set default size */
     set_size_request( 10, c_timearea_y );
@@ -54,14 +50,18 @@ seqtime::seqtime(sequence *a_seq, int a_zoom,
 void
 seqtime::update_sizes()
 {
-    /* set these for later */
     if( get_realized() )
     {
-        m_pixmap = Gdk::Pixmap::create( m_window,
-                                        m_window_x,
-                                        m_window_y, -1 );
-        update_pixmap();
-        queue_draw();
+        if (m_window_x != m_surface->get_width() || m_window_y != m_surface->get_height())
+        {
+            m_surface = Cairo::ImageSurface::create(
+                Cairo::Format::FORMAT_ARGB32,
+                m_window_x,
+                m_window_y
+            );
+        }
+
+        update_surface();
     }
 }
 
@@ -76,7 +76,9 @@ seqtime::on_realize()
 
     // Now we can allocate any additional resources we need
     m_window = get_window();
-    m_gc = Gdk::GC::create( m_window );
+    
+    m_surface_window = m_window->create_cairo_context();
+
     m_window->clear();
 
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqtime::change_horz ));
@@ -90,8 +92,7 @@ seqtime::change_horz( )
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
 
-    update_pixmap();
-    force_draw();
+    update_surface();
 }
 
 void
@@ -108,6 +109,8 @@ seqtime::on_size_allocate(Gtk::Allocation & a_r )
 bool
 seqtime::idle_progress( )
 {
+    on_draw(m_surface_window);
+
     return true;
 }
 
@@ -125,8 +128,6 @@ seqtime::reset()
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
 
     update_sizes();
-    update_pixmap();
-    draw_pixmap_on_window();
 }
 
 void
@@ -135,32 +136,41 @@ seqtime::redraw()
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
 
-    update_pixmap();
-    draw_pixmap_on_window();
+    update_surface();
 }
 
 void
-seqtime::update_pixmap()
+seqtime::update_surface()
 {
-    /* clear background */
-    m_gc->set_foreground(m_white);
-    m_pixmap->draw_rectangle(m_gc,true,
-                             0,
-                             0,
-                             m_window_x,
-                             m_window_y );
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+    
+    Pango::FontDescription font;
+    int text_width;
+    int text_height;
 
-    m_gc->set_foreground(m_black);
-    m_pixmap->draw_line(m_gc,
-                        0,
-                        m_window_y - 1,
-                        m_window_x,
-                        m_window_y - 1 );
+    font.set_family(c_font);
+    font.set_size((c_key_fontsize - 2) * Pango::SCALE);
+    font.set_weight(Pango::WEIGHT_NORMAL);
+
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(-1, -1, width + 2, height + 2);
+    cr->paint_with_alpha(1.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
+
+    cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+    cr->move_to(0.0, m_window_y - 1);
+    cr->line_to(m_window_x,  m_window_y - 1 );
+    cr->stroke();
 
     // at 32, a bar every measure
     // at 16
     /*
         zoom   32         16         8        4        1
+
 
         ml
         c_ppqn
@@ -194,79 +204,87 @@ seqtime::update_pixmap()
     //printf ( "ticks_per_step[%d] start_tick[%d] end_tick[%d]\n",
     //         ticks_per_step, start_tick, end_tick );
 
-    /* draw vert lines */
-    m_gc->set_foreground(m_black);
-    for ( int i=start_tick; i<end_tick; i += ticks_per_step )
+    /* draw vertical lines */
+    for ( int i = start_tick; i < end_tick; i += ticks_per_step )
     {
         int base_line = i / m_zoom;
 
         /* beat */
-        m_pixmap->draw_line(m_gc,
-                            base_line -  m_scroll_offset_x,
-                            0,
-                            base_line -  m_scroll_offset_x,
-                            m_window_y );
+        cr->move_to(base_line -  m_scroll_offset_x, 0);
+        cr->line_to(base_line -  m_scroll_offset_x, m_window_y );
+        cr->stroke();
 
+        /* The bar numbers */
         char bar[16];
         snprintf(bar, sizeof(bar), "%d", (i/ ticks_per_measure ) + 1);
 
-        m_gc->set_foreground(m_black);
+        auto t = create_pango_layout(bar);
+        t->set_font_description(font);
+        t->get_pixel_size(text_width, text_height);
 
-        p_font_renderer->render_string_on_drawable(m_gc,
-                base_line + 2 -  m_scroll_offset_x,
-                0,
-                m_pixmap, bar, font::BLACK );
+        cr->move_to(base_line + 2 -  m_scroll_offset_x, -1);
+
+        t->show_in_cairo_context(cr);
     }
 
     long end_x = m_seq->get_length() / m_zoom - m_scroll_offset_x;
+    
+    auto t = create_pango_layout("END");
+    font.set_size((c_key_fontsize -1) * Pango::SCALE);
+    font.set_weight(Pango::WEIGHT_BOLD);
+    t->set_font_description(font);
+    t->get_pixel_size(text_width, text_height);
 
-    m_gc->set_foreground(m_black);
-    m_pixmap->draw_rectangle(m_gc,true,
-                             end_x,
-                             9,
-                             19,
-                             8 );
+    // set background for label to black
+    cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
 
-    p_font_renderer->render_string_on_drawable(m_gc,
-            end_x + 1,
-            9,
-            m_pixmap, "END", font::WHITE );
+    // draw the black background for the 'END' label
+    cr->rectangle(end_x, m_window_y - text_height + 2, text_width + 2, text_height );
+    cr->stroke_preserve();
+    cr->fill();
+   
+    // print the 'END' label in white
+    cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+    cr->move_to(end_x + 1, m_window_y - text_height);
+
+    t->show_in_cairo_context(cr);
+
+    queue_draw();
 }
 
-void
-seqtime::draw_pixmap_on_window()
+bool
+seqtime::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-    m_window->draw_drawable(m_gc,
-                            m_pixmap,
-                            0,0,
-                            0,0,
-                            m_window_x,
-                            m_window_y );
+    cr->set_source_rgb(1.0, 1.0, 1.0);  // White FIXME
+    cr->rectangle (0.0, 0.0, m_window_x, m_window_y);
+    cr->stroke_preserve();
+    cr->fill();
+
+    cr->set_source(m_surface, 0.0, 0.0);
+    cr->paint();
+
+    return true;
 }
 
 bool
 seqtime::on_expose_event(GdkEventExpose* a_e)
 {
-    m_window->draw_drawable(m_gc,
-                            m_pixmap,
-                            a_e->area.x,
-                            a_e->area.y,
-                            a_e->area.x,
-                            a_e->area.y,
-                            a_e->area.width,
-                            a_e->area.height );
-    return true;
-}
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
 
-void
-seqtime::force_draw()
-{
-    m_window->draw_drawable(m_gc,
-                            m_pixmap,
-                            0,0,
-                            0,0,
-                            m_window_x,
-                            m_window_y );
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+    }
+    m_surface_window = m_window->create_cairo_context();
+ 
+    return true;
 }
 
 bool
