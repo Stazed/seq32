@@ -50,11 +50,10 @@ class perftime: public Gtk::DrawingArea
 
 private:
 
-    Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;
-    Gdk::Color    m_black, m_white, m_grey;
-
-    Glib::RefPtr<Gdk::Pixmap> m_pixmap;
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
+    
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     perform      * const m_mainperf;
     perfedit     * const m_perfedit;
@@ -66,6 +65,7 @@ private:
     int m_4bar_offset;
 
     int m_snap, m_measure_length;
+    bool m_draw_background;
 
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);
@@ -74,24 +74,17 @@ private:
     void on_size_allocate(Gtk::Allocation &a_r );
 
     void draw_background();
-    void update_sizes();
-    void draw_pixmap_on_window();
-    void draw_progress_on_window();
-    void update_pixmap();
-
-    int idle_progress();
-
     void change_horz();
+
+protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 public:
 
     perftime( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust );
 
+    void idle_progress();   // FIXME REMOVE
     void set_zoom (int a_zoom);
 
-    void reset();
-    void set_scale( int a_scale );
     void set_guides( int a_snap, int a_measure );
-
-    void increment_size();
 };

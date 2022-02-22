@@ -23,10 +23,6 @@
 
 
 perftime::perftime( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust ) :
-    m_black(Gdk::Color("black")),
-    m_white(Gdk::Color("white")),
-    m_grey(Gdk::Color("grey")),
-
     m_mainperf(a_perf),
     m_perfedit(a_perf_edit),
     m_hadjust(a_hadjust),
@@ -36,33 +32,22 @@ perftime::perftime( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjus
     m_4bar_offset(0),
 
     m_snap(c_ppqn),
-    m_measure_length(c_ppqn * 4)
+    m_measure_length(c_ppqn * 4),
+    m_draw_background(false)
 {
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
+
     add_events( Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK );
-
-    // in the constructor you can only allocate colors,
-    // get_window() returns 0 because we have not been realized
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-    colormap->alloc_color( m_black );
-    colormap->alloc_color( m_white );
-    colormap->alloc_color( m_grey );
 
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &perftime::change_horz ));
 
     set_double_buffered( false );
-}
-
-void
-perftime::increment_size()
-{
-
-}
-
-void
-perftime::update_sizes()
-{
-
 }
 
 void
@@ -71,7 +56,8 @@ perftime::set_zoom (int a_zoom)
     if (m_perfedit->zoom_check(a_zoom))
     {
         m_perf_scale_x = a_zoom;
-        draw_background();
+        m_draw_background = true;
+        queue_draw();
     }
 }
 
@@ -83,7 +69,8 @@ perftime::on_realize()
 
     // Now we can allocate any additional resources we need
     m_window = get_window();
-    m_gc = Gdk::GC::create( m_window );
+    m_surface_window = m_window->create_cairo_context();
+    
     m_window->clear();
 
     set_size_request( 10, c_timearea_y );
@@ -95,6 +82,20 @@ perftime::change_horz()
     if ( m_4bar_offset != (int) m_hadjust->get_value() )
     {
         m_4bar_offset = (int) m_hadjust->get_value();
+        Gtk::Allocation allocation = get_allocation();
+        const int width = allocation.get_width();
+        const int height = allocation.get_height();
+
+        // resize handler
+        if (width != m_surface->get_width() || height != m_surface->get_height())
+        {
+            m_surface = Cairo::ImageSurface::create(
+                Cairo::Format::FORMAT_ARGB32,
+                allocation.get_width(),
+                allocation.get_height()
+            );
+        }
+        m_draw_background = true;
         queue_draw();
     }
 }
@@ -104,30 +105,78 @@ perftime::set_guides( int a_snap, int a_measure )
 {
     m_snap = a_snap;
     m_measure_length = a_measure;
+    m_draw_background = true;
     queue_draw();
 }
 
-int
-perftime::idle_progress( )
+bool
+perftime::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+        m_draw_background = true;
+    }
+
+    if(m_draw_background)
+    {
+        m_draw_background = false;
+        draw_background();
+    }
+
+    /* Clear previous background */
+    cr->set_source_rgb(1.0, 1.0, 1.0);  // White FIXME
+    cr->rectangle (0.0, 0.0, width, height);
+    cr->stroke_preserve();
+    cr->fill();
+
+    /* Draw the new background */
+    cr->set_source(m_surface, 0.0, 0.0);
+    cr->paint();
+
     return true;
 }
 
+// FIXME REMOVE
 void
-perftime::update_pixmap()
+perftime::idle_progress( )
 {
-
-}
-
-void
-perftime::draw_pixmap_on_window()
-{
-
+    if (m_draw_background)
+    {
+        m_draw_background = false;
+       // draw_background();
+        on_draw(m_surface_window);
+    }
 }
 
 bool
 perftime::on_expose_event (GdkEventExpose * /* ev */ )
 {
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+        m_surface_window = m_window->create_cairo_context();
+        m_draw_background = true;
+    }
+    
     draw_background();
     return true;
 }
@@ -135,24 +184,39 @@ perftime::on_expose_event (GdkEventExpose * /* ev */ )
 void
 perftime::draw_background()
 {
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+
+    Pango::FontDescription font;
+    int text_width;
+    int text_height;
+
+    font.set_family(c_font);
+    font.set_size((c_key_fontsize - 2) * Pango::SCALE);
+    font.set_weight(Pango::WEIGHT_NORMAL);
+
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(-1, -1, width + 2, height + 2);
+    cr->paint_with_alpha(0.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
+
     /* clear background */
-    m_gc->set_foreground(m_white);
-    m_window->draw_rectangle(m_gc,true,
-                             0,
-                             0,
-                             m_window_x,
-                             m_window_y );
+    cr->set_source_rgb( 1.0, 1.0, 1.0);            // white FIXME
+    cr->set_line_width( 1.0);
+    cr->rectangle( 0, 0, m_window_x, m_window_y);
+    cr->stroke_preserve();
+    cr->fill();
 
-    m_gc->set_foreground(m_black);
-    m_window->draw_line(m_gc,
-                        0,
-                        m_window_y - 1,
-                        m_window_x,
-                        m_window_y - 1 );
+    cr->set_source_rgb( 0.0, 0.0, 0.0);            // black  FIXME
+    cr->set_line_width( 1.0);
+    cr->move_to( 0, m_window_y - 1);
+    cr->line_to( m_window_x, m_window_y - 1);
+    cr->stroke();
 
-    /* draw vert lines */
-    m_gc->set_foreground(m_grey);
-
+    /* draw vertical lines */
     long tick_offset = (m_4bar_offset * 16 * c_ppqn);
     long first_measure = tick_offset / m_measure_length;
 
@@ -179,30 +243,33 @@ perftime::draw_background()
     0    1    2    3    4    5
 
 #endif
+    cr->set_source_rgb( 0.6, 0.6, 0.6);            // Grey  FIXME
+    cr->set_line_width( 1.0);
 
     for ( int i=first_measure;
-            i<first_measure+(m_window_x * m_perf_scale_x / (m_measure_length)) + 1; i += bar_skip )
+            i<first_measure+(m_window_x * m_perf_scale_x / (m_measure_length)) + 1; i += bar_skip  )
     {
         int x_pos = ((i * m_measure_length) - tick_offset) / m_perf_scale_x;
 
         /* beat */
-        m_window->draw_line(m_gc,
-                            x_pos,
-                            0,
-                            x_pos,
-                            m_window_y );
+        cr->move_to( x_pos, 0);
+        cr->line_to( x_pos, m_window_y);
+        cr->stroke();
 
+        /* bar numbers */
         char bar[16];
-        snprintf( bar, sizeof(bar), "%d", i + 1 ); // bar numbers
+        snprintf( bar, sizeof(bar), "%d", i + 1 );
 
-        m_gc->set_foreground(m_black);
+        auto t = create_pango_layout(bar);
+        t->set_font_description(font);
 
-        p_font_renderer->render_string_on_drawable(m_gc,
-                x_pos + 2,
-                0,
-                m_window, bar, font::BLACK );
+        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black FIXME
+        cr->move_to( x_pos + 2, 0);
+
+        t->show_in_cairo_context(cr);
     }
 
+    /* The 'L' and 'R' markers */
     long left = m_mainperf->get_left_tick( );
     long right = m_mainperf->get_right_tick( );
 
@@ -213,32 +280,46 @@ perftime::draw_background()
 
     if ( left >=0 && left <= m_window_x )
     {
-        m_gc->set_foreground(m_black);
-        m_window->draw_rectangle(m_gc,true,
-                                 left, m_window_y - 9,
-                                 7,
-                                 10 );
+        // set background for tempo labels to black
+        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black FIXME
 
-        m_gc->set_foreground(m_white);
-        p_font_renderer->render_string_on_drawable(m_gc,
-                left + 1,
-                9,
-                m_window, "L", font::WHITE );
+        auto t = create_pango_layout("L");
+        font.set_weight(Pango::WEIGHT_BOLD);
+        t->set_font_description(font);
+        t->get_pixel_size(text_width, text_height);
+
+        // draw the black background for the labels
+        cr->rectangle( left, m_window_y - 9, text_width  + 2, text_height + 2);
+        cr->stroke_preserve();
+        cr->fill();
+
+        // print the 'L' label in white
+        cr->set_source_rgb( 1.0, 1.0, 1.0);    // White FIXME
+        cr->move_to( left + 1,  (m_window_y *.5) - (text_height * .5) + 4 );
+
+        t->show_in_cairo_context(cr);
     }
 
     if ( right >=0 && right <= m_window_x )
     {
-        m_gc->set_foreground(m_black);
-        m_window->draw_rectangle(m_gc,true,
-                                 right - 6, m_window_y - 9,
-                                 7,
-                                 10 );
+        // set background for tempo labels to black
+        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black FIXME
 
-        m_gc->set_foreground(m_white);
-        p_font_renderer->render_string_on_drawable(m_gc,
-                right - 6 + 1,
-                9,
-                m_window, "R", font::WHITE );
+        auto t = create_pango_layout("R");
+        font.set_weight(Pango::WEIGHT_BOLD);
+        t->set_font_description(font);
+        t->get_pixel_size(text_width, text_height);
+
+        // draw the black background for the labels
+        cr->rectangle( right - 7, m_window_y - 9, text_width  + 2, text_height + 2);
+        cr->stroke_preserve();
+        cr->fill();
+
+        // print the 'R' label in white
+        cr->set_source_rgb( 1.0, 1.0, 1.0);    // White FIXME
+        cr->move_to( right - 6, (m_window_y *.5) - (text_height * .5) + 4 );
+
+        t->show_in_cairo_context(cr);
     }
 }
 
@@ -264,6 +345,7 @@ perftime::on_button_press_event(GdkEventButton* p0)
         m_mainperf->set_right_tick( tick + m_snap );
     }
 
+    m_draw_background = true;
     queue_draw();
 
     return true;
