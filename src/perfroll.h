@@ -61,13 +61,12 @@ private:
     friend class Seq32PerfInput;
 
     AbstractPerfInput* m_interaction;
-
-    Glib::RefPtr<Gdk::GC> m_gc;
+    
     Glib::RefPtr<Gdk::Window> m_window;
-    Gdk::Color    m_black, m_white, m_grey, m_lt_grey;
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
 
-    Glib::RefPtr<Gdk::Pixmap> m_pixmap;
-    Glib::RefPtr<Gdk::Pixmap> m_background;
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface_track;
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface_background;
 
     perform        * const m_mainperf;
     perfedit       * const m_perfedit;
@@ -121,10 +120,10 @@ private:
     void convert_x( int a_x, long *a_ticks);
     void snap_x( int *a_x );
 
-    void draw_sequence_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_sequence );
-    void draw_background_on( Glib::RefPtr<Gdk::Drawable> a_draw, int a_sequence );
+    void draw_sequence_on( int a_sequence );
+    void draw_background_on( int a_sequence );
 
-    void draw_drawable_row( Glib::RefPtr<Gdk::Drawable> a_dest, Glib::RefPtr<Gdk::Drawable> a_src,  long a_y );
+    void draw_drawable_row( long a_y );     // FIXME remove
 
     void change_horz();
     void change_vert();
@@ -134,6 +133,11 @@ private:
     bool have_button_press;
     bool transport_follow;
     bool trans_button_press;
+    bool m_redraw_tracks;
+
+
+protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 public:
 
@@ -144,7 +148,7 @@ public:
 
     void update_sizes();
     void init_before_show( );
-    void fill_background_pixmap();
+    void fill_background_surface();
 
     void increment_size();
 
