@@ -107,7 +107,7 @@ perfnames::draw_sequence( int sequence )
     if ( sequence < c_total_seqs )
     {
         cr->set_source_rgb(0.0, 0.0, 0.0);        // Black FIXME
-        cr->rectangle(0, (c_names_y * i), c_names_x, c_names_y + 1);
+        cr->rectangle(0, (c_names_y * i), m_window_x, c_names_y + 1);
         cr->stroke_preserve();
         cr->fill();
 
@@ -150,7 +150,7 @@ perfnames::draw_sequence( int sequence )
         
         cr->rectangle(6 * 2 + 3,
                         (c_names_y * i) + 1,
-                        c_names_x - 3 - (6*2),
+                        m_window_x - 3 - (6*2),
                         c_names_y - 1  );
         cr->stroke_preserve();
         cr->fill();
@@ -161,9 +161,8 @@ perfnames::draw_sequence( int sequence )
 
             /* names */
             char name[50];
-            snprintf(name, sizeof(name), "%-14.14s   %2d",
-                     m_mainperf->get_sequence(sequence)->get_name(),
-                     m_mainperf->get_sequence(sequence)->get_midi_channel() + 1);
+            snprintf(name, sizeof(name), "%-20.20s",
+                     m_mainperf->get_sequence(sequence)->get_name());
 
             // set background for name
             auto n = create_pango_layout(name);
@@ -227,7 +226,7 @@ perfnames::draw_sequence( int sequence )
                 cr->set_source_rgb(0.5, 0.988, 0.0);    // Green FIXME
             }
 
-            cr->rectangle(6*2 + 6 * 20 + 3,
+            cr->rectangle(m_window_x - 10,
                                      (c_names_y * i) + 1,
                                      10,
                                      c_names_y - 1  );
@@ -292,7 +291,7 @@ perfnames::draw_sequence( int sequence )
     else    // if you scroll down to the very bottom
     {
         cr->set_source_rgb(0.6, 0.6, 0.6);    // grey FIXME
-        cr->rectangle(0, (c_names_y * i) + 1, c_names_x, c_names_y);
+        cr->rectangle(0, (c_names_y * i) + 1, m_window_x, c_names_y);
         cr->stroke_preserve();
         cr->fill();
     }
