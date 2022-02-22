@@ -50,15 +50,16 @@ class perfnames : public virtual Gtk::DrawingArea, public virtual seqmenu
 {
 private:
 
-    Glib::RefPtr<Gdk::GC>       m_gc;
     Glib::RefPtr<Gdk::Window>   m_window;
-    Gdk::Color    m_black, m_white, m_grey, m_orange, m_green;
-
-    Glib::RefPtr<Gdk::Pixmap>   m_pixmap;
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
+    
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     perform      *m_mainperf;
 
     Adjustment   *m_vadjust;
+
+    bool m_redraw_tracks;
 
     int m_window_x, m_window_y;
 
@@ -81,9 +82,6 @@ private:
     void on_size_allocate(Gtk::Allocation& );
     bool on_scroll_event( GdkEventScroll* a_ev ) ;
 
-    void draw_area();
-    void update_pixmap();
-
     void convert_y( int a_y, int *a_note);
 
     void draw_sequence( int a_sequence );
@@ -94,8 +92,12 @@ private:
     
     void check_global_solo_tracks();
 
+protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+
 public:
 
+    void idle_redraw();
     void redraw_dirty_sequences();
 
     perfnames( perform *a_perf, mainwnd *a_main,

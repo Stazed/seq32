@@ -22,18 +22,21 @@
 
 perfnames::perfnames( perform *a_perf, mainwnd *a_main, Adjustment *a_vadjust ):
     seqmenu(a_perf, a_main ),
-    m_black(Gdk::Color( "black" )),
-    m_white(Gdk::Color( "white" )),
-    m_grey(Gdk::Color( "grey" )),
-    m_orange(Gdk::Color( "Orange Red")),    // mute
-    m_green(Gdk::Color( "Lawn Green")),     // solo
     m_mainperf(a_perf),
     m_vadjust(a_vadjust),
+    m_redraw_tracks(false),
     m_sequence_offset(0),
     m_button_down(false),
     m_moving(false),
     m_old_seq(0)
 {
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
+
     add_events( Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
                 Gdk::BUTTON_MOTION_MASK |
@@ -41,15 +44,6 @@ perfnames::perfnames( perform *a_perf, mainwnd *a_main, Adjustment *a_vadjust ):
 
     /* set default size */
     set_size_request( c_names_x, 100 );
-
-    // in the constructor you can only allocate colors,
-    // get_window() returns 0 because we have not be realized
-    Glib::RefPtr<Gdk::Colormap>  colormap= get_default_colormap();
-    colormap->alloc_color( m_black );
-    colormap->alloc_color( m_white );
-    colormap->alloc_color( m_grey );
-    colormap->alloc_color( m_orange );
-    colormap->alloc_color( m_green );
 
     m_vadjust->signal_value_changed().connect( mem_fun( *(this), &perfnames::change_vert ));
 
@@ -67,13 +61,9 @@ perfnames::on_realize()
 
     // Now we can allocate any additional resources we need
     m_window = get_window();
-    m_gc = Gdk::GC::create( m_window );
-    m_window->clear();
+    m_surface_window = m_window->create_cairo_context();
 
-    m_pixmap = Gdk::Pixmap::create(m_window,
-                                   c_names_x,
-                                   c_names_y  * c_total_seqs + 1,
-                                   -1);
+    m_window->clear();
 }
 
 void
@@ -82,20 +72,9 @@ perfnames::change_vert()
     if ( m_sequence_offset != (int) m_vadjust->get_value() )
     {
         m_sequence_offset = (int) m_vadjust->get_value();
+        m_redraw_tracks = true;
         queue_draw();
     }
-}
-
-void
-perfnames::update_pixmap()
-{
-
-}
-
-void
-perfnames::draw_area()
-{
-
 }
 
 void
@@ -108,49 +87,73 @@ void
 perfnames::draw_sequence( int sequence )
 {
     int i = sequence - m_sequence_offset;
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+
+    Pango::FontDescription font;
+    int text_width;
+    int text_height;
+
+    font.set_family(c_font);
+    font.set_size((c_key_fontsize - 1) * Pango::SCALE);
+    font.set_weight(Pango::WEIGHT_NORMAL);
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(0, (c_names_y * i), m_window_x - 1, c_names_y);
+    cr->paint_with_alpha(0.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
+
+    cr->set_line_width(1.0);
 
     if ( sequence < c_total_seqs )
     {
-        m_gc->set_foreground(m_black);
-        m_window->draw_rectangle(m_gc,true,
-                                 0,
-                                 (c_names_y * i),
-                                 c_names_x,
-                                 c_names_y + 1 );
+        cr->set_source_rgb(0.0, 0.0, 0.0);        // Black FIXME
+        cr->rectangle(0, (c_names_y * i), c_names_x, c_names_y + 1);
+        cr->stroke_preserve();
+        cr->fill();
 
         if ( sequence % c_seqs_in_set == 0 )
         {
-            char ss[10];
-            snprintf(ss, sizeof(ss), "%2d", sequence / c_seqs_in_set );
+            char screen_set[10];
+            snprintf(screen_set, sizeof(screen_set), "%2d", sequence / c_seqs_in_set );
 
-            m_gc->set_foreground(m_white);
+            auto s = create_pango_layout(screen_set);
+            s->set_font_description(font);
+            s->get_pixel_size(text_width, text_height);
+            
+            cr->set_source_rgb(0.0, 0.0, 0.0);    // black FIXME
+            cr->rectangle(0, c_names_y * i + 2, text_width, text_height );
+            cr->stroke_preserve();
+            cr->fill();
+            
+            /* print the screen_set number */
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            cr->move_to(1, c_names_y * i + 2);
 
-            p_font_renderer->render_string_on_drawable(m_gc,
-                    2,
-                    c_names_y * i + 2,
-                    m_window, ss, font::WHITE );
+            s->show_in_cairo_context(cr);
         }
-
-        else
+        else    // no screen set number
         {
-            m_gc->set_foreground(m_white);
-            m_window->draw_rectangle(m_gc,true,
-                                     1,
-                                     (c_names_y * (i)),
-                                     (6*2) + 1,
-                                     c_names_y );
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            cr->rectangle(1, (c_names_y * (i)), (6*2), c_names_y - 1 );
+            cr->stroke_preserve();
+            cr->fill();
         }
 
         if ( m_mainperf->is_active( sequence ))
-            m_gc->set_foreground(m_white);
+        {
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+        }
         else
-            m_gc->set_foreground(m_grey);
-
-        m_window->draw_rectangle(m_gc,true,
-                                 6 * 2 + 3,
-                                 (c_names_y * i) + 1,
-                                 c_names_x - 3 - (6*2),
-                                 c_names_y - 1  );
+        {
+            cr->set_source_rgb(0.6, 0.6, 0.6);    // grey FIXME
+        }
+        
+        cr->rectangle(6 * 2 + 3,
+                        (c_names_y * i) + 1,
+                        c_names_x - 3 - (6*2),
+                        c_names_y - 1  );
+        cr->stroke_preserve();
+        cr->fill();
 
         if ( m_mainperf->is_active( sequence ))
         {
@@ -162,11 +165,23 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_name(),
                      m_mainperf->get_sequence(sequence)->get_midi_channel() + 1);
 
-            p_font_renderer->render_string_on_drawable(m_gc,
-                    5 + 6*2,
-                    c_names_y * i + 2,
-                    m_window, name, font::BLACK );
+            // set background for name
+            auto n = create_pango_layout(name);
+            n->set_font_description(font);
+            n->get_pixel_size(text_width, text_height);
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
 
+            // draw the white background for the name
+            cr->rectangle(5 + 6*2, c_names_y * i + 12, text_width, 10.0);
+            cr->stroke_preserve();
+            cr->fill();
+
+            cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+            cr->move_to(5 + 6*2, c_names_y * i);
+
+            n->show_in_cairo_context(cr);
+
+            /* Buses */
             char str[20];
             snprintf(str, sizeof(str),
                      "%d-%d %ld/%ld",
@@ -175,10 +190,23 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_bp_measure(),
                      m_mainperf->get_sequence(sequence)->get_bw() );
 
-            p_font_renderer->render_string_on_drawable(m_gc,
-                    5 + 6*2,
-                    c_names_y * i + 12,
-                    m_window, str, font::BLACK );
+            // set background for bus
+            auto t = create_pango_layout(str);
+            t->set_font_description(font);
+            t->get_pixel_size(text_width, text_height);
+
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            cr->set_line_width(1.0);
+
+            // draw the white background for the bus
+            cr->rectangle(5 + 6*2, c_names_y * i + 10, text_width, 6.0);
+            cr->stroke_preserve();
+            cr->fill();
+
+            cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+            cr->move_to(5 + 6*2, c_names_y * i + 10);
+
+            t->show_in_cairo_context(cr);
 
             bool fill = false;
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
@@ -187,57 +215,160 @@ perfnames::draw_sequence( int sequence )
             if(solo || muted)
                 fill = true;
 
-            m_gc->set_foreground(m_black);
+            cr->set_source_rgb(0.0, 0.0, 0.0);          // Black FIXME
             
             if(muted)
-                m_gc->set_foreground(m_orange);
-            if(solo)
-                m_gc->set_foreground(m_green);
-            
-            m_window->draw_rectangle(m_gc,fill,
-                                     6*2 + 6 * 20 + 2,
-                                     (c_names_y * i),
-                                     10,
-                                     c_names_y  );
-
-            if ( muted )
             {
-                p_font_renderer->render_string_on_drawable(m_gc,
-                        5 + 6*2 + 6 * 20,
-                        c_names_y * i + 2,
-                        m_window, "M", font::WHITE );
+                cr->set_source_rgb(1.0, 0.27, 0.0);     // Red FIXME
             }
-            else if ( solo )
+            if(solo)
             {
-                p_font_renderer->render_string_on_drawable(m_gc,
-                        5 + 6*2 + 6 * 20,
-                        c_names_y * i + 2,
-                        m_window, "S", font::WHITE );
+                cr->set_source_rgb(0.5, 0.988, 0.0);    // Green FIXME
+            }
+
+            cr->rectangle(6*2 + 6 * 20 + 3,
+                                     (c_names_y * i) + 1,
+                                     10,
+                                     c_names_y - 1  );
+
+            if ( fill )
+            {
+                cr->stroke_preserve();
+                cr->fill();
             }
             else
             {
-                p_font_renderer->render_string_on_drawable(m_gc,
-                        5 + 6*2 + 6 * 20,
-                        c_names_y * i + 2,
-                        m_window, "P", font::BLACK );
+                cr->stroke();
             }
+
+            char smute[5];
+
+            if ( muted )
+            {
+                snprintf(smute, sizeof(smute), "M" );
+                // background
+                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+            }
+            else if ( solo )
+            {
+                snprintf(smute, sizeof(smute), "S" );
+                // background
+                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+            }
+            else
+            {
+                snprintf(smute, sizeof(smute), "P" );
+                // background 
+                cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            }
+
+            auto m = create_pango_layout(smute);
+            m->set_font_description(font);
+            m->get_pixel_size(text_width, text_height);
+            
+            // draw the background for the mute label
+            cr->rectangle(m_window_x - text_width - 2 , c_names_y * i + (text_height * .5)  , text_width + 1, (text_height * .5) + 5 );
+            cr->stroke_preserve();
+            cr->fill();
+            
+            // print the mute label
+            if ( muted || solo )
+            {
+                cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            }
+            else
+            {
+                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+            }
+
+            cr->move_to(m_window_x - text_width - 1, (c_names_y * i) +  ((c_names_y * .5) - (text_height * .5) + 1 ));
+
+            m->show_in_cairo_context(cr);
+            
+        }   // Active sequence
+    }
+    else    // if you scroll down to the very bottom
+    {
+        cr->set_source_rgb(0.6, 0.6, 0.6);    // grey FIXME
+        cr->rectangle(0, (c_names_y * i) + 1, c_names_x, c_names_y);
+        cr->stroke_preserve();
+        cr->fill();
+    }
+}
+
+void
+perfnames::idle_redraw()
+{
+    if(m_redraw_tracks)
+    {
+        on_draw(m_surface_window);
+    }
+}
+
+bool
+perfnames::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+        m_redraw_tracks = true;
+    }
+
+    if (m_redraw_tracks)
+    {
+        m_redraw_tracks = false;
+        int trks = (m_window_y / c_names_y) + 1;
+
+        for ( int i = 0; i < trks; i++ )
+        {
+            int seq = i + m_sequence_offset;
+            draw_sequence(seq);
         }
     }
-    else
-    {
-        m_gc->set_foreground(m_grey);
-        m_window->draw_rectangle(m_gc,true,
-                                 0,
-                                 (c_names_y * i) + 1,
-                                 c_names_x,
-                                 c_names_y );
 
-    }
+   /* Clear previous background */
+    cr->set_source_rgb(1.0, 1.0, 1.0);  // White FIXME
+    cr->rectangle (0.0, 0.0, width, height);
+    cr->stroke_preserve();
+    cr->fill();
+
+    /* Draw the new background */
+    cr->set_source(m_surface, 0.0, 0.0);
+    cr->paint();
+
+    return true;
 }
 
 bool
 perfnames::on_expose_event(GdkEventExpose* a_e)
 {
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    // resize handler
+    if (width != m_surface->get_width() || height != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            allocation.get_width(),
+            allocation.get_height()
+        );
+
+       m_surface_window = m_window->create_cairo_context();
+       m_redraw_tracks = true;
+    }
+    
+    
     int seqs = (m_window_y / c_names_y) + 1;
 
     for ( int i=0; i< seqs; i++ )
@@ -287,6 +418,7 @@ perfnames::on_button_press_event(GdkEventButton *a_e)
             m_mainperf->get_sequence(sequence)->set_song_mute( solo );
         
         check_global_solo_tracks();
+        m_redraw_tracks = true;
         queue_draw();
     }
 
@@ -315,6 +447,7 @@ perfnames::on_button_release_event(GdkEventButton* p0)
             m_mainperf->get_sequence(m_current_seq)->set_song_solo( muted );
         
         check_global_solo_tracks();
+        m_redraw_tracks = true;
         queue_draw();
     }
     
@@ -425,7 +558,7 @@ perfnames::redraw_dirty_sequences()
 
     for ( int y=y_s; y<=y_f; y++ )
     {
-        int seq = y + m_sequence_offset; // 4am
+        int seq = y + m_sequence_offset;
 
         if ( seq < c_total_seqs)
         {
@@ -434,6 +567,8 @@ perfnames::redraw_dirty_sequences()
             if (dirty)
             {
                 draw_sequence( seq );
+                on_draw(m_surface_window);  // FIXME
+                queue_draw();
             }
         }
     }

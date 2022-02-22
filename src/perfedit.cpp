@@ -828,6 +828,7 @@ perfedit::timeout()
     m_perfnames->redraw_dirty_sequences();
     m_tempo->idle_progress();
     m_perftime->idle_progress();
+    m_perfnames->idle_redraw();
 
     if (m_button_follow->get_active() != m_mainperf->get_follow_transport())
         m_button_follow->set_active(m_mainperf->get_follow_transport());
