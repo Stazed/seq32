@@ -39,16 +39,22 @@
 
 #include "globals.h"
 
+enum
+{
+    White_Note = 0,
+    Green_Note,
+    Red_Note
+};
+
 /* holds the left side piano */
 class seqkeys : public Gtk::DrawingArea
 {
 private:
 
-    Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
-    Gdk::Color    m_black, m_white, m_red, m_green, m_blue;
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
 
-    Glib::RefPtr<Gdk::Pixmap> m_pixmap;
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     sequence *m_seq;
 
@@ -69,8 +75,7 @@ private:
     bool on_enter_notify_event(GdkEventCrossing* p0);
     bool on_scroll_event( GdkEventScroll* a_ev);
 
-    void draw_area();
-    void update_pixmap();
+    void update_surface();
     void convert_y( int a_y, int *a_note);
 
     bool m_hint_state;
@@ -87,13 +92,15 @@ private:
     void on_size_allocate(Gtk::Allocation&);
 
     void change_vert();
-    void force_draw();
-
     void update_sizes();
-
     void reset();
 
+protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+
 public:
+    
+    void idle_draw();
 
     /* listen to note on add or move */
     void set_listen_button_press(GdkEventButton* a_ev);

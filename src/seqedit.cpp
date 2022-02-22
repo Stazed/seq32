@@ -1689,6 +1689,7 @@ seqedit::timeout()
         raise();
     }
 
+    m_seqkeys_wid->idle_draw();
     m_seqroll_wid->draw_progress_on_window();
     
     if(m_mainperf->get_sequence_record())
