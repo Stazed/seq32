@@ -167,6 +167,7 @@ perfnames::draw_sequence( int sequence )
 
             // set background for name
             auto n = create_pango_layout(name);
+            font.set_size((c_key_fontsize - 2) * Pango::SCALE);
             n->set_font_description(font);
             n->get_pixel_size(text_width, text_height);
             cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
@@ -177,7 +178,7 @@ perfnames::draw_sequence( int sequence )
             cr->fill();
 
             cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
-            cr->move_to(5 + 6*2, c_names_y * i);
+            cr->move_to(5 + 6*2, c_names_y * i + 1);
 
             n->show_in_cairo_context(cr);
 
@@ -204,7 +205,7 @@ perfnames::draw_sequence( int sequence )
             cr->fill();
 
             cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
-            cr->move_to(5 + 6*2, c_names_y * i + 10);
+            cr->move_to(5 + 6*2, c_names_y * i + 11);
 
             t->show_in_cairo_context(cr);
 
@@ -263,11 +264,12 @@ perfnames::draw_sequence( int sequence )
             }
 
             auto m = create_pango_layout(smute);
+            font.set_size((c_key_fontsize - 1) * Pango::SCALE);
             m->set_font_description(font);
             m->get_pixel_size(text_width, text_height);
             
             // draw the background for the mute label
-            cr->rectangle(m_window_x - text_width - 2 , c_names_y * i + (text_height * .5)  , text_width + 1, (text_height * .5) + 5 );
+            cr->rectangle(m_window_x - text_width - 2 , c_names_y * i + (text_height * .5) - 1, text_width + 1, (text_height * .5) + 5 );
             cr->stroke_preserve();
             cr->fill();
             
@@ -281,7 +283,7 @@ perfnames::draw_sequence( int sequence )
                 cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
             }
 
-            cr->move_to(m_window_x - text_width - 1, (c_names_y * i) +  ((c_names_y * .5) - (text_height * .5) + 1 ));
+            cr->move_to(m_window_x - text_width - 1, (c_names_y * i) +  ((c_names_y * .5) - (text_height * .5)));
 
             m->show_in_cairo_context(cr);
             
