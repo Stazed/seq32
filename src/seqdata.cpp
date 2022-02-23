@@ -23,13 +23,6 @@
 
 
 seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust):
-    //m_text_font_5_7(Gdk_Font( c_font_5_7 )),
-    m_black(Gdk::Color("black")),
-    m_white(Gdk::Color("white")),
-    m_grey(Gdk::Color("grey")),
-    m_blue(Gdk::Color("blue")),
-    m_red(Gdk::Color("red")),
-
     m_seq(a_seq),
 
     m_zoom(a_zoom),
@@ -41,22 +34,21 @@ seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust):
     m_status(0x00),
 
     m_dragging(false),
-    m_drag_handle(false)
+    m_drag_handle(false),
+    m_redraw_events(false)
 {
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
+
     add_events( Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
                 Gdk::POINTER_MOTION_MASK |
                 Gdk::LEAVE_NOTIFY_MASK |
                 Gdk::SCROLL_MASK );
-
-    // in the constructor you can only allocate colors,
-    // get_window() returns 0 because we have not been realized
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-    colormap->alloc_color( m_black );
-    colormap->alloc_color( m_white );
-    colormap->alloc_color( m_grey );
-    colormap->alloc_color( m_blue );
-    colormap->alloc_color( m_red );
 
     set_can_focus();
     set_double_buffered( false );
@@ -69,13 +61,16 @@ seqdata::update_sizes()
 {
     if( get_realized() )
     {
-        /* create pixmaps with window dimensions */
+        if (m_window_x != m_surface->get_width() || m_window_y != m_surface->get_height())
+        {
+            m_surface = Cairo::ImageSurface::create(
+                Cairo::Format::FORMAT_ARGB32,
+                m_window_x,
+                m_window_y
+            );
+        }
 
-        m_pixmap = Gdk::Pixmap::create( m_window,
-                                        m_window_x,
-                                        m_window_y, -1  );
-        update_pixmap();
-        queue_draw();
+        m_redraw_events = true;
     }
 }
 
@@ -86,16 +81,12 @@ seqdata::reset()
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
 
     update_sizes();
-    update_pixmap();
-    queue_draw();
-
 }
 
 void
 seqdata::redraw()
 {
-    update_pixmap();
-    queue_draw();
+    m_redraw_events = true;
 }
 
 void
@@ -106,45 +97,10 @@ seqdata::on_realize()
 
     // Now we can allocate any additional resources we need
     m_window = get_window();
-    m_gc = Gdk::GC::create( m_window );
+    m_surface_window = m_window->create_cairo_context();
     m_window->clear();
 
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqdata::change_horz ));
-
-    for( int i=0; i<c_dataarea_y; ++i )
-    {
-        m_numbers[i] = Gdk::Pixmap::create( m_window,
-                                            6,
-                                            30, -1  );
-
-        m_gc->set_foreground( m_white );
-        m_numbers[i]->draw_rectangle(m_gc,true,
-                                     0,
-                                     0,
-                                     6,
-                                     30 );
-
-        char val[5];
-        snprintf(val, sizeof(val), "%3d\n", i);
-        char num[6];
-        memset( num, 0, 6);
-        num[0] = val[0];
-        num[2] = val[1];
-        num[4] = val[2];
-
-        p_font_renderer->render_string_on_drawable(m_gc,
-                0,
-                0,
-                m_numbers[i], &num[0], font::BLACK );
-        p_font_renderer->render_string_on_drawable(m_gc,
-                0,
-                8,
-                m_numbers[i], &num[2], font::BLACK );
-        p_font_renderer->render_string_on_drawable(m_gc,
-                0,
-                16,
-                m_numbers[i], &num[4], font::BLACK );
-    }
 
     update_sizes();
 }
@@ -165,18 +121,31 @@ seqdata::set_data_type( unsigned char a_status, unsigned char a_control = 0  )
     m_status = a_status;
     m_cc = a_control;
 
-    this->redraw();
+    redraw();
 }
 
 void
-seqdata::update_pixmap()
+seqdata::draw_events_on_window()
 {
-    draw_events_on_pixmap();
-}
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
 
-void
-seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
-{
+    Gtk::Allocation allocation = get_allocation();
+    const int width = allocation.get_width();
+    const int height = allocation.get_height();
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(-1, -1, width + 2, height + 2);
+    cr->paint_with_alpha(1.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
+
+    Pango::FontDescription font;
+    int text_width;
+    int text_height;
+
+    font.set_family(c_font);
+    font.set_size(c_key_fontsize * Pango::SCALE);
+    font.set_weight(Pango::WEIGHT_NORMAL);
+
     long tick;
 
     unsigned char d0,d1;
@@ -210,15 +179,6 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
     int start_tick = m_scroll_offset_ticks ;
     int end_tick = (m_window_x * m_zoom) + m_scroll_offset_ticks;
 
-    //printf( "draw_events_on\n" );
-
-    m_gc->set_foreground( m_white );
-    a_draw->draw_rectangle(m_gc,true,
-                           0,
-                           0,
-                           m_window_x,
-                           m_window_y );
-
     SECOND_PASS_NOTE_ON: // yes this is a goto... yikes!!!!
 
     m_seq->reset_draw_marker();
@@ -230,13 +190,25 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
     {
         if ( tick >= start_tick && tick <= end_tick )
         {
-            if(selected)
-                m_gc->set_foreground( m_red );
-            else
-                m_gc->set_foreground( m_blue );
-
             /* turn into screen corrids */
             event_x = tick / m_zoom;
+
+            /* Clear background of event velocity labels - we need
+             * to do this before the handles or they get cropped */
+            cr->set_source_rgb(1.0, 1.0, 1.0);  // White FIXME
+            cr->rectangle(event_x + 3 - m_scroll_offset_x,
+                                  c_dataarea_y - 40,
+                                  8, 40);
+            cr->fill();
+
+            if(selected)
+            {
+                cr->set_source_rgb(1.0, 0.27, 0.0);    // Red FIXME);
+            }
+            else
+            {
+                cr->set_source_rgb(0.0, 0.0, 1.0);    // blue FIXME
+            }
 
             /* generate the value */
             event_height = d1;
@@ -244,82 +216,89 @@ seqdata::draw_events_on(  Glib::RefPtr<Gdk::Drawable> a_draw  )
             if ( m_status == EVENT_PROGRAM_CHANGE ||
                     m_status == EVENT_CHANNEL_PRESSURE  )
             {
-
                 event_height = d0;
             }
 
-            m_gc->set_line_attributes( 2,
-                                       Gdk::LINE_SOLID,
-                                       Gdk::CAP_NOT_LAST,
-                                       Gdk::JOIN_MITER );
-
             /* draw vert lines */
-            a_draw->draw_line(m_gc,
-                              event_x -  m_scroll_offset_x + 1,
-                              c_dataarea_y - event_height,
-                              event_x -  m_scroll_offset_x + 1,
-                              c_dataarea_y );
+            cr->move_to(event_x -  m_scroll_offset_x +1, c_dataarea_y - event_height);
+            cr->line_to(event_x -  m_scroll_offset_x +1, c_dataarea_y);
+            cr->stroke();
 
             /* draw handle */
-            a_draw->draw_rectangle(m_gc,
-                              true,
-                              event_x -  m_scroll_offset_x - 3,
-                              c_dataarea_y - event_height ,
-                              c_data_handle_x,
-                              c_data_handle_y);
+            cr->arc(event_x -  m_scroll_offset_x + 1,
+                                c_dataarea_y - event_height + 2,
+                                c_data_handle_radius,
+                                0, 2 * M_PI);
+            cr->stroke_preserve();
+            cr->fill();
 
-            /* draw numbers */
-            a_draw->draw_drawable(m_gc,
-                                  m_numbers[event_height],
-                                  0,0,
-                                  event_x + 3 - m_scroll_offset_x,
-                                  c_dataarea_y - 25,
-                                  6,30);
+            /* event numbers */
+            auto t = create_pango_layout(to_string(event_height));
+            t->set_font_description(font);
+            t->set_justify(Pango::ALIGN_CENTER);
+            t->set_width(0);
+            t->set_wrap(Pango::WRAP_CHAR);
+            t->get_pixel_size(text_width, text_height);
+
+            cr->set_source_rgb(0.0, 0.0, 0.0);  // Black FIXME
+            cr->move_to(event_x + (text_width * 0.5) - m_scroll_offset_x,
+                                  c_dataarea_y - text_height);
+            t->show_in_cairo_context(cr);
         }
     }
 
     if(selection_type == UNSELECTED_EVENTS)
     {
         selection_type = num_selected_events;
-        goto SECOND_PASS_NOTE_ON; // this is NOT spaghetti code... it's very clear what is going on!!!
+        goto SECOND_PASS_NOTE_ON;
     }
-}
-
-void
-seqdata::draw_events_on_pixmap()
-{
-    draw_events_on( m_pixmap );
-}
-
-void
-seqdata::draw_pixmap_on_window()
-{
-    queue_draw();
 }
 
 int
 seqdata::idle_redraw()
 {
     /* no flicker, redraw */
-    if ( !m_dragging )
+    if ( m_redraw_events )
     {
-        draw_events_on( m_window );
-        draw_events_on( m_pixmap );
+        m_redraw_events = false;
+        draw_events_on_window();
+        
+        on_draw(m_surface_window);  // FIXME
+        queue_draw();
     }
+
+    return true;
+}
+
+bool
+seqdata::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    /* Clear previous background */
+    cr->set_source_rgb(1.0, 1.0, 1.0);  // White FIXME
+    cr->rectangle (0.0, 0.0, m_window_x, m_window_y);
+    cr->stroke_preserve();
+    cr->fill();
+
+    /* Draw the new background */
+    cr->set_source(m_surface, 0.0, 0.0);
+    cr->paint();
+    
+    /* The line drag adjustment */
+    if (m_dragging)
+    {
+        cr->set_source_rgb(1.0, 0.27, 0.0);    // Red FIXME
+        cr->move_to(m_current_x - m_scroll_offset_x, m_current_y);
+        cr->line_to( m_drop_x - m_scroll_offset_x, m_drop_y);
+        cr->stroke();
+    }
+
     return true;
 }
 
 bool
 seqdata::on_expose_event(GdkEventExpose* a_e)
 {
-    m_window->draw_drawable(m_gc,
-                            m_pixmap,
-                            a_e->area.x,
-                            a_e->area.y,
-                            a_e->area.x,
-                            a_e->area.y,
-                            a_e->area.width,
-                            a_e->area.height );
+    m_surface_window = m_window->create_cairo_context();
     return true;
 }
 
@@ -351,8 +330,7 @@ seqdata::on_scroll_event( GdkEventScroll* a_ev )
         m_seq->decrement_selected( m_status, m_cc );
     }
 
-    update_pixmap();
-    queue_draw();
+    m_redraw_events = true;
 
     return true;
 }
@@ -377,14 +355,15 @@ seqdata::on_button_press_event(GdkEventButton* a_p0)
                                               c_dataarea_y - m_drop_y +3);
 
         if(m_drag_handle)
+        {
             if(!m_seq->get_hold_undo()) // if they used line draw but did not leave...
                 m_seq->push_undo();
-
-        /* reset box that holds dirty redraw spot */
-        m_old.x = 0;
-        m_old.y = 0;
-        m_old.width = 0;
-        m_old.height = 0;
+        }
+        else    // dragging - set starting point
+        {
+            m_current_x = (int) a_p0->x;
+            m_current_y = (int) a_p0->y;
+        }
 
         m_dragging = !m_drag_handle;
     }
@@ -434,8 +413,8 @@ seqdata::on_button_release_event(GdkEventButton* a_p0)
         m_seq->set_hold_undo(false);
     }
 
-    update_pixmap();
-    queue_draw();
+    m_redraw_events = true;
+
     return true;
 }
 
@@ -490,8 +469,7 @@ seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 
         m_seq->adjust_data_handle(m_status, m_current_y );
 
-        update_pixmap();
-        draw_events_on( m_window );
+        m_redraw_events = true;
     }
 
     if ( m_dragging )
@@ -529,11 +507,7 @@ seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
                                         c_dataarea_y - adj_y_max -1 );
 
         /* convert x,y to ticks, then set events in range */
-        update_pixmap();
-
-        draw_events_on( m_window );
-
-        draw_line_on_window();
+        m_redraw_events = true;
     }
 
     return true;
@@ -542,51 +516,8 @@ seqdata::on_motion_notify_event(GdkEventMotion* a_p0)
 bool
 seqdata::on_leave_notify_event(GdkEventCrossing* p0)
 {
-    update_pixmap();
-    queue_draw();
+    m_redraw_events = true;
     return true;
-}
-
-void
-seqdata::draw_line_on_window()
-{
-    int x,y,w,h;
-    m_gc->set_foreground( m_black );
-    m_gc->set_line_attributes( 1,
-                               Gdk::LINE_SOLID,
-                               Gdk::CAP_NOT_LAST,
-                               Gdk::JOIN_MITER );
-
-    /* replace old */
-    m_window->draw_drawable(m_gc,
-                            m_pixmap,
-                            m_old.x,
-                            m_old.y,
-                            m_old.x,
-                            m_old.y,
-                            m_old.width + 1,
-                            m_old.height + 1 );
-
-    xy_to_rect ( m_drop_x,
-                 m_drop_y,
-                 m_current_x,
-                 m_current_y,
-                 &x, &y,
-                 &w, &h );
-
-    x -= m_scroll_offset_x;
-
-    m_old.x = x;
-    m_old.y = y;
-    m_old.width = w;
-    m_old.height = h;
-
-    m_gc->set_foreground(m_black);
-    m_window->draw_line(m_gc,
-                        m_current_x - m_scroll_offset_x,
-                        m_current_y,
-                        m_drop_x - m_scroll_offset_x,
-                        m_drop_y );
 }
 
 void
@@ -595,8 +526,7 @@ seqdata::change_horz()
     m_scroll_offset_ticks = (int) m_hadjust->get_value();
     m_scroll_offset_x = m_scroll_offset_ticks / m_zoom;
 
-    update_pixmap();
-    force_draw();
+    m_redraw_events = true;
 }
 
 void
@@ -608,17 +538,4 @@ seqdata::on_size_allocate(Gtk::Allocation& a_r )
     m_window_y = a_r.get_height();
 
     update_sizes();
-}
-
-void
-seqdata::force_draw()
-{
-    m_window->draw_drawable(m_gc,
-                            m_pixmap,
-                            0,
-                            0,
-                            0,
-                            0,
-                            m_window_x,
-                            m_window_y );
 }

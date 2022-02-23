@@ -270,8 +270,7 @@ seqevent::update_surface()
     draw_background();
     draw_events_on();
 
-    m_seqdata_wid->update_pixmap();
-    m_seqdata_wid->draw_pixmap_on_window();
+    m_seqdata_wid->reset();
 }
 
 void

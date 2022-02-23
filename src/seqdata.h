@@ -40,18 +40,16 @@
 
 #include "globals.h"
 
-/* piano event */
+/* Note or CC event velocity adjustment area */
 class seqdata : public Gtk::DrawingArea
 {
 
 private:
 
-    Glib::RefPtr<Gdk::GC>     m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
-    Gdk::Color    m_black, m_white, m_grey, m_blue, m_red;
-
-    Glib::RefPtr<Gdk::Pixmap>   m_pixmap;
-    Glib::RefPtr<Gdk::Pixmap>   m_numbers[c_dataarea_y];
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
+    
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     sequence     * const m_seq;
 
@@ -79,6 +77,7 @@ private:
 
     bool m_dragging;
     bool m_drag_handle;
+    bool m_redraw_events;
 
     void on_realize();
     bool on_expose_event(GdkEventExpose* a_ev);
@@ -90,10 +89,6 @@ private:
     bool on_scroll_event( GdkEventScroll* a_ev ) ;
 
     void update_sizes();
-    void draw_events_on_pixmap();
-    void draw_pixmap_on_window();
-    void update_pixmap();
-    void draw_line_on_window();
 
     void convert_x( int a_x, long *a_tick );
 
@@ -102,12 +97,13 @@ private:
                      int *a_x,  int *a_y,
                      int *a_w,  int *a_h );
 
-    void draw_events_on( Glib::RefPtr<Gdk::Drawable> a_draw );
+    void draw_events_on_window();
 
     void on_size_allocate(Gtk::Allocation& );
     void change_horz();
 
-    void force_draw();
+protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 public:
 
@@ -119,6 +115,7 @@ public:
     void set_data_type( unsigned char a_status, unsigned char a_control  );
 
     int idle_redraw();
+    void queue_draw_background() {m_redraw_events = true;} ;
 
     friend class seqroll;
     friend class seqevent;
