@@ -22,18 +22,8 @@
 
 
 maintime::maintime( ):
-    m_black(Gdk::Color("black")),
-    m_white(Gdk::Color("white")),
-    m_grey(Gdk::Color("grey")),
     m_tick(0)
 {
-    // in the construor you can only allocate colors,
-    // get_window() returns 0 because we have not be realized
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-
-    colormap->alloc_color( m_black );
-    colormap->alloc_color( m_white );
-    colormap->alloc_color( m_grey );
 }
 
 void
@@ -44,7 +34,6 @@ maintime::on_realize()
 
     // Now we can allocate any additional resources we need
     m_window = get_window();
-    m_gc = Gdk::GC::create( m_window );
     m_window->clear();
 
     /* set default size */
@@ -55,15 +44,43 @@ int
 maintime::idle_progress( long a_ticks )
 {
     m_tick = a_ticks;
+    
+    if(get_realized())
+    {
+        on_draw();
+    }
+   // queue_draw();
 
-    m_window->clear();
+    return true;
+}
 
-    m_gc->set_foreground(m_black);
-    m_window->draw_rectangle(m_gc,false,
-                             0,
-                             0,
-                             c_maintime_x - 1,
-                             c_maintime_y - 1  );
+bool
+maintime::on_expose_event(GdkEventExpose* a_e)
+{
+    idle_progress( m_tick );
+    return true;
+}
+
+bool
+maintime::on_draw(/* const Cairo::RefPtr<Cairo::Context>& cr */)
+{
+    Cairo::RefPtr<Cairo::Context> cr = m_window->create_cairo_context();
+
+    cr->set_operator(Cairo::OPERATOR_CLEAR);
+    cr->rectangle(-1, -1, (c_maintime_x - 1), (c_maintime_y - 1));
+    cr->paint_with_alpha(0.0);
+    cr->set_operator(Cairo::OPERATOR_OVER);
+
+    /* clear the window */
+    cr->set_source_rgb(0.8, 0.8, 0.8);          // light grey FIXME
+    cr->rectangle(0.0, 0.0, (c_maintime_x - 1), (c_maintime_y - 1));
+    cr->stroke_preserve();
+    cr->fill();
+
+    cr->set_source_rgb(0.0, 0.0, 0.0);          // black FIXME
+    cr->set_line_width(1.0);
+    cr->rectangle(0.0, 0.0, (c_maintime_x - 1), (c_maintime_y - 1));
+    cr->stroke();
 
     int width = c_maintime_x - 1 - c_pill_width;
 
@@ -73,33 +90,20 @@ maintime::idle_progress( long a_ticks )
 
     if ( tick_x <= (c_maintime_x / 4 ))
     {
-        m_gc->set_foreground(m_grey);
-        m_window->draw_rectangle(m_gc,true,
-                                 2, //tick_x + 2,
-                                 2,
-                                 c_maintime_x - 4,
-                                 c_maintime_y - 4  );
+        cr->set_source_rgb(0.6, 0.6, 0.6);    // grey FIXME
+        cr->rectangle(2.0, 2.0, (c_maintime_x - 4), (c_maintime_y - 4));
+        cr->stroke_preserve();
+        cr->fill();
     }
 
-    m_gc->set_foreground(m_black);
-    m_window->draw_rectangle(m_gc,true,
-                             beat_x + 2,
-                             2,
-                             c_pill_width,
-                             c_maintime_y - 4  );
+    cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+    cr->rectangle((beat_x + 2), 2.0, c_pill_width, (c_maintime_y - 4));
+    cr->stroke_preserve();
+    cr->fill();
 
-    m_window->draw_rectangle(m_gc,true,
-                             bar_x + 2,
-                             2,
-                             c_pill_width,
-                             c_maintime_y - 4  );
+    cr->rectangle((bar_x + 2), 2.0, c_pill_width, (c_maintime_y - 4));
+    cr->stroke_preserve();
+    cr->fill();
 
-    return true;
-}
-
-bool
-maintime::on_expose_event(GdkEventExpose* a_e)
-{
-    idle_progress( m_tick );
     return true;
 }
