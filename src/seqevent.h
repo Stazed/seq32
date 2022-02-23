@@ -81,11 +81,10 @@ private:
     friend struct Seq32SeqEventInput;
     Seq32SeqEventInput m_seq32_interaction;
 
-    Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
-    Gdk::Color m_dk_blue, m_white, m_grey, m_dk_grey, m_red;
-
-    Glib::RefPtr<Gdk::Pixmap> m_pixmap;
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
+    
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     GdkRectangle m_old;
     GdkRectangle m_selected;
@@ -144,14 +143,17 @@ private:
                  int *a_x, int *a_w  );
 
     void drop_event( long a_tick );
-    void draw_events_on ( Glib::RefPtr<Gdk::Drawable> a_draw );
+    void draw_events_on ();
 
     void start_paste();
 
     void on_size_allocate(Gtk::Allocation& );
     void change_horz();
+    void update_sizes();
+    void draw_background();
 
-    void force_draw();
+protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 public:
 
@@ -168,12 +170,7 @@ public:
 
     void set_data_type( unsigned char a_status, unsigned char a_control  );
 
-    void update_sizes();
-    void draw_background();
-    void draw_events_on_pixmap();
-    void draw_pixmap_on_window();
-    void draw_selection_on_window();
-    void update_pixmap();
+    void update_surface();
 
     int idle_redraw();
 };
