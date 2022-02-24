@@ -85,7 +85,6 @@ mainwid::on_realize()
     // Now we can allocate any additional resources we need
     m_window = get_window();
     m_surface_window = m_window->create_cairo_context();
-    m_window->clear();
     
     if (m_window_x != m_surface->get_width() || m_window_y != m_surface->get_height())
     {

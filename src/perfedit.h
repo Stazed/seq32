@@ -39,7 +39,7 @@
 #include <gtkmm/widget.h>
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/viewport.h>
-#include <gtkmm/combo.h>
+#include <gtkmm/entry.h>
 #include <gtkmm/label.h>
 #include <gtkmm/toolbar.h>
 #include <gtkmm/togglebutton.h>
@@ -128,7 +128,6 @@ private:
     HBox *m_hbox;
     HBox *m_hlbox;
 
-    Tooltips *m_tooltips;
 
     /* set snap to in pulses */
     int m_snap;

@@ -552,7 +552,7 @@ perfedit::rewind(bool a_press)
     else
         FF_RW_button_type = FF_RW_RELEASE;
 
-    gtk_timeout_add(120,FF_RW_timeout,m_mainperf);
+    g_timeout_add(120,FF_RW_timeout,m_mainperf);
 }
 
 void
@@ -568,7 +568,7 @@ perfedit::fast_forward(bool a_press)
     else
         FF_RW_button_type = FF_RW_RELEASE;
 
-    gtk_timeout_add(120,FF_RW_timeout,m_mainperf);
+    g_timeout_add(120,FF_RW_timeout,m_mainperf);
 }
 
 void
