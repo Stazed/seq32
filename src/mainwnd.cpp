@@ -61,12 +61,142 @@ mainwnd::mainwnd(perform *a_p):
     /* main window */
     update_window_title();
 
+    m_accelgroup = Gtk::AccelGroup::create();
+    add_accel_group(m_accelgroup);
+
     m_main_wid = manage( new mainwid( m_mainperf, this));
     m_main_time = manage( new maintime( ));
 
     m_menubar = manage(new MenuBar());
 
     m_menu_file = manage(new Menu());
+    
+#ifdef GTKMM_3_SUPPORT
+    m_menu_recent = nullptr;
+
+    m_menu_edit = manage(new Menu());
+
+    m_menu_help = manage(new Menu());
+
+    m_file_menu_items.resize(8);
+    m_edit_menu_items.resize(8);
+
+    m_file_menu_items[0].set_label("_File");
+    m_file_menu_items[0].set_use_underline(true);
+    m_file_menu_items[0].set_submenu(*m_menu_file);
+
+    m_menubar->append(m_file_menu_items[0]);
+
+    m_edit_menu_items[0].set_label("_Edit");
+    m_edit_menu_items[0].set_use_underline(true);
+    m_edit_menu_items[0].set_submenu(*m_menu_edit);
+
+    m_menubar->append(m_edit_menu_items[0]);
+
+    m_help_submenu_item.set_label("_Help");
+    m_help_submenu_item.set_use_underline(true);
+    m_help_submenu_item.set_submenu(*m_menu_help);
+
+    m_menubar->append(m_help_submenu_item);
+
+    /* file menu items */
+    m_file_menu_items[1].set_label("_New");
+    m_file_menu_items[1].set_use_underline(true);
+    m_file_menu_items[1].add_accelerator("activate", m_accelgroup, 'n', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_file_menu_items[1].signal_activate().connect(mem_fun(*this, &mainwnd::file_new));
+    m_menu_file->append(m_file_menu_items[1]);
+
+    m_file_menu_items[2].set_label("_Open");
+    m_file_menu_items[2].set_use_underline(true);
+    m_file_menu_items[2].add_accelerator("activate", m_accelgroup, 'o', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_file_menu_items[2].signal_activate().connect(mem_fun(*this, &mainwnd::file_open));
+    m_menu_file->append(m_file_menu_items[2]);
+
+    /* Add the recent files submenu */
+    update_recent_files_menu();
+
+    m_file_menu_items[3].set_label("Open _playlist...");
+    m_file_menu_items[3].set_use_underline(true);
+    m_file_menu_items[3].signal_activate().connect(mem_fun(*this, &mainwnd::file_open_playlist));
+    m_menu_file->append(m_file_menu_items[3]);
+
+    m_menu_file->append(m_menu_separator1);
+
+    m_file_menu_items[4].set_label("_Save");
+    m_file_menu_items[4].set_use_underline(true);
+    m_file_menu_items[4].add_accelerator("activate", m_accelgroup, 's', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_file_menu_items[4].signal_activate().connect(mem_fun(*this, &mainwnd::file_save));
+    m_menu_file->append(m_file_menu_items[4]);
+
+    m_file_menu_items[5].set_label("Save _as...");
+    m_file_menu_items[5].set_use_underline(true);
+    m_file_menu_items[5].add_accelerator("activate", m_accelgroup, 's', Gdk::CONTROL_MASK | Gdk::SHIFT_MASK, Gtk::ACCEL_VISIBLE);
+    m_file_menu_items[5].signal_activate().connect(sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ32_FORMAT, c_no_export_sequence));
+    m_menu_file->append(m_file_menu_items[5]);
+
+    m_menu_file->append(m_menu_separator2);
+
+    m_file_menu_items[6].set_label("O_ptions...");
+    m_file_menu_items[6].set_use_underline(true);
+    m_file_menu_items[6].signal_activate().connect(mem_fun(*this, &mainwnd::options_dialog));
+    m_menu_file->append(m_file_menu_items[6]);
+
+    m_menu_file->append(m_menu_separator3);
+
+    m_file_menu_items[7].set_label("E_xit");
+    m_file_menu_items[7].set_use_underline(true);
+    m_file_menu_items[7].add_accelerator("activate", m_accelgroup, 'q', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_file_menu_items[7].signal_activate().connect(mem_fun(*this, &mainwnd::file_exit));
+    m_menu_file->append(m_file_menu_items[7]);
+
+    /* edit menu items */
+    m_edit_menu_items[1].set_label("_Song_Editor");
+    m_edit_menu_items[1].set_use_underline(true);
+    m_edit_menu_items[1].add_accelerator("activate", m_accelgroup, 'e', Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    m_edit_menu_items[1].signal_activate().connect(mem_fun(*this, &mainwnd::open_performance_edit));
+    m_menu_edit->append(m_edit_menu_items[1]);
+
+    m_edit_menu_items[2].set_label("_Apply song transpose");
+    m_edit_menu_items[2].set_use_underline(true);
+    m_edit_menu_items[2].signal_activate().connect(mem_fun(*this, &mainwnd::apply_song_transpose));
+    m_menu_edit->append(m_edit_menu_items[2]);
+
+    m_menu_edit->append(m_menu_separator4);
+
+    m_edit_menu_items[3].set_label("_Mute all tracks");
+    m_edit_menu_items[3].set_use_underline(true);
+    m_edit_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_ON));
+    m_menu_edit->append(m_edit_menu_items[3]);
+
+    m_edit_menu_items[4].set_label("_Unmute all tracks");
+    m_edit_menu_items[4].set_use_underline(true);
+    m_edit_menu_items[4].signal_activate().connect(sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_OFF));
+    m_menu_edit->append(m_edit_menu_items[4]);
+
+    m_edit_menu_items[5].set_label("_Toggle mute all tracks");
+    m_edit_menu_items[5].set_use_underline(true);
+    m_edit_menu_items[5].signal_activate().connect(sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_TOGGLE));
+    m_menu_edit->append(m_edit_menu_items[5]);
+
+    m_menu_edit->append(m_menu_separator5);
+
+    m_edit_menu_items[6].set_label("_Import midi");
+    m_edit_menu_items[6].set_use_underline(true);
+    m_edit_menu_items[6].signal_activate().connect(mem_fun(*this, &mainwnd::file_import_dialog));
+    m_menu_edit->append(m_edit_menu_items[6]);
+
+    m_edit_menu_items[7].set_label("Midi export _song");
+    m_edit_menu_items[7].set_use_underline(true);
+    m_edit_menu_items[7].signal_activate().connect(sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SONG_FORMAT, c_no_export_sequence));
+    m_menu_edit->append(m_edit_menu_items[7]);
+
+    /* help menu items */
+    m_help_menu_item.set_label("_About...");
+    m_help_menu_item.set_use_underline(true);
+    m_help_menu_item.signal_activate().connect(mem_fun(*this, &mainwnd::about_dialog));
+    m_menu_help->append(m_help_menu_item);
+    
+#else
     m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
     
     m_menu_recent = nullptr;
@@ -133,7 +263,7 @@ mainwnd::mainwnd(perform *a_p):
     /* help menu items */
     m_menu_help->items().push_back(MenuElem("_About...",
                                             mem_fun(*this, &mainwnd::about_dialog)));
-
+#endif
     /* top line items */
     tophbox = manage( new HBox( false, 0 ) );
     
