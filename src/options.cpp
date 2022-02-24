@@ -120,9 +120,8 @@ options::add_midi_clock_page()
         }
     }
 
-    Adjustment *clock_mod_adj = new Adjustment(midibus::get_clock_mod(),
-            1, 16 << 10, 1 );
-    SpinButton *clock_mod_spin = new SpinButton( *clock_mod_adj );
+    Glib::RefPtr<Adjustment> clock_mod_adj = Adjustment::create(midibus::get_clock_mod(), 1, 16 << 10, 1);
+    SpinButton *clock_mod_spin = new SpinButton( clock_mod_adj );
 
     HBox *hbox2 = manage (new HBox ());
 
@@ -132,9 +131,14 @@ options::add_midi_clock_page()
     hbox2->pack_start(*clock_mod_spin, false, false );
 
     vbox->pack_start( *hbox2, false, false );
-
+    
+#ifdef GTKMM_3_SUPPORT
+    clock_mod_spin->signal_value_changed().connect(sigc::bind(mem_fun(*this,
+            &options::clock_mod_callback), clock_mod_adj));
+#else
     clock_mod_adj->signal_value_changed().connect(sigc::bind(mem_fun(*this,
             &options::clock_mod_callback), clock_mod_adj));
+#endif
 }
 
 /*MIDI Input page*/
@@ -511,7 +515,7 @@ options::clock_callback_mod (int a_bus, RadioButton *a_button)
 }
 
 void
-options::clock_mod_callback( Adjustment *adj )
+options::clock_mod_callback( Glib::RefPtr<Gtk::Adjustment> adj )
 {
     midibus::set_clock_mod((int)adj->get_value());
 }
