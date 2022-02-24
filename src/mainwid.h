@@ -66,9 +66,6 @@ private:
     
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
-    GdkRectangle m_old;
-    GdkRectangle m_selected;
-
     int          m_screenset;
 
     perform      * const m_mainperf;
@@ -110,12 +107,11 @@ private:
     bool on_focus_in_event(GdkEventFocus*);
     bool on_focus_out_event(GdkEventFocus*);
 
-    void draw_sequence_on_pixmap( int a_seq );
-    void draw_sequences_on_pixmap();
+    void draw_sequence_on_surface( int a_seq );
+    void draw_sequences_on_surface();
 
     void fill_background_window();
-    void draw_pixmap_on_window();
-    void draw_sequence_pixmap_on_window( int a_seq );
+    void draw_sequence_surface_on_window( int a_seq );
 
     int seq_from_xy( int a_x, int a_y );
 

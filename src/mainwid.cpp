@@ -101,13 +101,13 @@ mainwid::on_realize()
 
 // Fills Pixmap
 void
-mainwid::draw_sequences_on_pixmap()
+mainwid::draw_sequences_on_surface()
 {
     for ( int i = 0; i < c_mainwnd_rows *  c_mainwnd_cols; i++ )
     {
         int a_seq = i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols );
-        draw_sequence_on_pixmap( a_seq );
-        draw_sequence_pixmap_on_window(a_seq);
+        draw_sequence_on_surface( a_seq );
+        draw_sequence_surface_on_window(a_seq);
         m_last_tick_x[ i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols)  ] = 0;
     }
 }
@@ -127,7 +127,7 @@ mainwid::fill_background_window()
 
 // Draws a specific sequence on the surface
 void
-mainwid::draw_sequence_on_pixmap( int a_seq )
+mainwid::draw_sequence_on_surface( int a_seq )
 {
     Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
 
@@ -330,7 +330,7 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
 }
 
 void
-mainwid::draw_sequence_pixmap_on_window( int a_seq )
+mainwid::draw_sequence_surface_on_window( int a_seq )
 {
     if ( a_seq >= (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ) &&
             a_seq <  ((m_screenset+1)  * c_mainwnd_rows * c_mainwnd_cols ))
@@ -377,7 +377,7 @@ mainwid::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (m_need_redraw)
     {
         m_need_redraw = false;
-        draw_sequences_on_pixmap();
+        draw_sequences_on_surface();
     }
     
     for ( int i = 0; i < (c_mainwnd_rows * c_mainwnd_cols); i++ )
@@ -466,15 +466,8 @@ mainwid::update_sequences_on_window()
 void
 mainwid::update_sequence_on_window( int a_seq   )
 {
-    draw_sequence_on_pixmap( a_seq );
-    draw_sequence_pixmap_on_window( a_seq );
-}
-
-// queues blit of pixmap to window
-void
-mainwid::draw_pixmap_on_window()    // FIXME remove
-{
-    queue_draw();
+    draw_sequence_on_surface( a_seq );
+    draw_sequence_surface_on_window( a_seq );
 }
 
 // GTK expose event
