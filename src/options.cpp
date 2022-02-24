@@ -37,7 +37,7 @@ enum {e_keylabelsonsequence = 9999};
 
 
 options::options (Gtk::Window & parent, perform * a_p):
-    Gtk::Dialog ("Options", parent, true, true),
+    Gtk::Dialog ("Options", parent, DIALOG_MODAL),
     m_perf(a_p)
 {
     HBox *hbox = manage (new HBox ());
