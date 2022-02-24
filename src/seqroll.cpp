@@ -148,7 +148,6 @@ seqroll::on_realize()
     // Now we can allocate any additional resources we need
     m_window = get_window();
     m_surface_window = m_window->create_cairo_context();
-    m_window->clear();
 
     m_hadjust->signal_value_changed().connect( mem_fun( *this,
             &seqroll::change_horz ));
@@ -1381,7 +1380,7 @@ void FruitySeqRollInput::updateMousePtr(seqroll& ths)
         long start, end, note;
         if (ths.m_is_drag_pasting || ths.m_selecting || ths.m_moving || ths.m_growing || ths.m_paste)
         {
-            ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+            ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::LEFT_PTR ));
         }
         else if (!m_adding &&
                  ths.m_seq->intersectNotes( drop_tick, drop_note, start, end, note ) && note == drop_note)
@@ -1390,21 +1389,20 @@ void FruitySeqRollInput::updateMousePtr(seqroll& ths)
 
             if (start <= drop_tick && drop_tick <= start + handle_size)
             {
-                //get_window()->set_cursor( Gdk::Cursor( Gdk::RIGHT_PTR ));
-                ths.get_window()->set_cursor( Gdk::Cursor( Gdk::CENTER_PTR )); // not supported yet
+                ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::CENTER_PTR ));
             }
             else if (end - handle_size <= drop_tick && drop_tick <= end)
             {
-                ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+                ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::LEFT_PTR ));
             }
             else
             {
-                ths.get_window()->set_cursor( Gdk::Cursor( Gdk::CENTER_PTR ));
+                ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::CENTER_PTR ));
             }
         }
         else
         {
-            ths.get_window()->set_cursor( Gdk::Cursor( Gdk::PENCIL ));
+            ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::PENCIL ));
         }
     }
 }
@@ -1959,12 +1957,12 @@ Seq32SeqRollInput::set_adding( bool a_adding, seqroll& ths )
 {
     if ( a_adding )
     {
-        ths.get_window()->set_cursor(  Gdk::Cursor( Gdk::PENCIL ));
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::PENCIL ));
         m_adding = true;
     }
     else
     {
-        ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::LEFT_PTR ));
         m_adding = false;
     }
 }

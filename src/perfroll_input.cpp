@@ -16,26 +16,26 @@ void FruityPerfInput::updateMousePtr( perfroll& ths )
             if (start <= drop_tick && drop_tick <= start + (c_perfroll_size_box_click_w * c_perf_scale_x) &&
                     (m_current_y % c_names_y) <= c_perfroll_size_box_click_w + 1)
             {
-                ths.get_window()->set_cursor( Gdk::Cursor( Gdk::RIGHT_PTR ));
+                ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::RIGHT_PTR ));
             }
             else if (end - (c_perfroll_size_box_click_w * c_perf_scale_x) <= drop_tick && drop_tick <= end &&
                      (m_current_y % c_names_y) >= c_names_y - c_perfroll_size_box_click_w - 1)
             {
-                ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+                ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::LEFT_PTR ));
             }
             else
             {
-                ths.get_window()->set_cursor( Gdk::Cursor( Gdk::CENTER_PTR ));
+                ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::CENTER_PTR ));
             }
         }
         else
         {
-            ths.get_window()->set_cursor( Gdk::Cursor( Gdk::PENCIL ));
+            ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::PENCIL ));
         }
     }
     else
     {
-        ths.get_window()->set_cursor( Gdk::Cursor( Gdk::CROSSHAIR ));
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::CROSSHAIR ));
     }
 }
 
@@ -322,12 +322,12 @@ void Seq32PerfInput::set_adding( bool a_adding, perfroll& ths )
 {
     if ( a_adding )
     {
-        ths.get_window()->set_cursor(  Gdk::Cursor( Gdk::PENCIL ));
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::PENCIL ));
         m_adding = true;
     }
     else
     {
-        ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::LEFT_PTR ));
         m_adding = false;
     }
 }
@@ -360,7 +360,7 @@ bool Seq32PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
     {
         long tick = ths.m_drop_tick;
 
-        /* add a new note if we didnt select anything */
+        /* add a new note if we didn't select anything */
         if (  m_adding )
         {
             m_adding_pressed = true;

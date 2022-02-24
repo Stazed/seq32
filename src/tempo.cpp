@@ -354,7 +354,7 @@ tempo::on_button_press_event(GdkEventButton* p0)
          * than popping up the bpm window. */
         if(check_above_marker(tick, false, false))
         {
-            this->get_window()->set_cursor( Gdk::Cursor( Gdk::CENTER_PTR ));
+            this->get_window()->set_cursor(Gdk::Cursor::create(this->get_window()->get_display(),  Gdk::CENTER_PTR ));
             m_current_mark = m_move_marker;
             m_current_mark.tick = tick;
             m_init_move = false;
@@ -434,7 +434,7 @@ tempo::on_button_release_event(GdkEventButton* p0)
          * motion notify is not triggered to update the pointer. When
          * they return to the grid, the previous cursor state is still
          * active, so we adjust it here. */
-        this->get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+        this->get_window()->set_cursor(Gdk::Cursor::create(this->get_window()->get_display(),  Gdk::LEFT_PTR ));
     }
 
     m_draw_background = true;
@@ -462,7 +462,7 @@ tempo::on_motion_notify_event(GdkEventMotion* a_ev)
         {
             m_init_move = true;     // to tell button press we are on a marker
             m_current_mark = m_move_marker; // load the marker for display movement
-            this->get_window()->set_cursor( Gdk::Cursor( Gdk::CENTER_PTR ));
+            this->get_window()->set_cursor(Gdk::Cursor::create(this->get_window()->get_display(),  Gdk::CENTER_PTR ));
         }
         
         /* snap the movement so the user can see where it 
@@ -479,7 +479,7 @@ tempo::on_motion_notify_event(GdkEventMotion* a_ev)
         {
             m_init_move = false;
             m_move_marker.tick = 0;  // clear the move marker
-            this->get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+            this->get_window()->set_cursor(Gdk::Cursor::create(this->get_window()->get_display(),  Gdk::LEFT_PTR ));
         }
     }
     

@@ -64,8 +64,6 @@ seqkeys::on_realize()
     
     m_surface_window = m_window->create_cairo_context();
 
-    m_window->clear();
-
     m_vadjust->signal_value_changed().connect( mem_fun( *this, &seqkeys::change_vert ));
 
     change_vert();

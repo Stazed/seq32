@@ -76,7 +76,6 @@ seqevent::on_realize()
     // Now we can allocate any additional resources we need
     m_window = get_window();
     m_surface_window = m_window->create_cairo_context();
-    m_window->clear();
 
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqevent::change_horz ));
 
@@ -657,15 +656,15 @@ void FruitySeqEventInput::updateMousePtr(seqevent& ths)
 
     if (m_is_drag_pasting || ths.m_selecting || ths.m_moving || ths.m_paste)
     {
-        ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ));
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::LEFT_PTR ));
     }
     else if (ths.m_seq->intersectEvents( tick_s, tick_f, ths.m_status, pos ))
     {
-        ths.get_window()->set_cursor( Gdk::Cursor( Gdk::CENTER_PTR ));
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::CENTER_PTR ));
     }
     else
     {
-        ths.get_window()->set_cursor( Gdk::Cursor( Gdk::PENCIL ));
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::PENCIL ));
     }
 }
 
@@ -1042,12 +1041,12 @@ Seq32SeqEventInput::set_adding( bool a_adding, seqevent& ths )
 {
     if ( a_adding )
     {
-        ths.get_window()->set_cursor(  Gdk::Cursor( Gdk::PENCIL ) );
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::PENCIL ));
         m_adding = true;
     }
     else
     {
-        ths.get_window()->set_cursor( Gdk::Cursor( Gdk::LEFT_PTR ) );
+        ths.get_window()->set_cursor(Gdk::Cursor::create(ths.get_window()->get_display(),  Gdk::LEFT_PTR ));
         m_adding = false;
     }
 }
