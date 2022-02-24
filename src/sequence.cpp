@@ -380,7 +380,15 @@ sequence::toggle_queued()
     set_dirty_mp();
 
     m_queued = !m_queued;
-    m_queued_tick = m_last_tick - (m_last_tick % m_length) + m_length;
+
+    if(!global_is_running)
+    {
+        m_queued_tick = m_length;   // reset to first sequence
+    }
+    else    // were are running so next sequence 
+    {
+        m_queued_tick = m_last_tick - (m_last_tick % m_length) + m_length;
+    }
 
     unlock();
 }
