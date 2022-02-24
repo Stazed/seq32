@@ -48,6 +48,8 @@ mainwid::mainwid( perform *a_p, mainwnd *a_main ):
 
     m_button_down(false),
     m_moving(false),
+    m_need_redraw(false),
+    m_progress_tick(0),
     m_background_color(COLOR_WHITE),
     m_foreground_color(COLOR_BLACK)
 {
@@ -94,16 +96,18 @@ mainwid::on_realize()
     }
 
     fill_background_window();
-    draw_sequences_on_pixmap();
+    m_need_redraw = true;
 }
 
 // Fills Pixmap
 void
 mainwid::draw_sequences_on_pixmap()
 {
-    for ( int i=0; i< c_mainwnd_rows *  c_mainwnd_cols; i++ )
+    for ( int i = 0; i < c_mainwnd_rows *  c_mainwnd_cols; i++ )
     {
-        draw_sequence_on_pixmap( i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ));
+        int a_seq = i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols );
+        draw_sequence_on_pixmap( a_seq );
+        draw_sequence_pixmap_on_window(a_seq);
         m_last_tick_x[ i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols)  ] = 0;
     }
 }
@@ -120,11 +124,6 @@ mainwid::fill_background_window()
     cr->fill();
 }
 
-int
-mainwid::timeout()
-{
-    return true;
-}
 
 // Draws a specific sequence on the surface
 void
@@ -354,8 +353,7 @@ mainwid::draw_sequence_pixmap_on_window( int a_seq )
 void
 mainwid::redraw( int a_sequence )
 {
-    draw_sequence_on_pixmap( a_sequence );
-    draw_sequence_pixmap_on_window( a_sequence );
+    update_sequence_on_window( a_sequence );
 }
 
 /**
@@ -365,24 +363,44 @@ mainwid::redraw( int a_sequence )
 void
 mainwid::update_markers( int a_ticks )
 {
-    for ( int i=0; i< c_mainwnd_rows *  c_mainwnd_cols; i++ )
+    m_progress_tick = a_ticks;
+
+    on_draw(m_surface_window);
+  //  queue_draw();
+}
+
+bool
+mainwid::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    m_surface_window = cr;
+
+    if (m_need_redraw)
+    {
+        m_need_redraw = false;
+        draw_sequences_on_pixmap();
+    }
+    
+    for ( int i = 0; i < (c_mainwnd_rows * c_mainwnd_cols); i++ )
     {
         int a_seq = i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols );
 
-        draw_sequence_pixmap_on_window(a_seq);
+        if ( m_mainperf->is_dirty_main(a_seq ) )
+        {
+            update_sequence_on_window( a_seq );
+        }
 
-        draw_marker_on_sequence(a_seq, a_ticks);
+        if (global_is_running)
+        {
+            draw_marker_on_sequence(a_seq, m_progress_tick);
+        }
     }
+   
+    return true;
 }
 
 void
 mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 {
-    if ( m_mainperf->is_dirty_main(a_seq ) )
-    {
-        update_sequence_on_window( a_seq );
-    }
-
     if ( m_mainperf->is_active( a_seq ))
     {
         sequence *seq = m_mainperf->get_sequence( a_seq );
@@ -442,8 +460,7 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 void
 mainwid::update_sequences_on_window()
 {
-    draw_sequences_on_pixmap( );
-    draw_pixmap_on_window();
+    m_need_redraw = true;
 }
 
 void
@@ -455,7 +472,7 @@ mainwid::update_sequence_on_window( int a_seq   )
 
 // queues blit of pixmap to window
 void
-mainwid::draw_pixmap_on_window()
+mainwid::draw_pixmap_on_window()    // FIXME remove
 {
     queue_draw();
 }
@@ -540,8 +557,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
 
             m_mainperf->sequence_playing_toggle( m_current_seq );
 
-            draw_sequence_on_pixmap(  m_current_seq );
-            draw_sequence_pixmap_on_window( m_current_seq);
+            update_sequence_on_window( m_current_seq );
         }
     }
 
@@ -555,8 +571,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
             m_mainperf->new_sequence( m_current_seq  );
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;
 
-            draw_sequence_on_pixmap( m_current_seq  );
-            draw_sequence_pixmap_on_window( m_current_seq );
+            update_sequence_on_window( m_current_seq );
         }
         /* If we did land on another sequence and it is not being edited, then swap places. */
         else if ( !m_mainperf->is_sequence_in_edit( m_current_seq ) )
@@ -569,10 +584,9 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
             m_mainperf->new_sequence( m_current_seq  );                     // add a new blank one
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;    // replace with the old
             
-            draw_sequence_on_pixmap( m_old_seq  );
-            draw_sequence_pixmap_on_window( m_old_seq );
-            draw_sequence_on_pixmap( m_current_seq  );
-            draw_sequence_pixmap_on_window( m_current_seq );
+            update_sequence_on_window( m_old_seq );
+            
+            update_sequence_on_window( m_current_seq );
         }
         /* They landed on another sequence but it is being edited, so ignore the move 
          * and put the old sequence back to original location. */
@@ -581,8 +595,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
             m_mainperf->new_sequence( m_old_seq  );
             *(m_mainperf->get_sequence( m_old_seq )) = m_moving_seq;
 
-            draw_sequence_on_pixmap( m_old_seq  );
-            draw_sequence_pixmap_on_window( m_old_seq );
+            update_sequence_on_window( m_old_seq );
         }
     }
     // launch menu (right button)
@@ -611,8 +624,7 @@ mainwid::on_motion_notify_event(GdkEventMotion* a_p0)
 
                 m_moving_seq = *(m_mainperf->get_sequence( m_current_seq ));
                 m_mainperf->delete_sequence( m_current_seq );
-                draw_sequence_on_pixmap( m_current_seq  );
-                draw_sequence_pixmap_on_window( m_current_seq );
+                update_sequence_on_window( m_current_seq );
             }
         }
     }
@@ -624,8 +636,7 @@ mainwid::on_motion_notify_event(GdkEventMotion* a_p0)
 void
 mainwid::reset( )
 {
-    draw_sequences_on_pixmap();
-    draw_pixmap_on_window();
+    m_need_redraw = true;
 }
 
 void

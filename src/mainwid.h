@@ -82,6 +82,9 @@ private:
     bool         m_button_down;
     bool         m_moving;
     
+    bool         m_need_redraw;
+    int          m_progress_tick;
+    
     int m_background_color, m_foreground_color;
 
     /* when highlighting a bunch of events */
@@ -116,9 +119,10 @@ private:
 
     int seq_from_xy( int a_x, int a_y );
 
-    int timeout();
-
     void redraw( int a_seq );
+    
+protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 public:
 
