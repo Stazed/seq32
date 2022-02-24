@@ -79,8 +79,6 @@ seqtime::on_realize()
     
     m_surface_window = m_window->create_cairo_context();
 
-    m_window->clear();
-
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqtime::change_horz ));
 
     update_sizes();
