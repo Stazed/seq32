@@ -71,8 +71,6 @@ options::add_midi_clock_page()
     vbox->set_border_width(6);
     m_notebook->append_page(*vbox, "MIDI _Clock", true);
 
-    manage (new Tooltips ());
-
     for (int i = 0; i < buses; i++)
     {
         HBox *hbox2 = manage (new HBox ());

@@ -34,15 +34,14 @@
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/label.h>
 #include <gtkmm/frame.h>
-#include <gtkmm/fileselection.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/arrow.h>
 #include <gtkmm/spinbutton.h>
 #include <gtkmm/progressbar.h>
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/togglebutton.h>
+#include <gtkmm/radiobutton.h>
 #include <gtkmm/notebook.h>
-#include <gtkmm/tooltips.h>
 
 #include <sigc++/bind.h>
 

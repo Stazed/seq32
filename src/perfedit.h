@@ -42,11 +42,9 @@
 #include <gtkmm/combo.h>
 #include <gtkmm/label.h>
 #include <gtkmm/toolbar.h>
-#include <gtkmm/optionmenu.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/invisible.h>
 #include <gtkmm/separator.h>
-#include <gtkmm/tooltips.h>
 #include <gtkmm/invisible.h>
 #include <gtkmm/arrow.h>
 #include <gtkmm/image.h>

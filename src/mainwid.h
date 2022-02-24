@@ -41,7 +41,6 @@ class mainwnd;
 #include <gtkmm/table.h>
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/widget.h>
-#include <gtkmm/style.h>
 
 using namespace Gtk;
 

@@ -31,6 +31,7 @@
 #include <gtkmm/main.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/menubar.h>
+#include <gtkmm/togglebutton.h>
 #include <gtkmm/eventbox.h>
 #include <gtkmm/window.h>
 #include <gtkmm/table.h>

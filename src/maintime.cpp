@@ -34,7 +34,6 @@ maintime::on_realize()
 
     // Now we can allocate any additional resources we need
     m_window = get_window();
-    m_window->clear();
 
     /* set default size */
     set_size_request( c_maintime_x, c_maintime_y );
