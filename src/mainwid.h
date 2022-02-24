@@ -45,21 +45,26 @@ class mainwnd;
 
 using namespace Gtk;
 
+/* The draw progress area size */
 const int c_seqarea_seq_x = c_text_x * 13;
 const int c_seqarea_seq_y = c_text_y * 2;
 
-/* piano roll */
+enum
+{
+    COLOR_BLACK = 0,
+    COLOR_WHITE
+};
+
+/* The main window grid of sequences */
 class mainwid : public Gtk::DrawingArea, public seqmenu
 {
 
 private:
 
-    Glib::RefPtr<Gdk::GC> m_gc;
     Glib::RefPtr<Gdk::Window> m_window;
-    Gdk::Color   m_black, m_white, m_grey, m_dk_grey;
-    Gdk::Color   m_background, m_foreground;
-
-    Glib::RefPtr<Gdk::Pixmap>   m_pixmap;
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
+    
+    Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     GdkRectangle m_old;
     GdkRectangle m_selected;
@@ -76,6 +81,8 @@ private:
 
     bool         m_button_down;
     bool         m_moving;
+    
+    int m_background_color, m_foreground_color;
 
     /* when highlighting a bunch of events */
 

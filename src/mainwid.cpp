@@ -39,10 +39,6 @@ const char mainwid::m_seq_to_char[c_seqs_in_set] =
 
 mainwid::mainwid( perform *a_p, mainwnd *a_main ):
     seqmenu( a_p, a_main ),
-    m_black(Gdk::Color("black")),
-    m_white(Gdk::Color("white")),
-    m_grey (Gdk::Color("grey")),
-
     m_screenset(0),
 
     m_mainperf(a_p),
@@ -51,14 +47,18 @@ mainwid::mainwid( perform *a_p, mainwnd *a_main ):
     m_window_y(c_mainwid_y),
 
     m_button_down(false),
-    m_moving(false)
+    m_moving(false),
+    m_background_color(COLOR_WHITE),
+    m_foreground_color(COLOR_BLACK)
 {
-    using namespace Menu_Helpers;
+    Gtk::Allocation allocation = get_allocation();
+    m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        allocation.get_width(),
+        allocation.get_height()
+    );
 
-    Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
-    colormap->alloc_color( m_black );
-    colormap->alloc_color( m_white );
-    colormap->alloc_color( m_grey );
+    using namespace Menu_Helpers;
 
     set_size_request( c_mainwid_x, c_mainwid_y );
 
@@ -82,15 +82,16 @@ mainwid::on_realize()
 
     // Now we can allocate any additional resources we need
     m_window = get_window();
-    m_gc = Gdk::GC::create( m_window );
+    m_surface_window = m_window->create_cairo_context();
     m_window->clear();
-
-    p_font_renderer->init( m_window );
-
-    m_pixmap = Gdk::Pixmap::create(m_window,
-                                   c_mainwid_x,
-                                   c_mainwid_y,
-                                   -1 );
+    
+    if (m_window_x != m_surface->get_width() || m_window_y != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+                m_window_x,  m_window_y
+        );
+    }
 
     fill_background_window();
     draw_sequences_on_pixmap();
@@ -112,13 +113,11 @@ void
 mainwid::fill_background_window()
 {
     /* clear background */
-
-    m_pixmap->draw_rectangle(this->get_style()->get_bg_gc(Gtk::STATE_NORMAL),
-                             true,
-                             0,
-                             0,
-                             m_window_x,
-                             m_window_y );
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+    
+    cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+    cr->rectangle(0, 0, m_window_x, m_window_y);
+    cr->fill();
 }
 
 int
@@ -127,10 +126,23 @@ mainwid::timeout()
     return true;
 }
 
-// Draws a specific sequence on the Pixmap
+// Draws a specific sequence on the surface
 void
 mainwid::draw_sequence_on_pixmap( int a_seq )
 {
+    Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
+
+    cr->set_operator(Cairo::OPERATOR_DEST);
+    cr->set_operator(Cairo::OPERATOR_OVER);
+
+    Pango::FontDescription font;
+    int text_width;
+    int text_height;
+
+    font.set_family(c_font);
+    font.set_size((c_key_fontsize - 1) * Pango::SCALE);
+    font.set_weight(Pango::WEIGHT_NORMAL);
+
     if ( a_seq >= (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ) &&
             a_seq <  ((m_screenset+1)  * c_mainwnd_rows * c_mainwnd_cols ))
     {
@@ -143,13 +155,10 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
                       (c_seqarea_y + c_mainwid_spacing) * j);
 
         /*int local_seq = a_seq % c_seqs_in_set;*/
-
-        m_gc->set_foreground(m_black);
-        m_pixmap->draw_rectangle(m_gc, true,
-                                 base_x,
-                                 base_y,
-                                 c_seqarea_x,
-                                 c_seqarea_y );
+        
+        cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+        cr->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y );
+        cr->fill();
 
         if ( m_mainperf->is_active( a_seq ))
         {
@@ -158,45 +167,52 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
             if ( seq->get_playing() )
             {
                 m_last_playing[a_seq] = true;
-                m_background = m_black;
-                m_foreground = m_white;
+                m_background_color = COLOR_BLACK;
+                m_foreground_color = COLOR_WHITE;
             }
             else
             {
                 m_last_playing[a_seq] = false;
-                m_background = m_white;
-                m_foreground = m_black;
+                m_background_color = COLOR_WHITE;
+                m_foreground_color = COLOR_BLACK;
             }
-
-            m_gc->set_foreground(m_background);
-            m_pixmap->draw_rectangle(m_gc,true,
-                                     base_x + 1,
-                                     base_y + 1,
+            
+            if( m_background_color == COLOR_BLACK)
+            {
+                cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+            }
+            else
+            {
+                cr->set_source_rgb(1.0, 1.0, 1.0);        // White FIXME
+            }
+            
+            cr->rectangle(base_x + 1, base_y + 1,
                                      c_seqarea_x - 2,
                                      c_seqarea_y - 2 );
+            cr->fill();
 
-            m_gc->set_foreground(m_foreground);
+            if( m_foreground_color == COLOR_BLACK)
+            {
+                cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+            }
+            else
+            {
+                cr->set_source_rgb(1.0, 1.0, 1.0);        // White FIXME
+            }
+            
+
             char name[20];
             snprintf( name, sizeof name, "%.13s", seq->get_name() );
+            
+            auto n = create_pango_layout(name);
+            n->set_font_description(font);
+            n->get_pixel_size(text_width, text_height);
+            
+            cr->move_to(base_x + c_text_x, base_y + 4);
 
-            font::Color col = font::BLACK;;
-
-            if ( m_foreground == m_black )
-            {
-                col = font::BLACK;
-            }
-            if ( m_foreground == m_white )
-            {
-                col = font::WHITE;
-            }
-
-            p_font_renderer->render_string_on_drawable( m_gc,
-                    base_x + c_text_x,
-                    base_y + 4,
-                    m_pixmap, name, col);
+            n->show_in_cairo_context(cr);
 
             /* midi channel + key + timesig */
-
             /*char key =  m_seq_to_char[local_seq];*/
 
             char str[20];
@@ -205,10 +221,14 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
             {
                 snprintf( str, sizeof str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
 
-                p_font_renderer->render_string_on_drawable(m_gc,
-                        base_x + c_seqarea_x - 7,
-                        base_y + c_text_y * 4 - 2,
-                        m_pixmap, str, col );
+                auto k = create_pango_layout(str);
+                k->set_font_description(font);
+                k->get_pixel_size(text_width, text_height);
+                
+                cr->move_to(base_x + c_seqarea_x - 7,
+                        base_y + c_text_y * 4 - 2);
+                
+                k->show_in_cairo_context(cr);
             }
 
             snprintf( str, sizeof str,
@@ -216,33 +236,38 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
                       seq->get_midi_bus(),
                       seq->get_midi_channel()+1,
                       seq->get_bp_measure(), seq->get_bw() );
-
-            p_font_renderer->render_string_on_drawable(m_gc,
-                    base_x + c_text_x,
-                    base_y + c_text_y * 4 - 2,
-                    m_pixmap, str, col );
+            
+            auto b = create_pango_layout(str);
+            b->set_font_description(font);
+            b->get_pixel_size(text_width, text_height);
+            
+            cr->move_to(base_x + c_text_x,
+                    base_y + c_text_y * 4 - 2);
+            
+            b->show_in_cairo_context(cr);
 
             int rectangle_x = base_x + c_text_x - 1;
             int rectangle_y = base_y + c_text_y + c_text_x - 1;
 
             if ( seq->get_queued() )
             {
-                m_gc->set_foreground(m_grey);
-                m_pixmap->draw_rectangle(m_gc,true,
-                                         rectangle_x - 2,
+                cr->set_source_rgb(0.6, 0.6, 0.6);        // grey FIXME
+                cr->rectangle(rectangle_x - 2,
                                          rectangle_y - 1,
                                          c_seqarea_seq_x + 3,
                                          c_seqarea_seq_y + 3 );
+                cr->fill();
 
-                m_foreground = m_black;
+                m_foreground_color = COLOR_BLACK;
+                
+                cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
             }
-
-            m_gc->set_foreground(m_foreground);
-            m_pixmap->draw_rectangle(m_gc,false,
-                                     rectangle_x - 2,
+            
+            cr->rectangle(rectangle_x - 2,
                                      rectangle_y - 1,
                                      c_seqarea_seq_x + 3,
                                      c_seqarea_seq_y + 3 );
+            cr->stroke();
 
             int lowest_note = seq->get_lowest_note_event( );
             int highest_note = seq->get_highest_note_event( );
@@ -277,27 +302,30 @@ mainwid::draw_sequence_on_pixmap( int a_seq )
                 if ( tick_f_x <= tick_s_x )
                     tick_f_x = tick_s_x + 1;
 
-                m_gc->set_foreground(m_foreground);
-                m_pixmap->draw_line(m_gc, rectangle_x + tick_s_x,
-                                    rectangle_y + note_y,
-                                    rectangle_x + tick_f_x,
-                                    rectangle_y + note_y );
+                if (m_foreground_color == COLOR_BLACK)
+                {
+                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+                }
+                else
+                {
+                    cr->set_source_rgb(1.0, 1.0, 1.0);        // White FIXME
+                }
+                
+                cr->move_to(rectangle_x + tick_s_x,
+                                    rectangle_y + note_y);
+                cr->line_to(rectangle_x + tick_f_x,
+                                    rectangle_y + note_y);
+                cr->stroke();
             }
         }
-        else
+        else    /* not active */
         {
-            /* not active */
-
-            m_gc->set_foreground(m_grey);
-            m_pixmap->draw_rectangle( this->get_style()->get_bg_gc(Gtk::STATE_NORMAL),
-                                      true,
-                                      base_x + 4,       base_y,
-                                      c_seqarea_x - 8,  c_seqarea_y );
-
-            m_pixmap->draw_rectangle( this->get_style()->get_bg_gc(Gtk::STATE_NORMAL),
-                                      true,
-                                      base_x + 1,       base_y + 1,
-                                      c_seqarea_x - 2,  c_seqarea_y - 2 );
+            cr->set_source_rgb(0.8, 0.8, 0.8);        // light grey FIXME
+            cr->rectangle(base_x + 4, base_y, c_seqarea_x - 8,  c_seqarea_y);
+            cr->fill();
+            
+            cr->rectangle(base_x + 1, base_y + 1, c_seqarea_x - 2,  c_seqarea_y - 2);
+            cr->fill();
         }
     }
 }
@@ -315,15 +343,11 @@ mainwid::draw_sequence_pixmap_on_window( int a_seq )
                       (c_seqarea_x + c_mainwid_spacing) * i);
         int base_y = (c_mainwid_border +
                       (c_seqarea_y + c_mainwid_spacing) * j);
-
-        m_window->draw_drawable(m_gc,
-                                m_pixmap,
-                                base_x,
-                                base_y,
-                                base_x,
-                                base_y,
-                                c_seqarea_x,
-                                c_seqarea_y );
+        
+        m_surface_window->set_source(m_surface, 0, 0);
+        m_surface_window->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y );
+        m_surface_window->stroke_preserve();
+        m_surface_window->fill();
     }
 }
 
@@ -334,11 +358,21 @@ mainwid::redraw( int a_sequence )
     draw_sequence_pixmap_on_window( a_sequence );
 }
 
+/**
+ * From main window timeout
+ * @param a_ticks
+ */
 void
 mainwid::update_markers( int a_ticks )
 {
     for ( int i=0; i< c_mainwnd_rows *  c_mainwnd_cols; i++ )
-        draw_marker_on_sequence( i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ), a_ticks);
+    {
+        int a_seq = i + (m_screenset  * c_mainwnd_rows * c_mainwnd_cols );
+
+        draw_sequence_pixmap_on_window(a_seq);
+
+        draw_marker_on_sequence(a_seq, a_ticks);
+    }
 }
 
 void
@@ -369,41 +403,39 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
         a_tick %= length;
 
         long tick_x = a_tick * c_seqarea_seq_x / length;
+        
+        /* Redraws the progress area background to clear previous line */
+        m_surface_window->set_source(m_surface, 0, 0);
+        m_surface_window->rectangle(rectangle_x,
+                                    rectangle_y,
+                                    c_seqarea_seq_x,
+                                    c_seqarea_seq_y + 1 );
 
-        m_window->draw_drawable(m_gc,
-                                m_pixmap,
-                                rectangle_x + m_last_tick_x[a_seq],
-                                rectangle_y + 1,
-                                rectangle_x + m_last_tick_x[a_seq],
-                                rectangle_y + 1,
-                                1,
-                                c_seqarea_seq_y );
+        m_surface_window->stroke_preserve();
+        m_surface_window->fill();
 
         m_last_tick_x[a_seq] = tick_x;
 
         if ( seq->get_playing() )
         {
-            m_gc->set_foreground(m_white);
+            m_surface_window->set_source_rgb(1.0, 1.0, 1.0);        // White FIXME
         }
         else
         {
-            m_gc->set_foreground(m_black);
+            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black FIXME
         }
 
         if ( seq->get_queued())
         {
-            m_gc->set_foreground(m_black);
+            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black FIXME
         }
 
-        m_window->draw_line(m_gc,
-                            rectangle_x + tick_x,
-                            rectangle_y + 1,
-                            rectangle_x + tick_x,
-                            rectangle_y + c_seqarea_seq_y );
+        /* Draw the progress line */
+        m_surface_window->set_line_width(1.0);
 
-        //if ( seq->get_playing() ){
-        //
-        //}
+        m_surface_window->move_to(rectangle_x + tick_x, rectangle_y + 1);
+        m_surface_window->line_to(rectangle_x + tick_x, rectangle_y + c_seqarea_seq_y );
+        m_surface_window->stroke();
     }
 }
 
@@ -432,14 +464,7 @@ mainwid::draw_pixmap_on_window()
 bool
 mainwid::on_expose_event(GdkEventExpose* a_e)
 {
-    m_window->draw_drawable(m_gc,
-                            m_pixmap,
-                            a_e->area.x,
-                            a_e->area.y,
-                            a_e->area.x,
-                            a_e->area.y,
-                            a_e->area.width,
-                            a_e->area.height );
+    m_surface_window = m_window->create_cairo_context();
     return true;
 }
 
@@ -602,12 +627,6 @@ mainwid::reset( )
     draw_sequences_on_pixmap();
     draw_pixmap_on_window();
 }
-
-//int
-//mainwid::get_screenset( )
-//{
-//    return m_screenset;
-//}
 
 void
 mainwid::set_screenset( int a_ss )
