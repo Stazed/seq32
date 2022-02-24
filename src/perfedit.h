@@ -82,8 +82,8 @@ private:
     VScrollbar *m_vscroll;
     HScrollbar *m_hscroll;
 
-    Adjustment *m_vadjust;
-    Adjustment *m_hadjust;
+    Glib::RefPtr<Adjustment> m_vadjust;
+    Glib::RefPtr<Adjustment> m_hadjust;
 
     perfnames *m_perfnames;
     perfroll *m_perfroll;

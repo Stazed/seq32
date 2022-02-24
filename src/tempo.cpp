@@ -24,7 +24,7 @@
 #include "pixmaps/stop_marker.xpm"
 
 
-tempo::tempo( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust ) :
+tempo::tempo( perform *a_perf, perfedit *a_perf_edit, Glib::RefPtr<Adjustment> a_hadjust ) :
     m_mainperf(a_perf),
     m_perfedit(a_perf_edit),
     m_hadjust(a_hadjust),

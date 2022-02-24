@@ -64,7 +64,8 @@ private:
 
     perform      * const m_mainperf;
     perfedit     * const m_perfedit;
-    Adjustment   * const m_hadjust;
+
+    Glib::RefPtr<Adjustment> const m_hadjust;
     
     /* holds the markers */
     list < tempo_mark > m_list_marker;
@@ -121,7 +122,7 @@ protected:
 
 public:
 
-    tempo( perform *a_perf, perfedit *a_perf_edit, Adjustment *a_hadjust );
+    tempo( perform *a_perf, perfedit *a_perf_edit, Glib::RefPtr<Adjustment> a_hadjust );
     ~tempo();
 
     int idle_progress();

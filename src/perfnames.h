@@ -57,7 +57,7 @@ private:
 
     perform      *m_mainperf;
 
-    Adjustment   *m_vadjust;
+    Glib::RefPtr<Adjustment> m_vadjust;
 
     bool m_redraw_tracks;
 
@@ -101,6 +101,6 @@ public:
     void redraw_dirty_sequences();
 
     perfnames( perform *a_perf, mainwnd *a_main,
-               Adjustment *a_vadjust   );
+               Glib::RefPtr<Adjustment> a_vadjust );
 
 };

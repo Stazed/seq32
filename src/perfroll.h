@@ -94,8 +94,8 @@ private:
 
     bool         m_sequence_active[c_total_seqs];
 
-    Adjustment   *m_vadjust;
-    Adjustment   *m_hadjust;
+    Glib::RefPtr<Adjustment> m_vadjust;
+    Glib::RefPtr<Adjustment> m_hadjust;
 
     bool m_moving;
     bool m_growing;
@@ -159,8 +159,8 @@ public:
 
     perfroll( perform *a_perf,
               perfedit *a_perf_edit,
-              Adjustment *a_hadjust,
-              Adjustment *a_vadjust );
+              Glib::RefPtr<Adjustment> a_hadjust,
+              Glib::RefPtr<Adjustment> a_vadjust);
 
     ~perfroll( );
 };

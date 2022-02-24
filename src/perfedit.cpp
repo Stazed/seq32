@@ -64,11 +64,11 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     set_title( "seq32 - Song Editor");
     set_size_request(750, 400);
 
-    m_vadjust = manage( new Adjustment(0,0,1,1,1,1 ));
-    m_hadjust = manage( new Adjustment(0,0,1,1,1,1 ));
+    m_vadjust = Adjustment::create(0,0,1,1,1,1 );
+    m_hadjust = Adjustment::create(0,0,1,1,1,1 );
 
-    m_vscroll   =  manage(new VScrollbar( *m_vadjust ));
-    m_hscroll   =  manage(new HScrollbar( *m_hadjust ));
+    m_vscroll   =  manage(new VScrollbar( m_vadjust ));
+    m_hscroll   =  manage(new HScrollbar( m_hadjust ));
 
     m_perfnames = manage( new perfnames( m_mainperf, a_main, m_vadjust ));
 

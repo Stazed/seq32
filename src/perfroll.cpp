@@ -22,8 +22,8 @@
 
 perfroll::perfroll( perform *a_perf,
                     perfedit * a_perf_edit,
-                    Adjustment * a_hadjust,
-                    Adjustment * a_vadjust  ) :
+                    Glib::RefPtr<Adjustment> a_hadjust,
+                    Glib::RefPtr<Adjustment> a_vadjust  ) :
     m_window(NULL),
 
     m_mainperf(a_perf),
@@ -128,7 +128,6 @@ perfroll::on_realize()
     m_window = get_window();
     
     m_surface_window = m_window->create_cairo_context();
-    m_window->clear();
 
     update_sizes();
 

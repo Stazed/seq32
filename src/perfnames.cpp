@@ -20,7 +20,7 @@
 #include "perfnames.h"
 #include "font.h"
 
-perfnames::perfnames( perform *a_perf, mainwnd *a_main, Adjustment *a_vadjust ):
+perfnames::perfnames( perform *a_perf, mainwnd *a_main, Glib::RefPtr<Adjustment> a_vadjust ):
     seqmenu(a_perf, a_main ),
     m_mainperf(a_perf),
     m_vadjust(a_vadjust),
