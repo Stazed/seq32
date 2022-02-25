@@ -96,6 +96,17 @@ private:
     Menu       *m_menu_snap;
     Menu       *m_menu_note_length;
 
+    std::vector<MenuItem> m_tools_menu_items;
+    std::vector<MenuItem> m_snap_menu_items;
+    std::vector<MenuItem> m_note_length_menu_items;
+    std::vector<MenuItem> m_bw_menu_items;
+    std::vector<MenuItem> m_record_volume_menu_items;
+    std::vector<CheckMenuItem> m_data_menu_items;
+    std::vector<MenuItem> m_record_type_menu_items;
+
+    SeparatorMenuItem   m_menu_separator0;
+    SeparatorMenuItem   m_menu_separator1;
+
     /* length in measures */
     Menu       *m_menu_length;
     Menu       *m_menu_midich;

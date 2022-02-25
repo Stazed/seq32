@@ -342,7 +342,254 @@ seqedit::create_menus()
     using namespace Menu_Helpers;
 
     char b[20];
+#ifdef GTKMM_3_SUPPORT
+    /* zoom */
+    for (int i = c_min_zoom; i <= c_max_zoom; i*=2)
+    {
+        snprintf(b, sizeof(b), "1:%d", i);
+        MenuItem * menu_item = new MenuItem(b);
+        menu_item->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_zoom), i ) );
+        m_menu_zoom->append(*menu_item);
+    }
 
+    /* note snap */
+    m_snap_menu_items.resize(15);
+
+    m_snap_menu_items[0].set_label("1");
+    m_snap_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn * 4) );
+    m_menu_snap->append(m_snap_menu_items[0]);
+    
+    m_snap_menu_items[1].set_label("1/2");
+    m_snap_menu_items[1].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn * 2) );
+    m_menu_snap->append(m_snap_menu_items[1]);
+
+    m_snap_menu_items[2].set_label("1/4");
+    m_snap_menu_items[2].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn * 1) );
+    m_menu_snap->append(m_snap_menu_items[2]);
+
+    m_snap_menu_items[3].set_label("1/8");
+    m_snap_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 2) );
+    m_menu_snap->append(m_snap_menu_items[3]);
+
+    m_snap_menu_items[4].set_label("1/16");
+    m_snap_menu_items[4].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 4) );
+    m_menu_snap->append(m_snap_menu_items[4]);
+
+    m_snap_menu_items[5].set_label("1/32");
+    m_snap_menu_items[5].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 8) );
+    m_menu_snap->append(m_snap_menu_items[5]);
+
+    m_snap_menu_items[6].set_label("1/64");
+    m_snap_menu_items[6].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 16) );
+    m_menu_snap->append(m_snap_menu_items[6]);
+
+    m_snap_menu_items[7].set_label("1/128");
+    m_snap_menu_items[7].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 32) );
+    m_menu_snap->append(m_snap_menu_items[7]);
+
+    m_menu_snap->append(m_menu_separator0);
+
+    m_snap_menu_items[8].set_label("1/3");
+    m_snap_menu_items[8].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn * 4 / 3) );
+    m_menu_snap->append(m_snap_menu_items[8]);
+
+    m_snap_menu_items[9].set_label("1/6");
+    m_snap_menu_items[9].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn * 2 / 3) );
+    m_menu_snap->append(m_snap_menu_items[9]);
+
+    m_snap_menu_items[10].set_label("1/12");
+    m_snap_menu_items[10].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn * 1 / 3) );
+    m_menu_snap->append(m_snap_menu_items[10]);
+
+    m_snap_menu_items[11].set_label("1/24");
+    m_snap_menu_items[11].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 2 / 3) );
+    m_menu_snap->append(m_snap_menu_items[11]);
+
+    m_snap_menu_items[12].set_label("1/48");
+    m_snap_menu_items[12].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 4 / 3) );
+    m_menu_snap->append(m_snap_menu_items[12]);
+
+    m_snap_menu_items[13].set_label("1/96");
+    m_snap_menu_items[13].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 8 / 3) );
+    m_menu_snap->append(m_snap_menu_items[13]);
+
+    m_snap_menu_items[14].set_label("1/192");
+    m_snap_menu_items[14].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_snap), c_ppqn / 16 / 3) );
+    m_menu_snap->append(m_snap_menu_items[14]);
+
+    /* note note length */
+    m_note_length_menu_items.resize(15);
+
+    m_note_length_menu_items[0].set_label("1");
+    m_note_length_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn * 4) );
+    m_menu_note_length->append(m_note_length_menu_items[0]);
+
+    m_note_length_menu_items[1].set_label("1/2");
+    m_note_length_menu_items[1].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn * 2) );
+    m_menu_note_length->append(m_note_length_menu_items[1]);
+
+    m_note_length_menu_items[2].set_label("1/4");
+    m_note_length_menu_items[2].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn * 1) );
+    m_menu_note_length->append(m_note_length_menu_items[2]);
+
+    m_note_length_menu_items[3].set_label("1/8");
+    m_note_length_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 2) );
+    m_menu_note_length->append(m_note_length_menu_items[3]);
+
+    m_note_length_menu_items[4].set_label("1/16");
+    m_note_length_menu_items[4].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 4) );
+    m_menu_note_length->append(m_note_length_menu_items[4]);
+
+    m_note_length_menu_items[5].set_label("1/32");
+    m_note_length_menu_items[5].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 8) );
+    m_menu_note_length->append(m_note_length_menu_items[5]);
+
+    m_note_length_menu_items[6].set_label("1/64");
+    m_note_length_menu_items[6].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 16) );
+    m_menu_note_length->append(m_note_length_menu_items[6]);
+
+    m_note_length_menu_items[7].set_label("1/128");
+    m_note_length_menu_items[7].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 32) );
+    m_menu_note_length->append(m_note_length_menu_items[7]);
+
+    m_menu_note_length->append(m_menu_separator1);
+
+    m_note_length_menu_items[8].set_label("1/3");
+    m_note_length_menu_items[8].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn * 4 / 3) );
+    m_menu_note_length->append(m_note_length_menu_items[8]);
+
+    m_note_length_menu_items[9].set_label("1/6");
+    m_note_length_menu_items[9].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn * 2 / 3) );
+    m_menu_note_length->append(m_note_length_menu_items[9]);
+
+    m_note_length_menu_items[10].set_label("1/12");
+    m_note_length_menu_items[10].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn * 1 / 3) );
+    m_menu_note_length->append(m_note_length_menu_items[10]);
+
+    m_note_length_menu_items[11].set_label("1/24");
+    m_note_length_menu_items[11].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 2 / 3) );
+    m_menu_note_length->append(m_note_length_menu_items[11]);
+
+    m_note_length_menu_items[12].set_label("1/48");
+    m_note_length_menu_items[12].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 4 / 3) );
+    m_menu_note_length->append(m_note_length_menu_items[12]);
+
+    m_note_length_menu_items[13].set_label("1/96");
+    m_note_length_menu_items[13].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 8 / 3) );
+    m_menu_note_length->append(m_note_length_menu_items[13]);
+
+    m_note_length_menu_items[14].set_label("1/192");
+    m_note_length_menu_items[14].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_note_length), c_ppqn / 16 / 3) );
+    m_menu_note_length->append(m_note_length_menu_items[14]);
+
+    /* Key */
+    for (int i = 0; i < 12; i++)
+    {
+        MenuItem * menu_item = new MenuItem(c_key_text[i]);
+        menu_item->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_key), i) );
+        m_menu_key->append(*menu_item);
+    }
+
+    /* bw */
+    m_bw_menu_items.resize(5);
+
+    m_bw_menu_items[0].set_label("1");
+    m_bw_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_bw), 1) );
+    m_menu_bw->append(m_bw_menu_items[0]);
+
+    m_bw_menu_items[1].set_label("2");
+    m_bw_menu_items[1].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_bw), 2) );
+    m_menu_bw->append(m_bw_menu_items[1]);
+
+    m_bw_menu_items[2].set_label("4");
+    m_bw_menu_items[2].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_bw), 4) );
+    m_menu_bw->append(m_bw_menu_items[2]);
+
+    m_bw_menu_items[3].set_label("8");
+    m_bw_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_bw), 8) );
+    m_menu_bw->append(m_bw_menu_items[3]);
+
+    m_bw_menu_items[4].set_label("16");
+    m_bw_menu_items[4].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_bw), 16) );
+    m_menu_bw->append(m_bw_menu_items[4]);
+
+    /* note volume */
+    m_record_volume_menu_items.resize(9);
+    
+    m_record_volume_menu_items[0].set_label("Free");
+    m_record_volume_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 0) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[0]);
+
+    m_record_volume_menu_items[1].set_label("Fixed 8 (127)");
+    m_record_volume_menu_items[1].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 127) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[1]);
+
+    m_record_volume_menu_items[2].set_label("Fixed 7 (112)");
+    m_record_volume_menu_items[2].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 112) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[2]);
+
+    m_record_volume_menu_items[3].set_label("Fixed 6 (96)");
+    m_record_volume_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 96) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[3]);
+
+    m_record_volume_menu_items[4].set_label("Fixed 5 (80)");
+    m_record_volume_menu_items[4].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 80) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[4]);
+
+    m_record_volume_menu_items[5].set_label("Fixed 4 (64)");
+    m_record_volume_menu_items[5].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 64) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[5]);
+
+    m_record_volume_menu_items[6].set_label("Fixed 3 (48)");
+    m_record_volume_menu_items[6].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 48) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[6]);
+
+    m_record_volume_menu_items[7].set_label("Fixed 2 (32)");
+    m_record_volume_menu_items[7].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 32) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[7]);
+
+    m_record_volume_menu_items[8].set_label("Fixed 1 (16)");
+    m_record_volume_menu_items[8].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_vol), 16) );
+    m_menu_rec_vol->append(m_record_volume_menu_items[8]);
+
+    for (int i = int(c_scale_off); i < int(c_scale_size); i++)
+    {
+        /* music scale      */
+        MenuItem * menu_item = new MenuItem(c_scales_text[i]);
+        menu_item->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_scale), i) );
+        m_menu_scale->append(*menu_item);
+    }
+
+    for (int i = int(0); i < int(c_chord_number); i++)
+    {
+        /* Chords     */
+        MenuItem * menu_item = new MenuItem(c_chord_table_text[i]);
+        menu_item->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_chord), i) );
+        m_menu_chords->append(*menu_item);
+    }
+
+    for( int i = 0; i < 16; i++ )
+    {
+        snprintf(b, sizeof(b), "%d", i + 1);
+
+        MenuItem * menu_item1 = new MenuItem(b);
+        menu_item1->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::measures_button_callback), i + 1) );
+        m_menu_length->append(*menu_item1);
+
+        MenuItem * menu_item2 = new MenuItem(b);
+        menu_item2->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_bp_measure), i + 1) );
+        m_menu_bp_measure->append(*menu_item2);
+    }
+
+    MenuItem * menu_item32 = new MenuItem("32");
+    menu_item32->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::measures_button_callback), 32) );
+    m_menu_length->append(*menu_item32);
+
+    MenuItem * menu_item64 = new MenuItem("64");
+    menu_item64->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::measures_button_callback), 64) );
+    m_menu_length->append(*menu_item64);
+
+#else
     /* zoom */
     for (int i = c_min_zoom; i <= c_max_zoom; i*=2)
     {
@@ -525,11 +772,183 @@ seqedit::create_menus()
                                      sigc::bind(mem_fun(*this, &seqedit::measures_button_callback), 32 )));
     m_menu_length->items().push_back(MenuElem("64",
                                      sigc::bind(mem_fun(*this, &seqedit::measures_button_callback), 64 )));
+#endif
 }
 
 void
 seqedit::popup_tool_menu()
 {
+#ifdef GTKMM_3_SUPPORT
+    using namespace Menu_Helpers;
+
+    m_menu_tools = manage( new Menu());
+
+    /* tools */
+    Menu *holder;
+    Menu *holder2;
+
+    holder = manage( new Menu());
+
+    m_tools_menu_items.clear();
+    m_tools_menu_items.resize(23);
+    
+    m_tools_menu_items[0].set_label("All Notes");
+    m_tools_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_all_notes, 0) );
+    holder->append(m_tools_menu_items[0]);
+
+    m_tools_menu_items[1].set_label("Inverse Notes");
+    m_tools_menu_items[1].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_inverse_notes, 0) );
+    holder->append(m_tools_menu_items[1]);
+
+    m_tools_menu_items[2].set_label("Even 1/4 Note Beats");
+    m_tools_menu_items[2].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_even_notes, c_ppqn) );
+    holder->append(m_tools_menu_items[2]);
+
+    m_tools_menu_items[3].set_label("Odd 1/4 Note Beats");
+    m_tools_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_odd_notes, c_ppqn) );
+    holder->append(m_tools_menu_items[3]);
+
+    m_tools_menu_items[4].set_label("Even 1/8 Note Beats");
+    m_tools_menu_items[4].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_even_notes, c_ppen) );
+    holder->append(m_tools_menu_items[4]);
+
+    m_tools_menu_items[5].set_label("Odd 1/8 Note Beats");
+    m_tools_menu_items[5].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_odd_notes, c_ppen) );
+    holder->append(m_tools_menu_items[5]);
+
+    m_tools_menu_items[6].set_label("Even 1/16 Note Beats");
+    m_tools_menu_items[6].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_even_notes, c_ppsn) );
+    holder->append(m_tools_menu_items[6]);
+
+    m_tools_menu_items[7].set_label("Odd 1/16 Note Beats");
+    m_tools_menu_items[7].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_odd_notes, c_ppsn) );
+    holder->append(m_tools_menu_items[7]);
+
+    if ( m_editing_status !=  EVENT_NOTE_ON &&
+            m_editing_status !=  EVENT_NOTE_OFF )
+    {
+        SeparatorMenuItem * menu_separator = new SeparatorMenuItem;
+        holder->append(*menu_separator);
+
+        m_tools_menu_items[8].set_label("All Events");
+        m_tools_menu_items[8].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_all_events, 0) );
+        holder->append(m_tools_menu_items[8]);
+
+        m_tools_menu_items[9].set_label("Inverse Events");
+        m_tools_menu_items[9].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), select_inverse_events, 0) );
+        holder->append(m_tools_menu_items[9]);
+    }
+
+    m_tools_menu_items[10].set_label("Select");
+    m_tools_menu_items[10].set_submenu(*holder);
+    m_menu_tools->append(m_tools_menu_items[10]);
+
+    holder = manage( new Menu());
+
+    m_tools_menu_items[11].set_label("Quantize Selected Notes");
+    m_tools_menu_items[11].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), quantize_notes, 0 ) );
+    holder->append(m_tools_menu_items[11]);
+
+    m_tools_menu_items[12].set_label("Tighten Selected Notes");
+    m_tools_menu_items[12].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), tighten_notes, 0 ) );
+    holder->append(m_tools_menu_items[12]);
+
+    if ( m_editing_status !=  EVENT_NOTE_ON &&
+            m_editing_status !=  EVENT_NOTE_OFF )
+    {
+        SeparatorMenuItem * menu_separator = new SeparatorMenuItem;
+        holder->append(*menu_separator);
+
+        m_tools_menu_items[13].set_label("Quantize Selected Events");
+        m_tools_menu_items[13].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), quantize_events, 0 ) );
+        holder->append(m_tools_menu_items[13]);
+
+        m_tools_menu_items[14].set_label("Tighten Selected Events");
+        m_tools_menu_items[14].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), tighten_events, 0 ) );
+        holder->append(m_tools_menu_items[14]);
+    }
+
+    SeparatorMenuItem * menu_separator = new SeparatorMenuItem;
+    holder->append(*menu_separator);
+
+    m_tools_menu_items[15].set_label("Expand Pattern (double)");
+    m_tools_menu_items[15].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), expand_pattern, 0 ) );
+    holder->append(m_tools_menu_items[15]);
+
+    m_tools_menu_items[16].set_label("Compress Pattern (halve)");
+    m_tools_menu_items[16].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), compress_pattern, 0 ) );
+    holder->append(m_tools_menu_items[16]);
+
+    m_tools_menu_items[17].set_label("Modify Time");
+    m_tools_menu_items[17].set_submenu(*holder);
+    m_menu_tools->append(m_tools_menu_items[17]);
+
+    holder = manage( new Menu());
+
+    char num[11];
+
+    holder2 = manage( new Menu());
+    for ( int i = -12; i <= 12; ++i)
+    {
+        if (i != 0)
+        {
+            snprintf(num, sizeof(num), "%+d [%s]", i, c_interval_text[abs(i)]);
+
+            MenuItem * menu_item = new MenuItem(num);
+            menu_item->signal_activate().connect(sigc::bind(mem_fun(*this,&seqedit::do_action), transpose, i) );
+            holder2->insert(*menu_item, 0);
+        }
+    }
+
+    m_tools_menu_items[18].set_label("Transpose Selected");
+    m_tools_menu_items[18].set_submenu(*holder2);
+    holder->append(m_tools_menu_items[18]);
+
+    holder2 = manage( new Menu());
+    for ( int i = -7; i <= 7; ++i)
+    {
+        if (i != 0)
+        {
+            snprintf(num, sizeof(num), "%+d [%s]", (i<0) ? i-1 : i+1, c_chord_text[abs(i)]);
+
+            MenuItem * menu_item = new MenuItem(num);
+            menu_item->signal_activate().connect(sigc::bind(mem_fun(*this,&seqedit::do_action), transpose_h, i) );
+            holder2->insert(*menu_item, 0);
+        }
+    }
+
+    if ( m_scale != 0 )
+    {
+        m_tools_menu_items[19].set_label("Harmonic Transpose Selected");
+        m_tools_menu_items[19].set_submenu(*holder2);
+        holder->append(m_tools_menu_items[19]);
+    }
+
+    m_tools_menu_items[20].set_label("Modify Pitch");
+    m_tools_menu_items[20].set_submenu(*holder);
+    m_menu_tools->append(m_tools_menu_items[20]);
+
+    holder = manage( new Menu());
+    for ( int i = 1; i < 17; ++i)
+    {
+        snprintf(num, sizeof(num), "+/- %d", i);
+
+        MenuItem * menu_item = new MenuItem(num);
+        menu_item->signal_activate().connect(sigc::bind(mem_fun(*this,&seqedit::do_action), randomize_events, i) );
+        holder->append(*menu_item);
+    }
+
+    m_tools_menu_items[21].set_label("Randomize Event Values");
+    m_tools_menu_items[21].set_submenu(*holder);
+    m_menu_tools->append(m_tools_menu_items[21]);
+    
+    m_tools_menu_items[22].set_label("Reverse pattern");
+    m_tools_menu_items[22].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::do_action), reverse_pattern, 0) );
+    m_menu_tools->append(m_tools_menu_items[22]);
+
+    m_menu_tools->show_all();
+    m_menu_tools->popup_at_pointer(NULL);
+#else
     using namespace Menu_Helpers;
 
     m_menu_tools = manage( new Menu());
@@ -672,6 +1091,7 @@ seqedit::popup_tool_menu()
                                                          reverse_pattern, 0)));
 
     m_menu_tools->popup(0,0);
+#endif
 }
 
 void
@@ -1012,14 +1432,21 @@ seqedit::popup_midibus_menu()
 
     /* midi buses */
     mastermidibus *masterbus = m_mainperf->get_master_midi_bus();
-    for ( int i=0; i< masterbus->get_num_out_buses(); i++ )
+    for ( int i = 0; i < masterbus->get_num_out_buses(); i++ )
     {
+#ifdef GTKMM_3_SUPPORT
+        MenuItem * menu_item = new MenuItem(masterbus->get_midi_out_bus_name(i));
+        menu_item->signal_activate().connect(sigc::bind(mem_fun(*this,&seqedit::midi_bus_button_callback), i));
+        m_menu_midibus->append(*menu_item);
+#else
         m_menu_midibus->items().push_back(MenuElem(
                                               masterbus->get_midi_out_bus_name(i),
                                               sigc::bind(mem_fun(*this,&seqedit::midi_bus_button_callback), i)));
+#endif
     }
 
-    m_menu_midibus->popup(0,0);
+    m_menu_midibus->show_all();
+    m_menu_midibus->popup_at_pointer(NULL);
 }
 
 void
@@ -1045,14 +1472,76 @@ seqedit::popup_midich_menu()
                            global_user_instrument_definitions[instrument].instrument +
                            string(")") );
         }
+#ifdef GTKMM_3_SUPPORT
+        MenuItem * menu_item = new MenuItem(name);
+        menu_item->signal_activate().connect(sigc::bind(mem_fun(*this,&seqedit::midi_channel_button_callback), i));
+        m_menu_midich->append(*menu_item);
+#else
         m_menu_midich->items().push_back(MenuElem(name,
                                          sigc::bind(mem_fun(*this,&seqedit::midi_channel_button_callback),
                                                  i )));
+#endif
     }
 
-    m_menu_midich->popup(0,0);
+    m_menu_midich->show_all();
+    m_menu_midich->popup_at_pointer(NULL);
 }
 
+#ifdef GTKMM_3_SUPPORT
+
+void
+seqedit::popup_sequence_menu()
+{
+    using namespace Menu_Helpers;
+
+    m_menu_sequences = manage( new Menu());
+
+    MenuItem * menu_item = new MenuItem("Off");
+    menu_item->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_background_sequence), -1 ));
+    m_menu_sequences->append(*menu_item);
+    
+    SeparatorMenuItem * menu_separator = new SeparatorMenuItem;
+    m_menu_sequences->append(*menu_separator);
+
+    for ( int ss = 0; ss < c_max_sets; ++ss )
+    {
+        Menu *menu_ss = NULL;
+        bool inserted = false;
+
+        for (unsigned seq = 0; seq < c_seqs_in_set; seq++ )
+        {
+            int i = ss * c_seqs_in_set + seq;
+
+            char name[30];
+            
+            if ( m_mainperf->is_active( i ))
+            {
+                if ( !inserted )
+                {
+                    inserted = true;
+                    snprintf(name, sizeof(name), "[%d]", ss);
+                    menu_ss = manage( new Menu());
+
+                    MenuItem * menu_item = new MenuItem(name);
+                    menu_item->set_submenu(*menu_ss);
+                    m_menu_sequences->append(*menu_item);
+                }
+
+                sequence *seq = m_mainperf->get_sequence( i );
+                snprintf(name, sizeof(name),"[%d] %.13s", i, seq->get_name());
+
+                MenuItem * menu_item = new MenuItem(name);
+                menu_item->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_background_sequence), i));
+                menu_ss->append(*menu_item);
+            }
+        }
+    }
+
+    m_menu_sequences->show_all();
+    m_menu_sequences->popup_at_pointer(NULL);
+}
+
+#else
 void
 seqedit::popup_sequence_menu()
 {
@@ -1097,7 +1586,7 @@ seqedit::popup_sequence_menu()
 
     m_menu_sequences->popup(0,0);
 }
-
+#endif
 
 void
 seqedit::set_background_sequence( int a_seq )
@@ -1183,7 +1672,79 @@ seqedit::popup_event_menu()
     }
 
     m_menu_data = manage( new Menu());
+#ifdef GTKMM_3_SUPPORT
+    m_data_menu_items.clear();
+    m_data_menu_items.resize(6);
 
+    m_data_menu_items[0].set_label("Note On Velocity");
+    m_data_menu_items[0].set_active(note_on);
+    m_data_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_data_type), (unsigned char) EVENT_NOTE_ON, 0 ));
+    m_menu_data->append(m_data_menu_items[0]);
+
+    MenuItem * menu_separator1 = new SeparatorMenuItem();
+    m_menu_data->append(*menu_separator1);
+
+    m_data_menu_items[1].set_label("Note Off Velocity");
+    m_data_menu_items[1].set_active(note_off);
+    m_data_menu_items[1].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_data_type), (unsigned char) EVENT_NOTE_OFF, 0 ));
+    m_menu_data->append(m_data_menu_items[1]);
+
+    m_data_menu_items[2].set_label("AfterTouch");
+    m_data_menu_items[2].set_active(aftertouch);
+    m_data_menu_items[2].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_data_type), (unsigned char) EVENT_AFTERTOUCH, 0 ));
+    m_menu_data->append(m_data_menu_items[2]);
+
+    m_data_menu_items[3].set_label("Program Change");
+    m_data_menu_items[3].set_active(program_change);
+    m_data_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_data_type), (unsigned char) EVENT_PROGRAM_CHANGE, 0 ));
+    m_menu_data->append(m_data_menu_items[3]);
+
+    m_data_menu_items[4].set_label("Channel Pressure");
+    m_data_menu_items[4].set_active(channel_pressure);
+    m_data_menu_items[4].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_data_type), (unsigned char) EVENT_CHANNEL_PRESSURE, 0 ));
+    m_menu_data->append(m_data_menu_items[4]);
+
+    m_data_menu_items[5].set_label("Pitch Wheel");
+    m_data_menu_items[5].set_active(pitch_wheel);
+    m_data_menu_items[5].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_data_type), (unsigned char) EVENT_PITCH_WHEEL, 0 ));
+    m_menu_data->append(m_data_menu_items[5]);
+
+    MenuItem * menu_separator2 = new SeparatorMenuItem();
+    m_menu_data->append(*menu_separator2);
+
+    /* create control change */
+    for ( int i = 0; i < 8; i++ )
+    {
+        snprintf(b, sizeof(b), "Controls %d-%d", (i*16), (i*16) + 15);
+        Menu *menu_cc = manage( new Menu() );
+
+        for( int j = 0; j < 16; j++ )
+        {
+            string controller_name( c_controller_names[i*16+j] );
+            int instrument = global_user_midi_bus_definitions[midi_bus].instrument[midi_ch];
+            if ( instrument > -1 && instrument < c_max_instruments )
+            {
+                if ( global_user_instrument_definitions[instrument].controllers_active[i*16+j] )
+                    controller_name = global_user_instrument_definitions[instrument].controllers[i*16+j];
+            }
+
+            CheckMenuItem * menu_item =  new CheckMenuItem();
+            menu_item->set_label(controller_name);
+            menu_item->set_active(ccs[i * 16 + j]);
+            menu_item->signal_activate().connect(sigc::bind(mem_fun(this, &seqedit::set_data_type),
+                                                   (unsigned char) EVENT_CONTROL_CHANGE, i * 16 + j));
+            menu_cc->append(*menu_item);
+        }
+
+        MenuItem * menu_item = new MenuItem();
+        menu_item->set_label(string(b));
+        menu_item->set_submenu(*menu_cc);
+        m_menu_data->append(*menu_item);
+    }
+
+    m_menu_data->show_all();
+    m_menu_data->popup_at_pointer(NULL);
+#else
     m_menu_data->items().push_back( ImageMenuElem( "Note On Velocity",
                                     *create_menu_image( note_on ),
                                     sigc::bind(mem_fun(*this, &seqedit::set_data_type),
@@ -1243,6 +1804,7 @@ seqedit::popup_event_menu()
     }
 
     m_menu_data->popup(0,0);
+#endif
 }
 
 void
@@ -1251,7 +1813,30 @@ seqedit::popup_record_menu()
     using namespace Menu_Helpers;
     
     m_menu_rec_type = manage( new Menu());
-    
+#ifdef GTKMM_3_SUPPORT
+    /* record type */
+    m_record_type_menu_items.clear();
+    m_record_type_menu_items.resize(4);
+
+    m_record_type_menu_items[0].set_label("Legacy merge looped recording");
+    m_record_type_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_type), LOOP_RECORD_LEGACY ));
+    m_menu_rec_type->append(m_record_type_menu_items[0]);
+
+    m_record_type_menu_items[1].set_label("Overwrite looped recording");
+    m_record_type_menu_items[1].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_type), LOOP_RECORD_OVERWRITE ));
+    m_menu_rec_type->append(m_record_type_menu_items[1]);
+
+    m_record_type_menu_items[2].set_label("Expand sequence length to fit recording");
+    m_record_type_menu_items[2].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_type), LOOP_RECORD_EXPAND ));
+    m_menu_rec_type->append(m_record_type_menu_items[2]);
+
+    m_record_type_menu_items[3].set_label("Expand sequence length and overwrite");
+    m_record_type_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_rec_type), LOOP_RECORD_EXP_OVR ));
+    m_menu_rec_type->append(m_record_type_menu_items[3]);
+
+    m_menu_rec_type->show_all();
+    m_menu_rec_type->popup_at_pointer(NULL);
+#else
     /* record type */
     m_menu_rec_type->items().push_back(MenuElem("Legacy merge looped recording",
                                     sigc::bind(mem_fun(*this, &seqedit::set_rec_type), LOOP_RECORD_LEGACY)));
@@ -1266,6 +1851,7 @@ seqedit::popup_record_menu()
                                     sigc::bind(mem_fun(*this, &seqedit::set_rec_type), LOOP_RECORD_EXP_OVR)));
     
     m_menu_rec_type->popup(0,0);
+#endif
 }
 
 void
