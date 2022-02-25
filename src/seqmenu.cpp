@@ -47,7 +47,7 @@ seqmenu::popup_menu()
     m_menu = manage( new Menu());
     
     m_menu_items.clear();
-    m_menu_items.resize(11);
+    m_menu_items.resize(12);
 
     if ( m_mainperf->is_active( m_current_seq ))
     {
@@ -143,9 +143,9 @@ seqmenu::popup_menu()
     m_menu_items[9].signal_activate().connect(sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_OFF));
     menu_song->append(m_menu_items[9]);
     
-    m_menu_items[9].set_label("Unmute all tracks");
-    m_menu_items[9].signal_activate().connect(sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_TOGGLE));
-    menu_song->append(m_menu_items[9]);
+    m_menu_items[10].set_label("Unmute all tracks");
+    m_menu_items[10].signal_activate().connect(sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_TOGGLE));
+    menu_song->append(m_menu_items[10]);
 #else
 
     menu_song->items().push_back(MenuElem("Mute all tracks",
@@ -164,9 +164,9 @@ seqmenu::popup_menu()
         m_menu->append(*menu_separator3);
         
         Menu *menu_buses = manage( new Menu() );
-        m_menu_items[10].set_label("Midi Bus");
-        m_menu_items[10].set_submenu(*menu_buses);
-        m_menu->append(m_menu_items[10]);
+        m_menu_items[11].set_label("Midi Bus");
+        m_menu_items[11].set_submenu(*menu_buses);
+        m_menu->append(m_menu_items[11]);
 #else
         m_menu->items().push_back(SeparatorElem());
         Menu *menu_buses = manage( new Menu() );
