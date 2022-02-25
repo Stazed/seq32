@@ -31,16 +31,13 @@ class maintime: public Gtk::DrawingArea
 {
 
 private:
-    
-    Glib::RefPtr<Gdk::Window> m_window;
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
 
     long m_tick;
     
 protected:
-    bool on_draw(/* const Cairo::RefPtr<Cairo::Context>& cr */);
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 public:
 

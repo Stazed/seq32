@@ -32,9 +32,6 @@ maintime::on_realize()
     // we need to do the default realize
     Gtk::DrawingArea::on_realize();
 
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-
     /* set default size */
     set_size_request( c_maintime_x, c_maintime_y );
 }
@@ -43,28 +40,15 @@ int
 maintime::idle_progress( long a_ticks )
 {
     m_tick = a_ticks;
-    
-    if(get_realized())
-    {
-        on_draw();
-    }
-   // queue_draw();
+
+    queue_draw();
 
     return true;
 }
 
 bool
-maintime::on_expose_event(GdkEventExpose* a_e)
+maintime::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-    idle_progress( m_tick );
-    return true;
-}
-
-bool
-maintime::on_draw(/* const Cairo::RefPtr<Cairo::Context>& cr */)
-{
-    Cairo::RefPtr<Cairo::Context> cr = m_window->create_cairo_context();
-
     cr->set_operator(Cairo::OPERATOR_CLEAR);
     cr->rectangle(-1, -1, (c_maintime_x - 1), (c_maintime_y - 1));
     cr->paint_with_alpha(0.0);
