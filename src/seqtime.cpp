@@ -70,14 +70,6 @@ seqtime::on_realize()
     // we need to do the default realize
     Gtk::DrawingArea::on_realize();
 
-    //Gtk::Main::idle.connect(mem_fun(this,&seqtime::idleProgress));
-    Glib::signal_timeout().connect(mem_fun(*this,&seqtime::idle_progress), 50);
-
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    
-    m_surface_window = m_window->create_cairo_context();
-
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqtime::change_horz ));
 
     update_sizes();
@@ -103,19 +95,14 @@ seqtime::on_size_allocate(Gtk::Allocation & a_r )
     update_sizes();
 }
 
-bool
-seqtime::idle_progress( )
-{
-    on_draw(m_surface_window);
-
-    return true;
-}
-
 void
 seqtime::set_zoom( int a_zoom )
 {
-    m_zoom = a_zoom;
-    reset();
+    if ( m_zoom != a_zoom )
+    {
+        m_zoom = a_zoom;
+        reset();
+    }
 }
 
 void
@@ -260,27 +247,6 @@ seqtime::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->set_source(m_surface, 0.0, 0.0);
     cr->paint();
 
-    return true;
-}
-
-bool
-seqtime::on_expose_event(GdkEventExpose* a_e)
-{
-    Gtk::Allocation allocation = get_allocation();
-    const int width = allocation.get_width();
-    const int height = allocation.get_height();
-
-    // resize handler
-    if (width != m_surface->get_width() || height != m_surface->get_height())
-    {
-        m_surface = Cairo::ImageSurface::create(
-            Cairo::Format::FORMAT_ARGB32,
-            allocation.get_width(),
-            allocation.get_height()
-        );
-    }
-    m_surface_window = m_window->create_cairo_context();
- 
     return true;
 }
 

@@ -48,9 +48,6 @@ class seqtime: public Gtk::DrawingArea
 {
 
 private:
-
-    Glib::RefPtr<Gdk::Window>   m_window;
-    Cairo::RefPtr<Cairo::Context>  m_surface_window;
     
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
@@ -67,13 +64,10 @@ private:
     int m_window_x, m_window_y;
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
 
     void update_surface();
-
-    bool idle_progress();
 
     void on_size_allocate(Gtk::Allocation& );
 
