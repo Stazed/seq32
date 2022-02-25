@@ -457,12 +457,14 @@ mainwnd::~mainwnd()
 {
     delete m_perf_edit;
     delete m_options;
-
+#ifdef GTKMM_3_SUPPORT
+#else
     if (m_sigpipe[0] != -1)
         close(m_sigpipe[0]);
 
     if (m_sigpipe[1] != -1)
         close(m_sigpipe[1]);
+#endif
 }
 
 /*
