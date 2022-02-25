@@ -2040,6 +2040,9 @@ mainwnd::poll_nsm(void *)
 void
 mainwnd::set_nsm_menu()
 {
+#ifdef GTKMM_3_SUPPORT
+    
+#else
     if(m_menu_file != nullptr)
     {
         m_menu_file->items().clear();
@@ -2063,6 +2066,7 @@ mainwnd::set_nsm_menu()
     m_menu_file->items().push_back(SeparatorElem());
     m_menu_file->items().push_back(MenuElem("E_xit",
                                             Gtk::AccelKey("<control>Q"),
-                                            mem_fun(*this, &mainwnd::file_exit)));      
+                                            mem_fun(*this, &mainwnd::file_exit)));
+#endif
 }
 #endif
