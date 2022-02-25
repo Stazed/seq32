@@ -56,9 +56,7 @@ class tempo: public Gtk::DrawingArea
 
 private:
 
-    Glib::RefPtr<Gdk::Window>   m_window;
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
-    Cairo::RefPtr<Cairo::Context>  m_surface_window;
 
     Glib::RefPtr<Gdk::Pixbuf> m_pixbuf;
 
@@ -94,7 +92,6 @@ private:
     void unlock ();
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_ev);
@@ -125,7 +122,6 @@ public:
     tempo( perform *a_perf, perfedit *a_perf_edit, Glib::RefPtr<Adjustment> a_hadjust );
     ~tempo();
 
-    int idle_progress();
     void set_zoom (int a_zoom);
 
     void reset();

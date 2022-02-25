@@ -95,11 +95,6 @@ tempo::on_realize()
     // we need to do the default realize
     Gtk::DrawingArea::on_realize();
 
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    
-    m_surface_window = m_window->create_cairo_context();
-
     set_size_request( 10, c_timearea_y );
 }
 
@@ -127,42 +122,6 @@ tempo::set_guides( int a_snap, int a_measure )
 
     m_draw_background = true;
     queue_draw();
-}
-
-int
-tempo::idle_progress( )
-{
-    if(m_draw_background)
-    {
-        m_draw_background = false;
-        draw_background();
-        on_draw(m_surface_window);
-    }
-    return true;
-}
-
-bool
-tempo::on_expose_event (GdkEventExpose * /* ev */ )
-{
-    Gtk::Allocation allocation = get_allocation();
-    const int width = allocation.get_width();
-    const int height = allocation.get_height();
-
-    // resize handler
-    if (width != m_surface->get_width() || height != m_surface->get_height())
-    {
-        m_surface = Cairo::ImageSurface::create(
-            Cairo::Format::FORMAT_ARGB32,
-            allocation.get_width(),
-            allocation.get_height()
-        );
-        m_surface_window = m_window->create_cairo_context();
-        m_draw_background = true;
-    }
-
-
-  //  draw_background();
-    return true;
 }
 
 void
