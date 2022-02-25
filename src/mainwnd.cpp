@@ -1219,7 +1219,37 @@ mainwnd::update_recent_files_menu ()
     if(m_nsm != NULL)
         return;
 #endif
+#ifdef GTKMM_3_SUPPORT
+    if (m_menu_recent != nullptr)
+    {
+        // Nothing to do??
+    }
+    else
+    {
+        m_menu_recent = manage(new Gtk::Menu());
+        MenuItem * menu_item = new MenuItem("Recent Files");
+        menu_item->set_submenu(*m_menu_recent);
+        m_menu_file->append(*menu_item);
+    }
 
+    if (m_mainperf->recent_file_count() > 0)
+    {
+        for (int i = 0; i < m_mainperf->recent_file_count(); ++i)
+        {
+            std::string filepath = m_mainperf->recent_file(i);     // shortened name
+            MenuItem * menu_item = new MenuItem(filepath);
+            menu_item->signal_activate().connect(sigc::bind(SET_FILE, i));
+            m_menu_recent->append(*menu_item);
+        }
+    }
+    else
+    {
+        MenuItem * menu_item = new MenuItem("<none>");
+        menu_item->signal_activate().connect(sigc::bind(SET_FILE, (-1)));
+        m_menu_recent->append(*menu_item);
+    }
+    
+#else
     if (m_menu_recent != nullptr)
     {
         /*
@@ -1258,6 +1288,7 @@ mainwnd::update_recent_files_menu ()
             MenuElem("<none>", sigc::bind(SET_FILE, (-1)))
         );
     }
+#endif
 }
 
 /**
