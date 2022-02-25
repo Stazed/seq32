@@ -37,8 +37,8 @@ tempopopup::tempopopup(tempo *a_tempo) :
     set_size_request(150, 50);
 
     /* bpm spin button */
-    m_adjust_bpm = manage(new Adjustment(m_tempo->m_mainperf->get_bpm(), c_bpm_minimum -1, c_bpm_maximum, 1));
-    m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
+    m_adjust_bpm = Adjustment::create(m_tempo->m_mainperf->get_bpm(), c_bpm_minimum -1, c_bpm_maximum, 1);
+    m_spinbutton_bpm = manage( new SpinButton( m_adjust_bpm ));
     m_spinbutton_bpm->set_editable( true );
     m_spinbutton_bpm->set_digits(2);                             // 2 = two decimal precision
     m_adjust_bpm->signal_value_changed().connect(

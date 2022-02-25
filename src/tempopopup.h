@@ -35,7 +35,7 @@ private:
 
     HBox *m_hbox;
     SpinButton  *m_spinbutton_bpm;
-    Adjustment  *m_adjust_bpm;
+    Glib::RefPtr<Adjustment> m_adjust_bpm;
     Button      *m_button_tap;
     tempo       *m_tempo;
 
