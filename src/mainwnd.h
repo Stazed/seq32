@@ -89,15 +89,15 @@ private:
     ToggleButton *m_button_menu;
 
     SpinButton  *m_spinbutton_bpm;
-    Adjustment  *m_adjust_bpm;
+    Glib::RefPtr<Adjustment> m_adjust_bpm;
 
     Button      *m_button_tap;
 
     SpinButton  *m_spinbutton_ss;
-    Adjustment  *m_adjust_ss;
+    Glib::RefPtr<Adjustment> m_adjust_ss;
 
     SpinButton  *m_spinbutton_load_offset;
-    Adjustment  *m_adjust_load_offset;
+    Glib::RefPtr<Adjustment> m_adjust_load_offset;
 
     Entry       *m_entry_notes;
 

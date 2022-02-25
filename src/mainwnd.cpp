@@ -344,13 +344,12 @@ mainwnd::mainwnd(perform *a_p):
     HBox *bpmhbox = manage(new HBox(false, 4));
     bottomhbox->pack_start(*bpmhbox, Gtk::PACK_SHRINK);
 
-    m_adjust_bpm = manage(new Adjustment(c_bpm, c_bpm_minimum, c_bpm_maximum, 1));
-    m_spinbutton_bpm = manage( new SpinButton( *m_adjust_bpm ));
+    m_adjust_bpm = Adjustment::create(c_bpm, c_bpm_minimum, c_bpm_maximum, 1);
+    m_spinbutton_bpm = manage( new SpinButton( m_adjust_bpm ));
     m_spinbutton_bpm->set_name( "BPM Edit" );
     m_spinbutton_bpm->set_editable( true );
     m_spinbutton_bpm->set_digits(2);                    // 2 = two decimal precision
-    m_adjust_bpm->signal_value_changed().connect(
-        mem_fun(*this, &mainwnd::adj_callback_bpm));
+    m_spinbutton_bpm->signal_value_changed().connect(mem_fun(*this, &mainwnd::adj_callback_bpm ));
 
     add_tooltip( m_spinbutton_bpm, "Adjust beats per minute (BPM) value");
 
@@ -391,12 +390,13 @@ mainwnd::mainwnd(perform *a_p):
     HBox *sethbox = manage(new HBox(false, 4));
     bottomhbox->pack_start(*sethbox, Gtk::PACK_SHRINK);
 
-    m_adjust_ss = manage( new Adjustment( 0, 0, c_max_sets - 1, 1 ));
-    m_spinbutton_ss = manage( new SpinButton( *m_adjust_ss ));
+    m_adjust_ss = Adjustment::create( 0, 0, c_max_sets - 1, 1 );
+    m_spinbutton_ss = manage( new SpinButton( m_adjust_ss ));
     m_spinbutton_ss->set_editable( false );
     m_spinbutton_ss->set_wrap( true );
-    m_adjust_ss->signal_value_changed().connect(
+    m_spinbutton_ss->signal_value_changed().connect(
         mem_fun(*this, &mainwnd::adj_callback_ss ));
+    
     add_tooltip( m_spinbutton_ss, "Select screen set" );
     Label* setlabel = manage(new Label("_Set", true));
     setlabel->set_mnemonic_widget(*m_spinbutton_ss);
@@ -1317,9 +1317,9 @@ mainwnd::file_import_dialog()
     ButtonBox *btnbox = dialog.get_action_area();
     HBox hbox( false, 2 );
 
-    m_adjust_load_offset = manage( new Adjustment( 0, -(c_max_sets - 1),
-                                   c_max_sets - 1, 1 ));
-    m_spinbutton_load_offset = manage( new SpinButton( *m_adjust_load_offset ));
+    m_adjust_load_offset = Adjustment::create( 0, -(c_max_sets - 1),
+                                   c_max_sets - 1, 1 );
+    m_spinbutton_load_offset = manage( new SpinButton( m_adjust_load_offset ));
     m_spinbutton_load_offset->set_editable( false );
     m_spinbutton_load_offset->set_wrap( true );
     hbox.pack_end(*m_spinbutton_load_offset, false, false );
