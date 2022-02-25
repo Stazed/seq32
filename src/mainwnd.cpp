@@ -872,17 +872,17 @@ void mainwnd::file_save_as( file_type_e type, int a_seq )
     dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
     dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
 
-    Gtk::FileFilter filter_midi;
-    filter_midi.set_name("MIDI files");
-    filter_midi.add_pattern("*.midi");
-    filter_midi.add_pattern("*.MIDI");
-    filter_midi.add_pattern("*.mid");
-    filter_midi.add_pattern("*.MID");
+    auto filter_midi = Gtk::FileFilter::create();
+    filter_midi->set_name("MIDI files");
+    filter_midi->add_pattern("*.midi");
+    filter_midi->add_pattern("*.MIDI");
+    filter_midi->add_pattern("*.mid");
+    filter_midi->add_pattern("*.MID");
     dialog.add_filter(filter_midi);
 
-    Gtk::FileFilter filter_any;
-    filter_any.set_name("Any files");
-    filter_any.add_pattern("*");
+    auto filter_any = Gtk::FileFilter::create();
+    filter_any->set_name("Any files");
+    filter_any->add_pattern("*");
     dialog.add_filter(filter_any);
 
     dialog.set_current_folder(last_used_dir);
@@ -893,9 +893,9 @@ void mainwnd::file_save_as( file_type_e type, int a_seq )
     case Gtk::RESPONSE_OK:
     {
         std::string fname = dialog.get_filename();
-        Gtk::FileFilter* current_filter = dialog.get_filter();
+        auto current_filter = dialog.get_filter();
 
-        if ((current_filter != NULL) &&
+        if ((current_filter) &&
                 (current_filter->get_name() == "MIDI files"))
         {
             // check for MIDI file extension; if missing, add .midi
@@ -1065,18 +1065,18 @@ void mainwnd::choose_file(const bool playlist_mode)
 
     if(!playlist_mode)
     {
-        Gtk::FileFilter filter_midi;
-        filter_midi.set_name("MIDI files");
-        filter_midi.add_pattern("*.MIDI");
-        filter_midi.add_pattern("*.midi");
-        filter_midi.add_pattern("*.MID");
-        filter_midi.add_pattern("*.mid");
+        auto filter_midi = Gtk::FileFilter::create();
+        filter_midi->set_name("MIDI files");
+        filter_midi->add_pattern("*.MIDI");
+        filter_midi->add_pattern("*.midi");
+        filter_midi->add_pattern("*.MID");
+        filter_midi->add_pattern("*.mid");
         dialog.add_filter(filter_midi);
     }
 
-    Gtk::FileFilter filter_any;
-    filter_any.set_name("Any files");
-    filter_any.add_pattern("*");
+    auto filter_any = Gtk::FileFilter::create();
+    filter_any->set_name("Any files");
+    filter_any->add_pattern("*");
     dialog.add_filter(filter_any);
 
     dialog.set_current_folder(last_used_dir);
@@ -1301,17 +1301,17 @@ mainwnd::file_import_dialog()
                                   Gtk::FILE_CHOOSER_ACTION_OPEN);
     dialog.set_transient_for(*this);
 
-    Gtk::FileFilter filter_midi;
-    filter_midi.set_name("MIDI files");
-    filter_midi.add_pattern("*.midi");
-    filter_midi.add_pattern("*.MIDI");
-    filter_midi.add_pattern("*.mid");
-    filter_midi.add_pattern("*.MID");
+    auto filter_midi = Gtk::FileFilter::create();
+    filter_midi->set_name("MIDI files");
+    filter_midi->add_pattern("*.midi");
+    filter_midi->add_pattern("*.MIDI");
+    filter_midi->add_pattern("*.mid");
+    filter_midi->add_pattern("*.MID");
     dialog.add_filter(filter_midi);
 
-    Gtk::FileFilter filter_any;
-    filter_any.set_name("Any files");
-    filter_any.add_pattern("*");
+    auto filter_any = Gtk::FileFilter::create();
+    filter_any->set_name("Any files");
+    filter_any->add_pattern("*");
     dialog.add_filter(filter_any);
 
     dialog.set_current_folder(last_used_dir);
