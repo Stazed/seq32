@@ -49,6 +49,7 @@ mainwid::mainwid( perform *a_p, mainwnd *a_main ):
     m_button_down(false),
     m_moving(false),
     m_need_redraw(false),
+    m_have_realize(false),
     m_progress_tick(0),
     m_background_color(COLOR_WHITE),
     m_foreground_color(COLOR_BLACK)
@@ -81,10 +82,6 @@ mainwid::on_realize()
     Gtk::DrawingArea::on_realize();
 
     set_can_focus();
-
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    m_surface_window = m_window->create_cairo_context();
     
     if (m_window_x != m_surface->get_width() || m_window_y != m_surface->get_height())
     {
@@ -343,7 +340,7 @@ mainwid::draw_sequence_surface_on_window( int a_seq )
                       (c_seqarea_y + c_mainwid_spacing) * j);
         
         m_surface_window->set_source(m_surface, 0, 0);
-        m_surface_window->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y );
+        m_surface_window->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y);
         m_surface_window->stroke_preserve();
         m_surface_window->fill();
     }
@@ -363,20 +360,16 @@ void
 mainwid::update_markers( int a_ticks )
 {
     m_progress_tick = a_ticks;
-
-    on_draw(m_surface_window);
-  //  queue_draw();
-}
-
-bool
-mainwid::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{
-    m_surface_window = cr;
-
+    
     if (m_need_redraw)
     {
-        m_need_redraw = false;
-        draw_sequences_on_surface();
+        if(m_have_realize)
+        {
+            m_need_redraw = false;
+            draw_sequences_on_surface();
+        }
+        else
+            return; // if we don't have realize yet, the poll until we do
     }
     
     for ( int i = 0; i < (c_mainwnd_rows * c_mainwnd_cols); i++ )
@@ -393,7 +386,18 @@ mainwid::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             draw_marker_on_sequence(a_seq, m_progress_tick);
         }
     }
-   
+}
+
+bool
+mainwid::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    m_surface_window = cr;
+
+    m_have_realize = true;
+    m_need_redraw = true;
+    
+    update_markers(m_progress_tick);
+
     return true;
 }
 
@@ -467,14 +471,6 @@ mainwid::update_sequence_on_window( int a_seq   )
 {
     draw_sequence_on_surface( a_seq );
     draw_sequence_surface_on_window( a_seq );
-}
-
-// GTK expose event
-bool
-mainwid::on_expose_event(GdkEventExpose* a_e)
-{
-    m_surface_window = m_window->create_cairo_context();
-    return true;
 }
 
 // Translates XY corridinates to a sequence number

@@ -60,9 +60,7 @@ class mainwid : public Gtk::DrawingArea, public seqmenu
 
 private:
 
-    Glib::RefPtr<Gdk::Window> m_window;
     Cairo::RefPtr<Cairo::Context>  m_surface_window;
-    
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     int          m_screenset;
@@ -79,6 +77,7 @@ private:
     bool         m_moving;
     
     bool         m_need_redraw;
+    bool         m_have_realize;
     int          m_progress_tick;
     
     int m_background_color, m_foreground_color;
