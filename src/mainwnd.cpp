@@ -1410,13 +1410,20 @@ mainwnd::about_dialog()
     dialog.set_comments("Interactive MIDI Sequencer\n");
 
     dialog.set_copyright(
-        "(C) 2002 - 2006 Rob C. Buse\n"
-        "(C) 2008 - 2010 Seq24team");
-    dialog.set_website(
-        "http://www.filter24.org/seq24\n"
-        "http://edge.launchpad.net/seq24");
+        "(C) 2015 - present Stazed\n"
+        "(C) 2008 - 2010 Seq24team\n"
+        "(C) 2002 - 2006 Rob C. Buse");
+    dialog.set_website("https://github.com/Stazed/seq32");
 
-    std::list<Glib::ustring> list_authors;
+    dialog.set_logo(Gdk::Pixbuf::create_from_xpm_data( seq32_xpm  ));
+
+    Glib::ustring null_license;
+    dialog.set_license(null_license);
+
+    dialog.set_license_type(LICENSE_GPL_3_0);
+
+    std::vector<Glib::ustring> list_authors;
+
     list_authors.push_back("Rob C. Buse <rcb@filter24.org>");
     list_authors.push_back("Ivan Hernandez <ihernandez@kiusys.com>");
     list_authors.push_back("Guido Scholz <guido.scholz@bayernline.de>");
@@ -1427,13 +1434,10 @@ mainwnd::about_dialog()
     list_authors.push_back("Sebastien Alaiwan <sebastien.alaiwan@gmail.com>");
     list_authors.push_back("Kevin Meinert <kevin@subatomicglue.com>");
     list_authors.push_back("Andrea delle Canne <andreadellecanne@gmail.com>");
+    list_authors.push_back("Stazed <stazed@mapson.com>");
     dialog.set_authors(list_authors);
 
-    std::list<Glib::ustring> list_documenters;
-    list_documenters.push_back("Dana Olson <seq24@ubuntustudio.com>");
-    dialog.set_documenters(list_documenters);
-
-    dialog.show_all_children();
+    dialog.show();
     dialog.run();
 }
 
