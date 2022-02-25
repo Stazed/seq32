@@ -24,8 +24,6 @@ perfroll::perfroll( perform *a_perf,
                     perfedit * a_perf_edit,
                     Glib::RefPtr<Adjustment> a_hadjust,
                     Glib::RefPtr<Adjustment> a_vadjust  ) :
-    m_window(NULL),
-
     m_mainperf(a_perf),
     m_perfedit(a_perf_edit),
 
@@ -124,11 +122,6 @@ perfroll::on_realize()
 
     set_can_focus();
 
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    
-    m_surface_window = m_window->create_cairo_context();
-
     update_sizes();
 
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &perfroll::change_horz ));
@@ -199,8 +192,6 @@ perfroll::update_sizes()
     
     if ( get_realized() )
     {
-        m_surface_window = m_window->create_cairo_context();
-
         m_surface_track = Cairo::ImageSurface::create(
             Cairo::Format::FORMAT_ARGB32,
             m_window_x,  m_window_y
@@ -334,8 +325,6 @@ perfroll::draw_progress()
             draw_sequence_on(sequence);
         }
     }
-    
-    on_draw(m_surface_window);  // FIXME
 
     queue_draw();
 }
@@ -346,7 +335,7 @@ perfroll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     long tick = m_mainperf->get_tick();
     long tick_offset = m_4bar_offset * c_ppqn * 16;
 
-    int progress_x =     ( tick - tick_offset ) / m_perf_scale_x ;
+    int progress_x = ( tick - tick_offset ) / m_perf_scale_x ;
 
     cr->set_source(m_surface_track, 0.0, 0.0);
     cr->paint();
@@ -556,21 +545,6 @@ void perfroll::draw_background_on( int a_sequence )
     }
 }
 
-bool
-perfroll::on_expose_event(GdkEventExpose* e)
-{
-    int y_s = e->area.y / c_names_y;
-    int y_f = (e->area.y  + e->area.height) / c_names_y;
-
-    for ( int y=y_s; y<=y_f; y++ )
-    {
-        draw_background_on(y + m_sequence_offset );
-        draw_sequence_on(y + m_sequence_offset );
-    }
-
-    return true;
-}
-
 void
 perfroll::redraw_dirty_sequences()
 {
@@ -589,18 +563,6 @@ perfroll::redraw_dirty_sequences()
             draw_sequence_on( seq );
         }
     }
-}
-
-// FIXME remove
-void
-perfroll::draw_drawable_row( long a_y )
-{
-    if( a_y < 0) // if user scrolled up off the window
-        return;
-    
-    /* Draw the new background */
-    m_surface_window->set_source(m_surface_track, 0.0, 0.0);
-    m_surface_window->paint();
 }
 
 bool
@@ -880,7 +842,6 @@ perfroll::on_focus_in_event(GdkEventFocus*)
 bool
 perfroll::on_focus_out_event(GdkEventFocus*)
 {
-  //  unset_flags(Gtk::HAS_FOCUS);
     return false;
 }
 
@@ -908,7 +869,6 @@ perfroll::split_trigger( int a_sequence, long a_tick )
 
     draw_background_on( a_sequence );
     draw_sequence_on( a_sequence );
-    draw_drawable_row(m_drop_y);
 }
 
 void

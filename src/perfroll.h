@@ -102,7 +102,6 @@ private:
     bool m_grow_direction;
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_ev);
@@ -122,8 +121,6 @@ private:
 
     void draw_sequence_on( int a_sequence );
     void draw_background_on( int a_sequence );
-
-    void draw_drawable_row( long a_y );     // FIXME remove
 
     void change_horz();
     void change_vert();
