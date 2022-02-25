@@ -44,15 +44,12 @@ using namespace Gtk;
 
 class perfedit;
 
-/* piano time*/
+/* The 'L' and 'R' marker track for setting loops and edit markers */
 class perftime: public Gtk::DrawingArea
 {
 
 private:
 
-    Glib::RefPtr<Gdk::Window>   m_window;
-    Cairo::RefPtr<Cairo::Context>  m_surface_window;
-    
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     perform      * const m_mainperf;
@@ -69,7 +66,6 @@ private:
     bool m_draw_background;
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     void on_size_allocate(Gtk::Allocation &a_r );
@@ -84,7 +80,6 @@ public:
 
     perftime( perform *a_perf, perfedit *a_perf_edit, Glib::RefPtr<Adjustment> a_hadjust );
 
-    void idle_progress();   // FIXME REMOVE
     void set_zoom (int a_zoom);
 
     void set_guides( int a_snap, int a_measure );
