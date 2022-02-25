@@ -52,6 +52,8 @@ private:
     perform      *m_mainperf;
     mainwnd      *m_mainwnd;
     sequence     m_clipboard;
+    
+    std::vector<MenuItem> m_menu_items;
 
     void on_realize();
 
