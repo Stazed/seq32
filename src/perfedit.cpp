@@ -282,12 +282,27 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_menu_bp_measure = manage( new Menu() );
     m_menu_bw = manage( new Menu() );
 
-    /* bw */
-    m_menu_bw->items().push_back(MenuElem("1", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 1  )));
-    m_menu_bw->items().push_back(MenuElem("2", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 2  )));
-    m_menu_bw->items().push_back(MenuElem("4", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 4  )));
-    m_menu_bw->items().push_back(MenuElem("8", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 8  )));
-    m_menu_bw->items().push_back(MenuElem("16", sigc::bind(mem_fun(*this,&perfedit::bw_button_callback), 16 )));
+    m_bw_menu_items.resize(5);
+
+    m_bw_menu_items[0].set_label("1");
+    m_bw_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &perfedit::bw_button_callback), 1 ));
+    m_menu_bw->append(m_bw_menu_items[0]);
+
+    m_bw_menu_items[1].set_label("2");
+    m_bw_menu_items[1].signal_activate().connect(sigc::bind(mem_fun(*this, &perfedit::bw_button_callback), 2 ));
+    m_menu_bw->append(m_bw_menu_items[1]);
+
+    m_bw_menu_items[2].set_label("4");
+    m_bw_menu_items[2].signal_activate().connect(sigc::bind(mem_fun(*this, &perfedit::bw_button_callback), 4 ));
+    m_menu_bw->append(m_bw_menu_items[2]);
+
+    m_bw_menu_items[3].set_label("8");
+    m_bw_menu_items[3].signal_activate().connect(sigc::bind(mem_fun(*this, &perfedit::bw_button_callback), 8 ));
+    m_menu_bw->append(m_bw_menu_items[3]);
+
+    m_bw_menu_items[4].set_label("16");
+    m_bw_menu_items[4].signal_activate().connect(sigc::bind(mem_fun(*this, &perfedit::bw_button_callback), 16 ));
+    m_menu_bw->append(m_bw_menu_items[4]);
 
     char b[20];
 
@@ -295,10 +310,9 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     {
         snprintf( b, sizeof(b), "%d", i+1 );
 
-        /* length */
-        m_menu_bp_measure->items().push_back(MenuElem(b,
-                                             sigc::bind(mem_fun(*this,&perfedit::bp_measure_button_callback),
-                                                     i+1 )));
+        MenuItem * menu_item = new MenuItem(b);
+        menu_item->signal_activate().connect(sigc::bind(mem_fun(*this, &perfedit::bp_measure_button_callback), i + 1 ));
+        m_menu_bp_measure->append(*menu_item);
     }
 
     /* beats per measure */

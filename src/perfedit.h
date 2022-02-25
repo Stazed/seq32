@@ -98,6 +98,7 @@ private:
     Menu        *m_menu_xpose;
     
     std::vector<MenuItem> m_snap_menu_items;
+    std::vector<MenuItem> m_bw_menu_items;
     SeparatorMenuItem   m_menu_separator6;
     SeparatorMenuItem   m_menu_separator7;
     SeparatorMenuItem   m_menu_separator8;
