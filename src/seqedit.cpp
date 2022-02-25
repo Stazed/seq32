@@ -1420,7 +1420,8 @@ seqedit::fill_top_bar()
 void
 seqedit::popup_menu(Menu *a_menu)
 {
-    a_menu->popup(0,0);
+    a_menu->show_all();
+    a_menu->popup_at_pointer(NULL);
 }
 
 void
