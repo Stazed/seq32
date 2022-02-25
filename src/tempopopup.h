@@ -58,7 +58,7 @@ public:
 
     tempopopup (tempo *a_tempo);
     
-    void popup_tempo_win();
+    void popup_tempo_win(int x, int y);
     
     /* From  sequencer64 tap button */
     void tap ();

@@ -289,6 +289,13 @@ tempo::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 bool
 tempo::on_button_press_event(GdkEventButton* p0)
 {
+    /* For the popup window location - current mouse location */
+    int x, y;
+    GdkDisplay *display = gdk_display_get_default ();
+    GdkSeat* seat = gdk_display_get_default_seat(display);
+    GdkDevice* device = gdk_seat_get_pointer(seat);
+    gdk_device_get_position (device, NULL, &x, &y);
+
     uint64_t tick = (uint64_t) p0->x;
     tick *= m_perf_scale_x;
     tick += (m_4bar_offset * 16 * c_ppqn);
@@ -324,7 +331,7 @@ tempo::on_button_press_event(GdkEventButton* p0)
         
         /* We are not above a marker so trigger the popup bpm window to add */
         tick = tick - (tick % m_snap);  // snap only when adding, not when trying to delete
-        set_tempo_marker(tick);
+        set_tempo_marker(tick, x, y);
         /* don't queue_draw() here because they might escape key out */
         return true;
 
@@ -464,9 +471,9 @@ tempo::on_size_allocate(Gtk::Allocation &a_r )
 
 /* Raises the spinbutton entry window */
 void
-tempo::set_tempo_marker(long a_tick)
+tempo::set_tempo_marker(long a_tick, int x, int y)
 {
-    m_popup_tempo_wnd->popup_tempo_win();
+    m_popup_tempo_wnd->popup_tempo_win(x, y);
     m_current_mark.tick = a_tick;
 }
 

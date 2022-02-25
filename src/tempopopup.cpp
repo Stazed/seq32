@@ -184,7 +184,7 @@ tempopopup::on_key_press_event( GdkEventKey* a_ev )
 }
 
 void 
-tempopopup::popup_tempo_win()
+tempopopup::popup_tempo_win(int x, int y)
 {
     m_return = false;
     m_escape = false;
@@ -192,6 +192,7 @@ tempopopup::popup_tempo_win()
     m_spinbutton_bpm->set_value(m_tempo->m_mainperf->get_bpm());    // set to default starting bpm
     m_spinbutton_bpm->select_region(0,-1);                          // select all for easy typing replacement
     m_spinbutton_bpm->grab_focus();
+    move(x, y);
     show_all();
     raise();
 }

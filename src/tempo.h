@@ -101,7 +101,7 @@ private:
     void draw_background();
 
     void change_horz();
-    void set_tempo_marker(long a_tick);
+    void set_tempo_marker(long a_tick, int x, int y);
     
     /* Sequencer64 */
     inline double
