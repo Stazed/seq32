@@ -21,8 +21,7 @@
 #include "font.h"
 
 
-seqkeys::seqkeys(sequence *a_seq,
-                 Gtk::Adjustment *a_vadjust ):
+seqkeys::seqkeys(sequence *a_seq, Glib::RefPtr<Adjustment> a_vadjust ):
     m_seq(a_seq),
     m_vadjust(a_vadjust),
     m_scroll_offset_key(0),

@@ -126,8 +126,8 @@ private:
     HBox       *m_hbox2;
     HBox       *m_hbox3;
 
-    Adjustment *m_vadjust;
-    Adjustment *m_hadjust;
+    Glib::RefPtr<Adjustment> m_vadjust;
+    Glib::RefPtr<Adjustment> m_hadjust;
 
     VScrollbar *m_vscroll_new;
     HScrollbar *m_hscroll_new;

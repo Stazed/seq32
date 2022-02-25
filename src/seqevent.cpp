@@ -24,7 +24,7 @@ seqevent::seqevent(sequence *a_seq,
                    int a_zoom,
                    int a_snap,
                    seqdata *a_seqdata_wid,
-                   Gtk::Adjustment   *a_hadjust):
+                   Glib::RefPtr<Adjustment> a_hadjust):
     m_hadjust(a_hadjust),
 
     m_scroll_offset_ticks(0),

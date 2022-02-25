@@ -61,7 +61,7 @@ private:
     int m_drop_x, m_drop_y;
     int m_current_x, m_current_y;
 
-    Gtk::Adjustment   * const m_hadjust;
+    Glib::RefPtr<Adjustment> const m_hadjust;
 
     int m_scroll_offset_ticks;
     int m_scroll_offset_x;
@@ -107,7 +107,7 @@ protected:
 
 public:
 
-    seqdata( sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust );
+    seqdata( sequence *a_seq, int a_zoom,  Glib::RefPtr<Adjustment> a_hadjust);
 
     void reset();
     void redraw();

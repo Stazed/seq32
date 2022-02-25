@@ -21,8 +21,7 @@
 #include "seqtime.h"
 #include "font.h"
 
-seqtime::seqtime(sequence *a_seq, int a_zoom,
-                 Gtk::Adjustment   *a_hadjust):
+seqtime::seqtime(sequence *a_seq, int a_zoom, Glib::RefPtr<Adjustment> a_hadjust):
     m_hadjust(a_hadjust),
 
     m_scroll_offset_ticks(0),

@@ -39,6 +39,8 @@
 
 #include "globals.h"
 
+using namespace Gtk;
+
 enum
 {
     White_Note = 0,
@@ -58,7 +60,7 @@ private:
 
     sequence *m_seq;
 
-    Gtk::Adjustment   *m_vadjust;
+    Glib::RefPtr<Adjustment> m_vadjust;
 
     int m_scroll_offset_key;
     int m_scroll_offset_y;
@@ -113,8 +115,7 @@ public:
     /* true == on, false == off */
     void set_hint_state( bool a_state );
 
-    seqkeys( sequence *a_seq,
-             Gtk::Adjustment *a_vadjust );
+    seqkeys( sequence *a_seq, Glib::RefPtr<Adjustment> a_vadjust );
 
     void set_scale( int a_scale );
     void set_key( int a_key );

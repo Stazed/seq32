@@ -22,7 +22,7 @@
 #include "font.h"
 
 
-seqdata::seqdata(sequence *a_seq, int a_zoom,  Gtk::Adjustment   *a_hadjust):
+seqdata::seqdata(sequence *a_seq, int a_zoom,  Glib::RefPtr<Adjustment> a_hadjust):
     m_seq(a_seq),
 
     m_zoom(a_zoom),

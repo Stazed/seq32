@@ -118,10 +118,10 @@ seqedit::seqedit( sequence *a_seq,
     m_seq->set_editing( true );
 
     /* scroll bars */
-    m_vadjust = manage( new Adjustment(55,0, c_num_keys,           1,1,1 ));
-    m_hadjust = manage( new Adjustment(0, 0, 1,  1,1,1 ));
-    m_vscroll_new   =  manage(new VScrollbar( *m_vadjust ));
-    m_hscroll_new   =  manage(new HScrollbar( *m_hadjust ));
+    m_vadjust = Adjustment::create(55, 0, c_num_keys, 1, 1, 1);
+    m_hadjust = Adjustment::create(0, 0, 1, 1, 1, 1);
+    m_vscroll_new   =  manage(new VScrollbar( m_vadjust ));
+    m_hscroll_new   =  manage(new HScrollbar( m_hadjust ));
 
     /* get some new objects */
     m_seqkeys_wid  = manage( new seqkeys(  m_seq,

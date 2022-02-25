@@ -41,6 +41,8 @@
 
 #include "globals.h"
 
+using namespace Gtk;
+
 /* piano time*/
 class seqtime: public Gtk::DrawingArea
 {
@@ -52,7 +54,7 @@ private:
     
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
-    Gtk::Adjustment   *m_hadjust;
+    Glib::RefPtr<Adjustment> m_hadjust;
 
     int m_scroll_offset_ticks;
     int m_scroll_offset_x;
@@ -83,8 +85,7 @@ protected:
 
 public:
 
-    seqtime( sequence *a_seq, int a_zoom,
-             Gtk::Adjustment   *a_hadjust );
+    seqtime( sequence *a_seq, int a_zoom, Glib::RefPtr<Adjustment> a_hadjust);
 
     void reset();
     void redraw();

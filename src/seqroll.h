@@ -147,8 +147,8 @@ private:
 
     int m_old_progress_x;
 
-    Adjustment   * const m_vadjust;
-    Adjustment   * const m_hadjust;
+    Glib::RefPtr<Adjustment> const m_vadjust;
+    Glib::RefPtr<Adjustment> const m_hadjust;
 
     int m_scroll_offset_ticks;
     int m_scroll_offset_key;
@@ -244,8 +244,8 @@ public:
              seqevent *a_seqevent_wid,
              seqkeys *a_seqkeys_wid,
              int a_pos,
-             Adjustment *a_hadjust,
-             Adjustment *a_vadjust,
+             Glib::RefPtr<Adjustment> a_hadjust,
+             Glib::RefPtr<Adjustment> a_vadjust,
              ToggleButton *a_toggle_play);
 
     void set_data_type( unsigned char a_status, unsigned char a_control  );
