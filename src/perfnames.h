@@ -49,9 +49,6 @@ class mainwnd;
 class perfnames : public virtual Gtk::DrawingArea, public virtual seqmenu
 {
 private:
-
-    Glib::RefPtr<Gdk::Window>   m_window;
-    Cairo::RefPtr<Cairo::Context>  m_surface_window;
     
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
@@ -75,7 +72,6 @@ private:
     int          m_old_seq;
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_ev);
@@ -97,7 +93,6 @@ protected:
 
 public:
 
-    void idle_redraw();
     void redraw_dirty_sequences();
 
     perfnames( perform *a_perf, mainwnd *a_main,

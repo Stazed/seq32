@@ -58,10 +58,6 @@ perfnames::on_realize()
 {
     // we need to do the default realize
     Gtk::DrawingArea::on_realize();
-
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    m_surface_window = m_window->create_cairo_context();
 }
 
 void
@@ -295,15 +291,6 @@ perfnames::draw_sequence( int sequence )
     }
 }
 
-void
-perfnames::idle_redraw()
-{
-    if(m_redraw_tracks)
-    {
-        on_draw(m_surface_window);
-    }
-}
-
 bool
 perfnames::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
@@ -347,37 +334,6 @@ perfnames::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     return true;
 }
 
-bool
-perfnames::on_expose_event(GdkEventExpose* a_e)
-{
-    Gtk::Allocation allocation = get_allocation();
-    const int width = allocation.get_width();
-    const int height = allocation.get_height();
-
-    // resize handler
-    if (width != m_surface->get_width() || height != m_surface->get_height())
-    {
-        m_surface = Cairo::ImageSurface::create(
-            Cairo::Format::FORMAT_ARGB32,
-            allocation.get_width(),
-            allocation.get_height()
-        );
-
-       m_surface_window = m_window->create_cairo_context();
-       m_redraw_tracks = true;
-    }
-    
-    
-    int seqs = (m_window_y / c_names_y) + 1;
-
-    for ( int i=0; i< seqs; i++ )
-    {
-        int sequence = i + m_sequence_offset;
-        draw_sequence(sequence);
-    }
-    return true;
-}
-
 void
 perfnames::convert_y( int a_y, int *a_seq)
 {
@@ -417,8 +373,6 @@ perfnames::on_button_press_event(GdkEventButton *a_e)
             m_mainperf->get_sequence(sequence)->set_song_mute( solo );
         
         check_global_solo_tracks();
-        m_redraw_tracks = true;
-        queue_draw();
     }
 
     return true;
@@ -446,8 +400,6 @@ perfnames::on_button_release_event(GdkEventButton* p0)
             m_mainperf->get_sequence(m_current_seq)->set_song_solo( muted );
         
         check_global_solo_tracks();
-        m_redraw_tracks = true;
-        queue_draw();
     }
     
     /* Left button and moving */
@@ -566,7 +518,6 @@ perfnames::redraw_dirty_sequences()
             if (dirty)
             {
                 draw_sequence( seq );
-                on_draw(m_surface_window);  // FIXME
                 queue_draw();
             }
         }

@@ -249,6 +249,7 @@ void
 sequence::set_song_mute( bool a_mute )
 {
     m_song_mute = a_mute;
+    m_dirty_names = true;
 }
 
 bool
@@ -261,6 +262,7 @@ void
 sequence::set_song_solo( bool a_solo )
 {
     m_song_solo = a_solo;
+    m_dirty_names = true;
 }
 
 bool
