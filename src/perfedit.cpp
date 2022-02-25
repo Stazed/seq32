@@ -250,7 +250,7 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_button_snap->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_snap  ));
     add_tooltip( m_button_snap, "Grid snap. (Fraction of Measure Length)" );
     m_entry_snap = manage( new Entry());
-    m_entry_snap->set_size_request( 40, -1 );
+    m_entry_snap->set_width_chars(4);
     m_entry_snap->set_editable( false );
 
     m_menu_xpose =   manage( new Menu());
@@ -276,7 +276,7 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_button_xpose->signal_clicked().connect(  sigc::bind<Menu *>( mem_fun( *this, &perfedit::popup_menu), m_menu_xpose  ));
     add_tooltip( m_button_xpose, "Song transpose" );
     m_entry_xpose = manage( new Entry());
-    m_entry_xpose->set_size_request( 30, -1 );
+    m_entry_xpose->set_width_chars(4);
     m_entry_xpose->set_editable( false );
 
     m_menu_bp_measure = manage( new Menu() );
@@ -766,7 +766,8 @@ perfedit::set_xpose( int a_xpose  )
 void
 perfedit::popup_menu(Menu *a_menu)
 {
-    a_menu->popup(0,0);
+    a_menu->show_all();
+    a_menu->popup_at_pointer(NULL);
 }
 
 void
