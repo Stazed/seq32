@@ -53,9 +53,6 @@ class seqkeys : public Gtk::DrawingArea
 {
 private:
 
-    Glib::RefPtr<Gdk::Window> m_window;
-    Cairo::RefPtr<Cairo::Context>  m_surface_window;
-
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
     sequence *m_seq;
@@ -69,7 +66,6 @@ private:
     int m_window_y;
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_p0);
@@ -101,15 +97,13 @@ protected:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
 public:
-    
-    void idle_draw();
 
     /* listen to note on add or move */
     void set_listen_button_press(GdkEventButton* a_ev);
     void set_listen_button_release(GdkEventButton* a_ev);
     void set_listen_motion_notify(GdkEventMotion* a_p0);
 
-    /* sets key to red */
+    /* sets key to blue */
     void set_hint_key( int a_key );
 
     /* true == on, false == off */

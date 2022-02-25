@@ -2279,7 +2279,6 @@ seqedit::timeout()
     }
 
     m_seqdata_wid->idle_redraw();
-    m_seqkeys_wid->idle_draw();
     m_seqevent_wid->idle_redraw();
     m_seqroll_wid->draw_progress_on_window();
     

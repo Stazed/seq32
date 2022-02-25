@@ -58,11 +58,6 @@ seqkeys::on_realize()
     // we need to do the default realize
     Gtk::DrawingArea::on_realize();
 
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    
-    m_surface_window = m_window->create_cairo_context();
-
     m_vadjust->signal_value_changed().connect( mem_fun( *this, &seqkeys::change_vert ));
 
     change_vert();
@@ -233,20 +228,6 @@ seqkeys::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->set_source(m_surface, 0.0, -m_scroll_offset_y);
     cr->paint();
 
-    return true;
-}
-
-void
-seqkeys::idle_draw()
-{
-    on_draw(m_surface_window);
-}
-
-
-bool
-seqkeys::on_expose_event(GdkEventExpose* a_e)
-{
-    m_surface_window = m_window->create_cairo_context();
     return true;
 }
 
