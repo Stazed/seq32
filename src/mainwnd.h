@@ -51,6 +51,9 @@ private:
 
     perform  *m_mainperf;
     Glib::RefPtr<Gtk::Application> m_app;
+    
+    /* Holds the various window pointers so they can be closed by NSM */
+    vector< Gtk::Window *> m_vector_windows;
 
     bool      m_menu_mode;
 
@@ -108,6 +111,9 @@ private:
     int m_current_beats; // value is displayed in the button.
     long m_base_time_ms; // Indicates the first time the tap button was ... tapped.
     long m_last_time_ms; // Indicates the last time the tap button was tapped.
+
+    /* Flag to indicate that all windows are being closed */
+    bool m_closing_windows;
 
     void set_song_mode();
     void toggle_song_mode();
@@ -170,6 +176,7 @@ private:
     void tap ();
     void set_tap_button (int beats);
     double update_bpm ();
+    void close_all_windows();
 
 public:
 
@@ -188,5 +195,8 @@ public:
     void set_bp_measure(int bp_measure);
     void set_bw(int bw);
     void update_start_BPM(double bpm);
+
+    void set_window_pointer(Gtk::Window * a_win);
+    void remove_window_pointer(Gtk::Window * a_win);
     
 };

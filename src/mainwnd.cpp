@@ -542,7 +542,7 @@ mainwnd::timer_callback(  )
             else
             {
                 m_app->hold();
-               // close_all_windows();
+                close_all_windows();
                 hide();
                 nsm_send_is_hidden( m_nsm );
             }
@@ -1854,6 +1854,51 @@ mainwnd::update_start_BPM(double bpm)
 }
 
 #ifdef NSM_SUPPORT
+void
+mainwnd::close_all_windows()
+{
+    m_closing_windows = true;
+
+    for(unsigned i = 0; i < m_vector_windows.size(); ++i)
+    {
+        m_vector_windows[i]->close();
+    }
+
+    m_vector_windows.clear();
+    
+    if ( m_options != NULL )
+        m_options->hide();
+
+    if (m_perf_edit != NULL)
+    {
+      //  m_perf_edit->close_tempo_popup();
+        m_perf_edit->hide();
+    }
+
+    m_closing_windows = false;
+}
+
+void
+mainwnd::set_window_pointer(Gtk::Window * a_win)
+{
+    m_vector_windows.push_back(a_win);
+}
+
+void
+mainwnd::remove_window_pointer(Gtk::Window * a_win)
+{
+    if (m_closing_windows)
+        return;
+    
+    for(unsigned i = 0; i < m_vector_windows.size(); ++i)
+    {
+        if (m_vector_windows[i] == a_win)
+        {
+            m_vector_windows.erase(m_vector_windows.begin() + i);
+        }
+    }
+}
+
 void
 mainwnd::set_nsm_client(nsm_client_t *nsm, bool optional_gui)
 {
