@@ -152,6 +152,8 @@ public:
     void draw_progress();
 
     void redraw_dirty_sequences();
+    void redraw_all_tracks(){m_redraw_tracks = true;}
+    
     int get_drop_sequence();
 
     perfroll( perform *a_perf,
