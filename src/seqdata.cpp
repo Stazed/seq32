@@ -95,10 +95,6 @@ seqdata::on_realize()
     // we need to do the default realize
     Gtk::DrawingArea::on_realize();
 
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    m_surface_window = m_window->create_cairo_context();
-
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqdata::change_horz ));
 
     update_sizes();
@@ -261,8 +257,6 @@ seqdata::idle_redraw()
     {
         m_redraw_events = false;
         draw_events_on_window();
-        
-        on_draw(m_surface_window);  // FIXME
         queue_draw();
     }
 
@@ -291,13 +285,6 @@ seqdata::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         cr->stroke();
     }
 
-    return true;
-}
-
-bool
-seqdata::on_expose_event(GdkEventExpose* a_e)
-{
-    m_surface_window = m_window->create_cairo_context();
     return true;
 }
 

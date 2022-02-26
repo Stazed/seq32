@@ -45,9 +45,6 @@ class seqdata : public Gtk::DrawingArea
 {
 
 private:
-
-    Glib::RefPtr<Gdk::Window> m_window;
-    Cairo::RefPtr<Cairo::Context>  m_surface_window;
     
     Cairo::RefPtr<Cairo::ImageSurface> m_surface;
 
@@ -80,7 +77,6 @@ private:
     bool m_redraw_events;
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
 
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
