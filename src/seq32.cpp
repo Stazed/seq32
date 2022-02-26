@@ -28,9 +28,6 @@
 #    include "config.h"
 #endif
 
-#ifdef LASH_SUPPORT
-#    include "lash.h"
-#endif
 #include "mainwnd.h"
 #include "midifile.h"
 #include "optionsfile.h"
@@ -142,10 +139,6 @@ user_midi_bus_definition   global_user_midi_bus_definitions[c_maxBuses];
 user_instrument_definition global_user_instrument_definitions[c_max_instruments];
 
 
-#ifdef LASH_SUPPORT
-lash *lash_driver = NULL;
-#endif
-
 #ifdef __WIN32__
 #   define HOME "HOMEPATH"
 #   define SLASH "\\"
@@ -173,14 +166,6 @@ main (int argc, char *argv[])
         for ( int j=0; j<128; j++ )
             global_user_instrument_definitions[i].controllers_active[j] = false;
     }
-
-    /* Init the lash driver (strip lash specific command line
-     * arguments and connect to daemon) */
-    /* lash must be initialized here because mastermidibus uses the global
-     * lash_driver variable*/
-#ifdef LASH_SUPPORT
-    lash_driver = new lash(&argc, &argv);
-#endif
 
     /* parse parameters */
     int c;
@@ -458,12 +443,6 @@ main (int argc, char *argv[])
             }
         }
     }
-
-    /* connect to lash daemon and poll events*/
-#ifdef LASH_SUPPORT
-    lash_driver->set_mainwnd(&seq32_window);
-    lash_driver->start(&p);
-#endif
     
     int status = 0;
     status = application->run(seq32_window);
@@ -485,10 +464,6 @@ main (int argc, char *argv[])
     {
         printf( "Error calling getenv( \"%s\" )\n", HOME );
     }
-
-#ifdef LASH_SUPPORT
-    delete lash_driver;
-#endif
 
 #ifdef NSM_SUPPORT
     if(nsm)
