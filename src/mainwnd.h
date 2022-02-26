@@ -50,6 +50,8 @@ class mainwnd : public Gtk::Window, public performcallback
 private:
 
     perform  *m_mainperf;
+    Glib::RefPtr<Gtk::Application> m_app;
+
     bool      m_menu_mode;
     static int m_sigpipe[2];
 
@@ -177,7 +179,7 @@ private:
 
 public:
 
-    mainwnd(perform *a_p);
+    mainwnd(perform *a_p, Glib::RefPtr<Gtk::Application> app);
     ~mainwnd();
 
     bool open_file(const Glib::ustring&);

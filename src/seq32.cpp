@@ -383,7 +383,8 @@ main (int argc, char *argv[])
     p.launch_output_thread();
     p.init_jack();
 
-    mainwnd seq32_window( &p );
+    application = Gtk::Application::create();
+    mainwnd seq32_window( &p, application );
 
 #ifdef NSM_SUPPORT
     if ( nsm_url )
@@ -446,7 +447,9 @@ main (int argc, char *argv[])
     lash_driver->set_mainwnd(&seq32_window);
     lash_driver->start(&p);
 #endif
-    kit.run(seq32_window);
+    
+    int status = 0;
+    status = application->run(seq32_window);
 
     p.deinit_jack();
 
@@ -478,5 +481,5 @@ main (int argc, char *argv[])
     }
 #endif
 
-    return EXIT_SUCCESS;
+    return status;
 }

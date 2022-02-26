@@ -43,8 +43,9 @@ bool global_is_modified = false;
 
 #define add_tooltip( obj, text ) obj->set_tooltip_text( text);
 
-mainwnd::mainwnd(perform *a_p):
+mainwnd::mainwnd(perform *a_p, Glib::RefPtr<Gtk::Application> app):
     m_mainperf(a_p),
+    m_app(app),
     m_menu_mode(false),
     m_perf_edit(NULL),
     m_options(NULL)
