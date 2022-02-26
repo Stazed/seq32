@@ -121,7 +121,6 @@ perfroll::on_realize()
     Gtk::DrawingArea::on_realize();
 
     set_can_focus();
-
     update_sizes();
 
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &perfroll::change_horz ));
