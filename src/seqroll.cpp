@@ -145,10 +145,6 @@ seqroll::on_realize()
 
     set_can_focus();
 
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    m_surface_window = m_window->create_cairo_context();
-
     m_hadjust->signal_value_changed().connect( mem_fun( *this,
             &seqroll::change_horz ));
     m_vadjust->signal_value_changed().connect( mem_fun( *this,
@@ -507,7 +503,6 @@ seqroll::set_key( int a_key )
 void
 seqroll::update_surface()
 {
-    //printf( "update_pixmap()\n" );
     draw_background_on_surface();
     draw_events_on_surface();
 }
@@ -515,7 +510,6 @@ seqroll::update_surface()
 void
 seqroll::draw_progress_on_window()
 {
-    on_draw(m_surface_window);
     queue_draw();
 }
 
@@ -568,50 +562,6 @@ seqroll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     return true;
 }
-
-void
-seqroll::follow_progress()
-{
-    if( m_expanded_recording && m_seq->get_recording())
-    {
-        double h_max_value = ( m_seq->get_length() - (m_window_x * m_zoom));
-        m_hadjust->set_value(h_max_value);
-        
-    }else    /* use for non recording */
-    {
-        long progress_tick = m_seq->get_last_tick();
-
-        if (progress_tick > 0)
-        {
-            int progress_x = progress_tick / m_zoom + 10;
-            int page = progress_x / m_window_x;
-
-            if (page != m_scroll_page || (page == 0 && m_hadjust->get_value() != 0))
-            {
-                long left_tick = page * m_window_x * m_zoom;
-                m_scroll_page = page;
-
-                if((left_tick + m_hadjust->get_page_size()) >= m_hadjust->get_upper()) // don't scroll past upper
-                    m_hadjust->set_value(m_hadjust->get_upper() - m_hadjust->get_page_size());
-                else
-                    m_hadjust->set_value(double(left_tick));
-            }
-        }
-    }
-}
-
-void
-seqroll::set_expanded_recording(bool a_record)
-{
-    m_expanded_recording = a_record;
-}
-
-bool
-seqroll::get_expanded_record()
-{
-    return m_expanded_recording;
-}
-
 
 /* fills main surface with events */
 void
@@ -808,7 +758,6 @@ seqroll::draw_events_on_surface()
     }
 }
 
-
 /**
  * The selection box
  * 
@@ -894,11 +843,47 @@ seqroll::draw_selection_on_window(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 }
 
-bool
-seqroll::on_expose_event(GdkEventExpose* e)
+void
+seqroll::follow_progress()
 {
-    m_surface_window = m_window->create_cairo_context();
-    return true;
+    if( m_expanded_recording && m_seq->get_recording())
+    {
+        double h_max_value = ( m_seq->get_length() - (m_window_x * m_zoom));
+        m_hadjust->set_value(h_max_value);
+        
+    }else    /* use for non recording */
+    {
+        long progress_tick = m_seq->get_last_tick();
+
+        if (progress_tick > 0)
+        {
+            int progress_x = progress_tick / m_zoom + 10;
+            int page = progress_x / m_window_x;
+
+            if (page != m_scroll_page || (page == 0 && m_hadjust->get_value() != 0))
+            {
+                long left_tick = page * m_window_x * m_zoom;
+                m_scroll_page = page;
+
+                if((left_tick + m_hadjust->get_page_size()) >= m_hadjust->get_upper()) // don't scroll past upper
+                    m_hadjust->set_value(m_hadjust->get_upper() - m_hadjust->get_page_size());
+                else
+                    m_hadjust->set_value(double(left_tick));
+            }
+        }
+    }
+}
+
+void
+seqroll::set_expanded_recording(bool a_record)
+{
+    m_expanded_recording = a_record;
+}
+
+bool
+seqroll::get_expanded_record()
+{
+    return m_expanded_recording;
 }
 
 void
@@ -1116,7 +1101,6 @@ seqroll::on_focus_in_event(GdkEventFocus*)
 bool
 seqroll::on_focus_out_event(GdkEventFocus*)
 {
-   // unset_flags(Gtk::HAS_FOCUS);
     return false;
 }
 
@@ -1311,7 +1295,6 @@ seqroll::on_key_press_event(GdkEventKey* a_p0)
     if ( ret == true )
     {
         m_seq->set_dirty();
-        //redraw_events();
         return true;
     }
 
