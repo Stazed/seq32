@@ -53,7 +53,6 @@ private:
     Glib::RefPtr<Gtk::Application> m_app;
 
     bool      m_menu_mode;
-    static int m_sigpipe[2];
 
     MenuBar  *m_menubar;
     Menu     *m_menu_file;
@@ -162,10 +161,6 @@ private:
     bool is_save();
     void update_recent_files_menu ();
     void load_recent_file (int index);
-    
-    static void handle_signal(int sig);
-    bool install_signal_handlers();
-    bool signal_action(Glib::IOCondition condition);
 
     void popup_menu (Menu * a_menu);
     void apply_song_transpose ();
