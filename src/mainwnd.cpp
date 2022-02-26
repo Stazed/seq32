@@ -1243,7 +1243,7 @@ mainwnd::file_import_dialog()
     m_adjust_load_offset = Adjustment::create( 0, -(c_max_sets - 1),
                                    c_max_sets - 1, 1 );
     m_spinbutton_load_offset = manage( new SpinButton( m_adjust_load_offset ));
-    m_spinbutton_load_offset->set_editable( false );
+    m_spinbutton_load_offset->set_editable( true );
     m_spinbutton_load_offset->set_wrap( true );
     hbox.pack_end(*m_spinbutton_load_offset, false, false );
     hbox.pack_end(*(manage( new Label("Screen Set Offset"))), false, false, 4);
