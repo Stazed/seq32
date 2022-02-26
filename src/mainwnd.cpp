@@ -392,7 +392,7 @@ mainwnd::mainwnd(perform *a_p):
 
     m_adjust_ss = Adjustment::create( 0, 0, c_max_sets - 1, 1 );
     m_spinbutton_ss = manage( new SpinButton( m_adjust_ss ));
-    m_spinbutton_ss->set_editable( false );
+    m_spinbutton_ss->set_editable( true );
     m_spinbutton_ss->set_wrap( true );
     m_spinbutton_ss->signal_value_changed().connect(
         mem_fun(*this, &mainwnd::adj_callback_ss ));
