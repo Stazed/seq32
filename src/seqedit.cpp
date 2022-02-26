@@ -93,10 +93,12 @@ seqedit::menu_action_quantise()
 
 seqedit::seqedit( sequence *a_seq,
                   perform *a_perf,
+                  mainwnd *a_main,
                   int a_pos  ) :
     /* set the performance */
     m_seq(a_seq),
     m_mainperf(a_perf),
+    m_mainwnd(a_main),
     m_pos(a_pos),
 
     m_zoom(m_initial_zoom),
@@ -1864,6 +1866,8 @@ bool
 seqedit::on_delete_event(GdkEventAny *a_event)
 {
     //printf( "seqedit::on_delete_event()\n" );
+    m_mainwnd->remove_window_pointer(this);
+    
     m_seq->set_recording( false );
     m_mainperf->get_master_midi_bus()->set_sequence_input( false, m_seq );
     m_seq->set_editing( false );

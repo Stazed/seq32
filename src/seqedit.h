@@ -58,6 +58,7 @@
 #include <string>
 
 #include "globals.h"
+#include "mainwnd.h"
 #include "mainwid.h"
 #include "lfownd.h"
 
@@ -88,6 +89,7 @@ private:
 
     sequence   * const m_seq;
     perform    * const m_mainperf;
+    mainwnd    *m_mainwnd;
 
     MenuBar    *m_menubar;
 
@@ -304,6 +306,7 @@ public:
 
     seqedit(sequence *a_seq,
             perform *a_perf,
+            mainwnd *a_main,
             int a_pos);
 
     ~seqedit();

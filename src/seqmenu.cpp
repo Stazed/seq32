@@ -190,10 +190,13 @@ seqmenu::seq_edit()
     {
         if ( !m_mainperf->get_sequence( m_current_seq )->get_editing())
         {
-            new seqedit( m_mainperf->get_sequence( m_current_seq ),
+            seqedit * a_seq_edit = new seqedit( m_mainperf->get_sequence( m_current_seq ),
                          m_mainperf,
+                         m_mainwnd,
                          m_current_seq
                        );
+
+            m_mainwnd->set_window_pointer(a_seq_edit);
         }
         else
         {
@@ -203,10 +206,13 @@ seqmenu::seq_edit()
     else
     {
         this->seq_new();
-        new seqedit( m_mainperf->get_sequence( m_current_seq ),
+        seqedit * a_seq_edit =  new seqedit( m_mainperf->get_sequence( m_current_seq ),
                      m_mainperf,
+                     m_mainwnd,
                      m_current_seq
                    );
+
+        m_mainwnd->set_window_pointer(a_seq_edit);
     }
     m_mainperf->set_sequence_editing_list(true);
 }
