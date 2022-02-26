@@ -51,25 +51,15 @@ seqmenu::popup_menu()
 
     if ( m_mainperf->is_active( m_current_seq ))
     {
-#ifdef GTKMM_3_SUPPORT
         m_menu_items[0].set_label("Edit");
         m_menu_items[0].signal_activate().connect(mem_fun(*this, &seqmenu::seq_edit) );
         m_menu->append(m_menu_items[0]);
-#else
-        m_menu->items().push_back(MenuElem("Edit...",
-                                          mem_fun(*this, &seqmenu::seq_edit)));
-#endif
     }
     else
     {
-#ifdef GTKMM_3_SUPPORT
         m_menu_items[1].set_label("New");
         m_menu_items[1].signal_activate().connect(mem_fun(*this, &seqmenu::seq_edit) );
         m_menu->append(m_menu_items[1]);
-#else
-        m_menu->items().push_back(MenuElem("New",
-                                           mem_fun(*this, &seqmenu::seq_edit)));
-#endif
     }
     
     MenuItem * menu_separator1 = new SeparatorMenuItem();
@@ -77,7 +67,6 @@ seqmenu::popup_menu()
 
     if ( m_mainperf->is_active( m_current_seq ))
     {
-#ifdef GTKMM_3_SUPPORT
         m_menu_items[2].set_label("Cut");
         m_menu_items[2].signal_activate().connect(mem_fun(*this, &seqmenu::seq_cut) );
         m_menu->append(m_menu_items[2]);
@@ -93,48 +82,29 @@ seqmenu::popup_menu()
         m_menu_items[5].set_label("Export track");
         m_menu_items[5].signal_activate().connect(mem_fun(*this, &seqmenu::track_export) );
         m_menu->append(m_menu_items[5]);
-#else
-        m_menu->items().push_back(MenuElem("Cut", mem_fun(*this,&seqmenu::seq_cut)));
-        m_menu->items().push_back(MenuElem("Copy", mem_fun(*this,&seqmenu::seq_copy)));
-        m_menu->items().push_back(MenuElem("Export sequence", mem_fun(*this,&seqmenu::seq_export)));
-        m_menu->items().push_back(MenuElem("Export track", mem_fun(*this,&seqmenu::track_export)));     
-#endif
     }
     else
     {
-#ifdef GTKMM_3_SUPPORT
         m_menu_items[6].set_label("Paste");
         m_menu_items[6].signal_activate().connect(mem_fun(*this, &seqmenu::seq_paste) );
         m_menu->append(m_menu_items[6]);
-#else
-        m_menu->items().push_back(MenuElem("Paste", mem_fun(*this,&seqmenu::seq_paste)));
-#endif
     }
 
     MenuItem * menu_separator2 = new SeparatorMenuItem();
     m_menu->append(*menu_separator2);
 
-#ifdef GTKMM_3_SUPPORT
     Menu *menu_song = manage( new Menu() );
     m_menu_items[7].set_label("Song");
     m_menu_items[7].set_submenu(*menu_song);
     m_menu->append(m_menu_items[7]);
-#else
-    m_menu->items().push_back( MenuElem( "Song", *menu_song) );
-#endif
 
     if ( m_mainperf->is_active( m_current_seq ))
     {
-#ifdef GTKMM_3_SUPPORT
         MenuItem * menu_item = new MenuItem("Clear Song Data");
         menu_item->signal_activate().connect(mem_fun(*this,&seqmenu::seq_clear_perf));
         menu_song->append(*menu_item);
-#else
-        menu_song->items().push_back(MenuElem("Clear Song Data", mem_fun(*this,&seqmenu::seq_clear_perf)));
-#endif
     }
 
-#ifdef GTKMM_3_SUPPORT
     m_menu_items[8].set_label("Mute all tracks");
     m_menu_items[8].signal_activate().connect(sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_ON));
     menu_song->append(m_menu_items[8]);
@@ -143,23 +113,12 @@ seqmenu::popup_menu()
     m_menu_items[9].signal_activate().connect(sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_OFF));
     menu_song->append(m_menu_items[9]);
     
-    m_menu_items[10].set_label("Unmute all tracks");
+    m_menu_items[10].set_label("Toggle mute for all tracks");
     m_menu_items[10].signal_activate().connect(sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_TOGGLE));
     menu_song->append(m_menu_items[10]);
-#else
 
-    menu_song->items().push_back(MenuElem("Mute all tracks",
-                                            sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_ON)));
-
-    menu_song->items().push_back(MenuElem("Unmute all tracks",
-                                            sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_OFF)));
-
-    menu_song->items().push_back(MenuElem("Toggle mute for all tracks",
-                                            sigc::bind(mem_fun(*this, &seqmenu::set_song_mute), MUTE_TOGGLE)));
-#endif
     if ( m_mainperf->is_active( m_current_seq ))
     {
-#ifdef GTKMM_3_SUPPORT
         MenuItem * menu_separator3 = new SeparatorMenuItem();
         m_menu->append(*menu_separator3);
         
@@ -167,25 +126,17 @@ seqmenu::popup_menu()
         m_menu_items[11].set_label("Midi Bus");
         m_menu_items[11].set_submenu(*menu_buses);
         m_menu->append(m_menu_items[11]);
-#else
-        m_menu->items().push_back(SeparatorElem());
-        Menu *menu_buses = manage( new Menu() );
 
-        m_menu->items().push_back( MenuElem( "Midi Bus", *menu_buses) );
-#endif
         /* midi buses */
         mastermidibus *masterbus = m_mainperf->get_master_midi_bus();
         for ( int i=0; i< masterbus->get_num_out_buses(); i++ )
         {
             Menu *menu_channels = manage( new Menu() );
-#ifdef GTKMM_3_SUPPORT
+
             MenuItem * menu_item = new MenuItem(masterbus->get_midi_out_bus_name(i));
             menu_item->set_submenu(*menu_channels);
             menu_buses->append(*menu_item);
-#else
-            menu_buses->items().push_back(MenuElem( masterbus->get_midi_out_bus_name(i),
-                                                    *menu_channels ));
-#endif
+
             char b[4];
 
             /* midi channel menu */
@@ -200,24 +151,16 @@ seqmenu::popup_menu()
                                    global_user_instrument_definitions[instrument].instrument +
                                    string(")") );
                 }
-#ifdef GTKMM_3_SUPPORT
+
                 MenuItem * menu_item = new MenuItem(name);
                 menu_item->signal_activate().connect(sigc::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel), i, j));
                 menu_channels->append(*menu_item);
-#else
-                menu_channels->items().push_back(MenuElem(name,
-                                                 sigc::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel),
-                                                         i, j )));
-#endif
             }
         }
     }
-#ifdef GTKMM_3_SUPPORT
+
     m_menu->show_all();
     m_menu->popup_at_pointer(NULL);
-#else
-    m_menu->popup(0,0);
-#endif
 }
 
 void

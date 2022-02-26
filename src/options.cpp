@@ -125,20 +125,14 @@ options::add_midi_clock_page()
 
     HBox *hbox2 = manage (new HBox ());
 
-    //m_spinbutton_bpm->set_editable( false );
     hbox2->pack_start(*(manage(new Label(
                                    "Clock Start Modulo (1/16 Notes)"))), false, false, 4);
     hbox2->pack_start(*clock_mod_spin, false, false );
 
     vbox->pack_start( *hbox2, false, false );
-    
-#ifdef GTKMM_3_SUPPORT
+
     clock_mod_spin->signal_value_changed().connect(sigc::bind(mem_fun(*this,
             &options::clock_mod_callback), clock_mod_adj));
-#else
-    clock_mod_adj->signal_value_changed().connect(sigc::bind(mem_fun(*this,
-            &options::clock_mod_callback), clock_mod_adj));
-#endif
 }
 
 /*MIDI Input page*/

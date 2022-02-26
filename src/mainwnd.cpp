@@ -70,8 +70,7 @@ mainwnd::mainwnd(perform *a_p):
     m_menubar = manage(new MenuBar());
 
     m_menu_file = manage(new Menu());
-    
-#ifdef GTKMM_3_SUPPORT
+
     m_menu_recent = nullptr;
 
     m_menu_edit = manage(new Menu());
@@ -195,75 +194,7 @@ mainwnd::mainwnd(perform *a_p):
     m_help_menu_item.set_use_underline(true);
     m_help_menu_item.signal_activate().connect(mem_fun(*this, &mainwnd::about_dialog));
     m_menu_help->append(m_help_menu_item);
-    
-#else
-    m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
-    
-    m_menu_recent = nullptr;
 
-    m_menu_edit = manage( new Menu());
-    m_menubar->items().push_back(MenuElem("_Edit", *m_menu_edit));
-
-    m_menu_help = manage( new Menu());
-    m_menubar->items().push_back(MenuElem("_Help", *m_menu_help));
-
-    /* file menu items */
-    m_menu_file->items().push_back(MenuElem("_New",
-                                            Gtk::AccelKey("<control>N"),
-                                            mem_fun(*this, &mainwnd::file_new)));
-    m_menu_file->items().push_back(MenuElem("_Open...",
-                                            Gtk::AccelKey("<control>O"),
-                                            mem_fun(*this, &mainwnd::file_open)));
-    update_recent_files_menu();
-    
-    m_menu_file->items().push_back(MenuElem("Open _playlist...",
-                                            mem_fun(*this, &mainwnd::file_open_playlist)));
-    
-    m_menu_file->items().push_back(SeparatorElem());
-    
-    m_menu_file->items().push_back(MenuElem("_Save",
-                                            Gtk::AccelKey("<control>S"),
-                                            mem_fun(*this, &mainwnd::file_save)));
-    m_menu_file->items().push_back(MenuElem("Save _as...",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SEQ32_FORMAT, c_no_export_sequence)));
-
-    m_menu_file->items().push_back(SeparatorElem());
-    m_menu_file->items().push_back(MenuElem("O_ptions...",
-                                            mem_fun(*this,&mainwnd::options_dialog)));
-    m_menu_file->items().push_back(SeparatorElem());
-    m_menu_file->items().push_back(MenuElem("E_xit",
-                                            Gtk::AccelKey("<control>Q"),
-                                            mem_fun(*this, &mainwnd::file_exit)));
-
-    /* Edit menu items */
-    m_menu_edit->items().push_back(MenuElem("_Song Editor...",
-                                            Gtk::AccelKey("<control>E"),
-                                            mem_fun(*this, &mainwnd::open_performance_edit)));
-
-    m_menu_edit->items().push_back(MenuElem("_Apply song transpose",
-                                            mem_fun(*this, &mainwnd::apply_song_transpose)));
-
-    m_menu_edit->items().push_back(SeparatorElem());
-    m_menu_edit->items().push_back(MenuElem("_Mute all tracks",
-                                            sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_ON)));
-
-    m_menu_edit->items().push_back(MenuElem("_Unmute all tracks",
-                                            sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_OFF)));
-
-    m_menu_edit->items().push_back(MenuElem("_Toggle mute for all tracks",
-                                            sigc::bind(mem_fun(*this, &mainwnd::set_song_mute), MUTE_TOGGLE)));
-
-    m_menu_edit->items().push_back(SeparatorElem());
-    m_menu_edit->items().push_back(MenuElem("_Import...",
-                                            mem_fun(*this, &mainwnd::file_import_dialog)));
-
-    m_menu_edit->items().push_back(MenuElem("Midi export _song",
-                                            sigc::bind(mem_fun(*this, &mainwnd::file_save_as), E_MIDI_SONG_FORMAT, c_no_export_sequence)));
-
-    /* help menu items */
-    m_menu_help->items().push_back(MenuElem("_About...",
-                                            mem_fun(*this, &mainwnd::about_dialog)));
-#endif
     /* top line items */
     tophbox = manage( new HBox( false, 0 ) );
     
@@ -1219,7 +1150,7 @@ mainwnd::update_recent_files_menu ()
     if(m_nsm != NULL)
         return;
 #endif
-#ifdef GTKMM_3_SUPPORT
+
     if (m_menu_recent != nullptr)
     {
         // Nothing to do??
@@ -1248,47 +1179,6 @@ mainwnd::update_recent_files_menu ()
         menu_item->signal_activate().connect(sigc::bind(SET_FILE, (-1)));
         m_menu_recent->append(*menu_item);
     }
-    
-#else
-    if (m_menu_recent != nullptr)
-    {
-        /*
-         * Causes a crash:
-         *
-         *      m_menu_file->items().remove(*m_menu_recent);    // crash!
-         *      delete m_menu_recent;
-         */
-
-        m_menu_recent->items().clear();
-    }
-    else
-    {
-        m_menu_recent = manage(new Gtk::Menu());
-        m_menu_file->items().push_back
-        (
-            MenuElem("_Recent MIDI files...", *m_menu_recent)
-        );
-    }
-
-    if (m_mainperf->recent_file_count() > 0)
-    {
-        for (int i = 0; i < m_mainperf->recent_file_count(); ++i)
-        {
-            std::string filepath = m_mainperf->recent_file(i);     // shortened name
-            m_menu_recent->items().push_back
-            (
-                MenuElem(filepath, sigc::bind(SET_FILE, i))
-            );
-        }
-    }
-    else
-    {
-        m_menu_recent->items().push_back
-        (
-            MenuElem("<none>", sigc::bind(SET_FILE, (-1)))
-        );
-    }
-#endif
 }
 
 /**
