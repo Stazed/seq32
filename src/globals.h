@@ -34,8 +34,6 @@
 
 using namespace std;
 
-#define GTKMM_3_SUPPORT 1
-
 /* 16 per screen */
 const int c_mainwnd_rows = 4;
 const int c_mainwnd_cols = 8;
