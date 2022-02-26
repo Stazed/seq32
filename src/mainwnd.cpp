@@ -49,8 +49,9 @@ mainwnd::mainwnd(perform *a_p):
     m_perf_edit(NULL),
     m_options(NULL)
 #ifdef NSM_SUPPORT
-    ,m_dirty_flag(false),
-    m_nsm(NULL)
+    ,m_nsm_visible(true)
+    ,m_dirty_flag(false)
+    ,m_nsm(NULL)
 #endif
 {
     set_icon(Gdk::Pixbuf::create_from_xpm_data(seq32_32_xpm));
@@ -1928,35 +1929,19 @@ mainwnd::poll_nsm(void *)
 }
 
 void
-mainwnd::set_nsm_menu()
+mainwnd::set_nsm_client(nsm_client_t *nsm, bool optional_gui)
 {
-#ifdef GTKMM_3_SUPPORT
-    
-#else
+    m_nsm = nsm;
+    m_nsm_optional_gui = optional_gui;
     if(m_menu_file != nullptr)
     {
-        m_menu_file->items().clear();
+        m_file_menu_items[1].set_sensitive(false);  // New
+        m_file_menu_items[2].set_sensitive(false);  // Open
+        m_file_menu_items[3].set_sensitive(false);  // Open playlist
+        m_file_menu_items[5].set_sensitive(false);  // Save As
+
+        m_menu_recent->set_sensitive(false);        // Recent files submenu
+        m_file_menu_items[7].set_label("Hide");     // Exit
     }
-    else
-    {
-        m_menu_file = manage(new Gtk::Menu());
-        m_menubar->items().push_front(MenuElem("_File", *m_menu_file));
-    }
-
-    m_menu_file->items().push_back(MenuElem("Open _playlist...",
-                                            mem_fun(*this, &mainwnd::file_open_playlist)));
-
-    m_menu_file->items().push_back(MenuElem("_Save",
-                                            Gtk::AccelKey("<control>S"),
-                                            mem_fun(*this, &mainwnd::file_save)));
-
-    m_menu_file->items().push_back(MenuElem("O_ptions...",
-                                            mem_fun(*this,&mainwnd::options_dialog)));
-
-    m_menu_file->items().push_back(SeparatorElem());
-    m_menu_file->items().push_back(MenuElem("E_xit",
-                                            Gtk::AccelKey("<control>Q"),
-                                            mem_fun(*this, &mainwnd::file_exit)));
-#endif
 }
 #endif

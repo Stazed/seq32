@@ -41,11 +41,28 @@
 Glib::ustring global_client_name = "seq32"; // default
 Glib::ustring global_filename = "";
 
+Glib::RefPtr<Gtk::Application> application;
+
 #ifdef NSM_SUPPORT
 #include "nsm.h"
 
+bool global_nsm_gui = false;
+bool nsm_opional_gui_support = true;
 static nsm_client_t *nsm = 0;
 static int wait_nsm = 1;
+
+void
+nsm_hide_cb(void *userdata)
+{
+    application->hold();
+    global_nsm_gui = false;
+}
+
+void
+nsm_show_cb(void *userdata)
+{
+    global_nsm_gui = true;
+}
 
 int                                                                  
 cb_nsm_open ( const char *save_file_path,   // See API Docs 2.2.2 
@@ -373,10 +390,9 @@ main (int argc, char *argv[])
     {
         // Set the save callback and nsm client now that the mainwnd is created.
         nsm_set_save_callback( nsm, cb_nsm_save, (void*) &seq32_window );
-        seq32_window.set_nsm_client(nsm);
         
-        // Set limited file menu for session
-        seq32_window.set_nsm_menu();
+        // set client and limited file menus
+        seq32_window.set_nsm_client(nsm, nsm_opional_gui_support);
         
         // Open the NSM session file
         if (Glib::file_test(global_filename, Glib::FILE_TEST_EXISTS))
