@@ -1871,7 +1871,7 @@ mainwnd::close_all_windows()
 
     if (m_perf_edit != NULL)
     {
-      //  m_perf_edit->close_tempo_popup();
+        m_perf_edit->hide_tempo_popup();
         m_perf_edit->hide();
     }
 

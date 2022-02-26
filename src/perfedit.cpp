@@ -1084,6 +1084,11 @@ perfedit::toggle_time_format ()
     }
 }
 
+void
+perfedit::hide_tempo_popup()
+{
+    m_tempo->hide_tempo_popup();
+}
 
 int
 FF_RW_timeout(void *arg)

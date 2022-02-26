@@ -244,6 +244,7 @@ public:
     void load_tempo_list();
     
     void update_clock();
+    void hide_tempo_popup();
 
     friend int FF_RW_timeout(void *arg);
 
