@@ -41,8 +41,6 @@
 #include "pixmaps/undo.xpm"
 #include "pixmaps/redo.xpm"
 #include "pixmaps/quanize.xpm"
-#include "pixmaps/menu_empty.xpm"
-#include "pixmaps/menu_full.xpm"
 #include "pixmaps/sequences.xpm"
 #include "pixmaps/tools.xpm"
 #include "pixmaps/seq-editor.xpm"
@@ -1224,14 +1222,6 @@ seqedit::set_background_sequence( int a_seq )
     }
 }
 
-Gtk::Image*
-seqedit::create_menu_image( bool a_state )
-{
-    if ( a_state )
-        return manage( new Image(Gdk::Pixbuf::create_from_xpm_data( menu_full_xpm  )));
-    else
-        return manage( new Image(Gdk::Pixbuf::create_from_xpm_data( menu_empty_xpm  )));
-}
 
 void
 seqedit::popup_event_menu()

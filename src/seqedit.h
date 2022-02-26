@@ -263,8 +263,6 @@ private:
     void popup_tool_menu();
     void popup_midich_menu();
 
-    Gtk::Image* create_menu_image( bool a_state = false );
-
     void on_realize();
 
     bool timeout();
