@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include <list>
+#include <string>
+
 #include "sequence.h"
 #include "seqkeys.h"
 #include "seqroll.h"
@@ -27,36 +30,6 @@
 #include "seqtime.h"
 #include "seqevent.h"
 #include "perform.h"
-
-#include <gtkmm/adjustment.h>
-#include <gtkmm/button.h>
-#include <gtkmm/window.h>
-#include <gtkmm/accelgroup.h>
-#include <gtkmm/box.h>
-#include <gtkmm/main.h>
-#include <gtkmm/menu.h>
-#include <gtkmm/menubar.h>
-#include <gtkmm/eventbox.h>
-#include <gtkmm/window.h>
-#include <gtkmm/table.h>
-#include <gtkmm/drawingarea.h>
-#include <gtkmm/widget.h>
-#include <gtkmm/scrollbar.h>
-#include <gtkmm/viewport.h>
-#include <gtkmm/label.h>
-#include <gtkmm/toolbar.h>
-#include <gtkmm/togglebutton.h>
-#include <gtkmm/invisible.h>
-#include <gtkmm/separator.h>
-#include <gtkmm/image.h>
-#include <gtkmm/invisible.h>
-#include <gtkmm/image.h>
-
-#include <sigc++/bind.h>
-
-#include <list>
-#include <string>
-
 #include "globals.h"
 #include "mainwnd.h"
 #include "mainwid.h"

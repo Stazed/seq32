@@ -20,8 +20,6 @@
 //
 #pragma once
 
-#include <gtkmm/button.h>
-
 class perfroll;
 
 class AbstractPerfInput

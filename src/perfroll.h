@@ -21,30 +21,13 @@
 
 #pragma once
 
-#include <gtkmm/button.h>
-#include <gtkmm/window.h>
-#include <gtkmm/accelgroup.h>
-#include <gtkmm/box.h>
-#include <gtkmm/main.h>
-#include <gtkmm/menu.h>
-#include <gtkmm/menubar.h>
-#include <gtkmm/eventbox.h>
-#include <gtkmm/window.h>
-#include <gtkmm/table.h>
-#include <gtkmm/drawingarea.h>
-#include <gtkmm/widget.h>
-#include <gtkmm/scrollbar.h>
-#include <gtkmm/adjustment.h>
-#include <gdkmm/cursor.h>
-
 #include "globals.h"
 #include "perform.h"
 #include "mutex.h"
 #include "perfedit.h"
+#include "perfroll_input.h"
 
 using namespace Gtk;
-
-#include "perfroll_input.h"
 
 const int c_perfroll_background_x = (c_ppqn * 4 * 16) / c_perf_max_zoom ;
 const int c_perfroll_size_box_w = 6;

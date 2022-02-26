@@ -18,6 +18,9 @@
 //
 //-----------------------------------------------------------------------------
 
+#pragma once
+
+#include "globals.h"
 #include "mainwid.h"
 #include "perform.h"
 #include "sequence.h"
@@ -26,17 +29,12 @@
 #include "perfedit.h"
 #include "options.h"
 
-#pragma once
-
 #ifdef NSM_SUPPORT
 #include "nsm.h"
 #endif
 
 #include <map>
-#include <gtkmm.h>
 #include <string>
-
-#include "globals.h"
 
 using namespace Gtk;
 

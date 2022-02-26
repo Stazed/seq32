@@ -22,26 +22,12 @@
 
 #undef SEQ42_UNDO_TEMPO     // Seq42 type undo - not currently used
 
+#include <list>
+#include <stack>
+
 #include "perfedit.h"
 #include "perform.h"
 #include "seqtime.h"
-
-#include <list>
-#include <stack>
-#include <gtkmm/button.h>
-#include <gtkmm/window.h>
-#include <gtkmm/accelgroup.h>
-#include <gtkmm/box.h>
-#include <gtkmm/main.h>
-#include <gtkmm/menu.h>
-#include <gtkmm/menubar.h>
-#include <gtkmm/eventbox.h>
-#include <gtkmm/window.h>
-#include <gtkmm/table.h>
-#include <gtkmm/drawingarea.h>
-#include <gtkmm/widget.h>
-#include <gtkmm/adjustment.h>
-
 #include "globals.h"
 #include "tempopopup.h"
 #include "mutex.h"
