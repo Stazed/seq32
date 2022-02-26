@@ -18,7 +18,6 @@
 //
 //-----------------------------------------------------------------------------
 #include "perfnames.h"
-#include "font.h"
 
 perfnames::perfnames( perform *a_perf, mainwnd *a_main, Glib::RefPtr<Adjustment> a_vadjust ):
     seqmenu(a_perf, a_main ),

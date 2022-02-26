@@ -19,7 +19,6 @@
 //-----------------------------------------------------------------------------
 #include "event.h"
 #include "perftime.h"
-#include "font.h"
 
 
 perftime::perftime( perform *a_perf, perfedit *a_perf_edit, Glib::RefPtr<Adjustment> a_hadjust ) :

@@ -20,8 +20,6 @@
 
 #include "mainwid.h"
 #include "seqedit.h"
-#include "font.h"
-
 
 const char mainwid::m_seq_to_char[c_seqs_in_set] =
 {

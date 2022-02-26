@@ -20,7 +20,6 @@
 
 #include "seqmenu.h"
 #include "seqedit.h"
-#include "font.h"
 #include "mainwnd.h"
 
 // Constructor
