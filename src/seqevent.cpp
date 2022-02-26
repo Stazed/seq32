@@ -73,10 +73,6 @@ seqevent::on_realize()
 
     set_can_focus();
 
-    // Now we can allocate any additional resources we need
-    m_window = get_window();
-    m_surface_window = m_window->create_cairo_context();
-
     m_hadjust->signal_value_changed().connect( mem_fun( *this, &seqevent::change_horz ));
 
     update_sizes();
@@ -107,14 +103,6 @@ seqevent::on_size_allocate(Gtk::Allocation& a_r )
     );
 
     update_sizes();
-}
-
-int
-seqevent::idle_redraw()
-{
-    update_surface();
-    on_draw(m_surface_window);
-    return true;
 }
 
 void
@@ -391,13 +379,6 @@ seqevent::x_to_w( int a_x1, int a_x2,
     }
 }
 
-bool
-seqevent::on_expose_event(GdkEventExpose* e)
-{
-    m_surface_window = m_window->create_cairo_context();
-    return true;
-}
-
 void
 seqevent::start_paste()
 {
@@ -562,7 +543,6 @@ seqevent::on_focus_in_event(GdkEventFocus*)
 bool
 seqevent::on_focus_out_event(GdkEventFocus*)
 {
-   // unset_flags(Gtk::HAS_FOCUS);
     return false;
 }
 

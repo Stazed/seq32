@@ -70,7 +70,9 @@ struct Seq32SeqEventInput
     bool m_adding;
 };
 
-/* piano event */
+/* The small event grid below the note editor and above the velocity editor
+ * shows the vertical event notes and CCs.
+ */
 class seqevent : public Gtk::DrawingArea
 {
 
@@ -124,8 +126,6 @@ private:
     unsigned char m_cc;
 
     void on_realize();
-    bool on_expose_event(GdkEventExpose* a_ev);
-
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_ev);
@@ -171,6 +171,4 @@ public:
     void set_data_type( unsigned char a_status, unsigned char a_control  );
 
     void update_surface();
-
-    int idle_redraw();
 };
