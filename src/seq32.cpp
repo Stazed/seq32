@@ -38,7 +38,7 @@
 #include "perform.h"
 #include "userfile.h"
 
-Glib::ustring global_client_name = "seq32"; // default
+Glib::ustring global_client_name = PACKAGE; // default
 Glib::ustring global_filename = "";
 
 Glib::RefPtr<Gtk::Application> application;
@@ -363,7 +363,7 @@ main (int argc, char *argv[])
 
         if ( 0 == nsm_init( nsm, nsm_url ) )
         {
-            nsm_send_announce( nsm, "seq32", ":dirty:", argv[0] );
+            nsm_send_announce( nsm, PACKAGE, ":optional-gui:dirty:", argv[0] );
         }
 
         int timeout = 0;
@@ -391,6 +391,17 @@ main (int argc, char *argv[])
     {
         // Set the save callback and nsm client now that the mainwnd is created.
         nsm_set_save_callback( nsm, cb_nsm_save, (void*) &seq32_window );
+        if (nsm_opional_gui_support)
+        {
+            nsm_set_show_callback(nsm, nsm_show_cb, 0);
+            nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
+            if (!global_nsm_gui) nsm_hide_cb(0);
+            else nsm_send_is_shown(nsm);
+        } 
+        else 
+        {
+            global_nsm_gui = true;
+        }
         
         // set client and limited file menus
         seq32_window.set_nsm_client(nsm, nsm_opional_gui_support);
@@ -405,6 +416,13 @@ main (int argc, char *argv[])
             seq32_window.file_save();
             seq32_window.update_window_title();
         }
+        
+        // Bind sigterm handler
+        signal(SIGTERM, [](int param)
+        {
+            global_is_running = false;
+            application->quit();
+        });
     }
 #endif // NSM_SUPPORT
 

@@ -143,7 +143,6 @@ private:
     bool m_nsm_visible;
     bool m_dirty_flag;
     nsm_client_t *m_nsm;
-    void poll_nsm(void *);
 public:
     void set_nsm_client(nsm_client_t *nsm, bool optional_gui);
 private:

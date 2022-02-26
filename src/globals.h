@@ -191,6 +191,9 @@ extern bool global_solo_track_set;
 */
 extern bool global_is_running;
 extern bool global_is_modified;
+#ifdef NSM_SUPPORT
+extern bool global_nsm_gui;
+#endif
 
 extern Glib::ustring global_filename;
 extern Glib::ustring global_jack_session_uuid;

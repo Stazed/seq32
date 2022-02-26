@@ -540,8 +540,25 @@ mainwnd::timer_callback(  )
 #endif // JACK_SUPPORT
 
 #ifdef NSM_SUPPORT
-    if(m_nsm != NULL)
+    if(m_nsm)
     {
+        nsm_check_nowait( m_nsm );
+        if (m_nsm_optional_gui && m_nsm_visible != global_nsm_gui)
+        {
+            m_nsm_visible = global_nsm_gui;
+            if (m_nsm_visible)
+            {
+                show();
+                nsm_send_is_shown( m_nsm );
+            }
+            else
+            {
+                m_app->hold();
+               // close_all_windows();
+                hide();
+                nsm_send_is_hidden( m_nsm );
+            }
+        }
         if (m_dirty_flag != global_is_modified)
         {
             m_dirty_flag = global_is_modified;
@@ -554,8 +571,6 @@ mainwnd::timer_callback(  )
                 nsm_send_is_clean ( m_nsm );
             }
         }
-
-        poll_nsm(0);
     }
 #endif
 
@@ -1305,17 +1320,32 @@ mainwnd::file_import_dialog()
 /*callback function*/
 void mainwnd::file_exit()
 {
-    if (is_save())
+    if (m_nsm && m_nsm_optional_gui)
     {
-        if (global_is_running)
-            stop_playing();
-        hide();
+        global_nsm_gui = false;
+    }
+    else
+    {
+        if (is_save())
+        {
+            if (global_is_running)
+                stop_playing();
+
+            hide();
+        }
     }
 }
 
 bool
 mainwnd::on_delete_event(GdkEventAny *a_e)
 {
+    if (m_nsm && m_nsm_optional_gui)
+    {
+        // nsm : hide gui instead of closing
+        global_nsm_gui = false;
+        return true;
+    }
+
     bool result = is_save();
     if (result && global_is_running)
         stop_playing();
@@ -1919,16 +1949,6 @@ mainwnd::update_start_BPM(double bpm)
 }
 
 #ifdef NSM_SUPPORT
-void
-mainwnd::poll_nsm(void *)
-{
-    if ( m_nsm != NULL )
-    {
-        nsm_check_nowait( m_nsm );
-        return;
-    }
-}
-
 void
 mainwnd::set_nsm_client(nsm_client_t *nsm, bool optional_gui)
 {
