@@ -410,7 +410,7 @@ main (int argc, char *argv[])
     }
 #endif // NSM_SUPPORT
 
-    // Do not use command line file if if in NSM session
+    // Do not use command line file if in NSM session
 #ifdef NSM_SUPPORT
     if(!nsm)
     {
@@ -422,27 +422,27 @@ main (int argc, char *argv[])
             else
                 printf("File not found: %s\n", argv[optind]);
         }
+
+        if(playlist_mode)
+        {
+            p.set_playlist_mode(playlist_mode);
+            p.set_playlist_file(playlist_file);
+
+            if(p.get_playlist_mode())    // true means file load with no errors
+            {
+                if(seq32_window.verify_playlist_dialog())
+                {
+                    seq32_window.playlist_verify();
+                }
+                else
+                {
+                    seq32_window.playlist_jump(PLAYLIST_ZERO);
+                }
+            }
+        }
 #ifdef NSM_SUPPORT
     }
 #endif
-
-    if(playlist_mode)
-    {
-        p.set_playlist_mode(playlist_mode);
-        p.set_playlist_file(playlist_file);
-        
-        if(p.get_playlist_mode())    // true means file load with no errors
-        {
-            if(seq32_window.verify_playlist_dialog())
-            {
-                seq32_window.playlist_verify();
-            }
-            else
-            {
-                seq32_window.playlist_jump(PLAYLIST_ZERO);
-            }
-        }
-    }
     
     int status = 0;
     status = application->run(seq32_window);

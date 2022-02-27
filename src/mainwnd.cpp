@@ -1908,7 +1908,8 @@ mainwnd::set_nsm_client(nsm_client_t *nsm, bool optional_gui)
     {
         m_file_menu_items[1].set_sensitive(false);  // New
         m_file_menu_items[2].set_sensitive(false);  // Open
-        m_file_menu_items[3].set_sensitive(false);  // Open playlist
+        /* We allow loading of play list - but we prevent saving when using it */
+        // m_file_menu_items[3].set_sensitive(false);  // Open playlist
         m_file_menu_items[5].set_sensitive(false);  // Save As
 
         m_menu_recent->set_sensitive(false);        // Recent files submenu
