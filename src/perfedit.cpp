@@ -1026,7 +1026,7 @@ perfedit::tick_to_timestring (long a_tick)
     microseconds -= (hours * 60 * 60 + minutes * 60 + seconds) * 1000000UL;
 
     char tmp[32];
-    snprintf(tmp, sizeof tmp, "%03d:%d:%02d   ", hours, minutes, seconds);
+    snprintf(tmp, sizeof tmp, "%03d:%d:%02d", hours, minutes, seconds);
     return std::string(tmp);
 }
 
