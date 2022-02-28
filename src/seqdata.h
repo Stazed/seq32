@@ -59,7 +59,6 @@ private:
 
     bool m_dragging;
     bool m_drag_handle;
-    bool m_redraw_events;
 
     void on_realize();
 
@@ -95,8 +94,7 @@ public:
     void set_zoom( int a_zoom );
     void set_data_type( unsigned char a_status, unsigned char a_control  );
 
-    int idle_redraw();
-    void queue_draw_background() {m_redraw_events = true;} ;
+    void queue_draw_background() {queue_draw();} ;
 
     friend class seqroll;
     friend class seqevent;
