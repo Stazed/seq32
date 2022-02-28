@@ -98,7 +98,6 @@ private:
 
     void on_realize();
 
-    bool on_expose_event(GdkEventExpose* a_ev);
     bool on_button_press_event(GdkEventButton* a_ev);
     bool on_button_release_event(GdkEventButton* a_ev);
     bool on_motion_notify_event(GdkEventMotion* a_p0);
@@ -114,6 +113,7 @@ private:
     int seq_from_xy( int a_x, int a_y );
 
     void redraw( int a_seq );
+    void sequence_is_being_edited();
     
 protected:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);

@@ -582,6 +582,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
             *(m_mainperf->get_sequence( m_old_seq )) = m_moving_seq;
 
             update_sequence_on_window( m_old_seq );
+            sequence_is_being_edited();
         }
     }
     // launch menu (right button)
@@ -658,4 +659,16 @@ mainwid::on_focus_out_event(GdkEventFocus*)
 {
    // unset_flags(Gtk::HAS_FOCUS);
     return false;
+}
+
+void
+mainwid::sequence_is_being_edited()
+{
+    Glib::ustring query_str = "Cannot swap sequences if being edited!";
+    
+    Gtk::MessageDialog dialog( query_str, false,
+                              Gtk::MESSAGE_INFO,
+                              Gtk::BUTTONS_OK, true);
+
+    dialog.run();
 }

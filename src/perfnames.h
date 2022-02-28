@@ -72,6 +72,8 @@ private:
     void redraw( int a_sequence );
     
     void check_global_solo_tracks();
+    
+    void sequence_is_being_edited();
 
 protected:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);

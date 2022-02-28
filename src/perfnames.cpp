@@ -433,10 +433,10 @@ perfnames::on_button_release_event(GdkEventButton* p0)
          * and put the old track back to original location. */
         else
         {
-  //          printf("Cannot swap with a sequence that is being edited!!!\n");
             m_mainperf->new_sequence( m_old_seq  );
             *(m_mainperf->get_sequence( m_old_seq )) = m_moving_seq;
             m_mainperf->get_sequence(m_old_seq)->set_dirty();
+            sequence_is_being_edited();
         }  
     }
     
@@ -542,4 +542,16 @@ perfnames::check_global_solo_tracks()
             }
         }
     }
+}
+
+void
+perfnames::sequence_is_being_edited()
+{
+    Glib::ustring query_str = "Cannot swap sequences if being edited!";
+    
+    Gtk::MessageDialog dialog( query_str, false,
+                              Gtk::MESSAGE_INFO,
+                              Gtk::BUTTONS_OK, true);
+
+    dialog.run();
 }
