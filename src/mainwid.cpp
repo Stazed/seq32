@@ -556,6 +556,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
         {
             m_mainperf->new_sequence( m_current_seq  );
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;
+            m_mainperf->get_sequence( m_current_seq )->unselect_triggers();
 
             update_sequence_on_window( m_current_seq );
         }
@@ -569,6 +570,9 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
             m_mainperf->delete_sequence( m_current_seq );                   // delete the current for replacement
             m_mainperf->new_sequence( m_current_seq  );                     // add a new blank one
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;    // replace with the old
+            
+            m_mainperf->get_sequence( m_current_seq )->unselect_triggers();
+            m_mainperf->get_sequence( m_old_seq )->unselect_triggers();
             
             update_sequence_on_window( m_old_seq );
             
