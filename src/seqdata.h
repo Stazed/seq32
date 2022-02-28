@@ -25,6 +25,8 @@
 #include "seqkeys.h"
 #include "globals.h"
 
+using namespace Gtk;
+
 /* Note or CC event velocity adjustment area */
 class seqdata : public Gtk::DrawingArea
 {
@@ -92,9 +94,9 @@ public:
     void reset();
     void redraw();
     void set_zoom( int a_zoom );
-    void set_data_type( unsigned char a_status, unsigned char a_control  );
+    void set_data_type( unsigned char a_status, unsigned char a_control);
 
-    void queue_draw_background() {queue_draw();} ;
+    void queue_draw_background() {queue_draw();}
 
     friend class seqroll;
     friend class seqevent;

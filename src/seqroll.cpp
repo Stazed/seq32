@@ -1839,7 +1839,7 @@ bool FruitySeqRollInput::on_button_release_event(GdkEventButton* a_ev, seqroll& 
     updateMousePtr( ths );
 
     /* if they clicked, something changed */
-    if (  needs_update )
+    if (needs_update)
     {
         ////printf( "needs_update2\n" );
 
