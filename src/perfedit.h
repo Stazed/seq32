@@ -216,6 +216,7 @@ public:
     void load_tempo_list();
     
     void update_clock();
+    void reposition_progress_line();
     void hide_tempo_popup();
 
     friend int FF_RW_timeout(void *arg);

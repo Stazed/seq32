@@ -44,9 +44,6 @@ private:
     friend class Seq32PerfInput;
 
     AbstractPerfInput* m_interaction;
-    
-    Glib::RefPtr<Gdk::Window> m_window;
-    Cairo::RefPtr<Cairo::Context>  m_surface_window;
 
     Cairo::RefPtr<Cairo::ImageSurface> m_surface_track;
     Cairo::RefPtr<Cairo::ImageSurface> m_surface_background;

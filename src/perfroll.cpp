@@ -288,6 +288,19 @@ perfroll::set_guides( int a_snap, int a_measure, int a_beat )
 void
 perfroll::draw_progress()
 {
+    if (global_is_running)
+    {
+        queue_draw();
+    }
+    else if (m_redraw_tracks)
+    {
+        queue_draw();
+    }
+}
+
+bool 
+perfroll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
     // resize handler
     if (c_perfroll_background_x != m_surface_background->get_width() || c_names_y != m_surface_background->get_height())
     {
@@ -325,12 +338,7 @@ perfroll::draw_progress()
         }
     }
 
-    queue_draw();
-}
-
-bool 
-perfroll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{
+    /* draw progress line */
     long tick = m_mainperf->get_tick();
     long tick_offset = m_4bar_offset * c_ppqn * 16;
 
@@ -339,7 +347,6 @@ perfroll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->set_source(m_surface_track, 0.0, 0.0);
     cr->paint();
 
-    /* draw progress line */
     cr->set_source_rgb(0.0, 0.0, 0.0);            // Black  FIXME
     cr->set_line_width(2.0);
     cr->move_to(progress_x, 0.0);
@@ -560,6 +567,7 @@ perfroll::redraw_dirty_sequences()
         {
             draw_background_on( seq );
             draw_sequence_on( seq );
+            m_redraw_tracks = true;
         }
     }
 }
@@ -868,6 +876,7 @@ perfroll::split_trigger( int a_sequence, long a_tick )
 
     draw_background_on( a_sequence );
     draw_sequence_on( a_sequence );
+    m_redraw_tracks = true;
 }
 
 void

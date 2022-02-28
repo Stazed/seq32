@@ -980,6 +980,16 @@ perfedit::update_clock()
     }
 }
 
+/**
+ * Needed when transport is not running if reposition by FF, RW or P pointer.
+ * Updates the perfroll progress line.
+ */
+void
+perfedit::reposition_progress_line()
+{
+    m_perfroll->redraw_all_tracks();
+}
+
 double
 perfedit::tempo_map_microseconds(unsigned long a_tick)
 {
