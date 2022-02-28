@@ -232,7 +232,10 @@ void
 seqmenu::seq_copy()
 {
     if ( m_mainperf->is_active( m_current_seq ))
+    {
         m_clipboard = *(m_mainperf->get_sequence( m_current_seq ));
+        m_clipboard.unselect_triggers( );
+    }
 }
 
 // Exports solo sequence to selected midi file
@@ -262,6 +265,7 @@ seqmenu::seq_cut()
             !m_mainperf->is_sequence_in_edit( m_current_seq ) )
     {
         m_clipboard = *(m_mainperf->get_sequence( m_current_seq ));
+        m_clipboard.unselect_triggers( );
         m_mainperf->delete_sequence( m_current_seq );
         redraw( m_current_seq );
     }

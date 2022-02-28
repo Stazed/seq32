@@ -411,6 +411,7 @@ perfnames::on_button_release_event(GdkEventButton* p0)
         {
             m_mainperf->new_sequence( m_current_seq  );
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;
+            m_mainperf->get_sequence( m_current_seq )->unselect_triggers( );
             m_mainperf->get_sequence(m_current_seq)->set_dirty();
         }
         /* If we did land on an active track and it is not being edited, then swap places. */
@@ -419,17 +420,20 @@ perfnames::on_button_release_event(GdkEventButton* p0)
             m_clipboard = *(m_mainperf->get_sequence( m_current_seq ));      // hold the current for swap to old location
             m_mainperf->new_sequence( m_old_seq  );                          // The old location
             *(m_mainperf->get_sequence( m_old_seq )) = m_clipboard;          // put the current track into the old location
+            m_mainperf->get_sequence( m_old_seq )->unselect_triggers( );
             m_mainperf->get_sequence(m_old_seq)->set_dirty();
 
             m_mainperf->delete_sequence( m_current_seq );                    // delete the current for replacement
             m_mainperf->new_sequence( m_current_seq  );                      // add a new blank one
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;     // replace with the old
+            m_mainperf->get_sequence( m_current_seq )->unselect_triggers( );
             m_mainperf->get_sequence(m_current_seq)->set_dirty();
         }
        /* They landed on another track but it is being edited, so ignore the move 
          * and put the old track back to original location. */
         else
         {
+  //          printf("Cannot swap with a sequence that is being edited!!!\n");
             m_mainperf->new_sequence( m_old_seq  );
             *(m_mainperf->get_sequence( m_old_seq )) = m_moving_seq;
             m_mainperf->get_sequence(m_old_seq)->set_dirty();
