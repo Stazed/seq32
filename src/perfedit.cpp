@@ -879,6 +879,7 @@ void
 perfedit::set_follow_transport()
 {
     m_mainperf->set_follow_transport(m_button_follow->get_active());
+    m_perfroll->have_stopped_reposition();
 }
 
 void
@@ -987,7 +988,7 @@ perfedit::update_clock()
 void
 perfedit::reposition_progress_line()
 {
-    m_perfroll->redraw_all_tracks();
+    m_perfroll->have_stopped_reposition();
 }
 
 double

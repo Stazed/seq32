@@ -91,7 +91,6 @@ private:
     bool on_focus_in_event(GdkEventFocus*);
     bool on_focus_out_event(GdkEventFocus*);
 
-    void on_size_request(GtkRequisition* );
     void on_size_allocate(Gtk::Allocation& );
 
     bool on_key_press_event(GdkEventKey* a_p0);
@@ -113,6 +112,7 @@ private:
     bool trans_button_press;
     bool m_redraw_tracks;
     bool m_have_realize;
+    bool m_have_stop_reposition;
 
 
 protected:
@@ -135,6 +135,7 @@ public:
 
     void redraw_dirty_sequences();
     void redraw_all_tracks(){m_redraw_tracks = true;}
+    void have_stopped_reposition(){m_have_stop_reposition = true;}
     
     int get_drop_sequence();
 

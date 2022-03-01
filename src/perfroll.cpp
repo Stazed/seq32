@@ -48,6 +48,7 @@ perfroll::perfroll( perform *a_perf,
     trans_button_press(false),
     m_redraw_tracks(false),
     m_have_realize(false),
+    m_have_stop_reposition(false),
     m_zoom(c_perf_scale_x)
 {
     Gtk::Allocation allocation = get_allocation();
@@ -289,38 +290,17 @@ perfroll::set_guides( int a_snap, int a_measure, int a_beat )
 void
 perfroll::draw_progress()
 {
-    // resize handler
-    if (c_perfroll_background_x != m_surface_background->get_width() || c_names_y != m_surface_background->get_height())
-    {
-        m_surface_background = Cairo::ImageSurface::create(
-            Cairo::Format::FORMAT_ARGB32,
-            c_perfroll_background_x, c_names_y
-        );
-
-        fill_background_surface();
-        m_redraw_tracks = true;
-    }
-
-    if (m_window_x != m_surface_track->get_width() || m_window_y != m_surface_track->get_height())
-    {
-        m_surface_track = Cairo::ImageSurface::create(
-            Cairo::Format::FORMAT_ARGB32,
-                m_window_x,  m_window_y
-        );
-
-        m_redraw_tracks = true;
-    }
-    
     if (m_redraw_tracks)
     {
         if(!m_have_realize)     // We keep polling until we get it
             return;
 
         m_redraw_tracks = false;
+
         int y_s = 0;
         int y_f = m_window_y / c_names_y;
 
-        for ( int y=y_s; y<=y_f; y++ )
+        for ( int y = y_s; y <= y_f; y++ )
         {
             int sequence = y + m_sequence_offset;
 
@@ -330,10 +310,14 @@ perfroll::draw_progress()
 
         m_surface_window->set_source(m_surface_track, 0.0, 0.0);
         m_surface_window->paint();
+        m_have_stop_reposition = true;  // in case we are stopped, we need to draw the progress line
     }
 
-    if (global_is_running)
+    /* Here we draw the progress line */
+    if (global_is_running || m_have_stop_reposition )
     {
+        m_have_stop_reposition = false;
+
         /* draw progress line */
         long tick = m_mainperf->get_tick();
         long tick_offset = m_4bar_offset * c_ppqn * 16;
@@ -346,7 +330,7 @@ perfroll::draw_progress()
         m_surface_window->stroke_preserve();
         m_surface_window->fill();
 
-        m_old_progress_ticks = progress_x;
+        m_old_progress_ticks = progress_x;  // hold the position to clear for next line
 
         /* The new progress line */
         m_surface_window->set_source_rgb(0.0, 0.0, 0.0);            // Black  FIXME
@@ -356,8 +340,6 @@ perfroll::draw_progress()
         m_surface_window->stroke();
 
         auto_scroll_horz();
-        
-        // FIXME todo scroll, FF, RW P when not running.
     }
 }
 
@@ -367,6 +349,25 @@ perfroll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     m_surface_window = cr;
 
     m_have_realize = true;
+
+    if (c_perfroll_background_x != m_surface_background->get_width() || c_names_y != m_surface_background->get_height())
+    {
+        m_surface_background = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            c_perfroll_background_x, c_names_y
+        );
+
+        fill_background_surface();
+    }
+
+    if (m_window_x != m_surface_track->get_width() || m_window_y != m_surface_track->get_height())
+    {
+        m_surface_track = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+                m_window_x,  m_window_y
+        );
+    }
+    
     m_redraw_tracks = true;
     
     draw_progress();
@@ -877,11 +878,6 @@ perfroll::on_size_allocate(Gtk::Allocation& a_r )
     m_window_y = a_r.get_height();
 
     update_sizes();
-}
-
-void
-perfroll::on_size_request(GtkRequisition* a_r )
-{
 }
 
 void
