@@ -364,10 +364,11 @@ mainwid::update_markers( int a_ticks )
         if(m_have_realize)
         {
             m_need_redraw = false;
+            fill_background_window();
             draw_sequences_on_surface();
         }
         else
-            return; // if we don't have realize yet, the poll until we do
+            return; // if we don't have realize yet, then poll until we do
     }
     
     for ( int i = 0; i < (c_mainwnd_rows * c_mainwnd_cols); i++ )
@@ -423,11 +424,11 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 
         long tick_x = a_tick * c_seqarea_seq_x / length;
         
-        /* Redraws the progress area background to clear previous line */
+        /* Redraws the previous progress line background to clear previous line */
         m_surface_window->set_source(m_surface, 0, 0);
-        m_surface_window->rectangle(rectangle_x,
+        m_surface_window->rectangle(rectangle_x + m_last_tick_x[a_seq] - 1,
                                     rectangle_y,
-                                    c_seqarea_seq_x,
+                                    3,
                                     c_seqarea_seq_y + 1 );
 
         m_surface_window->stroke_preserve();
@@ -661,8 +662,28 @@ mainwid::on_focus_in_event(GdkEventFocus*)
 bool
 mainwid::on_focus_out_event(GdkEventFocus*)
 {
-   // unset_flags(Gtk::HAS_FOCUS);
     return false;
+}
+
+void
+mainwid::on_size_allocate(Gtk::Allocation &a_r )
+{
+    Gtk::DrawingArea::on_size_allocate( a_r );
+
+    m_window_x = a_r.get_width();
+    m_window_y = a_r.get_height();
+
+    // resize handler
+    if ( m_window_x != m_surface->get_width() || m_window_y != m_surface->get_height())
+    {
+        m_surface = Cairo::ImageSurface::create(
+            Cairo::Format::FORMAT_ARGB32,
+            m_window_x,
+            m_window_y
+        );
+        
+        m_need_redraw = true;
+    }
 }
 
 void

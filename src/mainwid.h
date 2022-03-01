@@ -103,6 +103,7 @@ private:
     bool on_motion_notify_event(GdkEventMotion* a_p0);
     bool on_focus_in_event(GdkEventFocus*);
     bool on_focus_out_event(GdkEventFocus*);
+    void on_size_allocate(Gtk::Allocation& );
 
     void draw_sequence_on_surface( int a_seq );
     void draw_sequences_on_surface();
