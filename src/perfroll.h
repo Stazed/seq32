@@ -45,6 +45,7 @@ private:
 
     AbstractPerfInput* m_interaction;
 
+    Cairo::RefPtr<Cairo::Context>  m_surface_window;
     Cairo::RefPtr<Cairo::ImageSurface> m_surface_track;
     Cairo::RefPtr<Cairo::ImageSurface> m_surface_background;
 
@@ -111,6 +112,7 @@ private:
     bool transport_follow;
     bool trans_button_press;
     bool m_redraw_tracks;
+    bool m_have_realize;
 
 
 protected:
