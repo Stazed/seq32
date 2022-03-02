@@ -73,6 +73,7 @@ private:
     friend struct Seq32SeqRollInput;
     Seq32SeqRollInput m_seq32_interaction;
     
+    Cairo::RefPtr<Cairo::Context> m_surface_window;
     Cairo::RefPtr<Cairo::ImageSurface> m_surface_edit;
     Cairo::RefPtr<Cairo::ImageSurface> m_surface_background;
 
@@ -147,6 +148,8 @@ private:
 
     bool m_ignore_redraw;
     bool m_expanded_recording;
+    bool m_have_realize;
+    bool m_redraw_window;
 
     void on_realize();
     bool on_button_press_event(GdkEventButton* a_ev);
