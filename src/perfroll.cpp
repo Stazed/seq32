@@ -571,6 +571,9 @@ void perfroll::draw_background_on( int a_sequence )
 void
 perfroll::draw_track_on_window( int a_sequence )
 {
+    if(!m_have_realize)
+        return;
+
     draw_background_on( a_sequence );
     draw_sequence_on( a_sequence );
 
