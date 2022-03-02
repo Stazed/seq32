@@ -569,6 +569,25 @@ void perfroll::draw_background_on( int a_sequence )
 }
 
 void
+perfroll::draw_track_on_window( int a_sequence )
+{
+    draw_background_on( a_sequence );
+    draw_sequence_on( a_sequence );
+
+    a_sequence -= m_sequence_offset;
+    int y = c_names_y * a_sequence;
+
+    m_surface_window->set_source(m_surface_track, 0.0, 0.0);
+    m_surface_window->rectangle(a_sequence, y, m_window_x, c_names_y);
+    m_surface_window->fill();
+    
+    /* If the transport is stopped, then we need to set this
+     * to draw the progress line above the track */
+    m_have_stop_reposition = true;
+}
+
+
+void
 perfroll::redraw_dirty_sequences()
 {
     int y_s = 0;
@@ -582,9 +601,7 @@ perfroll::redraw_dirty_sequences()
 
         if (dirty)
         {
-            draw_background_on( seq );
-            draw_sequence_on( seq );
-            m_redraw_tracks = true;
+            draw_track_on_window(seq);
         }
     }
 }
@@ -886,9 +903,7 @@ perfroll::split_trigger( int a_sequence, long a_tick )
     m_mainperf->push_trigger_undo(a_sequence);
     m_mainperf->get_sequence( a_sequence )->split_trigger( a_tick );
 
-    draw_background_on( a_sequence );
-    draw_sequence_on( a_sequence );
-    m_redraw_tracks = true;
+    draw_track_on_window(a_sequence);
 }
 
 void

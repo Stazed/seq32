@@ -101,6 +101,7 @@ private:
 
     void draw_sequence_on( int a_sequence );
     void draw_background_on( int a_sequence );
+    void draw_track_on_window( int a_sequence );
 
     void change_horz();
     void change_vert();
