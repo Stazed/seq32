@@ -99,7 +99,7 @@ perfnames::draw_sequence( int sequence )
 
     if ( sequence < c_total_seqs )
     {
-        cr->set_source_rgb(0.0, 0.0, 0.0);        // Black FIXME
+        cr->set_source_rgb(0.0, 0.0, 0.0);        // Black
         cr->rectangle(0, (c_names_y * i), m_window_x, c_names_y + 1);
         cr->stroke_preserve();
         cr->fill();
@@ -113,20 +113,20 @@ perfnames::draw_sequence( int sequence )
             s->set_font_description(font);
             s->get_pixel_size(text_width, text_height);
             
-            cr->set_source_rgb(0.0, 0.0, 0.0);    // black FIXME
+            cr->set_source_rgb(0.0, 0.0, 0.0);    // black
             cr->rectangle(0, c_names_y * i + 2, text_width, text_height );
             cr->stroke_preserve();
             cr->fill();
             
             /* print the screen_set number */
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
             cr->move_to(1, c_names_y * i + 2);
 
             s->show_in_cairo_context(cr);
         }
         else    // no screen set number
         {
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
             cr->rectangle(1, (c_names_y * (i)), (6*2), c_names_y - 1 );
             cr->stroke_preserve();
             cr->fill();
@@ -134,11 +134,11 @@ perfnames::draw_sequence( int sequence )
 
         if ( m_mainperf->is_active( sequence ))
         {
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
         }
         else
         {
-            cr->set_source_rgb(0.6, 0.6, 0.6);    // grey FIXME
+            cr->set_source_rgb(0.6, 0.6, 0.6);    // grey
         }
         
         cr->rectangle(6 * 2 + 3,
@@ -162,14 +162,14 @@ perfnames::draw_sequence( int sequence )
             font.set_size((c_key_fontsize - 2) * Pango::SCALE);
             n->set_font_description(font);
             n->get_pixel_size(text_width, text_height);
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
 
             // draw the white background for the name
             cr->rectangle(5 + 6*2, c_names_y * i + 12, text_width, 10.0);
             cr->stroke_preserve();
             cr->fill();
 
-            cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+            cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
             cr->move_to(5 + 6*2, c_names_y * i + 1);
 
             n->show_in_cairo_context(cr);
@@ -188,7 +188,7 @@ perfnames::draw_sequence( int sequence )
             t->set_font_description(font);
             t->get_pixel_size(text_width, text_height);
 
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
             cr->set_line_width(1.0);
 
             // draw the white background for the bus
@@ -196,7 +196,7 @@ perfnames::draw_sequence( int sequence )
             cr->stroke_preserve();
             cr->fill();
 
-            cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+            cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
             cr->move_to(5 + 6*2, c_names_y * i + 11);
 
             t->show_in_cairo_context(cr);
@@ -208,15 +208,15 @@ perfnames::draw_sequence( int sequence )
             if(solo || muted)
                 fill = true;
 
-            cr->set_source_rgb(0.0, 0.0, 0.0);          // Black FIXME
+            cr->set_source_rgb(0.0, 0.0, 0.0);          // Black
             
             if(muted)
             {
-                cr->set_source_rgb(1.0, 0.27, 0.0);     // Red FIXME
+                cr->set_source_rgb(1.0, 0.27, 0.0);     // Red
             }
             if(solo)
             {
-                cr->set_source_rgb(0.5, 0.988, 0.0);    // Green FIXME
+                cr->set_source_rgb(0.5, 0.988, 0.0);    // Green
             }
 
             cr->rectangle(m_window_x - 11,
@@ -240,19 +240,19 @@ perfnames::draw_sequence( int sequence )
             {
                 snprintf(smute, sizeof(smute), "M" );
                 // background
-                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
             }
             else if ( solo )
             {
                 snprintf(smute, sizeof(smute), "S" );
                 // background
-                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
             }
             else
             {
                 snprintf(smute, sizeof(smute), "P" );
                 // background 
-                cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+                cr->set_source_rgb(1.0, 1.0, 1.0);    // White
             }
 
             auto m = create_pango_layout(smute);
@@ -268,11 +268,11 @@ perfnames::draw_sequence( int sequence )
             // print the mute label
             if ( muted || solo )
             {
-                cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+                cr->set_source_rgb(1.0, 1.0, 1.0);    // White
             }
             else
             {
-                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black FIXME
+                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
             }
 
             cr->move_to(m_window_x - text_width - 2, (c_names_y * i) +  ((c_names_y * .5) - (text_height * .5)));
@@ -283,7 +283,7 @@ perfnames::draw_sequence( int sequence )
     }
     else    // if you scroll down to the very bottom
     {
-        cr->set_source_rgb(0.6, 0.6, 0.6);    // grey FIXME
+        cr->set_source_rgb(0.6, 0.6, 0.6);    // grey
         cr->rectangle(0, (c_names_y * i) + 1, m_window_x, c_names_y);
         cr->stroke_preserve();
         cr->fill();
@@ -321,7 +321,7 @@ perfnames::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
    /* Clear previous background */
-    cr->set_source_rgb(1.0, 1.0, 1.0);  // White FIXME
+    cr->set_source_rgb(1.0, 1.0, 1.0);  // White
     cr->rectangle (0.0, 0.0, width, height);
     cr->stroke_preserve();
     cr->fill();

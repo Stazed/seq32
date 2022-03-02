@@ -127,7 +127,7 @@ perftime::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
     /* Clear previous background */
-    cr->set_source_rgb(1.0, 1.0, 1.0);  // White FIXME
+    cr->set_source_rgb(1.0, 1.0, 1.0);  // White
     cr->rectangle (0.0, 0.0, width, height);
     cr->stroke_preserve();
     cr->fill();
@@ -162,13 +162,13 @@ perftime::draw_background()
     cr->set_operator(Cairo::OPERATOR_OVER);
 
     /* clear background */
-    cr->set_source_rgb( 1.0, 1.0, 1.0);            // white FIXME
+    cr->set_source_rgb( 1.0, 1.0, 1.0);            // white
     cr->set_line_width( 1.0);
     cr->rectangle( 0, 0, m_window_x, m_window_y);
     cr->stroke_preserve();
     cr->fill();
 
-    cr->set_source_rgb( 0.0, 0.0, 0.0);            // black  FIXME
+    cr->set_source_rgb( 0.0, 0.0, 0.0);            // black 
     cr->set_line_width( 1.0);
     cr->move_to( 0, m_window_y - 1);
     cr->line_to( m_window_x, m_window_y - 1);
@@ -201,7 +201,7 @@ perftime::draw_background()
     0    1    2    3    4    5
 
 #endif
-    cr->set_source_rgb( 0.6, 0.6, 0.6);            // Grey  FIXME
+    cr->set_source_rgb( 0.6, 0.6, 0.6);            // Grey 
     cr->set_line_width( 1.0);
 
     for ( int i=first_measure;
@@ -221,7 +221,7 @@ perftime::draw_background()
         auto t = create_pango_layout(bar);
         t->set_font_description(font);
 
-        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black FIXME
+        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black
         cr->move_to( x_pos + 2, 0);
 
         t->show_in_cairo_context(cr);
@@ -239,7 +239,7 @@ perftime::draw_background()
     if ( left >=0 && left <= m_window_x )
     {
         // set background for tempo labels to black
-        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black FIXME
+        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black
 
         auto t = create_pango_layout("L");
         font.set_weight(Pango::WEIGHT_BOLD);
@@ -252,7 +252,7 @@ perftime::draw_background()
         cr->fill();
 
         // print the 'L' label in white
-        cr->set_source_rgb( 1.0, 1.0, 1.0);    // White FIXME
+        cr->set_source_rgb( 1.0, 1.0, 1.0);    // White
         cr->move_to( left + 1,  (m_window_y *.5) - (text_height * .5) + 4 );
 
         t->show_in_cairo_context(cr);
@@ -261,7 +261,7 @@ perftime::draw_background()
     if ( right >=0 && right <= m_window_x )
     {
         // set background for tempo labels to black
-        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black FIXME
+        cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black
 
         auto t = create_pango_layout("R");
         font.set_weight(Pango::WEIGHT_BOLD);
@@ -274,7 +274,7 @@ perftime::draw_background()
         cr->fill();
 
         // print the 'R' label in white
-        cr->set_source_rgb( 1.0, 1.0, 1.0);    // White FIXME
+        cr->set_source_rgb( 1.0, 1.0, 1.0);    // White
         cr->move_to( right - 6, (m_window_y *.5) - (text_height * .5) + 4 );
 
         t->show_in_cairo_context(cr);

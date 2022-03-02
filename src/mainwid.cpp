@@ -113,7 +113,7 @@ mainwid::fill_background_window()
     /* clear background */
     Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
     
-    cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+    cr->set_source_rgb(1.0, 1.0, 1.0);    // White
     cr->rectangle(0, 0, m_window_x, m_window_y);
     cr->fill();
 }
@@ -149,7 +149,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
         /*int local_seq = a_seq % c_seqs_in_set;*/
         
-        cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+        cr->set_source_rgb(0.0, 0.0, 0.0);        // black
         cr->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y );
         cr->fill();
 
@@ -172,11 +172,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
             
             if( m_background_color == COLOR_BLACK)
             {
-                cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+                cr->set_source_rgb(0.0, 0.0, 0.0);        // black
             }
             else
             {
-                cr->set_source_rgb(1.0, 1.0, 1.0);        // White FIXME
+                cr->set_source_rgb(1.0, 1.0, 1.0);        // White
             }
             
             cr->rectangle(base_x + 1, base_y + 1,
@@ -186,11 +186,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
             if( m_foreground_color == COLOR_BLACK)
             {
-                cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+                cr->set_source_rgb(0.0, 0.0, 0.0);        // black
             }
             else
             {
-                cr->set_source_rgb(1.0, 1.0, 1.0);        // White FIXME
+                cr->set_source_rgb(1.0, 1.0, 1.0);        // White
             }
             
 
@@ -244,7 +244,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
             if ( seq->get_queued() )
             {
-                cr->set_source_rgb(0.6, 0.6, 0.6);        // grey FIXME
+                cr->set_source_rgb(0.6, 0.6, 0.6);        // grey
                 cr->rectangle(rectangle_x - 2,
                                          rectangle_y - 1,
                                          c_seqarea_seq_x + 3,
@@ -253,7 +253,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
                 m_foreground_color = COLOR_BLACK;
                 
-                cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+                cr->set_source_rgb(0.0, 0.0, 0.0);        // black
             }
             
             cr->rectangle(rectangle_x - 2,
@@ -297,11 +297,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
                 if (m_foreground_color == COLOR_BLACK)
                 {
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black
                 }
                 else
                 {
-                    cr->set_source_rgb(1.0, 1.0, 1.0);        // White FIXME
+                    cr->set_source_rgb(1.0, 1.0, 1.0);        // White
                 }
                 
                 cr->move_to(rectangle_x + tick_s_x,
@@ -313,7 +313,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
         }
         else    /* not active */
         {
-            cr->set_source_rgb(0.8, 0.8, 0.8);        // light grey FIXME
+            cr->set_source_rgb(0.8, 0.8, 0.8);        // light grey
             cr->rectangle(base_x + 4, base_y, c_seqarea_x - 8,  c_seqarea_y);
             cr->fill();
             
@@ -438,16 +438,16 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 
         if ( seq->get_playing() )
         {
-            m_surface_window->set_source_rgb(1.0, 1.0, 1.0);        // White FIXME
+            m_surface_window->set_source_rgb(1.0, 1.0, 1.0);        // White
         }
         else
         {
-            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black FIXME
+            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black
         }
 
         if ( seq->get_queued())
         {
-            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black FIXME
+            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black
         }
 
         /* Draw the progress line */

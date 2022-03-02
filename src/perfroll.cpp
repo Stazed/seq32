@@ -221,14 +221,14 @@ perfroll::fill_background_surface()
     cr->set_operator(Cairo::OPERATOR_OVER);
 
     /* clear background */
-    cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+    cr->set_source_rgb(1.0, 1.0, 1.0);    // White
     cr->set_line_width(1.0);
     cr->rectangle(0.0, 0.0, c_perfroll_background_x, c_names_y);
     cr->stroke_preserve();
     cr->fill();
 
     /* draw horizontal grey lines */
-    cr->set_source_rgb(0.6, 0.6, 0.6);    // Grey  FIXME
+    cr->set_source_rgb(0.6, 0.6, 0.6);    // Grey 
     static const std::vector<double> dashed = {1.0};
     static const std::vector<double> clear;
     cr->set_line_width(1.0);
@@ -333,7 +333,7 @@ perfroll::draw_progress()
         m_old_progress_ticks = progress_x;  // hold the position to clear for next line
 
         /* The new progress line */
-        m_surface_window->set_source_rgb(0.0, 0.0, 0.0);            // Black  FIXME
+        m_surface_window->set_source_rgb(0.0, 0.0, 0.0);            // Black 
         m_surface_window->set_line_width(2.0);
         m_surface_window->move_to(progress_x, 0.0);
         m_surface_window->line_to(progress_x, m_window_y);
@@ -423,11 +423,11 @@ void perfroll::draw_sequence_on( int a_sequence )
 
                     if ( selected )
                     {
-                        cr->set_source_rgb(0.6, 0.8, 1.0);    // blue FIXME
+                        cr->set_source_rgb(0.6, 0.8, 1.0);    // blue
                     }
                     else
                     {
-                        cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+                        cr->set_source_rgb(1.0, 1.0, 1.0);    // White
                     }
 
                     /* main trigger box */
@@ -435,12 +435,12 @@ void perfroll::draw_sequence_on( int a_sequence )
                     cr->fill();
 
                     /* trigger outline */
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black
                     cr->rectangle(x, y, w, h);
                     cr->stroke();
 
                     /* resize handle - top left */
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black
                     cr->rectangle(x, y, c_perfroll_size_box_w, c_perfroll_size_box_w);
                     cr->stroke();
 
@@ -448,7 +448,7 @@ void perfroll::draw_sequence_on( int a_sequence )
                     cr->rectangle(x+w-c_perfroll_size_box_w, y+h-c_perfroll_size_box_w, c_perfroll_size_box_w, c_perfroll_size_box_w);
                     cr->stroke();
 
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black FIXME
+                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black
 
                     long length_marker_first_tick = ( tick_on - (tick_on % sequence_length) + (offset % sequence_length) - sequence_length);
 
@@ -462,11 +462,11 @@ void perfroll::draw_sequence_on( int a_sequence )
                         {
                             if ( selected )
                             {
-                                cr->set_source_rgb(1.0, 1.0, 1.0);    // White FIXME
+                                cr->set_source_rgb(1.0, 1.0, 1.0);    // White
                             }
                             else
                             {
-                                cr->set_source_rgb(0.6, 0.6, 0.6);    // grey FIXME
+                                cr->set_source_rgb(0.6, 0.6, 0.6);    // grey
                             }
 
                             cr->rectangle(tick_marker_x, (y + 4), 1.0, (h - 8) );
@@ -492,7 +492,7 @@ void perfroll::draw_sequence_on( int a_sequence )
 
                         seq->reset_draw_marker();
 
-                        cr->set_source_rgb(0.0, 0.0, 0.0);      // black FIXME
+                        cr->set_source_rgb(0.0, 0.0, 0.0);      // black
 
                         while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note,
                                                                 &selected, &velocity )) != DRAW_FIN )
