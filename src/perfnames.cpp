@@ -114,13 +114,13 @@ perfnames::draw_sequence( int sequence )
             s->set_font_description(font);
             s->get_pixel_size(text_width, text_height);
             
-            cr->set_source_rgb(0.0, 0.0, 0.0);    // black
+            cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
             cr->rectangle(0, c_names_y * i + 2, text_width, text_height );
             cr->stroke_preserve();
             cr->fill();
             
             /* print the screen_set number */
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
+            cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
             cr->move_to(1, c_names_y * i + 2);
 
             s->show_in_cairo_context(cr);
@@ -269,12 +269,6 @@ perfnames::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             draw_sequence(seq);
         }
     }
-
-   /* Clear previous background */
-    cr->set_source_rgb(1.0, 1.0, 1.0);  // White
-    cr->rectangle (0.0, 0.0, width, height);
-    cr->stroke_preserve();
-    cr->fill();
 
     /* Draw the new background */
     cr->set_source(m_surface, 0.0, 0.0);
