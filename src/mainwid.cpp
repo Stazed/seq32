@@ -110,7 +110,7 @@ mainwid::draw_sequences_on_surface()
 void
 mainwid::fill_background_window()
 {
-    /* clear background */
+    /* clear background - the whole sequence drawing area */
     Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
     
     cr->set_source_rgb(1.0, 1.0, 1.0);    // White
@@ -149,9 +149,15 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
         /*int local_seq = a_seq % c_seqs_in_set;*/
         
+        /* The outline of the sequences */
         cr->set_source_rgb(0.0, 0.0, 0.0);        // black
         cr->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y );
         cr->fill();
+        
+        /* Outline of the whole window */
+        cr->set_source_rgb(1.0, 1.0, 1.0);        // White
+        cr->rectangle(0, 0, m_window_x, m_window_y );
+        cr->stroke();
 
         if ( m_mainperf->is_active( a_seq ))
         {
@@ -172,11 +178,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
             
             if( m_background_color == COLOR_BLACK)
             {
-                cr->set_source_rgb(0.0, 0.0, 0.0);        // black
+                cr->set_source_rgba(c_track_color.r, c_track_color.g, c_track_color.b, 1.0);
             }
             else
             {
-                cr->set_source_rgb(1.0, 1.0, 1.0);        // White
+                cr->set_source_rgba(c_track_color.r, c_track_color.g, c_track_color.b, 0.5);
             }
             
             cr->rectangle(base_x + 1, base_y + 1,
@@ -184,13 +190,14 @@ mainwid::draw_sequence_on_surface( int a_seq )
                                      c_seqarea_y - 2 );
             cr->fill();
 
+            /* The text color */
             if( m_foreground_color == COLOR_BLACK)
             {
-                cr->set_source_rgb(0.0, 0.0, 0.0);        // black
+                cr->set_source_rgb(1.0, 1.0, 1.0);        // White
             }
             else
             {
-                cr->set_source_rgb(1.0, 1.0, 1.0);        // White
+                cr->set_source_rgb(0.0, 0.0, 0.0);        // Black
             }
             
 
@@ -253,9 +260,10 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
                 m_foreground_color = COLOR_BLACK;
                 
-                cr->set_source_rgb(0.0, 0.0, 0.0);        // black
+                cr->set_source_rgba(c_track_color.r, c_track_color.g, c_track_color.b, 0.5);
             }
             
+            /* The box around the note, queue area */
             cr->rectangle(rectangle_x - 2,
                                      rectangle_y - 1,
                                      c_seqarea_seq_x + 3,
@@ -295,13 +303,14 @@ mainwid::draw_sequence_on_surface( int a_seq )
                 if ( tick_f_x <= tick_s_x )
                     tick_f_x = tick_s_x + 1;
 
+                /* The drawn note color */
                 if (m_foreground_color == COLOR_BLACK)
                 {
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black
+                    cr->set_source_rgb(1.0, 1.0, 1.0);        // White
                 }
                 else
                 {
-                    cr->set_source_rgb(1.0, 1.0, 1.0);        // White
+                    cr->set_source_rgb(0.0, 0.0, 0.0);        // Black
                 }
                 
                 cr->move_to(rectangle_x + tick_s_x,
@@ -438,16 +447,16 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 
         if ( seq->get_playing() )
         {
-            m_surface_window->set_source_rgb(1.0, 1.0, 1.0);        // White
+            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black
         }
         else
         {
-            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black
+            m_surface_window->set_source_rgb(1.0, 1.0, 1.0);        // White
         }
 
         if ( seq->get_queued())
         {
-            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black
+            m_surface_window->set_source_rgb(1.0, 1.0, 1.0);        // White
         }
 
         /* Draw the progress line */
