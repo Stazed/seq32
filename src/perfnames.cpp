@@ -18,6 +18,9 @@
 //
 //-----------------------------------------------------------------------------
 #include "perfnames.h"
+#include "pixmaps/track_play.xpm"
+#include "pixmaps/track_solo.xpm"
+#include "pixmaps/track_mute.xpm"
 
 perfnames::perfnames( perform *a_perf, mainwnd *a_main, Glib::RefPtr<Adjustment> a_vadjust ):
     seqmenu(a_perf, a_main ),
@@ -201,84 +204,29 @@ perfnames::draw_sequence( int sequence )
 
             t->show_in_cairo_context(cr);
 
-            bool fill = false;
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
             
-            if(solo || muted)
-                fill = true;
-
-            cr->set_source_rgb(0.0, 0.0, 0.0);          // Black
-            
-            if(muted)
-            {
-                cr->set_source_rgb(1.0, 0.27, 0.0);     // Red
-            }
             if(solo)
             {
-                cr->set_source_rgb(0.5, 0.988, 0.0);    // Green
+                m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_solo_xpm);
+                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (c_names_y * i) + 3);
+                cr->paint();
             }
-
-            cr->rectangle(m_window_x - 11,
-                                     (c_names_y * i) + 1,
-                                     11,
-                                     c_names_y - 1  );
-
-            if ( fill )
+            else if (muted)
             {
-                cr->stroke_preserve();
-                cr->fill();
+                m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_mute_xpm);
+
+                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (c_names_y * i) + 3);
+                cr->paint();
             }
             else
             {
-                cr->stroke();
-            }
+                m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_play_xpm);
 
-            char smute[5];
-
-            if ( muted )
-            {
-                snprintf(smute, sizeof(smute), "M" );
-                // background
-                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
+                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (c_names_y * i) + 3);
+                cr->paint();
             }
-            else if ( solo )
-            {
-                snprintf(smute, sizeof(smute), "S" );
-                // background
-                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
-            }
-            else
-            {
-                snprintf(smute, sizeof(smute), "P" );
-                // background 
-                cr->set_source_rgb(1.0, 1.0, 1.0);    // White
-            }
-
-            auto m = create_pango_layout(smute);
-            font.set_size((c_key_fontsize - 1) * Pango::SCALE);
-            m->set_font_description(font);
-            m->get_pixel_size(text_width, text_height);
-            
-            // draw the background for the mute label
-            cr->rectangle(m_window_x - text_width - 3 , c_names_y * i + (text_height * .5) - 1, text_width + 1, (text_height * .5) + 5 );
-            cr->stroke_preserve();
-            cr->fill();
-            
-            // print the mute label
-            if ( muted || solo )
-            {
-                cr->set_source_rgb(1.0, 1.0, 1.0);    // White
-            }
-            else
-            {
-                cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
-            }
-
-            cr->move_to(m_window_x - text_width - 2, (c_names_y * i) +  ((c_names_y * .5) - (text_height * .5)));
-
-            m->show_in_cairo_context(cr);
-            
         }   // Active sequence
     }
     else    // if you scroll down to the very bottom
