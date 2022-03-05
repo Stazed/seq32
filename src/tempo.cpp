@@ -146,20 +146,21 @@ tempo::draw_background()
     cr->set_operator(Cairo::OPERATOR_OVER);
 
     /* clear background */
-    cr->set_source_rgb( 1.0, 1.0, 1.0);            // white
+    cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
     cr->set_line_width( 1);
     cr->rectangle( 0, 0, m_window_x, m_window_y);
     cr->stroke_preserve();
     cr->fill();
 
-    cr->set_source_rgb( 0.0, 0.0, 0.0);            // black 
+    /* Line at bottom of tempo track */
+    cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
     cr->set_line_width( 2.0);
     cr->move_to( 0, m_window_y - 1);
     cr->line_to( m_window_x, m_window_y - 1);
     cr->stroke();
 
     /* draw vertical lines */
-    cr->set_source_rgb( 0.6, 0.6, 0.6);            // Grey 
+    cr->set_source_rgb(c_back_light_grey.r, c_back_light_grey.g, c_back_light_grey.b);
     cr->set_line_width( 1);
 
     long tick_offset = (m_4bar_offset * 16 * c_ppqn);
@@ -229,7 +230,7 @@ tempo::draw_background()
             }
 
             // set background for tempo labels to black
-            cr->set_source_rgb( 0.0, 0.0, 0.0);    // Black
+            cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
 
             auto t = create_pango_layout(str);
             t->set_font_description(font);
@@ -241,7 +242,7 @@ tempo::draw_background()
             cr->fill();
 
             // print the BPM or [Stop] label in white
-            cr->set_source_rgb( 1.0, 1.0, 1.0);    // White
+            cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
             cr->move_to( tempo_marker + 5, (m_window_y * .5) - (text_height * .5) - 3 );
 
             t->show_in_cairo_context(cr);
@@ -272,11 +273,6 @@ tempo::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         m_draw_background = false;
         draw_background();
     }
-
-    cr->set_source_rgb(1.0, 1.0, 1.0);  // White
-    cr->rectangle (0.0, 0.0, width, height);
-    cr->stroke_preserve();
-    cr->fill();
 
     /* Draw the new background */
     cr->set_source(m_surface, 0.0, 0.0);
