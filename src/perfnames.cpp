@@ -103,7 +103,7 @@ perfnames::draw_sequence( int sequence )
     if ( sequence < c_total_seqs )
     {
         cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-        cr->rectangle(0, (c_names_y * i), m_window_x, c_names_y + 1);
+        cr->rectangle(0, (c_names_y * i), m_window_x - 1, c_names_y);
         cr->stroke_preserve();
         cr->fill();
 
@@ -141,13 +141,15 @@ perfnames::draw_sequence( int sequence )
         }
         else
         {
-            cr->set_source_rgb(0.6, 0.6, 0.6);    // grey
+            cr->set_source_rgb(c_back_light_grey.r, c_back_light_grey.g, c_back_light_grey.b);
         }
-        
+
+        /* Track name background */
+        cr->set_line_width(2.0);
         cr->rectangle(c_perf_ss_width + 3,
-                        (c_names_y * i) + 1,
-                        m_window_x - 3 - c_perf_ss_width,
-                        c_names_y - 1  );
+                        (c_names_y * i) + 3,
+                        m_window_x - 4 - c_perf_ss_width,
+                        c_names_y - 4  );
         cr->stroke_preserve();
         cr->fill();
 
@@ -164,13 +166,6 @@ perfnames::draw_sequence( int sequence )
             auto n = create_pango_layout(name);
             font.set_size((c_key_fontsize - 2) * Pango::SCALE);
             n->set_font_description(font);
-            n->get_pixel_size(text_width, text_height);
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
-
-            // draw the white background for the name
-            cr->rectangle(5 + c_perf_ss_width, c_names_y * i + 12, text_width, 10.0);
-            cr->stroke_preserve();
-            cr->fill();
 
             cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
             cr->move_to(5 + c_perf_ss_width, c_names_y * i + 1);
@@ -186,18 +181,9 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_bp_measure(),
                      m_mainperf->get_sequence(sequence)->get_bw() );
 
-            // set background for bus
+            /* Print the sequence bus, etc */
             auto t = create_pango_layout(str);
             t->set_font_description(font);
-            t->get_pixel_size(text_width, text_height);
-
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
-            cr->set_line_width(1.0);
-
-            // draw the white background for the bus
-            cr->rectangle(5 + c_perf_ss_width, c_names_y * i + 10, text_width, 6.0);
-            cr->stroke_preserve();
-            cr->fill();
 
             cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
             cr->move_to(5 + c_perf_ss_width, c_names_y * i + 11);
@@ -231,7 +217,7 @@ perfnames::draw_sequence( int sequence )
     }
     else    // if you scroll down to the very bottom
     {
-        cr->set_source_rgb(0.6, 0.6, 0.6);    // grey
+        cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
         cr->rectangle(0, (c_names_y * i) + 1, m_window_x, c_names_y);
         cr->stroke_preserve();
         cr->fill();
