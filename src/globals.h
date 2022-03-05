@@ -62,6 +62,7 @@ const int c_seqs_in_set = c_mainwnd_rows * c_mainwnd_cols;
 const int c_gmute_tracks = c_seqs_in_set * c_seqs_in_set;
 const int c_max_sets = 32;
 const int c_total_seqs = c_seqs_in_set * c_max_sets;
+const int c_perf_ss_width = ( 6 * 2 );
 
 /* number of sequences */
 /* 32 screen sets */

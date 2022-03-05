@@ -102,7 +102,7 @@ perfnames::draw_sequence( int sequence )
 
     if ( sequence < c_total_seqs )
     {
-        cr->set_source_rgb(0.0, 0.0, 0.0);        // Black
+        cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
         cr->rectangle(0, (c_names_y * i), m_window_x, c_names_y + 1);
         cr->stroke_preserve();
         cr->fill();
@@ -130,7 +130,7 @@ perfnames::draw_sequence( int sequence )
         else    // no screen set number
         {
             cr->set_source_rgb(1.0, 1.0, 1.0);    // White
-            cr->rectangle(1, (c_names_y * (i)), (6*2), c_names_y - 1 );
+            cr->rectangle(1, (c_names_y * (i)), c_perf_ss_width, c_names_y - 1 );
             cr->stroke_preserve();
             cr->fill();
         }
@@ -144,9 +144,9 @@ perfnames::draw_sequence( int sequence )
             cr->set_source_rgb(0.6, 0.6, 0.6);    // grey
         }
         
-        cr->rectangle(6 * 2 + 3,
+        cr->rectangle(c_perf_ss_width + 3,
                         (c_names_y * i) + 1,
-                        m_window_x - 3 - (6*2),
+                        m_window_x - 3 - c_perf_ss_width,
                         c_names_y - 1  );
         cr->stroke_preserve();
         cr->fill();
@@ -168,12 +168,12 @@ perfnames::draw_sequence( int sequence )
             cr->set_source_rgb(1.0, 1.0, 1.0);    // White
 
             // draw the white background for the name
-            cr->rectangle(5 + 6*2, c_names_y * i + 12, text_width, 10.0);
+            cr->rectangle(5 + c_perf_ss_width, c_names_y * i + 12, text_width, 10.0);
             cr->stroke_preserve();
             cr->fill();
 
             cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
-            cr->move_to(5 + 6*2, c_names_y * i + 1);
+            cr->move_to(5 + c_perf_ss_width, c_names_y * i + 1);
 
             n->show_in_cairo_context(cr);
 
@@ -195,12 +195,12 @@ perfnames::draw_sequence( int sequence )
             cr->set_line_width(1.0);
 
             // draw the white background for the bus
-            cr->rectangle(5 + 6*2, c_names_y * i + 10, text_width, 6.0);
+            cr->rectangle(5 + c_perf_ss_width, c_names_y * i + 10, text_width, 6.0);
             cr->stroke_preserve();
             cr->fill();
 
             cr->set_source_rgb(0.0, 0.0, 0.0);    // Black
-            cr->move_to(5 + 6*2, c_names_y * i + 11);
+            cr->move_to(5 + c_perf_ss_width, c_names_y * i + 11);
 
             t->show_in_cairo_context(cr);
 
