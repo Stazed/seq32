@@ -98,8 +98,6 @@ perfnames::draw_sequence( int sequence )
     cr->paint_with_alpha(0.0);
     cr->set_operator(Cairo::OPERATOR_OVER);
 
-    cr->set_line_width(1.0);
-
     if ( sequence < c_total_seqs )
     {
         cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
@@ -129,8 +127,8 @@ perfnames::draw_sequence( int sequence )
         }
         else    // no screen set number
         {
-            cr->set_source_rgb(1.0, 1.0, 1.0);    // White
-            cr->rectangle(1, (c_names_y * (i)), c_perf_ss_width, c_names_y - 1 );
+            cr->set_source_rgb(c_back_medium_grey.r, c_back_medium_grey.g, c_back_medium_grey.b);
+            cr->rectangle(1, (c_names_y * (i)) + 3, c_perf_ss_width, c_names_y - 5 );
             cr->stroke_preserve();
             cr->fill();
         }
