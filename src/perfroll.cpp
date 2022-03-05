@@ -35,7 +35,7 @@ perfroll::perfroll( perform *a_perf,
     m_sequence_offset(0),
     m_roll_length_ticks(0),
     m_drop_y(0),
-    m_drop_sequence(0),
+    m_drop_sequence(-1),    // set to invalid so focus will work on first sequence
 
     m_vadjust(a_vadjust),
     m_hadjust(a_hadjust),

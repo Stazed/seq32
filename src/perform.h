@@ -226,6 +226,7 @@ private:
     bool m_was_active_edit[ c_max_sequence ];
     bool m_was_active_perf[ c_max_sequence ];
     bool m_was_active_names[ c_max_sequence ];
+    bool m_is_focus_track[ c_max_sequence ];
 
     bool m_sequence_state[  c_max_sequence ];
 
@@ -529,6 +530,8 @@ public:
     bool is_dirty_edit (int a_sequence);
     bool is_dirty_perf (int a_sequence);
     bool is_dirty_names (int a_sequence);
+    void set_focus_track(int a_sequence);
+    bool is_focus_track(int a_sequence);
 
     void new_sequence( int a_sequence );
 

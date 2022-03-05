@@ -43,6 +43,8 @@ bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 {
     ths.grab_focus( );
 
+    int old_focus = ths.m_drop_sequence;
+
     if ( ths.m_mainperf->is_active( ths.m_drop_sequence ))
     {
         ths.m_mainperf->get_sequence( ths.m_drop_sequence )->unselect_triggers( );
@@ -55,6 +57,25 @@ bool FruityPerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
     m_current_y = (int) a_ev->y;
 
     ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &ths.m_drop_tick, &ths.m_drop_sequence );
+
+    if ( old_focus != ths.m_drop_sequence )
+    {
+        if ( ths.m_mainperf->is_active( ths.m_drop_sequence ))
+        {
+            ths.m_mainperf->set_focus_track(ths.m_drop_sequence);
+            ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_dirty();
+        }
+        else
+        {
+            // un-set all focus here
+            ths.m_mainperf->set_focus_track(ths.m_drop_sequence);
+        }
+
+        if( ths.m_mainperf->is_active( old_focus ) )
+        {
+            ths.m_mainperf->get_sequence( old_focus )->set_dirty();
+        }
+    }
 
     /*      left mouse button     */
     if ( a_ev->button == 1)
@@ -318,6 +339,8 @@ bool Seq32PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
 {
     ths.grab_focus( );
 
+    int old_focus = ths.m_drop_sequence;
+
     if ( ths.m_mainperf->is_active( ths.m_drop_sequence ))
     {
         ths.m_mainperf->get_sequence( ths.m_drop_sequence )->unselect_triggers( );
@@ -328,6 +351,25 @@ bool Seq32PerfInput::on_button_press_event(GdkEventButton* a_ev, perfroll& ths)
     ths.m_drop_y = (int) a_ev->y;
 
     ths.convert_xy( ths.m_drop_x, ths.m_drop_y, &ths.m_drop_tick, &ths.m_drop_sequence );
+
+    if ( old_focus != ths.m_drop_sequence )
+    {
+        if ( ths.m_mainperf->is_active( ths.m_drop_sequence ))
+        {
+            ths.m_mainperf->set_focus_track(ths.m_drop_sequence);
+            ths.m_mainperf->get_sequence( ths.m_drop_sequence )->set_dirty();
+        }
+        else
+        {
+            // un-set all focus here
+            ths.m_mainperf->set_focus_track(ths.m_drop_sequence);
+        }
+
+        if( ths.m_mainperf->is_active( old_focus ) )
+        {
+            ths.m_mainperf->get_sequence( old_focus )->set_dirty();
+        }
+    }
 
     /*      left mouse button     */
     if ( a_ev->button == 1 )

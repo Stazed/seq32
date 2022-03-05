@@ -876,6 +876,27 @@ bool perform::is_dirty_names (int a_sequence)
     return was_active;
 }
 
+void perform::set_focus_track(int a_sequence)
+{
+    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
+        return;
+    
+    for ( unsigned int i = 0; i < c_max_sequence; ++i )
+    {
+        m_is_focus_track[i] = false;
+    }
+    
+    m_is_focus_track[a_sequence] = true;
+}
+
+bool perform::is_focus_track(int a_sequence)
+{
+    if ( a_sequence < 0 || a_sequence >= c_max_sequence )
+        return false;
+
+   return m_is_focus_track[a_sequence];
+}
+
 sequence* perform::get_sequence( int a_sequence )
 {
     return m_seqs[a_sequence];
