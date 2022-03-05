@@ -221,14 +221,14 @@ perfroll::fill_background_surface()
     cr->set_operator(Cairo::OPERATOR_OVER);
 
     /* clear background */
-    cr->set_source_rgb(1.0, 1.0, 1.0);    // White
+    cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
     cr->set_line_width(1.0);
     cr->rectangle(0.0, 0.0, c_perfroll_background_x, c_names_y);
     cr->stroke_preserve();
     cr->fill();
 
     /* draw horizontal grey lines */
-    cr->set_source_rgb(0.6, 0.6, 0.6);    // Grey 
+    cr->set_source_rgb(c_back_light_grey.r, c_back_light_grey.g, c_back_light_grey.b);
     static const std::vector<double> dashed = {1.0};
     static const std::vector<double> clear;
     cr->set_line_width(1.0);
@@ -333,7 +333,7 @@ perfroll::draw_progress()
         m_old_progress_ticks = progress_x;  // hold the position to clear for next line
 
         /* The new progress line */
-        m_surface_window->set_source_rgb(0.0, 0.0, 0.0);            // Black 
+        m_surface_window->set_source_rgb(c_progress_line.r, c_progress_line.g, c_progress_line.b);
         m_surface_window->set_line_width(2.0);
         m_surface_window->move_to(progress_x, 0.0);
         m_surface_window->line_to(progress_x, m_window_y);
@@ -418,37 +418,42 @@ void perfroll::draw_sequence_on( int a_sequence )
                     int y = c_names_y * a_sequence + 1;  // + 2
                     int h = c_names_y - 2; // - 4
 
-                    // adjust to screen corrids
+                    /* adjust to screen coordinates */
                     x = x - x_offset;
 
                     if ( selected )
                     {
-                        cr->set_source_rgb(0.6, 0.8, 1.0);    // blue
+                        cr->set_source_rgba(c_track_color.r, c_track_color.g, c_track_color.b, 1.0);
                     }
                     else
                     {
-                        cr->set_source_rgb(1.0, 1.0, 1.0);    // White
+                        cr->set_source_rgba(c_track_color.r, c_track_color.g, c_track_color.b, 0.5);
                     }
 
                     /* main trigger box */
                     cr->rectangle(x, y, w, h);
                     cr->fill();
 
+                    if ( selected )
+                    {
+                        cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
+                    }
+                    else
+                    {
+                        cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
+                    }
+
                     /* trigger outline */
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black
                     cr->rectangle(x, y, w, h);
                     cr->stroke();
 
                     /* resize handle - top left */
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black
                     cr->rectangle(x, y, c_perfroll_size_box_w, c_perfroll_size_box_w);
                     cr->stroke();
 
                     /* resize handle - bottom right */
                     cr->rectangle(x+w-c_perfroll_size_box_w, y+h-c_perfroll_size_box_w, c_perfroll_size_box_w, c_perfroll_size_box_w);
                     cr->stroke();
-
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // black
 
                     long length_marker_first_tick = ( tick_on - (tick_on % sequence_length) + (offset % sequence_length) - sequence_length);
 
@@ -462,11 +467,11 @@ void perfroll::draw_sequence_on( int a_sequence )
                         {
                             if ( selected )
                             {
-                                cr->set_source_rgb(1.0, 1.0, 1.0);    // White
+                                cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
                             }
                             else
                             {
-                                cr->set_source_rgb(0.6, 0.6, 0.6);    // grey
+                                cr->set_source_rgb(c_back_light_grey.r, c_back_light_grey.g, c_back_light_grey.b);
                             }
 
                             cr->rectangle(tick_marker_x, (y + 4), 1.0, (h - 8) );
@@ -485,17 +490,24 @@ void perfroll::draw_sequence_on( int a_sequence )
                         long tick_f;
                         int note;
 
-                        bool selected;
+                        bool t_selected;
 
                         int velocity;
                         draw_type dt;
 
                         seq->reset_draw_marker();
 
-                        cr->set_source_rgb(0.0, 0.0, 0.0);      // black
+                        if ( selected )
+                        {
+                            cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
+                        }
+                        else
+                        {
+                            cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
+                        }
 
                         while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note,
-                                                                &selected, &velocity )) != DRAW_FIN )
+                                                                &t_selected, &velocity )) != DRAW_FIN )
                         {
                             int note_y = ((c_names_y-6) -
                                           ((c_names_y-6)  * (note - lowest_note)) / height) + 1;
