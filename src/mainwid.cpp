@@ -150,12 +150,12 @@ mainwid::draw_sequence_on_surface( int a_seq )
         /*int local_seq = a_seq % c_seqs_in_set;*/
         
         /* The outline of the sequences */
-        cr->set_source_rgb(0.0, 0.0, 0.0);        // black
+        cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
         cr->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y );
         cr->fill();
         
         /* Outline of the whole window */
-        cr->set_source_rgb(1.0, 1.0, 1.0);        // White
+        cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
         cr->rectangle(0, 0, m_window_x, m_window_y );
         cr->stroke();
 
@@ -193,11 +193,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
             /* The text color */
             if( m_foreground_color == COLOR_BLACK)
             {
-                cr->set_source_rgb(1.0, 1.0, 1.0);        // White
+                cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
             }
             else
             {
-                cr->set_source_rgb(0.0, 0.0, 0.0);        // Black
+                cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
             }
             
 
@@ -208,7 +208,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
             n->set_font_description(font);
             n->get_pixel_size(text_width, text_height);
             
-            cr->move_to(base_x + c_text_x, base_y + 4);
+            cr->move_to(base_x + c_text_x, base_y + 1);
 
             n->show_in_cairo_context(cr);
 
@@ -225,7 +225,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
                 k->set_font_description(font);
                 k->get_pixel_size(text_width, text_height);
                 
-                cr->move_to(base_x + c_seqarea_x - 7,
+                cr->move_to(base_x + c_seqarea_x - 9,
                         base_y + c_text_y * 4 - 2);
                 
                 k->show_in_cairo_context(cr);
@@ -252,7 +252,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
             if ( seq->get_queued() )
             {
                 cr->set_source_rgb(0.6, 0.6, 0.6);        // grey
-                cr->rectangle(rectangle_x - 2,
+                cr->rectangle(rectangle_x,
                                          rectangle_y - 1,
                                          c_seqarea_seq_x + 3,
                                          c_seqarea_seq_y + 3 );
@@ -264,7 +264,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
             }
             
             /* The box around the note, queue area */
-            cr->rectangle(rectangle_x - 2,
+            cr->rectangle(rectangle_x,
                                      rectangle_y - 1,
                                      c_seqarea_seq_x + 3,
                                      c_seqarea_seq_y + 3 );
@@ -306,16 +306,16 @@ mainwid::draw_sequence_on_surface( int a_seq )
                 /* The drawn note color */
                 if (m_foreground_color == COLOR_BLACK)
                 {
-                    cr->set_source_rgb(1.0, 1.0, 1.0);        // White
+                    cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
                 }
                 else
                 {
-                    cr->set_source_rgb(0.0, 0.0, 0.0);        // Black
+                    cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
                 }
                 
-                cr->move_to(rectangle_x + tick_s_x,
+                cr->move_to(rectangle_x + tick_s_x + 2,
                                     rectangle_y + note_y);
-                cr->line_to(rectangle_x + tick_f_x,
+                cr->line_to(rectangle_x + tick_f_x + 2,
                                     rectangle_y + note_y);
                 cr->stroke();
             }
@@ -447,16 +447,16 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
 
         if ( seq->get_playing() )
         {
-            m_surface_window->set_source_rgb(0.0, 0.0, 0.0);        // Black
+            m_surface_window->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
         }
         else
         {
-            m_surface_window->set_source_rgb(1.0, 1.0, 1.0);        // White
+            m_surface_window->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
         }
 
         if ( seq->get_queued())
         {
-            m_surface_window->set_source_rgb(1.0, 1.0, 1.0);        // White
+            m_surface_window->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
         }
 
         /* Draw the progress line */
