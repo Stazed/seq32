@@ -113,7 +113,7 @@ mainwid::fill_background_window()
     /* clear background - the whole sequence drawing area */
     Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
     
-    cr->set_source_rgb(1.0, 1.0, 1.0);    // White
+    cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
     cr->rectangle(0, 0, m_window_x, m_window_y);
     cr->fill();
 }
@@ -251,7 +251,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
             if ( seq->get_queued() )
             {
-                cr->set_source_rgb(0.6, 0.6, 0.6);        // grey
+                cr->set_source_rgb(c_back_light_grey.r, c_back_light_grey.g, c_back_light_grey.b);
                 cr->rectangle(rectangle_x,
                                          rectangle_y - 1,
                                          c_seqarea_seq_x + 3,
@@ -322,7 +322,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
         }
         else    /* not active */
         {
-            cr->set_source_rgb(0.8, 0.8, 0.8);        // light grey
+            cr->set_source_rgb(c_fore_light_grey.r, c_fore_light_grey.g, c_fore_light_grey.b);
             cr->rectangle(base_x + 4, base_y, c_seqarea_x - 8,  c_seqarea_y);
             cr->fill();
             
