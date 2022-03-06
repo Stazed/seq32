@@ -6,6 +6,7 @@ EXTRA_DIST += \
   src/collapse.xpm \
   src/copy.xpm \
   src/down.xpm \
+  src/end.xpm \
   src/expand.xpm \
   src/font_b.xpm \
   src/font_w.xpm \
@@ -15,6 +16,8 @@ EXTRA_DIST += \
   src/learn.xpm \
   src/length.xpm \
   src/loop.xpm \
+  src/mark_left.xpm \
+  src/mark_right.xpm \
   src/menu.xpm\
   src/menu_empty.xpm \
   src/menu_full.xpm \
@@ -39,6 +42,9 @@ EXTRA_DIST += \
   src/tempo_marker.xpm \
   src/thru.xpm \
   src/tools.xpm \
+  src/track_mute.xpm \
+  src/track_play.xpm \
+  src/track_solo.xpm \
   src/transpose.xpm\
   src/transportFollow.xpm \
   src/undo.xpm \
