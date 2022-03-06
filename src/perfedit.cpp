@@ -1101,6 +1101,13 @@ perfedit::hide_tempo_popup()
     m_tempo->hide_tempo_popup();
 }
 
+void
+perfedit::set_perfroll_marker_change(bool a_change)
+{
+    m_perfroll->set_marker_changed(a_change);
+    m_perfroll->redraw_all_tracks();
+}
+
 int
 FF_RW_timeout(void *arg)
 {

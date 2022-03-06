@@ -114,6 +114,7 @@ private:
     bool m_redraw_tracks;
     bool m_have_realize;
     bool m_have_stop_reposition;
+    bool m_marker_change;
 
 
 protected:
@@ -137,6 +138,7 @@ public:
     void redraw_dirty_sequences();
     void redraw_all_tracks(){m_redraw_tracks = true;}
     void have_stopped_reposition(){m_have_stop_reposition = true;}
+    void set_marker_changed(bool a_change){ m_marker_change = a_change;}
     
     int get_drop_sequence();
 
