@@ -1108,6 +1108,13 @@ perfedit::set_perfroll_marker_change(bool a_change)
     m_perfroll->redraw_all_tracks();
 }
 
+void
+perfedit::set_tempo_marker_change(uint64_t a_tick)
+{
+    m_perfroll->set_tempo_marker_changed(a_tick);
+    m_perfroll->redraw_all_tracks();
+}
+
 int
 FF_RW_timeout(void *arg)
 {

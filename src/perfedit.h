@@ -219,6 +219,7 @@ public:
     void reposition_progress_line();
     void hide_tempo_popup();
     void set_perfroll_marker_change(bool a_change);
+    void set_tempo_marker_change(uint64_t a_tick = 0);
 
     friend int FF_RW_timeout(void *arg);
 
