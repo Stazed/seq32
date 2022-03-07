@@ -2883,6 +2883,89 @@ sequence::copy_triggers( long a_start_tick, long a_distance  )
 }
 
 void
+sequence::paste_triggers (long a_start_tick,
+                      long a_distance, long a_offset)
+{
+    long end_tick = a_start_tick + a_distance - 1;
+    
+    lock();
+
+    /* if we are pasting before the 'L' 'R' markers */
+    if( a_offset < 0 )
+    {
+        a_start_tick += a_distance;
+        end_tick += a_distance;
+        
+        a_distance = 0;
+    }
+
+    list<trigger>::iterator i = m_list_trigger.begin();
+    while(  i != m_list_trigger.end() )
+    {
+        /* The start is at or after 'L' and before 'R' marker */
+        if ( (*i).m_tick_start >= a_start_tick &&
+                (*i).m_tick_start <= end_tick )
+        {
+            trigger e;
+            e.m_offset = (*i).m_offset;
+            e.m_selected = false;
+
+            e.m_tick_start  = (*i).m_tick_start + a_offset + a_distance;
+
+            if ((*i).m_tick_end <= end_tick )
+            {
+                e.m_tick_end  = (*i).m_tick_end + a_offset + a_distance;
+            }
+
+            if ((*i).m_tick_end > end_tick )
+            {
+                e.m_tick_end = end_tick + a_offset + a_distance;
+            }
+
+            e.m_offset += a_offset + a_distance;
+
+            if ( e.m_offset < 0 )
+                e.m_offset += m_length;
+
+            m_list_trigger.push_front( e );
+        }
+        /* The start is before the 'L' marker but the end after */
+        else if ( (*i).m_tick_start <= a_start_tick &&
+                (*i).m_tick_end >= a_start_tick )
+        {
+            trigger e;
+            e.m_offset = (*i).m_offset;
+            e.m_selected = false;
+
+            e.m_tick_start  = a_start_tick + a_offset + a_distance;
+
+            if ((*i).m_tick_end <= end_tick )
+            {
+                e.m_tick_end  = (*i).m_tick_end + a_offset + a_distance;
+            }
+
+            if ((*i).m_tick_end > end_tick )
+            {
+                e.m_tick_end = end_tick + a_offset + a_distance;
+            }
+
+            e.m_offset += a_offset + a_distance;
+
+            if ( e.m_offset < 0 )
+                e.m_offset += m_length;
+ 
+            m_list_trigger.push_front( e );
+        }
+
+        ++i;
+    }
+
+    m_list_trigger.sort();
+
+    unlock();
+}
+
+void
 sequence::split_trigger( long a_tick )
 {
     lock();

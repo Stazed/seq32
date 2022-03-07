@@ -589,7 +589,9 @@ perfedit::on_key_release_event(GdkEventKey* a_ev)
             return true;
         }
     }
-    return false;
+
+    /* For CTRL-L paste trigger */
+    return m_perftime->on_key_release_event(a_ev);
 }
 
 void
@@ -687,6 +689,14 @@ perfedit::expand()
 {
     m_mainperf->push_trigger_undo(-1); // all tracks
     m_mainperf->move_triggers( true );
+    m_perfroll->redraw_all_tracks();
+}
+
+void
+perfedit::paste_triggers(long paste_tick) // all tracks
+{
+    m_mainperf->push_trigger_undo(-1);
+    m_mainperf->paste_triggers ( paste_tick );
     m_perfroll->redraw_all_tracks();
 }
 
@@ -1109,9 +1119,9 @@ perfedit::set_perfroll_marker_change(bool a_change)
 }
 
 void
-perfedit::set_tempo_marker_change(uint64_t a_tick)
+perfedit::set_marker_line_selection(uint64_t a_tick)
 {
-    m_perfroll->set_tempo_marker_changed(a_tick);
+    m_perfroll->set_marker_line_selection(a_tick);
     m_perfroll->redraw_all_tracks();
 }
 
