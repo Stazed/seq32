@@ -2832,6 +2832,8 @@ L       R
 
 #endif
 
+#if 0
+// This is replaced by paste_triggers()
 void
 sequence::copy_triggers( long a_start_tick, long a_distance  )
 {
@@ -2881,6 +2883,7 @@ sequence::copy_triggers( long a_start_tick, long a_distance  )
 
     unlock();
 }
+#endif
 
 void
 sequence::paste_triggers (long a_start_tick,
