@@ -1,7 +1,51 @@
 SEQ32 - Midi Sequencer
 ======================
 
-release-1.1.2
+NAVIGATION FROM THE SONG EDITOR:
+
+--------------------
+
+EDITING GRID:
+
+Mouse scroll >> scroll vertically.
+Shift + mouse scroll >> scroll horizontally.
+CTRL + mouse scroll >> zoom-in, zoom-out horizontally.
+
+z >> zoom-in.
+Shift z >> zoom-out.
+0 >> reset zoom to default.
+
+CTRL + c >> copy selected trigger to clipboard.
+CTRL + v >> paste clipboard trigger after selected trigger.
+CTRL + x >> cut selected trigger and copy to clipboard.
+Delete, backspace >> delete selected trigger.
+Middle mouse button >> paste clipboard trigger to mouse location.
+
+--------------------
+
+TRACK NAME AREA:
+
+Left mouse button >> mute track.
+Middle mouse button >> solo track.
+Right mouse button >> show menu.
+
+Left mouse button - hold and drag >> to inactive track, will move to the new location.
+Left mouse button - hold and drag >> to active track, will swap locations.
+
+Mouse scroll >> scroll vertically.
+
+---------------------
+
+'L' and 'R' EDIT LOOP TRACK:
+
+Left mouse button and drag >> move 'L' marker to pointer location.
+Right mouse button and drag >> move 'R' marker to pointer location.
+
+CTRL + left mouse button and drag >> A green vertical location line will appear.
+    Release the CTRL button to insert/paste all track triggers between the 'L' and 'R'
+    markers to the location line.
+
+--------------------
 
 Midi Control:
 
