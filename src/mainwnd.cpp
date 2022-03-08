@@ -1309,12 +1309,14 @@ mainwnd::file_import_dialog()
 /*callback function*/
 void mainwnd::file_exit()
 {
+#ifdef NSM_SUPPORT
     if (m_nsm && m_nsm_optional_gui)
     {
         global_nsm_gui = false;
     }
     else
     {
+#endif  
         if (is_save())
         {
             if (global_is_running)
@@ -1322,18 +1324,22 @@ void mainwnd::file_exit()
 
             hide();
         }
+#ifdef NSM_SUPPORT
     }
+#endif
 }
 
 bool
 mainwnd::on_delete_event(GdkEventAny *a_e)
 {
+#ifdef NSM_SUPPORT
     if (m_nsm && m_nsm_optional_gui)
     {
         // nsm : hide gui instead of closing
         global_nsm_gui = false;
         return true;
     }
+#endif
 
     bool result = is_save();
     if (result && global_is_running)

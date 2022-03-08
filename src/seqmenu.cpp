@@ -194,8 +194,9 @@ seqmenu::seq_edit()
                          m_mainwnd,
                          m_current_seq
                        );
-
+#ifdef NSM_SUPPORT
             m_mainwnd->set_window_pointer(a_seq_edit);
+#endif
         }
         else
         {
@@ -210,8 +211,9 @@ seqmenu::seq_edit()
                      m_mainwnd,
                      m_current_seq
                    );
-
+#ifdef NSM_SUPPORT
         m_mainwnd->set_window_pointer(a_seq_edit);
+#endif
     }
     m_mainperf->set_sequence_editing_list(true);
 }

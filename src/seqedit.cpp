@@ -1854,8 +1854,10 @@ seqedit::~seqedit()
 bool
 seqedit::on_delete_event(GdkEventAny *a_event)
 {
+#ifdef NSM_SUPPORT
     //printf( "seqedit::on_delete_event()\n" );
     m_mainwnd->remove_window_pointer(this);
+#endif
     
     m_seq->set_recording( false );
     m_mainperf->get_master_midi_bus()->set_sequence_input( false, m_seq );
