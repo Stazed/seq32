@@ -981,13 +981,17 @@ perfedit::update_clock()
     long ticks = m_mainperf->get_tick();
     if (m_tick_time_as_bbt)
     {
-        std::string t = tick_to_measurestring(ticks);
-        m_tick_time->set_text(t);
+        std::string t = "<b><span foreground=\"#7FFE00\" size=\"14000\">";
+        t += tick_to_measurestring(ticks);
+        t += "</span></b>";
+        m_tick_time->set_markup(t);
     }
     else
     {
-        std::string t = tick_to_timestring(ticks); 
-        m_tick_time->set_text(t);
+        std::string t = "<b><span foreground=\"#7FFE00\" size=\"14000\">";
+        t += tick_to_timestring(ticks);
+        t += "</span></b>";
+        m_tick_time->set_markup(t);
     }
 }
 

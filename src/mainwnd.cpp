@@ -371,12 +371,13 @@ mainwnd::mainwnd(perform *a_p, Glib::RefPtr<Gtk::Application> app):
     m_last_time_ms  = 0;
 
     /* show everything */
+    set_position(Gtk::WIN_POS_CENTER);
     show_all();
 
     add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );
 
     m_timeout_connect = Glib::signal_timeout().connect(
-                            mem_fun(*this, &mainwnd::timer_callback), 25);
+                            mem_fun(*this, &mainwnd::timer_callback), c_redraw_ms);
 
     m_perf_edit = new perfedit( m_mainperf, this );
 }

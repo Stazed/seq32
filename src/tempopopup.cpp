@@ -86,7 +86,7 @@ tempopopup::tempopopup(tempo *a_tempo) :
     add_events( Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK );
     
     m_timeout_connect = Glib::signal_timeout().connect(
-                        mem_fun(*this, &tempopopup::timer_callback), 25);
+                        mem_fun(*this, &tempopopup::timer_callback), c_redraw_ms);
 }
 
 bool
