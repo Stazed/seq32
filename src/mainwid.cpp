@@ -149,7 +149,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
         /*int local_seq = a_seq % c_seqs_in_set;*/
         
-        /* The outline of the sequences */
+        /* The background of the sequences */
         cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
         cr->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y );
         cr->fill();
@@ -251,7 +251,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
 
             if ( seq->get_queued() )
             {
-                cr->set_source_rgb(c_back_light_grey.r, c_back_light_grey.g, c_back_light_grey.b);
+                cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
                 cr->rectangle(rectangle_x,
                                          rectangle_y - 1,
                                          c_seqarea_seq_x + 3,
@@ -322,7 +322,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
         }
         else    /* not active */
         {
-            cr->set_source_rgb(c_fore_light_grey.r, c_fore_light_grey.g, c_fore_light_grey.b);
+            cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
             cr->rectangle(base_x + 4, base_y, c_seqarea_x - 8,  c_seqarea_y);
             cr->fill();
             
