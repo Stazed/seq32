@@ -100,7 +100,7 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_button_time_type = manage(new Gtk::Button("HMS"));
     Gtk::HBox * hbox4 = manage(new Gtk::HBox(false, 0));
     m_tick_time->set_justify(Gtk::JUSTIFY_LEFT);
-    
+
     m_button_time_type->set_focus_on_click(false);
     
     m_button_time_type->signal_clicked().connect
@@ -981,14 +981,14 @@ perfedit::update_clock()
     long ticks = m_mainperf->get_tick();
     if (m_tick_time_as_bbt)
     {
-        std::string t = "<b><span foreground=\"#7FFE00\" size=\"13000\" background=\"#000000\">";
+        std::string t = "<b><span foreground=\"#7FFE00\" size=\"large\" background=\"#000000\">";
         t += tick_to_measurestring(ticks);
         t += "</span></b>";
         m_tick_time->set_markup(t);
     }
     else
     {
-        std::string t = "<b><span foreground=\"#7FFE00\" size=\"13000\" background=\"#000000\">";
+        std::string t = "<b><span foreground=\"#7FFE00\" size=\"large\" background=\"#000000\">";
         t += tick_to_timestring(ticks);
         t += "</span></b>";
         m_tick_time->set_markup(t);
