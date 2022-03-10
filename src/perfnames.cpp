@@ -350,13 +350,21 @@ perfnames::on_button_release_event(GdkEventButton* p0)
     {
         m_moving = false;
         
-        /* If we did not land on another active track, then move to new location */
+        /* If we land on in-active track, then move or copy to new location */
         if ( ! m_mainperf->is_active( m_current_seq ) )
         {
             m_mainperf->new_sequence( m_current_seq  );
             *(m_mainperf->get_sequence( m_current_seq )) = m_moving_seq;
             m_mainperf->get_sequence( m_current_seq )->unselect_triggers( );
             m_mainperf->get_sequence(m_current_seq)->set_dirty();
+
+            /* Alt key, put the original back to old location - since this is a copy, not move */
+            if ( p0->state & GDK_MOD1_MASK)
+            {
+                m_mainperf->new_sequence( m_old_seq  );
+                *(m_mainperf->get_sequence( m_old_seq )) = m_moving_seq;
+                m_mainperf->get_sequence(m_old_seq)->set_dirty();
+            }
         }
         /* If we did land on an active track and it is not being edited, then swap places. */
         else if ( !m_mainperf->is_sequence_in_edit( m_current_seq ) )

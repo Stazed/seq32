@@ -32,6 +32,8 @@ Right mouse button >> show menu.
 Left mouse button - hold and drag >> to inactive track, will move to the new location.
 Left mouse button - hold and drag >> to active track, will swap locations.
 
+ALT + Left mouse button - hold and drag >> to inactive track, copy track to landing location.
+
 Mouse scroll >> scroll vertically.
 
 ---------------------
@@ -270,11 +272,16 @@ simple interface.
 	a new loop, or edit a existing one.
 
 	Left clicking on a box will change its state
-	from muted (white) to playing (black) when
+	from muted (Dark blue) to playing (Light Blue) when
 	the sequencer is running.
 
 	By clicking and holding the left button on a sequence,
 	you can drag it to a new location on the grid.
+
+        Dragging to an already existing sequence will swap locations.
+
+        Dragging with the ALT key pressed to an in-active location will
+        copy to the landing location.
 
         Right Clicking will bring up a menu of available options
         for the sequence.  Here you can select the midi bus/channel.

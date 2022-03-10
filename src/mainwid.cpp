@@ -561,7 +561,7 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
     {
         m_moving = false;
 
-        /* If we did not land on another sequence, then move to new location */
+        /* If we land on in-active track, then move or copy to new location */
         if ( ! m_mainperf->is_active( m_current_seq ) && m_current_seq != -1 )
         {
             m_mainperf->new_sequence( m_current_seq  );
@@ -569,6 +569,15 @@ mainwid::on_button_release_event(GdkEventButton* a_p0)
             m_mainperf->get_sequence( m_current_seq )->unselect_triggers();
 
             update_sequence_on_window( m_current_seq );
+            
+            /* Alt key, put the original back to old location - since this is a copy, not move */
+            if ( a_p0->state & GDK_MOD1_MASK)
+            {
+                m_mainperf->new_sequence( m_old_seq  );
+                *(m_mainperf->get_sequence( m_old_seq )) = m_moving_seq;
+
+                update_sequence_on_window( m_old_seq );
+            }
         }
         /* If we did land on another sequence and it is not being edited, then swap places. */
         else if ( !m_mainperf->is_sequence_in_edit( m_current_seq ) )
