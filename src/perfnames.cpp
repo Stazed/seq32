@@ -113,15 +113,15 @@ perfnames::draw_sequence( int sequence )
             auto s = create_pango_layout(screen_set);
             s->set_font_description(font);
             s->get_pixel_size(text_width, text_height);
-            
+
             cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
             cr->rectangle(0, c_names_y * i + 2, text_width, text_height );
             cr->stroke_preserve();
             cr->fill();
-            
+
             /* print the screen_set number */
             cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
-            cr->move_to(1, c_names_y * i + 2);
+            cr->move_to(1, c_names_y * i + 4);
 
             s->show_in_cairo_context(cr);
         }
@@ -151,12 +151,12 @@ perfnames::draw_sequence( int sequence )
         {
             cr->set_source_rgb(c_back_light_grey.r, c_back_light_grey.g, c_back_light_grey.b);
         }
-        
+
         cr->set_line_width(2.0);
         cr->rectangle(c_perf_ss_width + 3,
                         (c_names_y * i) + 3,
                         m_window_x - 4 - c_perf_ss_width,
-                        c_names_y - 4  );
+                        c_names_y - 5  );
         cr->stroke_preserve();
         cr->fill();
 
@@ -168,7 +168,7 @@ perfnames::draw_sequence( int sequence )
             char name[50];
             snprintf(name, sizeof(name), "%-20.20s",
                      m_mainperf->get_sequence(sequence)->get_name());
-            
+
             /* Set the label color based on focus */
             if(is_focus)
             {
@@ -179,7 +179,7 @@ perfnames::draw_sequence( int sequence )
                 cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
             }
             cr->set_line_width(1.0);
-            
+
             // set background for name
             auto n = create_pango_layout(name);
             font.set_size((c_key_fontsize - 2) * Pango::SCALE);
@@ -208,7 +208,7 @@ perfnames::draw_sequence( int sequence )
 
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
-            
+
             if(solo)
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_solo_xpm);
