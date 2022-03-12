@@ -1354,7 +1354,7 @@ mainwnd::about_dialog()
 {
     Gtk::AboutDialog dialog;
     dialog.set_transient_for(*this);
-    dialog.set_name(PACKAGE_NAME);
+    dialog.set_name(PACKAGE);
     dialog.set_version(VERSION);
     dialog.set_comments("Interactive MIDI Sequencer\n");
 
