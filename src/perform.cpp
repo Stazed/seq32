@@ -80,7 +80,7 @@ perform::perform()
     m_right_tick = c_ppqn * 16;
     m_starting_tick = 0;
 
-    midi_control zero = {false,false,0,0,0};
+    midi_control zero = {false, false, 0, 0, 0, 0};
 
     for ( int i=0; i<c_midi_controls; i++ )
     {
