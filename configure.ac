@@ -9,6 +9,8 @@ AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects])
 
 AC_DEFINE(_GNU_SOURCE, 1, [gnu source])
 
+AC_DEFINE(WEBSITE, "https://github.com/Stazed/seq32", [package website])
+
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC

@@ -1362,7 +1362,7 @@ mainwnd::about_dialog()
         "(C) 2015 - present Stazed\n"
         "(C) 2008 - 2010 Seq24team\n"
         "(C) 2002 - 2006 Rob C. Buse");
-    dialog.set_website("https://github.com/Stazed/seq32");
+    dialog.set_website(WEBSITE);
 
     dialog.set_logo(Gdk::Pixbuf::create_from_xpm_data( seq32_xpm  ));
 
