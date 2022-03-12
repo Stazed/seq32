@@ -48,7 +48,8 @@ mainwnd::mainwnd(perform *a_p, Glib::RefPtr<Gtk::Application> app):
     m_app(app),
     m_menu_mode(false),
     m_perf_edit(NULL),
-    m_options(NULL)
+    m_options(NULL),
+    m_closing_windows(false)
 #ifdef NSM_SUPPORT
     ,m_nsm_visible(true)
     ,m_dirty_flag(false)

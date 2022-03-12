@@ -50,6 +50,7 @@ perform::perform()
         m_was_active_edit[i] = false;
         m_was_active_perf[i] = false;
         m_was_active_names[i] = false;
+        m_is_focus_track[i] = false;
     }
 
     m_playlist_midi_jump_value = 0;
