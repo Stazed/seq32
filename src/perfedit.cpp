@@ -679,7 +679,7 @@ perfedit::collapse()
 void
 perfedit::copy()
 {
-    m_mainperf->push_trigger_undo(-1); // all tracks
+    /* we push undo from copy_triggers >> paste_triggers() because of location check */
     m_mainperf->copy_triggers(  );
     m_perfroll->redraw_all_tracks();
 }
@@ -695,7 +695,7 @@ perfedit::expand()
 void
 perfedit::paste_triggers(long paste_tick) // all tracks
 {
-    m_mainperf->push_trigger_undo(-1);
+    /* we push undo from paste_triggers() because of location check */
     m_mainperf->paste_triggers ( paste_tick );
     m_perfroll->redraw_all_tracks();
 }
