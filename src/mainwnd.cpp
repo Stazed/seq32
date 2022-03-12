@@ -1331,7 +1331,7 @@ void mainwnd::file_exit()
 }
 
 bool
-mainwnd::on_delete_event(GdkEventAny *a_e)
+mainwnd::on_delete_event(GdkEventAny * /* a_e */)
 {
 #ifdef NSM_SUPPORT
     if (m_nsm && m_nsm_optional_gui)

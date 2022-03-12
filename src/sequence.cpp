@@ -1723,7 +1723,7 @@ sequence::grow_selected( long a_delta_tick )
 }
 
 void
-sequence::increment_selected( unsigned char a_status, unsigned char a_control )
+sequence::increment_selected( unsigned char a_status, unsigned char /* a_control */ )
 {
     lock();
 
@@ -1759,7 +1759,7 @@ sequence::increment_selected( unsigned char a_status, unsigned char a_control )
 }
 
 void
-sequence::decrement_selected(unsigned char a_status, unsigned char a_control )
+sequence::decrement_selected(unsigned char a_status, unsigned char /* a_control */ )
 {
     lock();
 
@@ -1795,7 +1795,7 @@ sequence::decrement_selected(unsigned char a_status, unsigned char a_control )
 }
 
 void
-sequence::randomize_selected( unsigned char a_status, unsigned char a_control, int a_plus_minus )
+sequence::randomize_selected( unsigned char a_status, unsigned char /* a_control */, int a_plus_minus )
 {
     int random;
     unsigned char data[2];

@@ -214,7 +214,7 @@ void FruityPerfInput::on_left_button_pressed(GdkEventButton* a_ev, perfroll& ths
     }
 }
 
-void FruityPerfInput::on_right_button_pressed(GdkEventButton* a_ev, perfroll& ths)
+void FruityPerfInput::on_right_button_pressed(GdkEventButton* /* a_ev */, perfroll& ths)
 {
     //set_adding( false );
 

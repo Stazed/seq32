@@ -970,7 +970,7 @@ perfedit::~perfedit()
 }
 
 bool
-perfedit::on_delete_event(GdkEventAny *a_event)
+perfedit::on_delete_event(GdkEventAny * /* a_event */)
 {
     return false;
 }

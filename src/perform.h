@@ -176,7 +176,7 @@ const int c_midi_controls             = c_midi_track_ctrl + 18;    // 82
 
 struct performcallback
 {
-    virtual void on_grouplearnchange(bool state) {}
+    virtual void on_grouplearnchange(bool /* state */) {}
 };
 
 class perform

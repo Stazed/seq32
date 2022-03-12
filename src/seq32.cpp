@@ -50,14 +50,14 @@ static nsm_client_t *nsm = 0;
 static int wait_nsm = 1;
 
 void
-nsm_hide_cb(void *userdata)
+nsm_hide_cb(void * /* userdata */)
 {
     application->hold();
     global_nsm_gui = false;
 }
 
 void
-nsm_show_cb(void *userdata)
+nsm_show_cb(void * /* userdata */)
 {
     global_nsm_gui = true;
 }
@@ -404,7 +404,7 @@ main (int argc, char *argv[])
         }
         
         // Bind sigterm handler
-        signal(SIGTERM, [](int param)
+        signal(SIGTERM, [](int /* param */)
         {
             global_is_running = false;
             application->quit();
