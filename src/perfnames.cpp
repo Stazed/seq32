@@ -18,6 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 #include "perfnames.h"
+#include "font.h"
 #include "pixmaps/track_play.xpm"
 #include "pixmaps/track_solo.xpm"
 #include "pixmaps/track_mute.xpm"
@@ -170,24 +171,15 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_name());
 
             /* Set the label color based on focus */
+            font::Color font_color = font::WHITE;
+
             if(is_focus)
             {
-                cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
+                font_color = font::BLACK;
             }
-            else
-            {
-                cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
-            }
-            cr->set_line_width(1.0);
 
-            // set background for name
-            auto n = create_pango_layout(name);
-            font.set_size((c_key_fontsize - 2) * Pango::SCALE);
-            n->set_font_description(font);
-
-            cr->move_to(5 + c_perf_ss_width, c_names_y * i + 1);
-
-            n->show_in_cairo_context(cr);
+            /* Print the sequence name */
+            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, c_names_y * i + 2, cr, name, font_color);
 
             /* Buses */
             char str[20];
@@ -199,12 +191,7 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_bw() );
 
             /* Print the sequence bus, etc */
-            auto t = create_pango_layout(str);
-            t->set_font_description(font);
-
-            cr->move_to(5 + c_perf_ss_width, c_names_y * i + 11);
-
-            t->show_in_cairo_context(cr);
+            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, c_names_y * i + 12, cr, str, font_color);
 
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
