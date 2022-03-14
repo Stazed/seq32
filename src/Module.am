@@ -14,6 +14,8 @@ bin_PROGRAMS = %D%/seq32
 	%D%/keybindentry.cpp \
   %D%/configfile.h \
   %D%/event.h \
+  %D%/font.cpp \
+  %D%/font.h \
   %D%/keybindentry.h \
   %D%/lfownd.cpp\
   %D%/lfownd.h\

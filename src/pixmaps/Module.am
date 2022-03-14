@@ -8,8 +8,8 @@ EXTRA_DIST += \
   src/down.xpm \
   src/end.xpm \
   src/expand.xpm \
-  src/font_b.xpm \
-  src/font_w.xpm \
+  src/font_black.xpm \
+  src/font_white.xpm \
   src/jack.xpm\
   src/key.xpm \
   src/learn2.xpm \
