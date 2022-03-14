@@ -86,14 +86,6 @@ perfnames::draw_sequence( int sequence )
     int i = sequence - m_sequence_offset;
     Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
 
-    Pango::FontDescription font;
-    int text_width;
-    int text_height;
-
-    font.set_family(c_font);
-    font.set_size((c_key_fontsize - 1) * Pango::SCALE);
-    font.set_weight(Pango::WEIGHT_NORMAL);
-
     cr->set_operator(Cairo::OPERATOR_CLEAR);
     cr->rectangle(0, (c_names_y * i), m_window_x - 1, c_names_y);
     cr->paint_with_alpha(0.0);
@@ -111,25 +103,19 @@ perfnames::draw_sequence( int sequence )
             char screen_set[10];
             snprintf(screen_set, sizeof(screen_set), "%2d", sequence / c_seqs_in_set );
 
-            auto s = create_pango_layout(screen_set);
-            s->set_font_description(font);
-            s->get_pixel_size(text_width, text_height);
-
+            /* The black background */
             cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-            cr->rectangle(0, c_names_y * i + 2, text_width, text_height );
+            cr->rectangle(0, (c_names_y * i) + 2, c_perf_ss_width, c_names_y - 5 );
             cr->stroke_preserve();
             cr->fill();
 
             /* print the screen_set number */
-            cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
-            cr->move_to(1, c_names_y * i + 4);
-
-            s->show_in_cairo_context(cr);
+            p_font_renderer->render_string_on_drawable(1, (c_names_y * i) + 6, cr, screen_set, font::WHITE);
         }
         else    // no screen set number
         {
             cr->set_source_rgb(c_back_medium_grey.r, c_back_medium_grey.g, c_back_medium_grey.b);
-            cr->rectangle(1, (c_names_y * (i)) + 3, c_perf_ss_width, c_names_y - 5 );
+            cr->rectangle(1, (c_names_y * i) + 3, c_perf_ss_width, c_names_y - 5 );
             cr->stroke_preserve();
             cr->fill();
         }
@@ -179,7 +165,7 @@ perfnames::draw_sequence( int sequence )
             }
 
             /* Print the sequence name */
-            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, c_names_y * i + 2, cr, name, font_color);
+            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, (c_names_y * i) + 2, cr, name, font_color);
 
             /* Buses */
             char str[20];
@@ -191,7 +177,7 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_bw() );
 
             /* Print the sequence bus, etc */
-            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, c_names_y * i + 12, cr, str, font_color);
+            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, (c_names_y * i) + 12, cr, str, font_color);
 
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();

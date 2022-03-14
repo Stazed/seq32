@@ -89,8 +89,6 @@ mainwid::on_realize()
                 m_window_x,  m_window_y
         );
     }
-    
-    p_font_renderer->init( );
 
     fill_background_window();
     m_need_redraw = true;
