@@ -129,14 +129,6 @@ mainwid::draw_sequence_on_surface( int a_seq )
     cr->set_operator(Cairo::OPERATOR_DEST);
     cr->set_operator(Cairo::OPERATOR_OVER);
 
-    Pango::FontDescription font;
-    int text_width;
-    int text_height;
-
-    font.set_family(c_font);
-    font.set_size((c_key_fontsize - 1) * Pango::SCALE);
-    font.set_weight(Pango::WEIGHT_NORMAL);
-
     if ( a_seq >= (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ) &&
             a_seq <  ((m_screenset+1)  * c_mainwnd_rows * c_mainwnd_cols ))
     {
@@ -176,7 +168,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
                 m_background_color = COLOR_WHITE;
                 m_foreground_color = COLOR_BLACK;
             }
-            
+
             if( m_background_color == COLOR_BLACK)
             {
                 cr->set_source_rgba(c_track_color.r, c_track_color.g, c_track_color.b, 1.0);
@@ -185,13 +177,12 @@ mainwid::draw_sequence_on_surface( int a_seq )
             {
                 cr->set_source_rgba(c_track_color.r, c_track_color.g, c_track_color.b, 0.5);
             }
-            
+
             cr->rectangle(base_x + 1, base_y + 1,
                                      c_seqarea_x - 2,
                                      c_seqarea_y - 2 );
             cr->fill();
 
-            /* The text color */
             if( m_foreground_color == COLOR_BLACK)
             {
                 cr->set_source_rgb(c_fore_white.r, c_fore_white.g, c_fore_white.b);
@@ -200,52 +191,6 @@ mainwid::draw_sequence_on_surface( int a_seq )
             {
                 cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
             }
-            
-
-            char name[20];
-            snprintf( name, sizeof name, "%.13s", seq->get_name() );
-            
-            auto n = create_pango_layout(name);
-            n->set_font_description(font);
-            n->get_pixel_size(text_width, text_height);
-            
-            cr->move_to(base_x + c_text_x, base_y + 1);
-
-            n->show_in_cairo_context(cr);
-
-            /* midi channel + key + timesig */
-            /*char key =  m_seq_to_char[local_seq];*/
-
-            char str[20];
-
-            if (m_mainperf->show_ui_sequence_key())
-            {
-                snprintf( str, sizeof str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
-
-                auto k = create_pango_layout(str);
-                k->set_font_description(font);
-                k->get_pixel_size(text_width, text_height);
-                
-                cr->move_to(base_x + c_seqarea_x - 9,
-                        base_y + c_text_y * 4 - 2);
-                
-                k->show_in_cairo_context(cr);
-            }
-
-            snprintf( str, sizeof str,
-                      "%d-%d %ld/%ld",
-                      seq->get_midi_bus(),
-                      seq->get_midi_channel()+1,
-                      seq->get_bp_measure(), seq->get_bw() );
-            
-            auto b = create_pango_layout(str);
-            b->set_font_description(font);
-            b->get_pixel_size(text_width, text_height);
-            
-            cr->move_to(base_x + c_text_x,
-                    base_y + c_text_y * 4 - 2);
-            
-            b->show_in_cairo_context(cr);
 
             int rectangle_x = base_x + c_text_x - 1;
             int rectangle_y = base_y + c_text_y + c_text_x - 1;
@@ -320,6 +265,47 @@ mainwid::draw_sequence_on_surface( int a_seq )
                                     rectangle_y + note_y);
                 cr->stroke();
             }
+            
+            /* The sequence names, bus, channel, key, text color */
+            font::Color font_color;
+
+            if ( seq->get_playing() )
+            {
+                font_color = font::BLACK;
+            }
+            else
+            {
+                font_color = font::WHITE;
+            }
+
+            /* Sequence name */
+            char name[20];
+            snprintf( name, sizeof name, "%.13s", seq->get_name() );
+
+            p_font_renderer->render_string_on_drawable(base_x + c_text_x, base_y + 2, cr, name, font_color);
+
+            /* midi channel + key + timesig */
+            /*char key =  m_seq_to_char[local_seq];*/
+            char str[20];
+
+            if (m_mainperf->show_ui_sequence_key())
+            {
+                snprintf( str, sizeof str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
+
+                p_font_renderer->render_string_on_drawable(base_x + c_seqarea_x - 8,
+                                                            base_y + c_text_y * 4 - 0,
+                                                            cr, str, font_color );
+            }
+
+            snprintf( str, sizeof str,
+                      "%d-%d %ld/%ld",
+                      seq->get_midi_bus(),
+                      seq->get_midi_channel()+1,
+                      seq->get_bp_measure(), seq->get_bw() );
+
+            p_font_renderer->render_string_on_drawable( base_x + c_text_x,
+                                                        base_y + c_text_y * 4 - 0,
+                                                        cr, str, font_color);
         }
         else    /* not active */
         {
