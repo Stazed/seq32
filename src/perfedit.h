@@ -185,6 +185,8 @@ private:
     std::string tick_to_timestring(long a_tick);
     std::string tick_to_measurestring (long a_tick);
     void tick_to_midi_measures (long a_tick, int &measures, int &beats, int &divisions);
+    
+    void invalid_paste_triggers();
 
     bool on_delete_event (GdkEventAny * a_event);
     bool on_key_press_event(GdkEventKey* a_ev);

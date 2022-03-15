@@ -468,7 +468,7 @@ public:
 
     void move_triggers( bool a_direction, uint64_t location = 0 );
     void copy_triggers(  );
-    void paste_triggers (long paste_tick);
+    bool paste_triggers (long paste_tick);
 
     void push_trigger_undo(int a_track);
     void pop_trigger_undo();
