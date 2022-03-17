@@ -693,10 +693,10 @@ perfedit::expand()
 }
 
 void
-perfedit::paste_triggers(long paste_tick) // all tracks
+perfedit::paste_triggers(long paste_tick, bool overwrite) // all tracks
 {
     /* we push undo from paste_triggers() because of location check */
-    if( !m_mainperf->paste_triggers ( paste_tick ) )
+    if( !m_mainperf->paste_triggers ( paste_tick, overwrite ) )
     {
         invalid_paste_triggers();
     }
@@ -1118,7 +1118,8 @@ perfedit::toggle_time_format ()
 void
 perfedit::invalid_paste_triggers()
 {
-    Glib::ustring query_str = "You cannot paste between the L and R markers!";
+    Glib::ustring query_str = "You cannot paste if it alters the triggers\n"
+            "between the L and R markers!";
     
     Gtk::MessageDialog dialog( query_str, false,
                               Gtk::MESSAGE_INFO,

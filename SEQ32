@@ -254,8 +254,13 @@ simple interface.
         Right mouse button and drag >> move 'R' marker to pointer location.
 
         CTRL + left mouse button and drag >> A green vertical location line will appear.
-            Release the CTRL button to insert/paste all track triggers between the 'L' and 'R'
+            Release the CTRL button to expand insert/paste all track triggers between the 'L' and 'R'
             markers to the location line.
+
+        ALT + left mouse button and drag >> A green vertical location line will appear.
+            Release the ALT button to overwrite/paste all track triggers between the 'L' and 'R'
+            markers to the location line.
+
 
         Use the collapse and expand button to modify events.
 

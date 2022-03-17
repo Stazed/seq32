@@ -222,7 +222,7 @@ public:
     void hide_tempo_popup();
     void set_perfroll_marker_change(bool a_change);
     void set_marker_line_selection(uint64_t a_tick = 0);
-    void paste_triggers(long paste_tick);
+    void paste_triggers(long paste_tick, bool overwrite);
 
     friend int FF_RW_timeout(void *arg);
 
