@@ -87,6 +87,8 @@ private:
     int          m_zoom;
     int          m_snap;
 
+    int          m_key_y;
+
     int m_window_x, m_window_y;
 
     /* when highlighting a bunch of events */

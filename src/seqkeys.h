@@ -71,6 +71,10 @@ private:
     int          m_scale;
     int          m_key;
 
+    int m_key_y;
+    int m_keyarea_y;
+    int m_rollarea_y;
+
     void draw_key( int a_key, bool a_state );
     void on_size_allocate(Gtk::Allocation&);
 

@@ -100,6 +100,10 @@ private:
     int          m_chord;
     int          m_key;
 
+    /* Vertical Zoom */
+    int         m_key_y;
+    int         m_rollarea_y;
+
     int m_window_x, m_window_y;
 
     /* what is the data window currently editing ? */

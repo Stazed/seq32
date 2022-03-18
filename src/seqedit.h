@@ -186,6 +186,11 @@ private:
     int         m_zoom;
     static int  m_initial_zoom;
 
+    int         m_key_y;
+    int         m_keyarea_y;
+    int         m_rollarea_y;
+    float       m_vertical_zoom;
+
     /* set snap to in pulses, off = 1 */
     int         m_snap;
     static int  m_initial_snap;
