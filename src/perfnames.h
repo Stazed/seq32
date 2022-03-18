@@ -47,6 +47,7 @@ private:
     int m_window_x, m_window_y;
 
     int          m_sequence_offset;
+    int          m_names_y;
 
     bool         m_sequence_active[c_total_seqs];
     

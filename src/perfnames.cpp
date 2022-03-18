@@ -29,6 +29,7 @@ perfnames::perfnames( perform *a_perf, mainwnd *a_main, Glib::RefPtr<Adjustment>
     m_vadjust(a_vadjust),
     m_redraw_tracks(false),
     m_sequence_offset(0),
+    m_names_y(c_names_y),
     m_button_down(false),
     m_moving(false),
     m_old_seq(0)
@@ -87,14 +88,14 @@ perfnames::draw_sequence( int sequence )
     Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(m_surface);
 
     cr->set_operator(Cairo::OPERATOR_CLEAR);
-    cr->rectangle(0, (c_names_y * i), m_window_x - 1, c_names_y);
+    cr->rectangle(0, (m_names_y * i), m_window_x - 1, m_names_y);
     cr->paint_with_alpha(0.0);
     cr->set_operator(Cairo::OPERATOR_OVER);
 
     if ( sequence < c_total_seqs )
     {
         cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-        cr->rectangle(0, (c_names_y * i), m_window_x - 1, c_names_y);
+        cr->rectangle(0, (m_names_y * i), m_window_x - 1, m_names_y);
         cr->stroke_preserve();
         cr->fill();
 
@@ -105,17 +106,17 @@ perfnames::draw_sequence( int sequence )
 
             /* The black background */
             cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-            cr->rectangle(0, (c_names_y * i) + 2, c_perf_ss_width, c_names_y - 5 );
+            cr->rectangle(0, (m_names_y * i) + 2, c_perf_ss_width, m_names_y - 5 );
             cr->stroke_preserve();
             cr->fill();
 
             /* print the screen_set number */
-            p_font_renderer->render_string_on_drawable(1, (c_names_y * i) + 6, cr, screen_set, font::WHITE);
+            p_font_renderer->render_string_on_drawable(1, (m_names_y * i) + 6, cr, screen_set, font::WHITE);
         }
         else    // no screen set number
         {
             cr->set_source_rgb(c_back_medium_grey.r, c_back_medium_grey.g, c_back_medium_grey.b);
-            cr->rectangle(1, (c_names_y * i) + 3, c_perf_ss_width, c_names_y - 5 );
+            cr->rectangle(1, (m_names_y * i) + 3, c_perf_ss_width, m_names_y - 5 );
             cr->stroke_preserve();
             cr->fill();
         }
@@ -141,9 +142,9 @@ perfnames::draw_sequence( int sequence )
 
         cr->set_line_width(2.0);
         cr->rectangle(c_perf_ss_width + 3,
-                        (c_names_y * i) + 3,
+                        (m_names_y * i) + 3,
                         m_window_x - 4 - c_perf_ss_width,
-                        c_names_y - 5  );
+                        m_names_y - 5  );
         cr->stroke_preserve();
         cr->fill();
 
@@ -165,7 +166,7 @@ perfnames::draw_sequence( int sequence )
             }
 
             /* Print the sequence name */
-            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, (c_names_y * i) + 2, cr, name, font_color);
+            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, (m_names_y * i) + 2, cr, name, font_color);
 
             /* Buses */
             char str[20];
@@ -177,7 +178,7 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_bw() );
 
             /* Print the sequence bus, etc */
-            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, (c_names_y * i) + 12, cr, str, font_color);
+            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, (m_names_y * i) + 12, cr, str, font_color);
 
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
@@ -185,21 +186,21 @@ perfnames::draw_sequence( int sequence )
             if(solo)
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_solo_xpm);
-                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (c_names_y * i) + 3);
+                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (m_names_y * i) + 3);
                 cr->paint();
             }
             else if (muted)
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_mute_xpm);
 
-                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (c_names_y * i) + 3);
+                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (m_names_y * i) + 3);
                 cr->paint();
             }
             else
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_play_xpm);
 
-                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (c_names_y * i) + 3);
+                Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (m_names_y * i) + 3);
                 cr->paint();
             }
         }   // Active sequence
@@ -207,7 +208,7 @@ perfnames::draw_sequence( int sequence )
     else    // if you scroll down to the very bottom
     {
         cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-        cr->rectangle(0, (c_names_y * i) + 1, m_window_x, c_names_y);
+        cr->rectangle(0, (m_names_y * i) + 1, m_window_x, m_names_y);
         cr->stroke_preserve();
         cr->fill();
     }
@@ -234,7 +235,7 @@ perfnames::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (m_redraw_tracks)
     {
         m_redraw_tracks = false;
-        int trks = (m_window_y / c_names_y) + 1;
+        int trks = (m_window_y / m_names_y) + 1;
 
         for ( int i = 0; i < trks; i++ )
         {
@@ -253,7 +254,7 @@ perfnames::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 void
 perfnames::convert_y( int a_y, int *a_seq)
 {
-    *a_seq = a_y / c_names_y;
+    *a_seq = a_y / m_names_y;
     *a_seq  += m_sequence_offset;
 
     if ( *a_seq >= c_total_seqs )
@@ -433,7 +434,7 @@ void
 perfnames::redraw_dirty_sequences()
 {
     int y_s = 0;
-    int y_f = m_window_y / c_names_y;
+    int y_f = m_window_y / m_names_y;
 
     for ( int y=y_s; y<=y_f; y++ )
     {
