@@ -1933,6 +1933,18 @@ seqedit::on_scroll_event( GdkEventScroll* a_ev )
         }
         return true;
     }
+    else if ((a_ev->state & modifiers) == GDK_MOD1_MASK)
+    {
+        if (a_ev->direction == GDK_SCROLL_DOWN)
+        {
+           set_vertical_zoom(m_vertical_zoom + c_vert_seqroll_zoom_step);
+        }
+        else if (a_ev->direction == GDK_SCROLL_UP)
+        {
+           set_vertical_zoom(m_vertical_zoom - c_vert_seqroll_zoom_step);
+        }
+        return true;
+    }
 
     return false;  // Not handled
 }
@@ -1950,7 +1962,51 @@ seqedit::on_key_press_event( GdkEventKey* a_ev )
         return Gtk::Window::on_key_press_event(a_ev); // return = don't do anything else
 
     if(! m_seqroll_wid->on_key_press_event(a_ev))     // seqroll has priority - no duplicates
-        return Gtk::Window::on_key_press_event(a_ev);
+    {
+        bool result = false;
+
+        /* Horizontal zoom */
+        if (a_ev->keyval == GDK_KEY_Z)              /* zoom in              */
+        {
+            set_zoom(m_zoom / 2);
+            result = true;
+        }
+        else if (a_ev->keyval == GDK_KEY_0)         /* reset to normal zoom */
+        {
+            set_zoom(c_default_zoom);
+            result = true;
+        }
+        else if (a_ev->keyval == GDK_KEY_z)         /* zoom out             */
+        {
+            set_zoom(m_zoom * 2);
+            result = true;
+        }
+
+        /* Vertical zoom */
+        if ( !(a_ev->state & GDK_CONTROL_MASK) )
+        {
+            if (a_ev->keyval == GDK_KEY_V)         /* zoom in              */
+            {
+                set_vertical_zoom(m_vertical_zoom + c_vert_seqroll_zoom_step);
+                result = true;
+            }
+            else if (a_ev->keyval == GDK_KEY_9)    /* reset to normal zoom */
+            {
+                set_vertical_zoom(c_default_vertical_zoom);
+                result = true;
+            }
+            else if (a_ev->keyval == GDK_KEY_v)    /* zoom out             */
+            {
+                set_vertical_zoom(m_vertical_zoom - c_vert_seqroll_zoom_step);
+                result = true;
+            }
+        }
+
+        if (! result)
+            result = Gtk::Window::on_key_press_event(a_ev);
+
+        return result;
+    }
 
     return false;
 }
