@@ -456,6 +456,17 @@ seqroll::set_zoom( int a_zoom )
     }
 }
 
+void
+seqroll::set_vertical_zoom( int key_y, int rollarea_y)
+{
+    if ( m_key_y != key_y )
+    {
+        m_key_y = key_y;
+        m_rollarea_y = rollarea_y;
+        reset();
+    }
+}
+
 /* simply ses the snap member */
 void
 seqroll::set_snap( int a_snap )

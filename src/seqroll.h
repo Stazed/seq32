@@ -200,6 +200,7 @@ public:
     void redraw();
     void redraw_events();
     void set_zoom( int a_zoom );
+    void set_vertical_zoom( int key_y, int rollarea_y);
     void set_snap( int a_snap );
     void set_note_length( int a_note_length );
     void set_ignore_redraw(bool a_ignore);

@@ -1476,6 +1476,23 @@ seqedit::set_note_length( int a_note_length  )
 }
 
 void
+seqedit::set_vertical_zoom( float a_zoom )
+{    
+    if ( a_zoom > c_max_seqroll_vertical_zoom || a_zoom < c_min_seqroll_vertical_zoom )
+        return;
+
+    m_vertical_zoom = a_zoom;
+
+    m_key_y = c_key_y * m_vertical_zoom;
+    m_keyarea_y = m_key_y * c_num_keys + 1;
+    m_rollarea_y = m_keyarea_y;
+
+    m_seqroll_wid->set_vertical_zoom(m_key_y, m_rollarea_y);
+    m_seqkeys_wid->set_vertical_zoom(m_key_y, m_keyarea_y, m_rollarea_y, m_vertical_zoom);
+    m_seqevent_wid->set_vertical_zoom(m_key_y);
+}
+
+void
 seqedit::set_scale( int a_scale )
 {
     m_entry_scale->set_text( c_scales_text[a_scale] );

@@ -234,6 +234,16 @@ seqevent::set_zoom( int a_zoom )
     }
 }
 
+void
+seqevent::set_vertical_zoom(int key_y)
+{
+    if ( m_key_y != key_y )
+    {
+        m_key_y = key_y;
+        reset();
+    }
+}
+
 /* simply sets the snap member */
 void
 seqevent::set_snap( int a_snap )

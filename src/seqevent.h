@@ -152,6 +152,7 @@ public:
     void reset();
     void redraw();
     void set_zoom( int a_zoom );
+    void set_vertical_zoom(int key_y);
     void set_snap( int a_snap );
 
     void set_data_type( unsigned char a_status, unsigned char a_control  );
