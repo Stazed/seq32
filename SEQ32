@@ -222,10 +222,15 @@ simple interface.
         Mouse scroll >> scroll vertically.
         Shift + mouse scroll >> scroll horizontally.
         CTRL + mouse scroll >> zoom-in, zoom-out horizontally.
+        ALT + mouse scroll >> zoom-in, zoom-out vertically.
 
-        z >> zoom-in.
-        Shift z >> zoom-out.
-        0 >> reset zoom to default.
+        Key z >> horizontal zoom-in.
+        Shift z >> horizontal zoom-out.
+        Key 0 >> reset horizontal zoom to default.
+
+        Key v >> vertical zoom-in.
+        Shift v >> vertical zoom-out.
+        Key 9 >> reset vertical zoom to default.
 
         CTRL + c >> copy selected trigger to clipboard.
         CTRL + v >> paste clipboard trigger after selected trigger.
@@ -247,6 +252,7 @@ simple interface.
         ALT + Left mouse button - hold and drag >> to inactive track, copy track to landing location.
 
         Mouse scroll >> scroll vertically.
+        ALT + mouse scroll >> zoom-in, zoom-out vertically.
 
         'L' and 'R' EDIT LOOP TRACK:
 

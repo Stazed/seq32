@@ -59,9 +59,9 @@ perftime::perftime( perform *a_perf, perfedit *a_perf_edit, Glib::RefPtr<Adjustm
 }
 
 void
-perftime::set_zoom (int a_zoom)
+perftime::set_horizontal_zoom (int a_zoom)
 {
-    if (m_perfedit->zoom_check(a_zoom))
+    if (m_perfedit->zoom_check_horizontal(a_zoom))
     {
         m_perf_scale_x = a_zoom;
         m_draw_background = true;

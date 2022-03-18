@@ -71,7 +71,7 @@ public:
 
     perftime( perform *a_perf, perfedit *a_perf_edit, Glib::RefPtr<Adjustment> a_hadjust );
 
-    void set_zoom (int a_zoom);
+    void set_horizontal_zoom (int a_zoom);
 
     void set_guides( int a_snap, int a_measure );
     bool on_key_release_event(GdkEventKey* a_ev);

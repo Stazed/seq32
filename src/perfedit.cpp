@@ -480,17 +480,17 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
     /* Horizontal zoom */
     if (a_ev->keyval == GDK_KEY_Z)         /* zoom in              */
     {
-        set_zoom(m_perfroll->m_zoom / 2);
+        set_horizontal_zoom(m_perfroll->m_horizontal_zoom / 2);
         return true;
     }
     else if (a_ev->keyval == GDK_KEY_0)         /* reset to normal zoom */
     {
-        set_zoom(c_perf_scale_x);
+        set_horizontal_zoom(c_perf_scale_x);
         return true;
     }
     else if (a_ev->keyval == GDK_KEY_z)         /* zoom out             */
     {
-        set_zoom(m_perfroll->m_zoom * 2);
+        set_horizontal_zoom(m_perfroll->m_horizontal_zoom * 2);
         return true;
     }
 
@@ -885,11 +885,11 @@ perfedit::clear_tempo_list()
 }
 
 void
-perfedit::set_zoom (int z)
+perfedit::set_horizontal_zoom (int z)
 {
-    m_perfroll->set_zoom(z);
-    m_perftime->set_zoom(z);
-    m_tempo->set_zoom(z);
+    m_perfroll->set_horizontal_zoom(z);
+    m_perftime->set_horizontal_zoom(z);
+    m_tempo->set_horizontal_zoom(z);
 }
 
 void

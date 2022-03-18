@@ -53,7 +53,7 @@ perfroll::perfroll( perform *a_perf,
     m_have_stop_reposition(false),
     m_marker_change(false),
     m_line_location(0),
-    m_zoom(c_perf_scale_x)
+    m_horizontal_zoom(c_perf_scale_x)
 {
     Gtk::Allocation allocation = get_allocation();
     m_surface_track = Cairo::ImageSurface::create(
@@ -693,11 +693,11 @@ perfroll::auto_scroll_horz()
     if(!m_mainperf->get_follow_transport())
         return;
 
-    if(m_zoom >= c_perf_scale_x)
+    if(m_horizontal_zoom >= c_perf_scale_x)
     {
-        double progress = (double)m_mainperf->get_tick()/m_zoom/c_ppen;
+        double progress = (double)m_mainperf->get_tick()/m_horizontal_zoom/c_ppen;
 
-        int zoom_ratio = m_zoom/c_perf_scale_x;
+        int zoom_ratio = m_horizontal_zoom/c_perf_scale_x;
 
         progress *= zoom_ratio;
 
@@ -717,14 +717,14 @@ perfroll::auto_scroll_horz()
     long progress_tick = m_mainperf->get_tick();
     long tick_offset = m_4bar_offset * c_ppqn * 16;
 
-    int progress_x =     ( progress_tick - tick_offset ) / m_zoom  + 100;
+    int progress_x =     ( progress_tick - tick_offset ) / m_horizontal_zoom  + 100;
     int page = progress_x / m_window_x;
 
     if (page != 0 || progress_x < 0)
     {
-        double left_tick = (double) progress_tick /m_zoom/c_ppen;
+        double left_tick = (double) progress_tick /m_horizontal_zoom/c_ppen;
 
-        switch(m_zoom)
+        switch(m_horizontal_zoom)
         {
         case 8:
             m_hadjust->set_value(left_tick / 4);
@@ -757,11 +757,11 @@ perfroll::on_scroll_event( GdkEventScroll* a_ev )
     {
         if (a_ev->direction == GDK_SCROLL_DOWN)
         {
-            m_perfedit->set_zoom(m_zoom*2);
+            m_perfedit->set_horizontal_zoom(m_horizontal_zoom*2);
         }
         else if (a_ev->direction == GDK_SCROLL_UP)
         {
-            m_perfedit->set_zoom(m_zoom/2);
+            m_perfedit->set_horizontal_zoom(m_horizontal_zoom/2);
         }
         return true;
     }
@@ -997,12 +997,12 @@ perfroll::split_trigger( int a_sequence, long a_tick )
 }
 
 void
-perfroll::set_zoom (int a_zoom)
+perfroll::set_horizontal_zoom (int a_zoom)
 {
-    if (m_perfedit->zoom_check(a_zoom))
+    if (m_perfedit->zoom_check_horizontal(a_zoom))
     {
-        m_zoom = a_zoom;
-        m_perf_scale_x = m_zoom;
+        m_horizontal_zoom = a_zoom;
+        m_perf_scale_x = m_horizontal_zoom;
 
         if (m_perf_scale_x == 0)
             m_perf_scale_x = 1;

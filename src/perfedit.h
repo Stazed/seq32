@@ -194,7 +194,7 @@ private:
 
 public:
 
-    static bool zoom_check (int z)
+    static bool zoom_check_horizontal (int z)
     {
         return z >= c_perf_max_zoom && z <= (4 * c_perf_scale_x);
     }
@@ -213,7 +213,7 @@ public:
     void clear_tempo_list();
 
     void set_xpose (int a_xpose);
-    void set_zoom (int z);
+    void set_horizontal_zoom (int z);
     void set_vertical_zoom(float z);
 
     bool get_toggle_jack();

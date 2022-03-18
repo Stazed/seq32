@@ -123,10 +123,11 @@ protected:
 
 public:
 
+    int  m_horizontal_zoom;
+
     bool on_key_press_event(GdkEventKey* a_p0);
     void auto_scroll_horz();
-    int  m_zoom;
-    void set_zoom (int a_zoom);
+    void set_horizontal_zoom (int a_zoom);
     void set_vertical_zoom (float a_zoom);
     void set_guides( int a_snap, int a_measure, int a_beat );
 
