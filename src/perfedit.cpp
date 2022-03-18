@@ -477,6 +477,7 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
         }
     }
 
+    /* Horizontal zoom */
     if (a_ev->keyval == GDK_KEY_Z)         /* zoom in              */
     {
         set_zoom(m_perfroll->m_zoom / 2);
@@ -567,7 +568,7 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
 
     if(!event_was_handled)
     {
-        return Gtk::Window::on_key_press_event(a_ev);
+        return m_perfroll->on_key_press_event(a_ev);
     }
 
     return false;
