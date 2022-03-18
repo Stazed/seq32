@@ -180,6 +180,11 @@ public:
 
     mainwnd(perform *a_p, Glib::RefPtr<Gtk::Application> app);
     ~mainwnd();
+    
+    static bool zoom_check_vertical (float z)
+    {
+        return z >= c_perf_min_vertical_zoom && z <= c_perf_max_vertical_zoom;
+    }
 
     bool open_file(const Glib::ustring&);
     void export_seq_track_trigger(file_type_e type, int a_seq);

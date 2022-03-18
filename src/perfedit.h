@@ -198,6 +198,11 @@ public:
     {
         return z >= c_perf_max_zoom && z <= (4 * c_perf_scale_x);
     }
+    
+    static bool zoom_check_vertical (float z)
+    {
+        return z >= c_perf_min_vertical_zoom && z <= c_perf_max_vertical_zoom;
+    }
 
     void init_before_show ();
     void set_bp_measure( int a_beats_per_measure );
