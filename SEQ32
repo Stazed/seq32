@@ -179,6 +179,20 @@ simple interface.
 	will capture and ALSA midi input and save it in the
 	sequence.
 
+        Midi record supports simultaneous multi-sequence record, channel specific, up to 16 channels at once.
+
+        Midi recording types. Recording button 'Merge' to select type:
+            Legacy merged looped (notes are added upon looping of sequence).
+            Overwrite looped record (notes will be cleared upon looping after
+            the first note played and overwrite previous pass).
+            Expand sequence length to fit recording (sequence does not loop and
+            will expand after reaching last 1/4 measure).
+            Expand and replace recording. 
+
+        Midi step edit is added on record(seq42 not playing), starting at transport line.
+        Sequence editor Ctrl-right arrow and Ctrl-left arrow key moves transport line by snap.
+        Home key moves transport line to start.
+
 	On both the grid window and the event window, HOLDING
 	down the right mouse button will change your cursor
 	to a pencil and put you in 'draw' mode.  Then while
@@ -189,12 +203,45 @@ simple interface.
         manipulation.
 
         Pressing  the middle mouse button will let you change 
-	the length of the note. 
+	the length of the note.
+
+        Chord note selection will draw notes based on the
+        chord selection (Thanks to LMMS for the lookup table).
+
+        Mute and solo individual notes on sequence editor.
+            Right mouse button click on piano roll will mute,
+            middle mouse button to solo. Muted keys will change color to red,
+            and solo to green. These settings will NOT be saved to file.
 
 	The left mouse button lets you select multiple events 
         which can then be clicked and moved, cut (Ctrl-X), 
         copy (Ctrl-C), or pasted (Ctrl-V).  When the notes are 
         selected, you can delete them with the Delete key.
+
+        You can use cursor keys to move selected notes up/down
+        in pitch or left/right in time.
+        Up and down move by one semitone.
+        Hold down Shift to move up or down by octave.
+        Right and left move the selected notes by the current snap amount.
+        (Note that it does not automatically snap the notes to the grid.
+        If you want that, use the quantize function first.)
+        Nudge the selected notes by individual ticks by holding down the
+        Shift key with left or right arrows.
+
+        Notes will send MIDI play when added to the sequence or moved.
+
+        Mouse scroll >> scroll vertically.
+        Shift + mouse scroll >> scroll horizontally.
+        CTRL + mouse scroll >> zoom-in, zoom-out horizontally.
+        ALT + mouse scroll >> zoom-in, zoom-out vertically.
+
+        Key z >> horizontal zoom-out.
+        Shift z >> horizontal zoom-in.
+        Key 0 >> reset horizontal zoom to default.
+
+        Key v >> vertical zoom-out.
+        Shift v >> vertical zoom-in.
+        Key 9 >> reset vertical zoom to default.
 
 	Right clicking on the event strip ( directly under
 	the paino roll grid ) will allow you to add/select/move 
@@ -224,12 +271,12 @@ simple interface.
         CTRL + mouse scroll >> zoom-in, zoom-out horizontally.
         ALT + mouse scroll >> zoom-in, zoom-out vertically.
 
-        Key z >> horizontal zoom-in.
-        Shift z >> horizontal zoom-out.
+        Key z >> horizontal zoom-out.
+        Shift z >> horizontal zoom-in.
         Key 0 >> reset horizontal zoom to default.
 
-        Key v >> vertical zoom-in.
-        Shift v >> vertical zoom-out.
+        Key v >> vertical zoom-out.
+        Shift v >> vertical zoom-in.
         Key 9 >> reset vertical zoom to default.
 
         CTRL + c >> copy selected trigger to clipboard.
