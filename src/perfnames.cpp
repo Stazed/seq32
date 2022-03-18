@@ -168,7 +168,11 @@ perfnames::draw_sequence( int sequence )
             }
 
             /* Print the sequence name */
-            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, (m_names_y * i) + 2, cr, name, font_color);
+            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width,
+                                                       (m_names_y * i) + 2,
+                                                       cr, name, font_color,
+                                                       1.0,
+                                                       m_vertical_zoom);
 
             /* Buses */
             char str[20];
@@ -180,7 +184,11 @@ perfnames::draw_sequence( int sequence )
                      m_mainperf->get_sequence(sequence)->get_bw() );
 
             /* Print the sequence bus, etc */
-            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width, (m_names_y * i) + 12, cr, str, font_color);
+            p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width,
+                                                       m_names_y * i + (12 * m_vertical_zoom),
+                                                       cr, str, font_color,
+                                                       1.0,
+                                                       m_vertical_zoom);
 
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
             bool muted = m_mainperf->get_sequence(sequence)->get_song_mute();
@@ -188,20 +196,21 @@ perfnames::draw_sequence( int sequence )
             if(solo)
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_solo_xpm);
+                m_pixbuf = m_pixbuf->scale_simple(c_mute_x, (int) (c_mute_y * m_vertical_zoom), Gdk::INTERP_BILINEAR);
                 Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (m_names_y * i) + 3);
                 cr->paint();
             }
             else if (muted)
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_mute_xpm);
-
+                m_pixbuf = m_pixbuf->scale_simple(c_mute_x, (int) (c_mute_y * m_vertical_zoom), Gdk::INTERP_BILINEAR);
                 Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (m_names_y * i) + 3);
                 cr->paint();
             }
             else
             {
                 m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(track_play_xpm);
-
+                m_pixbuf = m_pixbuf->scale_simple(c_mute_x, (int) (c_mute_y * m_vertical_zoom), Gdk::INTERP_BILINEAR);
                 Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, m_window_x - 17, (m_names_y * i) + 3);
                 cr->paint();
             }
