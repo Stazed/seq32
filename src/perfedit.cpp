@@ -892,6 +892,13 @@ perfedit::set_zoom (int z)
 }
 
 void
+perfedit::set_vertical_zoom(float z)
+{
+    m_perfnames->set_vertical_zoom(z);
+    m_perfroll->set_vertical_zoom(z);
+}
+
+void
 perfedit::set_follow_transport()
 {
     m_mainperf->set_follow_transport(m_button_follow->get_active());

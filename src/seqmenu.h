@@ -37,7 +37,6 @@ private:
 
     Menu         *m_menu;
     perform      *m_mainperf;
-    mainwnd      *m_mainwnd;
     sequence     m_clipboard;
     
     std::vector<MenuItem> m_menu_items;
@@ -62,6 +61,7 @@ private:
 
 protected:
 
+    mainwnd      *m_mainwnd;
     int m_current_seq;
     void popup_menu();
 

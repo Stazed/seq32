@@ -1862,6 +1862,12 @@ mainwnd::update_start_BPM(double bpm)
     m_perf_edit->update_start_BPM(bpm);
 }
 
+void
+mainwnd::set_vertical_zoom(float z)
+{
+    m_perf_edit->set_vertical_zoom(z);
+}
+
 #ifdef NSM_SUPPORT
 void
 mainwnd::close_all_windows()

@@ -48,6 +48,7 @@ private:
 
     int          m_sequence_offset;
     int          m_names_y;
+    float        m_vertical_zoom;
 
     bool         m_sequence_active[c_total_seqs];
     
@@ -83,6 +84,7 @@ protected:
 public:
 
     void redraw_dirty_sequences();
+    void set_vertical_zoom (float a_zoom);
 
     perfnames( perform *a_perf, mainwnd *a_main,
                Glib::RefPtr<Adjustment> a_vadjust );

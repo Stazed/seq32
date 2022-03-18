@@ -58,6 +58,7 @@ private:
 
     int          m_perf_scale_x; // for zoom - replace c_perf_scale_x
     int          m_names_y;      // vertical zoom
+    float        m_vertical_zoom;
 
     int          m_window_x, m_window_y;
 
@@ -127,6 +128,7 @@ public:
     void auto_scroll_horz();
     int  m_zoom;
     void set_zoom (int a_zoom);
+    void set_vertical_zoom (float a_zoom);
     void set_guides( int a_snap, int a_measure, int a_beat );
 
     void update_sizes();

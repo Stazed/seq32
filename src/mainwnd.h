@@ -193,6 +193,7 @@ public:
     void set_bp_measure(int bp_measure);
     void set_bw(int bw);
     void update_start_BPM(double bpm);
+    void set_vertical_zoom(float z);
 
     void set_window_pointer(Gtk::Window * a_win);
     void remove_window_pointer(Gtk::Window * a_win);

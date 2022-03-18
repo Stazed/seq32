@@ -209,6 +209,7 @@ public:
 
     void set_xpose (int a_xpose);
     void set_zoom (int z);
+    void set_vertical_zoom(float z);
 
     bool get_toggle_jack();
     void toggle_jack();
