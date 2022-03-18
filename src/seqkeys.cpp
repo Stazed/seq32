@@ -105,6 +105,7 @@ seqkeys::set_vertical_zoom(int key_y, int keyarea_y, int rollarea_y, float verti
 void
 seqkeys::reset()
 {
+    change_vert();
     update_surface();
     queue_draw();
 }
@@ -214,7 +215,11 @@ seqkeys::update_surface()
 
             snprintf(notes, sizeof(notes), "%2s%1d", c_key_text[key], octave);
 
-            p_font_renderer->render_string_on_drawable(2, m_key_y * i, cr, notes, font::BLACK );
+            p_font_renderer->render_string_on_drawable(2,
+                                                       m_key_y * i,
+                                                       cr, notes, font::BLACK,
+                                                       1.0,
+                                                       m_vertical_zoom);
         }
     }
 }
@@ -422,6 +427,14 @@ seqkeys::draw_key( int a_key, bool a_state )
 void
 seqkeys::change_vert( )
 {
+    if ( m_surface->get_width() != c_keyarea_x || m_surface->get_height() != m_keyarea_y )
+    {
+        m_surface = Cairo::ImageSurface::create(
+        Cairo::Format::FORMAT_ARGB32,
+        c_keyarea_x,
+        m_keyarea_y);
+    }
+
     m_scroll_offset_key = (int) m_vadjust->get_value();
     m_scroll_offset_y = m_scroll_offset_key * m_key_y,
 
