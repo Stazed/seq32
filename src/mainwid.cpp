@@ -138,19 +138,19 @@ mainwid::draw_sequence_on_surface( int a_seq )
     if ( a_seq >= (m_screenset  * c_mainwnd_rows * c_mainwnd_cols ) &&
             a_seq <  ((m_screenset+1)  * c_mainwnd_rows * c_mainwnd_cols ))
     {
-        int i =  (a_seq / c_mainwnd_rows) % c_mainwnd_cols;
-        int j =  a_seq % c_mainwnd_rows;
+        float i =  (a_seq / c_mainwnd_rows) % c_mainwnd_cols;
+        float j =  a_seq % c_mainwnd_rows;
 
-        int base_x = (c_mainwid_border +
+        float base_x = (c_mainwid_border +
                       (m_seqarea_x + c_mainwid_spacing) * i);
-        int base_y = (c_mainwid_border +
+        float base_y = (c_mainwid_border +
                       (m_seqarea_y + c_mainwid_spacing) * j);
 
         /*int local_seq = a_seq % c_seqs_in_set;*/
         
         /* The background of the sequences */
         cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-        cr->rectangle(base_x, base_y, m_seqarea_x, m_seqarea_y );
+        cr->rectangle(base_x + 1, base_y + 1, m_seqarea_x - 1, m_seqarea_y - 1);
         cr->fill();
         
         /* Outline of the whole window */
@@ -338,9 +338,9 @@ mainwid::draw_sequence_surface_on_window( int a_seq )
                       (m_seqarea_x + c_mainwid_spacing) * i);
         int base_y = (c_mainwid_border +
                       (m_seqarea_y + c_mainwid_spacing) * j);
-        
+
         m_surface_window->set_source(m_surface, 0, 0);
-        m_surface_window->rectangle(base_x, base_y, m_seqarea_x, m_seqarea_y);
+        m_surface_window->rectangle(base_x, base_y, (int) m_seqarea_x, (int) m_seqarea_y);
         m_surface_window->stroke_preserve();
         m_surface_window->fill();
     }
@@ -492,8 +492,8 @@ mainwid::seq_from_xy( int a_x, int a_y )
     }
 
     /* gives us in box corrdinates */
-    int box_test_x = x % (m_seqarea_x + c_mainwid_spacing);
-    int box_test_y = y % (m_seqarea_y + c_mainwid_spacing);
+    int box_test_x = x % (int) (m_seqarea_x + c_mainwid_spacing);
+    int box_test_y = y % (int) (m_seqarea_y + c_mainwid_spacing);
 
     /* right inactive side of area */
     if ( box_test_x > m_seqarea_x
@@ -502,8 +502,8 @@ mainwid::seq_from_xy( int a_x, int a_y )
         return -1;
     }
 
-    x /= (m_seqarea_x + c_mainwid_spacing);
-    y /= (m_seqarea_y + c_mainwid_spacing);
+    x /= (int) (m_seqarea_x + c_mainwid_spacing);
+    y /= (int) (m_seqarea_y + c_mainwid_spacing);
 
     int sequence =  ( (x * c_mainwnd_rows + y)
                       + ( m_screenset * c_mainwnd_rows * c_mainwnd_cols ));
@@ -683,7 +683,7 @@ mainwid::on_size_allocate(Gtk::Allocation &a_r )
 
     m_window_x = a_r.get_width();
     m_window_y = a_r.get_height();
-
+    
     // resize handler
     if ( m_window_x != m_surface->get_width() || m_window_y != m_surface->get_height())
     {
@@ -692,8 +692,15 @@ mainwid::on_size_allocate(Gtk::Allocation &a_r )
             m_window_x,
             m_window_y
         );
+
+        m_text_x = ( (float)  m_window_x / 8.0) / 15.0;
+        m_text_y = ( (float) m_window_y / 4.0) / 5.0;
         
-        m_need_redraw = true;
+        m_seqarea_x = m_text_x * 15.0;
+        m_seqarea_y =  m_text_y * 5.0;
+        
+        m_seqarea_seq_x = m_text_x * 13.0;
+        m_seqarea_seq_y = m_text_y * 2.0;
     }
 }
 

@@ -100,8 +100,8 @@ const int c_text_y = 12;
 const int c_seqarea_x = c_text_x * 15;
 const int c_seqarea_y =  c_text_y * 5;
 
-const int c_mainwid_border = 0;
-const int c_mainwid_spacing = 2;
+const float c_mainwid_border = 0.0;
+const float c_mainwid_spacing = 0.0;
 
 const int c_control_height = 0;
 

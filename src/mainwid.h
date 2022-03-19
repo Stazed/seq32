@@ -73,10 +73,10 @@ private:
     int          m_window_x,
                  m_window_y;
 
-    int          m_text_x;
-    int          m_text_y;
-    int          m_seqarea_x;
-    int          m_seqarea_y;
+    float        m_text_x;
+    float        m_text_y;
+    float        m_seqarea_x;
+    float        m_seqarea_y;
 
     /* The draw progress area size */
     int         m_seqarea_seq_x = c_text_x * 13;
