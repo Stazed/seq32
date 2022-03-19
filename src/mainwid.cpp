@@ -50,6 +50,8 @@ mainwid::mainwid( perform *a_p, mainwnd *a_main ):
     m_seqarea_y(c_seqarea_y),
     m_seqarea_seq_x(c_text_x * 13),
     m_seqarea_seq_y(c_text_y * 2),
+    m_resize_ratio_x(1.0),
+    m_resize_ratio_y(1.0),
 
     m_button_down(false),
     m_moving(false),
@@ -229,12 +231,14 @@ mainwid::draw_sequence_on_surface( int a_seq )
             height += 2;
 
             int length = seq->get_length( );
-
+            
             long tick_s;
             long tick_f;
             int note;
 
             bool selected;
+            
+            float scale_font_w = (float) c_font_width * m_resize_ratio_x;
 
             int velocity;
             draw_type dt;
@@ -288,7 +292,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
             char name[20];
             snprintf( name, sizeof name, "%.13s", seq->get_name() );
 
-            p_font_renderer->render_string_on_drawable(base_x + m_text_x, base_y + 2, cr, name, font_color);
+            p_font_renderer->render_string_on_drawable((base_x + m_text_x),
+                                                       base_y + 2, cr,
+                                                       name, font_color,
+                                                       m_resize_ratio_x,
+                                                       m_resize_ratio_y);
 
             /* midi channel + key + timesig */
             /*char key =  m_seq_to_char[local_seq];*/
@@ -298,9 +306,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
             {
                 snprintf( str, sizeof str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
 
-                p_font_renderer->render_string_on_drawable(base_x + m_seqarea_x - 8,
-                                                            base_y + m_text_y * 4 - 0,
-                                                            cr, str, font_color );
+                p_font_renderer->render_string_on_drawable((base_x + m_seqarea_x - 5) - scale_font_w,
+                                                            base_y + m_text_y * 4,
+                                                            cr, str, font_color,
+                                                            m_resize_ratio_x,
+                                                            m_resize_ratio_y);
             }
 
             snprintf( str, sizeof str,
@@ -309,9 +319,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
                       seq->get_midi_channel()+1,
                       seq->get_bp_measure(), seq->get_bw() );
 
-            p_font_renderer->render_string_on_drawable( base_x + m_text_x,
-                                                        base_y + m_text_y * 4 - 0,
-                                                        cr, str, font_color);
+            p_font_renderer->render_string_on_drawable( (base_x + m_text_x),
+                                                        base_y + m_text_y * 4,
+                                                        cr, str, font_color,
+                                                        m_resize_ratio_x,
+                                                        m_resize_ratio_y);
         }
         else    /* not active */
         {
@@ -701,6 +713,9 @@ mainwid::on_size_allocate(Gtk::Allocation &a_r )
         
         m_seqarea_seq_x = m_text_x * 13.0;
         m_seqarea_seq_y = m_text_y * 2.0;
+        
+        m_resize_ratio_x = (float) m_window_x / (float) c_mainwid_x;
+        m_resize_ratio_y = (float) m_window_y / (float) c_mainwid_y;;
     }
 }
 

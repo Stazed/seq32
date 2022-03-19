@@ -44,10 +44,6 @@ class mainwnd;
 
 using namespace Gtk;
 
-/* The draw progress area size */
-//const int c_seqarea_seq_x = c_text_x * 13;
-//const int c_seqarea_seq_y = c_text_y * 2;
-
 enum
 {
     COLOR_BLACK = 0,
@@ -81,6 +77,10 @@ private:
     /* The draw progress area size */
     int         m_seqarea_seq_x = c_text_x * 13;
     int         m_seqarea_seq_y = c_text_y * 2;
+    
+    /* The resize ratio for font resizing */
+    float       m_resize_ratio_x;
+    float       m_resize_ratio_y;
 
     bool         m_button_down;
     bool         m_moving;
