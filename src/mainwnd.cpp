@@ -346,19 +346,18 @@ mainwnd::mainwnd(perform *a_p, Glib::RefPtr<Gtk::Application> app):
     add_tooltip( m_button_perfedit, "Show or hide song editor window" );
     bottomhbox->pack_end(*m_button_perfedit, Gtk::PACK_SHRINK);
 
-    /* vertical layout container for window content*/
-    VBox *contentvbox = new VBox();
-    contentvbox->set_spacing(10);
-    contentvbox->set_border_width(10);
-    contentvbox->pack_start(*tophbox, Gtk::PACK_SHRINK);
-    contentvbox->pack_start(*m_main_wid, Gtk::PACK_SHRINK);
-    contentvbox->pack_start(*bottomhbox, Gtk::PACK_SHRINK);
+    /* Table layout container for window content*/
+    m_table     = manage( new Table( 3, 3, false));
+
+    m_table->attach(*tophbox, 0, 1, 0, 1, Gtk::FILL | Gtk::EXPAND, Gtk::SHRINK, 10, 10 );
+    m_table->attach( *m_main_wid,    0, 3, 1, 2, Gtk::FILL | Gtk::EXPAND, Gtk::FILL | Gtk::EXPAND, 10, 10 );
+    m_table->attach(*bottomhbox, 0, 1, 2, 3, Gtk::FILL | Gtk::EXPAND, Gtk::SHRINK, 10, 10 );
 
     /*main container for menu and window content */
     VBox *mainvbox = new VBox();
 
     mainvbox->pack_start(*m_menubar, false, false );
-    mainvbox->pack_start( *contentvbox );
+    mainvbox->pack_start( *m_table);
 
     m_main_wid->set_can_focus();
     m_main_wid->grab_focus();

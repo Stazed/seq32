@@ -81,6 +81,7 @@ private:
     perfedit *m_perf_edit;
     options *m_options;
 
+    Table       *m_table;
     Button      *m_button_learn;
 
     Button      *m_button_stop;
