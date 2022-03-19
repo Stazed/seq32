@@ -1434,17 +1434,20 @@ seqedit::set_midi_bus( int a_midibus )
 void
 seqedit::set_zoom( int a_zoom  )
 {
-    char b[10];
+    if ((a_zoom >= c_min_zoom) && (a_zoom <= c_max_zoom))
+    {
+        char b[10];
 
-    snprintf(b, sizeof(b), "1:%d", a_zoom);
-    m_entry_zoom->set_text(b);
+        snprintf(b, sizeof(b), "1:%d", a_zoom);
+        m_entry_zoom->set_text(b);
 
-    m_zoom = a_zoom;
-    m_initial_zoom = a_zoom;
-    m_seqroll_wid->set_zoom( m_zoom );
-    m_seqtime_wid->set_zoom( m_zoom );
-    m_seqdata_wid->set_zoom( m_zoom );
-    m_seqevent_wid->set_zoom( m_zoom );
+        m_zoom = a_zoom;
+        m_initial_zoom = a_zoom;
+        m_seqroll_wid->set_zoom( m_zoom );
+        m_seqtime_wid->set_zoom( m_zoom );
+        m_seqdata_wid->set_zoom( m_zoom );
+        m_seqevent_wid->set_zoom( m_zoom );
+    }
 }
 
 void
