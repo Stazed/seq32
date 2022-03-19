@@ -152,7 +152,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
         
         /* The background of the sequences */
         cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-        cr->rectangle(base_x + 1, base_y + 1, m_seqarea_x - 1, m_seqarea_y - 1);
+        cr->rectangle(base_x + 2, base_y + 2, m_seqarea_x - 3, m_seqarea_y - 3);
         cr->fill();
         
         /* Outline of the whole window */
