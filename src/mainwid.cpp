@@ -201,7 +201,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
             }
 
             int rectangle_x = base_x + m_text_x - 1;
-            int rectangle_y = base_y + m_text_y + m_text_x - 1;
+            int rectangle_y = base_y + m_text_y + 6;
 
             if ( seq->get_queued() )
             {
@@ -430,7 +430,7 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
                       (m_seqarea_y + c_mainwid_spacing) * j);
 
         int rectangle_x = base_x + m_text_x - 1;
-        int rectangle_y = base_y + m_text_y + m_text_x - 1;
+        int rectangle_y = base_y + m_text_y + 6;
 
         int length = seq->get_length( );
         a_tick += (length - seq->get_trigger_offset( ));
