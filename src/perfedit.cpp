@@ -673,7 +673,7 @@ void
 perfedit::collapse()
 {
     m_mainperf->push_trigger_undo(-1); //  all tracks
-    m_mainperf->move_triggers( false );
+    m_mainperf->move_triggers( false, m_mainperf->get_right_tick() );
     m_perfroll->redraw_all_tracks();
 }
 
@@ -689,7 +689,7 @@ void
 perfedit::expand()
 {
     m_mainperf->push_trigger_undo(-1); // all tracks
-    m_mainperf->move_triggers( true );
+    m_mainperf->move_triggers( true, m_mainperf->get_left_tick() );
     m_perfroll->redraw_all_tracks();
 }
 
