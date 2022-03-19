@@ -465,7 +465,7 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
         }
 
         /* Draw the progress line */
-        m_surface_window->set_line_width(1.0);
+        m_surface_window->set_line_width(2.0);
 
         m_surface_window->move_to(rectangle_x + tick_x, rectangle_y + 1);
         m_surface_window->line_to(rectangle_x + tick_x, rectangle_y + m_seqarea_seq_y );
