@@ -45,8 +45,8 @@ class mainwnd;
 using namespace Gtk;
 
 /* The draw progress area size */
-const int c_seqarea_seq_x = c_text_x * 13;
-const int c_seqarea_seq_y = c_text_y * 2;
+//const int c_seqarea_seq_x = c_text_x * 13;
+//const int c_seqarea_seq_y = c_text_y * 2;
 
 enum
 {
@@ -72,6 +72,15 @@ private:
 
     int          m_window_x,
                  m_window_y;
+
+    int          m_text_x;
+    int          m_text_y;
+    int          m_seqarea_x;
+    int          m_seqarea_y;
+
+    /* The draw progress area size */
+    int         m_seqarea_seq_x = c_text_x * 13;
+    int         m_seqarea_seq_y = c_text_y * 2;
 
     bool         m_button_down;
     bool         m_moving;

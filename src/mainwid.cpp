@@ -44,6 +44,12 @@ mainwid::mainwid( perform *a_p, mainwnd *a_main ):
 
     m_window_x(c_mainwid_x),
     m_window_y(c_mainwid_y),
+    m_text_x(c_text_x),
+    m_text_y(c_text_y),
+    m_seqarea_x(c_seqarea_x),
+    m_seqarea_y(c_seqarea_y),
+    m_seqarea_seq_x(c_text_x * 13),
+    m_seqarea_seq_y(c_text_y * 2),
 
     m_button_down(false),
     m_moving(false),
@@ -62,7 +68,7 @@ mainwid::mainwid( perform *a_p, mainwnd *a_main ):
 
     using namespace Menu_Helpers;
 
-    set_size_request( c_mainwid_x, c_mainwid_y );
+    set_size_request( m_window_x, m_window_y );
 
     add_events( Gdk::BUTTON_PRESS_MASK |
                 Gdk::BUTTON_RELEASE_MASK |
@@ -136,15 +142,15 @@ mainwid::draw_sequence_on_surface( int a_seq )
         int j =  a_seq % c_mainwnd_rows;
 
         int base_x = (c_mainwid_border +
-                      (c_seqarea_x + c_mainwid_spacing) * i);
+                      (m_seqarea_x + c_mainwid_spacing) * i);
         int base_y = (c_mainwid_border +
-                      (c_seqarea_y + c_mainwid_spacing) * j);
+                      (m_seqarea_y + c_mainwid_spacing) * j);
 
         /*int local_seq = a_seq % c_seqs_in_set;*/
         
         /* The background of the sequences */
         cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-        cr->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y );
+        cr->rectangle(base_x, base_y, m_seqarea_x, m_seqarea_y );
         cr->fill();
         
         /* Outline of the whole window */
@@ -179,8 +185,8 @@ mainwid::draw_sequence_on_surface( int a_seq )
             }
 
             cr->rectangle(base_x + 1, base_y + 1,
-                                     c_seqarea_x - 2,
-                                     c_seqarea_y - 2 );
+                                     m_seqarea_x - 2,
+                                     m_seqarea_y - 2 );
             cr->fill();
 
             if( m_foreground_color == COLOR_BLACK)
@@ -192,16 +198,16 @@ mainwid::draw_sequence_on_surface( int a_seq )
                 cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
             }
 
-            int rectangle_x = base_x + c_text_x - 1;
-            int rectangle_y = base_y + c_text_y + c_text_x - 1;
+            int rectangle_x = base_x + m_text_x - 1;
+            int rectangle_y = base_y + m_text_y + m_text_x - 1;
 
             if ( seq->get_queued() )
             {
                 cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
                 cr->rectangle(rectangle_x,
                                          rectangle_y - 1,
-                                         c_seqarea_seq_x + 3,
-                                         c_seqarea_seq_y + 3 );
+                                         m_seqarea_seq_x + 3,
+                                         m_seqarea_seq_y + 3 );
                 cr->fill();
 
                 m_foreground_color = COLOR_BLACK;
@@ -212,8 +218,8 @@ mainwid::draw_sequence_on_surface( int a_seq )
             /* The box around the note, queue area */
             cr->rectangle(rectangle_x,
                                      rectangle_y - 1,
-                                     c_seqarea_seq_x + 3,
-                                     c_seqarea_seq_y + 3 );
+                                     m_seqarea_seq_x + 3,
+                                     m_seqarea_seq_y + 3 );
             cr->stroke();
 
             int lowest_note = seq->get_lowest_note_event( );
@@ -238,11 +244,11 @@ mainwid::draw_sequence_on_surface( int a_seq )
             while ( (dt = seq->get_next_note_event( &tick_s, &tick_f, &note,
                                                     &selected, &velocity )) != DRAW_FIN )
             {
-                int note_y = c_seqarea_seq_y -
-                             (c_seqarea_seq_y  * (note + 1 - lowest_note)) / height ;
+                int note_y = m_seqarea_seq_y -
+                             (m_seqarea_seq_y  * (note + 1 - lowest_note)) / height ;
 
-                int tick_s_x = (tick_s * c_seqarea_seq_x)  / length;
-                int tick_f_x = (tick_f * c_seqarea_seq_x)  / length;
+                int tick_s_x = (tick_s * m_seqarea_seq_x)  / length;
+                int tick_f_x = (tick_f * m_seqarea_seq_x)  / length;
 
                 if ( dt == DRAW_NOTE_ON || dt == DRAW_NOTE_OFF )
                     tick_f_x = tick_s_x + 1;
@@ -282,7 +288,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
             char name[20];
             snprintf( name, sizeof name, "%.13s", seq->get_name() );
 
-            p_font_renderer->render_string_on_drawable(base_x + c_text_x, base_y + 2, cr, name, font_color);
+            p_font_renderer->render_string_on_drawable(base_x + m_text_x, base_y + 2, cr, name, font_color);
 
             /* midi channel + key + timesig */
             /*char key =  m_seq_to_char[local_seq];*/
@@ -292,8 +298,8 @@ mainwid::draw_sequence_on_surface( int a_seq )
             {
                 snprintf( str, sizeof str, "%c", (char)m_mainperf->lookup_keyevent_key( a_seq ) );
 
-                p_font_renderer->render_string_on_drawable(base_x + c_seqarea_x - 8,
-                                                            base_y + c_text_y * 4 - 0,
+                p_font_renderer->render_string_on_drawable(base_x + m_seqarea_x - 8,
+                                                            base_y + m_text_y * 4 - 0,
                                                             cr, str, font_color );
             }
 
@@ -303,17 +309,17 @@ mainwid::draw_sequence_on_surface( int a_seq )
                       seq->get_midi_channel()+1,
                       seq->get_bp_measure(), seq->get_bw() );
 
-            p_font_renderer->render_string_on_drawable( base_x + c_text_x,
-                                                        base_y + c_text_y * 4 - 0,
+            p_font_renderer->render_string_on_drawable( base_x + m_text_x,
+                                                        base_y + m_text_y * 4 - 0,
                                                         cr, str, font_color);
         }
         else    /* not active */
         {
             cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-            cr->rectangle(base_x + 4, base_y, c_seqarea_x - 8,  c_seqarea_y);
+            cr->rectangle(base_x + 4, base_y, m_seqarea_x - 8,  m_seqarea_y);
             cr->fill();
             
-            cr->rectangle(base_x + 1, base_y + 1, c_seqarea_x - 2,  c_seqarea_y - 2);
+            cr->rectangle(base_x + 1, base_y + 1, m_seqarea_x - 2,  m_seqarea_y - 2);
             cr->fill();
         }
     }
@@ -329,12 +335,12 @@ mainwid::draw_sequence_surface_on_window( int a_seq )
         int j =  a_seq % c_mainwnd_rows;
 
         int base_x = (c_mainwid_border +
-                      (c_seqarea_x + c_mainwid_spacing) * i);
+                      (m_seqarea_x + c_mainwid_spacing) * i);
         int base_y = (c_mainwid_border +
-                      (c_seqarea_y + c_mainwid_spacing) * j);
+                      (m_seqarea_y + c_mainwid_spacing) * j);
         
         m_surface_window->set_source(m_surface, 0, 0);
-        m_surface_window->rectangle(base_x, base_y, c_seqarea_x, c_seqarea_y);
+        m_surface_window->rectangle(base_x, base_y, m_seqarea_x, m_seqarea_y);
         m_surface_window->stroke_preserve();
         m_surface_window->fill();
     }
@@ -407,25 +413,25 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
         int j =  a_seq % c_mainwnd_rows;
 
         int base_x = (c_mainwid_border +
-                      (c_seqarea_x + c_mainwid_spacing) * i);
+                      (m_seqarea_x + c_mainwid_spacing) * i);
         int base_y = (c_mainwid_border +
-                      (c_seqarea_y + c_mainwid_spacing) * j);
+                      (m_seqarea_y + c_mainwid_spacing) * j);
 
-        int rectangle_x = base_x + c_text_x - 1;
-        int rectangle_y = base_y + c_text_y + c_text_x - 1;
+        int rectangle_x = base_x + m_text_x - 1;
+        int rectangle_y = base_y + m_text_y + m_text_x - 1;
 
         int length = seq->get_length( );
         a_tick += (length - seq->get_trigger_offset( ));
         a_tick %= length;
 
-        long tick_x = a_tick * c_seqarea_seq_x / length;
+        long tick_x = a_tick * m_seqarea_seq_x / length;
         
         /* Redraws the previous progress line background to clear previous line */
         m_surface_window->set_source(m_surface, 0, 0);
         m_surface_window->rectangle(rectangle_x + m_last_tick_x[a_seq] - 1,
                                     rectangle_y,
                                     3,
-                                    c_seqarea_seq_y + 1 );
+                                    m_seqarea_seq_y + 1 );
 
         m_surface_window->stroke_preserve();
         m_surface_window->fill();
@@ -450,7 +456,7 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
         m_surface_window->set_line_width(1.0);
 
         m_surface_window->move_to(rectangle_x + tick_x, rectangle_y + 1);
-        m_surface_window->line_to(rectangle_x + tick_x, rectangle_y + c_seqarea_seq_y );
+        m_surface_window->line_to(rectangle_x + tick_x, rectangle_y + m_seqarea_seq_y );
         m_surface_window->stroke();
     }
 }
@@ -478,26 +484,26 @@ mainwid::seq_from_xy( int a_x, int a_y )
 
     /* is it in the box ? */
     if ( x < 0
-            || x >= ((c_seqarea_x + c_mainwid_spacing ) * c_mainwnd_cols )
+            || x >= ((m_seqarea_x + c_mainwid_spacing ) * c_mainwnd_cols )
             || y < 0
-            || y >= ((c_seqarea_y + c_mainwid_spacing ) * c_mainwnd_rows ))
+            || y >= ((m_seqarea_y + c_mainwid_spacing ) * c_mainwnd_rows ))
     {
         return -1;
     }
 
     /* gives us in box corrdinates */
-    int box_test_x = x % (c_seqarea_x + c_mainwid_spacing);
-    int box_test_y = y % (c_seqarea_y + c_mainwid_spacing);
+    int box_test_x = x % (m_seqarea_x + c_mainwid_spacing);
+    int box_test_y = y % (m_seqarea_y + c_mainwid_spacing);
 
     /* right inactive side of area */
-    if ( box_test_x > c_seqarea_x
-            || box_test_y > c_seqarea_y )
+    if ( box_test_x > m_seqarea_x
+            || box_test_y > m_seqarea_y )
     {
         return -1;
     }
 
-    x /= (c_seqarea_x + c_mainwid_spacing);
-    y /= (c_seqarea_y + c_mainwid_spacing);
+    x /= (m_seqarea_x + c_mainwid_spacing);
+    y /= (m_seqarea_y + c_mainwid_spacing);
 
     int sequence =  ( (x * c_mainwnd_rows + y)
                       + ( m_screenset * c_mainwnd_rows * c_mainwnd_cols ));
