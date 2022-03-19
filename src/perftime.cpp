@@ -111,6 +111,13 @@ perftime::set_guides( int a_snap, int a_measure )
     queue_draw();
 }
 
+void
+perftime::redraw()
+{
+    m_draw_background = true;
+    queue_draw();
+}
+
 bool
 perftime::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {

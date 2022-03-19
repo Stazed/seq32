@@ -564,6 +564,25 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
                 m_mainwnd->export_seq_track_trigger(E_MIDI_SOLO_TRIGGER, m_perfroll->get_drop_sequence());
             }
         }
+
+        if (a_ev->keyval == GDK_KEY_Home)
+        {
+            if(m_mainperf->is_jack_running() && global_song_start_mode)
+            {
+                m_mainperf->position_jack(global_song_start_mode, m_mainperf->get_left_tick());
+            }
+            else
+            {
+                m_mainperf->set_starting_tick(m_mainperf->get_left_tick());  // this will set progress line
+                m_mainperf->set_reposition();
+            }
+        }
+
+        if (a_ev->keyval == GDK_KEY_s)
+        {
+            m_mainperf->set_left_tick(m_mainperf->get_tick());
+            m_perftime->redraw();
+        }
     }
 
     if(!event_was_handled)

@@ -285,6 +285,12 @@ simple interface.
         Delete, backspace >> delete selected trigger.
         Middle mouse button >> paste clipboard trigger to mouse location.
 
+        Home key >> reposition the progress line to the L marker.
+        's' key >> reposition the L marker to the progress line.
+
+        'p' key reposition song editor play location. With mouse focus on song editor(tracks),
+        press 'p' to move play position to mouse location.
+
         --------------------
 
         TRACK NAME AREA:
