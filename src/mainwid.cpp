@@ -492,7 +492,7 @@ int
 mainwid::seq_from_xy( int a_x, int a_y )
 {
     /* adjust for border */
-    int x = a_x - c_mainwid_border;
+    int x = a_x - c_mainwid_border - (2 * m_resize_ratio_x);
     int y = a_y - c_mainwid_border;
 
     /* is it in the box ? */
