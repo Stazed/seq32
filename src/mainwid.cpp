@@ -329,7 +329,7 @@ mainwid::draw_sequence_on_surface( int a_seq )
         else    /* not active */
         {
             cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-            cr->rectangle((int) base_x + 4, (int) base_y, (int) m_seqarea_x - 8, (int) m_seqarea_y);
+            cr->rectangle((int) base_x + 4, (int) base_y, (int) m_seqarea_x - 8, (int) m_seqarea_y + 1);
             cr->fill();
             
             cr->rectangle((int) base_x + 1, (int) base_y + 1, (int) m_seqarea_x - 2, (int) m_seqarea_y - 2);
