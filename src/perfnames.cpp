@@ -171,7 +171,7 @@ perfnames::draw_sequence( int sequence )
             p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width,
                                                        (m_names_y * i) + 2,
                                                        cr, name, font_color,
-                                                       1.0,
+                                                       c_default_horizontal_zoom,
                                                        m_vertical_zoom);
 
             /* Buses */
@@ -187,7 +187,7 @@ perfnames::draw_sequence( int sequence )
             p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width,
                                                        m_names_y * i + (12 * m_vertical_zoom),
                                                        cr, str, font_color,
-                                                       1.0,
+                                                       c_default_horizontal_zoom,
                                                        m_vertical_zoom);
 
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();

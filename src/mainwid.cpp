@@ -50,8 +50,8 @@ mainwid::mainwid( perform *a_p, mainwnd *a_main ):
     m_seqarea_y(c_seqarea_y),
     m_seqarea_seq_x(c_text_x * 13),
     m_seqarea_seq_y(c_text_y * 2),
-    m_resize_ratio_x(1.0),
-    m_resize_ratio_y(1.0),
+    m_resize_ratio_x(c_default_horizontal_zoom),
+    m_resize_ratio_y(c_default_vertical_zoom),
 
     m_button_down(false),
     m_moving(false),

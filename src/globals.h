@@ -197,6 +197,7 @@ const int c_names_x = 154;
 const int c_names_y = 22;
 const int c_perf_scale_x = 32; /*ticks per pixel */
 const int c_perf_max_zoom = 8;
+const float c_default_horizontal_zoom = 1.0;
 const float c_default_vertical_zoom = 1.0;
 const float c_perf_max_vertical_zoom = 3.0;
 const float c_perf_min_vertical_zoom = 0.5;
