@@ -512,6 +512,18 @@ simple interface.
         The midi clock fields will contain the clocking state from the last 
         time seq32 was run.  Turn off clock with a 0, or on with a 1.
 
+        * [manual-alsa-ports]
+
+        Set this to 1 if you want to expose alsa ports to Jack.
+        Set to 0 if you want manual alsa connections from seq32.
+
+        * [vertical-zoom-sequence]
+
+        Sets the vertical zoom default for the sequence editor.
+
+        * [vertical-zoom-song]
+
+        Sets the vertical zoom default for the song editor tracks.
 
         * [keyboard-control]      
         

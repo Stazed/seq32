@@ -124,6 +124,7 @@ protected:
 public:
 
     int  m_horizontal_zoom;
+    float m_default_vertical_zoom;
 
     bool on_key_press_event(GdkEventKey* a_p0);
     void auto_scroll_horz();

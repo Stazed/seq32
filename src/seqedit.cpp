@@ -324,11 +324,12 @@ seqedit::seqedit( sequence *a_seq,
     set_note_length( m_note_length );
     set_background_sequence( m_sequence );
     
-    /* The user options default zoom */
+    /* The user options default zoom - the value reset when the '9' key is pressed */
     m_default_vertical_zoom = c_default_vertical_zoom +  
             (float) (global_sequence_editor_zoom - c_default_config_sequence_zoom)
             * c_vert_seqroll_zoom_step;
 
+    /* Set the actual zoom */
     set_vertical_zoom(m_default_vertical_zoom);
 
     set_bp_measure( m_seq->get_bp_measure() );

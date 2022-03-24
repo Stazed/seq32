@@ -30,6 +30,7 @@ perfroll::perfroll( perform *a_perf,
     m_perf_scale_x(c_perf_scale_x),       // 32 ticks per pixel
     m_names_y(c_names_y),
     m_vertical_zoom(c_default_vertical_zoom),
+    m_default_vertical_zoom(c_default_vertical_zoom),
 
     m_old_progress_ticks(0),
 
@@ -830,9 +831,9 @@ perfroll::on_key_press_event(GdkEventKey* a_p0)
             m_perfedit->set_vertical_zoom(m_vertical_zoom + c_vertical_zoom_step);
             return true;
         }
-        else if (a_p0->keyval == GDK_KEY_9)         /* reset to normal zoom */
+        else if (a_p0->keyval == GDK_KEY_9)         /* reset to user default zoom */
         {
-            m_perfedit->set_vertical_zoom(c_default_vertical_zoom);
+            m_perfedit->set_vertical_zoom(m_default_vertical_zoom);
             return true;
         }
         else if (a_p0->keyval == GDK_KEY_v)         /* zoom out             */

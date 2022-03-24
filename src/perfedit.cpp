@@ -911,11 +911,29 @@ perfedit::set_horizontal_zoom (int z)
     m_tempo->set_horizontal_zoom(z);
 }
 
+/**
+ *  Set the actual zoom to a given value;
+ * 
+ * @param z
+ *      The zoom value to adjust.
+ */
 void
 perfedit::set_vertical_zoom(float z)
 {
     m_perfnames->set_vertical_zoom(z);
     m_perfroll->set_vertical_zoom(z);
+}
+
+/**
+ *  Set the user default from the options file - .seq32rc
+ * 
+ * @param z
+ *      The user default adjusted to float zoom value.
+ */
+void
+perfedit::set_default_vertical_zoom(float z)
+{
+    m_perfroll->m_default_vertical_zoom = z;
 }
 
 void
