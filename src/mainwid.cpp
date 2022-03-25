@@ -207,9 +207,9 @@ mainwid::draw_sequence_on_surface( int a_seq )
             if ( seq->get_queued() )
             {
                 cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
-                cr->rectangle( (int) rectangle_x,
+                cr->rectangle( (int) rectangle_x + 1,
                                          (int) rectangle_y - 1,
-                                         (int) m_seqarea_seq_x + 3,
+                                         (int) m_seqarea_seq_x + 1,
                                          (int) m_seqarea_seq_y + 3 );
                 cr->fill();
 
@@ -219,9 +219,9 @@ mainwid::draw_sequence_on_surface( int a_seq )
             }
             
             /* The box around the note, queue area */
-            cr->rectangle( (int) rectangle_x,
+            cr->rectangle( (int) rectangle_x + 1,
                                     (int) rectangle_y - 1,
-                                    (int) m_seqarea_seq_x + 3,
+                                    (int) m_seqarea_seq_x + 1,
                                     (int) m_seqarea_seq_y + 3 );
             cr->stroke();
 
@@ -270,9 +270,9 @@ mainwid::draw_sequence_on_surface( int a_seq )
                     cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
                 }
                 
-                cr->move_to( (int) rectangle_x + tick_s_x + 2,
+                cr->move_to( (int) rectangle_x + tick_s_x,
                                    (int) rectangle_y + note_y);
-                cr->line_to( (int) rectangle_x + tick_f_x + 2,
+                cr->line_to( (int) rectangle_x + tick_f_x,
                                    (int) rectangle_y + note_y);
                 cr->stroke();
             }
@@ -441,7 +441,7 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
         
         /* Redraws the previous progress line background to clear previous line */
         m_surface_window->set_source(m_surface, 0, 0);
-        m_surface_window->rectangle( (int) rectangle_x + m_last_tick_x[a_seq] - 1,
+        m_surface_window->rectangle( (int) rectangle_x + m_last_tick_x[a_seq],
                                     (int) rectangle_y,
                                     3,
                                     m_seqarea_seq_y + 1 );
@@ -468,8 +468,8 @@ mainwid::draw_marker_on_sequence( int a_seq, int a_tick )
         /* Draw the progress line */
         m_surface_window->set_line_width(2.0);
 
-        m_surface_window->move_to( (int) rectangle_x + tick_x, (int) rectangle_y + 1);
-        m_surface_window->line_to( (int) rectangle_x + tick_x, (int) rectangle_y + m_seqarea_seq_y );
+        m_surface_window->move_to( (int) rectangle_x + tick_x + 1, (int) rectangle_y + 1);
+        m_surface_window->line_to( (int) rectangle_x + tick_x + 1, (int) rectangle_y + m_seqarea_seq_y );
         m_surface_window->stroke();
     }
 }
