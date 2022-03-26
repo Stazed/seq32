@@ -30,7 +30,6 @@ perfroll::perfroll( perform *a_perf,
     m_perf_scale_x(c_perf_scale_x),       // 32 ticks per pixel
     m_names_y(c_names_y),
     m_vertical_zoom(c_default_vertical_zoom),
-    m_default_vertical_zoom(c_default_vertical_zoom),
 
     m_old_progress_ticks(0),
 
@@ -54,7 +53,8 @@ perfroll::perfroll( perform *a_perf,
     m_have_stop_reposition(false),
     m_marker_change(false),
     m_line_location(0),
-    m_horizontal_zoom(c_perf_scale_x)
+    m_horizontal_zoom(c_perf_scale_x),
+    m_default_vertical_zoom(c_default_vertical_zoom)
 {
     Gtk::Allocation allocation = get_allocation();
     m_surface_track = Cairo::ImageSurface::create(
