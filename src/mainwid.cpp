@@ -270,9 +270,9 @@ mainwid::draw_sequence_on_surface( int a_seq )
                     cr->set_source_rgb(c_back_black.r, c_back_black.g, c_back_black.b);
                 }
                 
-                cr->move_to( (int) rectangle_x + tick_s_x,
+                cr->move_to( (int) rectangle_x + tick_s_x + 1,
                                    (int) rectangle_y + note_y);
-                cr->line_to( (int) rectangle_x + tick_f_x,
+                cr->line_to( (int) rectangle_x + tick_f_x + 1,
                                    (int) rectangle_y + note_y);
                 cr->stroke();
             }
