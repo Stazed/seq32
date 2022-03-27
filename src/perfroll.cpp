@@ -19,6 +19,8 @@
 //-----------------------------------------------------------------------------
 #include "event.h"
 #include "perfroll.h"
+#include "pixmaps/resize_black.xpm"
+#include "pixmaps/resize_white.xpm"
 
 perfroll::perfroll( perform *a_perf,
                     perfedit * a_perf_edit,
@@ -30,6 +32,8 @@ perfroll::perfroll( perform *a_perf,
     m_perf_scale_x(c_perf_scale_x),       // 32 ticks per pixel
     m_names_y(c_names_y),
     m_vertical_zoom(c_default_vertical_zoom),
+    m_resize_handle_w(c_perfroll_resize_box_default),
+    m_resize_handle_h(c_perfroll_resize_box_default),
 
     m_old_progress_ticks(0),
 
@@ -487,14 +491,35 @@ void perfroll::draw_sequence_on( int a_sequence )
                     /* trigger outline */
                     cr->rectangle(x, y, w, h);
                     cr->stroke();
+                    
+                    /* Scale the handle size to the zoom size */
+                    m_resize_handle_w = c_perfroll_resize_box_default * ( (float)  c_perf_scale_x / m_perf_scale_x);
+                    m_resize_handle_h = c_perfroll_resize_box_default * ( (float) m_names_y / c_names_y);
+
+                    /* The resize handles */
+                    if ( selected )
+                    {
+                        m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(resize_black_xpm);
+                    }
+                    else
+                    {
+                        m_pixbuf = Gdk::Pixbuf::create_from_xpm_data(resize_white_xpm);
+                    }
+
+                    /* Scale the pixbuf to the zoom size */
+                    m_pixbuf = m_pixbuf->scale_simple( (int) m_resize_handle_w,
+                                          (int) m_resize_handle_h,
+                                          Gdk::INTERP_BILINEAR);
 
                     /* resize handle - top left */
-                    cr->rectangle(x, y, c_perfroll_size_box_w, c_perfroll_size_box_w);
-                    cr->stroke();
+                    Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf, x, y);
+                    cr->paint();
 
                     /* resize handle - bottom right */
-                    cr->rectangle(x+w-c_perfroll_size_box_w, y+h-c_perfroll_size_box_w, c_perfroll_size_box_w, c_perfroll_size_box_w);
-                    cr->stroke();
+                    Gdk::Cairo::set_source_pixbuf (cr, m_pixbuf,
+                                                   x + w - (int) m_resize_handle_w,
+                                                   y + h - (int) m_resize_handle_h);
+                    cr->paint();
 
                     long length_marker_first_tick = ( tick_on - (tick_on % sequence_length) + (offset % sequence_length) - sequence_length);
 
