@@ -725,8 +725,6 @@ perfroll::auto_scroll_horz()
     int progress_x =     ( progress_tick - tick_offset ) / m_horizontal_zoom ;
     int page = progress_x / m_window_x;
 
-    float adjust =  ( (float) m_horizontal_zoom / c_perf_scale_x  );
-
     /* 50 so we rewind short of beginning and 0.75 short of the end on forward */
     if (page != 0 || ((progress_x - 50) < 0) || (progress_x > (m_window_x * 0.75)))
     {
