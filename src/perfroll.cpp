@@ -748,6 +748,15 @@ perfroll::auto_scroll_horz()
         {
             m_hadjust->set_value( set_hadjust );
         }
+
+        /* When stopped, reset scroll based on left tick */
+        if ( !global_is_running )
+        {
+            if ( progress_tick == m_mainperf->get_left_tick() )
+            {
+                m_hadjust->set_value(set_hadjust);
+            }
+        }
     }
 }
 
