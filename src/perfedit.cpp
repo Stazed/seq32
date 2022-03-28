@@ -480,7 +480,7 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
     /* Horizontal zoom */
     if (a_ev->keyval == GDK_KEY_Z)         /* zoom in              */
     {
-        set_horizontal_zoom(m_perfroll->m_horizontal_zoom / 2);
+        set_horizontal_zoom(( m_perfroll->m_horizontal_zoom + 2) );
         return true;
     }
     else if (a_ev->keyval == GDK_KEY_0)         /* reset to normal zoom */
@@ -490,7 +490,7 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
     }
     else if (a_ev->keyval == GDK_KEY_z)         /* zoom out             */
     {
-        set_horizontal_zoom(m_perfroll->m_horizontal_zoom * 2);
+        set_horizontal_zoom( ( m_perfroll->m_horizontal_zoom - 2) );
         return true;
     }
 
