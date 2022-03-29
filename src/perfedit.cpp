@@ -59,6 +59,7 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_mainwnd = a_main;
     m_tick_time_as_bbt = false;
     m_toggle_time_type = true;      // set true to show clock on start
+    m_default_horizontal_zoom = c_perf_scale_x;
 
     /* main window */
     set_title( "seq32 - Song Editor");
@@ -485,7 +486,7 @@ perfedit::on_key_press_event(GdkEventKey* a_ev)
     }
     else if (a_ev->keyval == GDK_KEY_0)         /* reset to normal zoom */
     {
-        set_horizontal_zoom(c_perf_scale_x);
+        set_horizontal_zoom(m_default_horizontal_zoom);
         return true;
     }
     else if (a_ev->keyval == GDK_KEY_z)         /* zoom out             */
@@ -909,6 +910,12 @@ perfedit::set_horizontal_zoom (int z)
     m_perfroll->set_horizontal_zoom(z);
     m_perftime->set_horizontal_zoom(z);
     m_tempo->set_horizontal_zoom(z);
+}
+
+void
+perfedit::set_default_horizontal_zoom(int z)
+{
+    m_default_horizontal_zoom = z;
 }
 
 /**

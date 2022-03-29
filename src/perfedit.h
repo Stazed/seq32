@@ -132,6 +132,9 @@ private:
     
     /* Flag used when time type is toggled when stopped to update gui */
     bool m_toggle_time_type;
+    
+    /* User default */
+    int  m_default_horizontal_zoom;
 
     void bp_measure_button_callback(int a_beats_per_measure);
     void bw_button_callback(int a_beat_width);
@@ -214,6 +217,7 @@ public:
 
     void set_xpose (int a_xpose);
     void set_horizontal_zoom (int z);
+    void set_default_horizontal_zoom(int z);
     void set_vertical_zoom(float z);
     void set_default_vertical_zoom(float z);
 

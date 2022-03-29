@@ -381,7 +381,7 @@ mainwnd::mainwnd(perform *a_p, Glib::RefPtr<Gtk::Application> app):
 
     m_perf_edit = new perfedit( m_mainperf, this );
     
-    /* The song editor - perfedit - user default */
+    /* The song editor - perfedit - vertical zoom user default */
     float default_vertical_zoom = c_default_vertical_zoom + 
             (float) (global_song_editor_zoom - c_default_config_song_zoom)
             * c_vertical_zoom_step;
@@ -391,6 +391,15 @@ mainwnd::mainwnd(perform *a_p, Glib::RefPtr<Gtk::Application> app):
 
     /* Set the actual zoom */
     set_vertical_zoom( default_vertical_zoom );
+
+    /* The horizontal zoom - user default */
+    int default_horizontal_zoom = (global_song_editor_horizontal_zoom * 2) + 8;
+    
+    /* Set the default value that will be reset when the '0' key is pressed */
+    m_perf_edit->set_default_horizontal_zoom(default_horizontal_zoom);
+
+    /* Set the actual zoom */
+    m_perf_edit->set_horizontal_zoom(default_horizontal_zoom);
 }
 
 
