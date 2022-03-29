@@ -326,7 +326,7 @@ seqedit::seqedit( sequence *a_seq,
     
     /* The user options default zoom - the value reset when the '9' key is pressed */
     m_default_vertical_zoom = c_default_vertical_zoom +  
-            (float) (global_sequence_editor_zoom - c_default_config_sequence_zoom)
+            (float) (global_sequence_editor_vertical_zoom - c_default_config_sequence_vertical_zoom)
             * c_vert_seqroll_zoom_step;
 
     /* Set the actual zoom */
