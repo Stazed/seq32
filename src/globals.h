@@ -51,6 +51,7 @@ const color c_solo_green = { c_color_solo_green.get_red(), c_color_solo_green.ge
 const color c_mute_red = { c_color_mute_red.get_red(), c_color_mute_red.get_green(), c_color_mute_red.get_blue() };
 const color c_fore_white = { 1.0, 1.0, 1.0 };
 const color c_back_black = { 0.0, 0.0, 0.0 };
+const color c_back_x_dark_grey = { 0.2, 0.2, 0.2 };
 const color c_back_dark_grey = { 0.3, 0.3, 0.3 };
 const color c_back_medium_grey = { 0.5, 0.5, 0.5 };
 const color c_back_light_grey = { 0.6, 0.6, 0.6 };
