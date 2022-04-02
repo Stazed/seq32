@@ -2,7 +2,7 @@
 Name=Seq32
 GenericName=
 Comment=MIDI Sequencer
-Icon=seq32_48.png
+Icon=seq32_48
 Type=Application
 Categories=AudioVideo;Audio;X-Jack;Midi;X-MIDI;
 Exec=seq32
