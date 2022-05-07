@@ -69,7 +69,7 @@ Apply "autoreconf -i" to get a configure script, then:
 Run the usual "./configure" then "make".
 
 To install: As root, "make install".
-Or you can copy the "seq42" binary (in the "src" directory) wherever you like.
+Or you can copy the "seq32" binary (in the "src" directory) wherever you like.
 
 Re: macro `AM_PATH_ALSA' not found in library
 
