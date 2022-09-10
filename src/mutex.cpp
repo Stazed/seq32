@@ -23,7 +23,12 @@
 namespace seq32
 {
 
-const pthread_mutex_t mutex::recmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+#if defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
+    const pthread_mutex_t mutex::recmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+#else
+    const pthread_mutex_t mutex::recmutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
+
 const pthread_cond_t condition_var::cond  = PTHREAD_COND_INITIALIZER;
 
 mutex::mutex( )

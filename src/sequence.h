@@ -77,7 +77,7 @@ public:
         m_selected = false;
     };
 
-    bool operator< (trigger rhs)
+    bool operator< (trigger rhs) const
     {
         if (m_tick_start < rhs.m_tick_start)
             return true;
