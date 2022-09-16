@@ -27,7 +27,8 @@
 seqmenu::seqmenu( perform *a_p, mainwnd *a_main ) :
     m_menu(NULL),
     m_mainperf(a_p),
-    m_mainwnd(a_main)
+    m_mainwnd(a_main),
+    m_current_seq()
 {
     using namespace Menu_Helpers;
 
@@ -151,9 +152,9 @@ seqmenu::popup_menu()
                                    string(")") );
                 }
 
-                MenuItem * menu_item = new MenuItem(name);
-                menu_item->signal_activate().connect(sigc::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel), i, j));
-                menu_channels->append(*menu_item);
+                MenuItem * menu_item_name = new MenuItem(name);
+                menu_item_name->signal_activate().connect(sigc::bind(mem_fun(*this,&seqmenu::set_bus_and_midi_channel), i, j));
+                menu_channels->append(*menu_item_name);
             }
         }
     }
