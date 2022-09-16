@@ -210,7 +210,7 @@ private:
     void adjust_trigger_offsets_to_legnth( long a_new_len );
     long adjust_offset( long a_offset );
     void remove( list<event>::iterator i );
-    void remove( event* e );
+    void remove(const event* e );
 
 public:
 
@@ -240,7 +240,7 @@ public:
     void set_have_redo();
 
     /* name */
-    void set_name (string a_name);
+    void set_name (const string &a_name);
     void set_name (char *a_name);
 
     void set_unit_measure ();
@@ -463,7 +463,7 @@ public:
                     unsigned char a_status,
                     unsigned char a_d0, unsigned char a_d1, bool a_paint = false);
 
-    bool stream_event (event * a_ev);
+    bool stream_event (const event * a_ev);
 
     /* changes velocities in a ramping way from vel_s to vel_f  */
     void change_event_data_range (long a_tick_s, long a_tick_f,
