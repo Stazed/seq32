@@ -36,6 +36,8 @@ seqevent::seqevent(sequence *a_seq,
     m_zoom(a_zoom),
     m_snap(a_snap),
     m_key_y(c_key_y),
+    m_window_x(),
+    m_window_y(),
 
     m_selecting(false),
     m_moving_init(false),
@@ -43,8 +45,14 @@ seqevent::seqevent(sequence *a_seq,
     m_growing(false),
     m_painting(false),
     m_paste(false),
+    m_drop_x(),
+    m_drop_y(),
+    m_current_x(),
+    m_current_y(),
+    m_move_snap_offset_x(),
 
-    m_status(EVENT_NOTE_ON)
+    m_status(EVENT_NOTE_ON),
+    m_cc()
 {
     Gtk::Allocation allocation = get_allocation();
     m_surface = Cairo::ImageSurface::create(
@@ -667,7 +675,7 @@ void FruitySeqEventInput::updateMousePtr(seqevent& ths)
 
 bool FruitySeqEventInput::on_button_press_event(GdkEventButton* a_ev, seqevent& ths)
 {
-    int x,w,numsel;
+    int x,w;
 
     long tick_s;
     long tick_f;
@@ -751,7 +759,7 @@ bool FruitySeqEventInput::on_button_press_event(GdkEventButton* a_ev, seqevent& 
                     }
 
                     /* on direct click select only one event */
-                    numsel = ths.m_seq->select_events( tick_s, tick_f,
+                    int numsel = ths.m_seq->select_events( tick_s, tick_f,
                                                        ths.m_status,
                                                        ths.m_cc, sequence::e_select_one );
 
@@ -1050,7 +1058,7 @@ Seq32SeqEventInput::set_adding( bool a_adding, seqevent& ths )
 
 bool Seq32SeqEventInput::on_button_press_event(GdkEventButton* a_ev, seqevent& ths)
 {
-    int x,w,numsel;
+    int x,w;
 
     long tick_s;
     long tick_f;
@@ -1119,7 +1127,7 @@ bool Seq32SeqEventInput::on_button_press_event(GdkEventButton* a_ev, seqevent& t
                         ths.m_seq->unselect();
                     }
 
-                    numsel = ths.m_seq->select_events( tick_s, tick_f,
+                    int numsel = ths.m_seq->select_events( tick_s, tick_f,
                                                        ths.m_status,
                                                        ths.m_cc, sequence::e_select_one );
 

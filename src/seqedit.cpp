@@ -1187,28 +1187,27 @@ seqedit::popup_sequence_menu()
         for (unsigned seq = 0; seq < c_seqs_in_set; seq++ )
         {
             int i = ss * c_seqs_in_set + seq;
-
-            char name[30];
             
             if ( m_mainperf->is_active( i ))
             {
+                char name[30];
                 if ( !inserted )
                 {
                     inserted = true;
                     snprintf(name, sizeof(name), "[%d]", ss);
                     menu_ss = manage( new Menu());
 
-                    MenuItem * menu_item = new MenuItem(name);
-                    menu_item->set_submenu(*menu_ss);
-                    m_menu_sequences->append(*menu_item);
+                    MenuItem * menu_item_nn = new MenuItem(name);
+                    menu_item_nn->set_submenu(*menu_ss);
+                    m_menu_sequences->append(*menu_item_nn);
                 }
 
-                sequence *seq = m_mainperf->get_sequence( i );
-                snprintf(name, sizeof(name),"[%d] %.13s", i, seq->get_name());
+                sequence *a_seq = m_mainperf->get_sequence( i );
+                snprintf(name, sizeof(name),"[%d] %.13s", i, a_seq->get_name());
 
-                MenuItem * menu_item = new MenuItem(name);
-                menu_item->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_background_sequence), i));
-                menu_ss->append(*menu_item);
+                MenuItem * menu_item_name = new MenuItem(name);
+                menu_item_name->signal_activate().connect(sigc::bind(mem_fun(*this, &seqedit::set_background_sequence), i));
+                menu_ss->append(*menu_item_name);
             }
         }
     }
@@ -1220,8 +1219,6 @@ seqedit::popup_sequence_menu()
 void
 seqedit::set_background_sequence( int a_seq )
 {
-    char name[30];
-
     m_initial_sequence = m_sequence = a_seq;
 
     if ( a_seq == -1 || !m_mainperf->is_active( a_seq ))
@@ -1232,6 +1229,7 @@ seqedit::set_background_sequence( int a_seq )
 
     if ( m_mainperf->is_active( a_seq ))
     {
+        char name[30];
         sequence *seq = m_mainperf->get_sequence( a_seq );
         snprintf(name, sizeof(name),"[%d] %.13s", a_seq, seq->get_name());
         m_entry_sequence->set_text(name);
