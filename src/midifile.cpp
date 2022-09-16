@@ -144,7 +144,6 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
     unsigned short Format;			/* 0,1,2 */
     unsigned short NumTracks;
     unsigned short ppqn;
-    unsigned short perf;
 
     /* track name from file */
     char TrackName[256];
@@ -156,9 +155,13 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
     sequence * seq;
     event e;
 
-    /* read in header */
+    /* Read in header - do not change the scope of these as they increment
+        the class m_pos varible from call to read_byte().
+        Cppcheck will complain about value assigned but not used.
+     */
     ID = read_long ();
-    TrackLength = read_long ();
+    /*TrackLength = */ read_long ();    // Fix Cppcheck style message - need to read to increment m_pos
+                                        // but the return is not used.
     Format = read_short ();
     NumTracks = read_short ();
     ppqn = read_short ();
@@ -190,12 +193,6 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
     {
         /* done for each track */
         bool done = false;
-        perf = 0;
-
-        /* events */
-        unsigned char status = 0, type, data[2], laststatus;
-        long len;
-        unsigned long proprietary = 0;
 
         /* Get ID + Length */
         ID = read_long ();
@@ -206,6 +203,14 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
         {
             /* we know we have a good track, so we can create
                a new sequence to dump it to */
+
+            unsigned short perf = 0;
+
+            /* events */
+            unsigned char status = 0, type, data[2];
+            long len;
+            unsigned long proprietary = 0;
+
             seq = new sequence ();
             if (seq == NULL)
             {
@@ -224,7 +229,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                 Delta = read_var ();
 
                 /* get status */
-                laststatus = status;
+                unsigned char laststatus = status;
                 status = m_d[m_pos];
 
                 /* is it a status bit ? */
@@ -343,7 +348,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                             {
                                 int num_triggers = len / 4;
 
-                                for (int i = 0; i < num_triggers; i += 2)
+                                for (int k = 0; k < num_triggers; k += 2)
                                 {
                                     unsigned long on = read_long ();
                                     unsigned long length = (read_long () - on);
@@ -356,7 +361,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                                 int num_triggers = len / 12;
 
                                 //printf( "num_triggers[%d]\n", num_triggers );
-                                for (int i = 0; i < num_triggers; i++)
+                                for (int k = 0; k < num_triggers; k++)
                                 {
                                     unsigned long on = read_long ();
                                     unsigned long off = read_long ();
@@ -537,31 +542,31 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
         {
             unsigned long seqs = read_long ();
 
-            for (unsigned int i = 0; i < seqs; i++)
+            for (unsigned int k = 0; k < seqs; k++)
             {
-                a_perf->get_midi_control_toggle (i)->m_active = read_byte();
-                a_perf->get_midi_control_toggle (i)->m_inverse_active =
+                a_perf->get_midi_control_toggle (k)->m_active = read_byte();
+                a_perf->get_midi_control_toggle (k)->m_inverse_active =
                     read_byte();
-                a_perf->get_midi_control_toggle (i)->m_status = read_byte();
-                a_perf->get_midi_control_toggle (i)->m_data = read_byte();
-                a_perf->get_midi_control_toggle (i)->m_min_value = read_byte();
-                a_perf->get_midi_control_toggle (i)->m_max_value = read_byte();
+                a_perf->get_midi_control_toggle (k)->m_status = read_byte();
+                a_perf->get_midi_control_toggle (k)->m_data = read_byte();
+                a_perf->get_midi_control_toggle (k)->m_min_value = read_byte();
+                a_perf->get_midi_control_toggle (k)->m_max_value = read_byte();
 
-                a_perf->get_midi_control_on (i)->m_active = read_byte();
-                a_perf->get_midi_control_on (i)->m_inverse_active =
+                a_perf->get_midi_control_on (k)->m_active = read_byte();
+                a_perf->get_midi_control_on (k)->m_inverse_active =
                     read_byte();
-                a_perf->get_midi_control_on (i)->m_status = read_byte();
-                a_perf->get_midi_control_on (i)->m_data = read_byte();
-                a_perf->get_midi_control_on (i)->m_min_value = read_byte();
-                a_perf->get_midi_control_on (i)->m_max_value = read_byte();
+                a_perf->get_midi_control_on (k)->m_status = read_byte();
+                a_perf->get_midi_control_on (k)->m_data = read_byte();
+                a_perf->get_midi_control_on (k)->m_min_value = read_byte();
+                a_perf->get_midi_control_on (k)->m_max_value = read_byte();
 
-                a_perf->get_midi_control_off (i)->m_active = read_byte();
-                a_perf->get_midi_control_off (i)->m_inverse_active =
+                a_perf->get_midi_control_off (k)->m_active = read_byte();
+                a_perf->get_midi_control_off (k)->m_inverse_active =
                     read_byte();
-                a_perf->get_midi_control_off (i)->m_status = read_byte();
-                a_perf->get_midi_control_off (i)->m_data = read_byte();
-                a_perf->get_midi_control_off (i)->m_min_value = read_byte();
-                a_perf->get_midi_control_off (i)->m_max_value = read_byte();
+                a_perf->get_midi_control_off (k)->m_status = read_byte();
+                a_perf->get_midi_control_off (k)->m_data = read_byte();
+                a_perf->get_midi_control_off (k)->m_min_value = read_byte();
+                a_perf->get_midi_control_off (k)->m_max_value = read_byte();
             }
         }
 
@@ -593,7 +598,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                 unsigned int len = read_short ();
                 string notess;
 
-                for (unsigned int i = 0; i < len; i++)
+                for (unsigned int k = 0; k < len; k++)
                     notess += read_byte();
 
                 a_perf->set_screen_set_notepad (x, &notess);
@@ -627,7 +632,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                 {
                     printf( "corrupt data in mutegroup section\n" );
                 }
-                for (int i = 0; i < c_seqs_in_set; i++)
+                for (int j = 0; j < c_seqs_in_set; j++)
                 {
                     a_perf->select_group_mute(read_long ());
                     for (int k = 0; k < c_seqs_in_set; ++k)
@@ -681,7 +686,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
             }
             
             /* if use_tempo_map is false we should still run through the reads in case additional tags are added later */
-            for(int i = 0; i < length; ++i)
+            for(int k = 0; k < length; ++k)
             {
                 a_marker.tick = read_long();
                 double a_bpm = (double) read_long ();
@@ -943,11 +948,11 @@ bool midifile::write (perform * a_perf, int a_solo_seq)
         write_long(c_tempo_map);
         write_long(a_perf->m_list_total_marker.size());
         list<tempo_mark>::iterator i;
-        for ( i = a_perf->m_list_total_marker.begin(); i != a_perf->m_list_total_marker.end(); i++ )
+        for ( i = a_perf->m_list_total_marker.begin(); i != a_perf->m_list_total_marker.end(); ++i )
         {
             write_long((*i).tick);
-            long scaled_bpm = long((*i).bpm * c_bpm_scale_factor);
-            write_long (scaled_bpm);
+            long scaled_bpm_factor = long((*i).bpm * c_bpm_scale_factor);
+            write_long (scaled_bpm_factor);
             write_long((*i).bw);
             write_long((*i).bp_measure);
            // don't need start frame since it will be re-calculated on load
@@ -964,7 +969,7 @@ bool midifile::write (perform * a_perf, int a_solo_seq)
     file.rdbuf()->pubsetbuf(file_buffer, sizeof file_buffer);
 
     for (list < unsigned char >::iterator i = m_l.begin ();
-            i != m_l.end (); i++)
+            i != m_l.end (); ++i)
     {
         char c = *i;
         file.write(&c, 1);
@@ -1054,12 +1059,10 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
             std::vector<trigger> trig_vect;
             seq->get_sequence_triggers(trig_vect);
             list<char> l;
-
-            int vect_size = 1;                          // for solo trigger
             
             if(type == E_MIDI_SONG_FORMAT || type == E_MIDI_SOLO_TRACK)
             {
-                vect_size = trig_vect.size();
+                int vect_size = trig_vect.size();
 
                 /*  sequence name  */
                 seq->seq_number_fill_list( &l, numtracks );
@@ -1162,7 +1165,7 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
     file.rdbuf()->pubsetbuf(file_buffer, sizeof file_buffer);
 
     for (list < unsigned char >::iterator i = m_l.begin ();
-            i != m_l.end (); i++)
+            i != m_l.end (); ++i)
     {
         char c = *i;
         file.write(&c, 1);
