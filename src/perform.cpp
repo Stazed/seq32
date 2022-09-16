@@ -757,8 +757,7 @@ void perform::add_sequence( sequence *a_seq, int a_pref )
 {
     /* check for preferred */
     if ( a_pref < c_max_sequence &&
-            is_active(a_pref) == false &&
-            a_pref >= 0 )
+            is_active(a_pref) == false )
     {
         m_seqs[a_pref] = a_seq;
         set_active(a_pref, true);
@@ -1118,7 +1117,7 @@ bool perform::tempo_change()
 {
     list<tempo_mark>::iterator i;
 
-    for ( i = m_list_play_marker.begin(); i != m_list_play_marker.end(); i++ )
+    for ( i = m_list_play_marker.begin(); i != m_list_play_marker.end(); ++i )
     {
         if((uint64_t)m_tick >= (i)->tick)
         {
@@ -1824,7 +1823,7 @@ long perform::get_max_trigger()
 void* output_thread_func(void *a_pef )
 {
     /* set our performance */
-    perform *p = (perform *) a_pef;
+    perform *p = static_cast<perform *>(a_pef);
     assert(p);
 
     struct sched_param schp;
@@ -2577,7 +2576,7 @@ void perform::output_func()
 void* input_thread_func(void *a_pef )
 {
     /* set our performance */
-    perform *p = (perform *) a_pef;
+    perform *p = static_cast<perform *>(a_pef);
     assert(p);
 
     struct sched_param schp;
