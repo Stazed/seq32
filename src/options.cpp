@@ -170,7 +170,6 @@ options::add_keyboard_page()
     Label* label;
     KeyBindEntry* entry;
 
-    HBox *hbox = manage (new HBox());
     CheckButton *check = manage(new CheckButton(
                                     "_Show key labels on sequences", true));
     check->signal_toggled().connect(bind(mem_fun(*this,
@@ -338,14 +337,12 @@ options::add_keyboard_page()
     toggletable->set_spacings(4);
     toggleframe->add(*toggletable);
 
-    int x = 0;
-    int y = 0;
     Label* numlabel;
 
     for (int i = 0; i < 32; i++)
     {
-        x = i % 8 * 2;
-        y = i / 8;
+        int x = i % 8 * 2;
+        int y = i / 8;
         int slot = x * 2 + y; // count this way: 0, 4, 8, 16...
         char buf[16];
         snprintf(buf, sizeof(buf), "%d", slot);
@@ -368,8 +365,8 @@ options::add_keyboard_page()
 
     for (int i = 0; i <32; i++)
     {
-        x = i%8*2;
-        y = i/8;
+        int x = i%8*2;
+        int y = i/8;
         char buf[16];
         snprintf(buf, sizeof(buf), "%d", i);
         numlabel = manage(new Label(buf, Gtk::ALIGN_END));
@@ -385,7 +382,7 @@ options::add_keyboard_page()
     entry = manage(new KeyBindEntry(KeyBindEntry::location, &integer)); \
     hbox->pack_start(*entry, false, false, 4);
 
-    hbox = manage(new HBox());
+    HBox *hbox = manage (new HBox());
     AddKey("Learn (while pressing a mute-group key):",
            m_perf->m_key_group_learn);
     AddKey("Disable:", m_perf->m_key_group_off);
@@ -549,6 +546,7 @@ options::mouse_fruity_callback(Gtk::RadioButton *btn)
         global_interactionmethod = e_fruity_interaction;
 }
 
+/* Never used */
 void
 options::transport_callback(button a_type, Button *a_check)
 {

@@ -28,9 +28,9 @@ class optionsfile : public configfile
 
 public:
 
-    optionsfile(const Glib::ustring& a_name);
+    explicit optionsfile(const Glib::ustring& a_name);
 
-    bool parse( perform *a_perf );
-    bool write( perform *a_perf );
+    bool parse( perform *a_perf ) override;
+    bool write( perform *a_perf ) override;
 
 };
