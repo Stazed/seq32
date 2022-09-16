@@ -492,7 +492,7 @@ public:
     void set_sequence_record(bool a_record);
     bool get_sequence_record();
 
-    void set_screen_set_notepad( int a_screen_set, string *a_note );
+    void set_screen_set_notepad( int a_screen_set, const string *a_note );
     string *get_screen_set_notepad( int a_screen_set );
 
     void set_screenset( int a_ss );

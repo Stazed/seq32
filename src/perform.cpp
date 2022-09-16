@@ -1017,7 +1017,7 @@ void perform::error_message_gtk( Glib::ustring message)
     errdialog.run();
 }
 
-void perform::set_screen_set_notepad( int a_screen_set, string *a_notepad )
+void perform::set_screen_set_notepad( int a_screen_set,const string *a_notepad )
 {
     if ( a_screen_set < c_max_sets )
         m_screen_set_notepad[a_screen_set] = *a_notepad;
@@ -2472,23 +2472,23 @@ void perform::output_func()
 #ifndef __WIN32__
                 delta.tv_sec  =  (stats_loop_finish.tv_sec  - stats_loop_start.tv_sec  );
                 delta.tv_nsec =  (stats_loop_finish.tv_nsec - stats_loop_start.tv_nsec );
-                long delta_us = (delta.tv_sec * 1000000) + (delta.tv_nsec / 1000);
+                long delta_us2 = (delta.tv_sec * 1000000) + (delta.tv_nsec / 1000);
 #else
                 delta = stats_loop_finish - stats_loop_start;
-                long delta_us = delta * 1000;
+                long delta_us2 = delta * 1000;
 #endif
-                int index = delta_us / 100;
+                int index = delta_us2 / 100;
                 if ( index >= 100  ) index = 99;
 
                 stats_all[index]++;
 
-                if ( delta_us > stats_max )
-                    stats_max = delta_us;
+                if ( delta_us2 > stats_max )
+                    stats_max = delta_us2;
 
-                if ( delta_us < stats_min )
-                    stats_min = delta_us;
+                if ( delta_us2 < stats_min )
+                    stats_min = delta_us2;
 
-                stats_avg += delta_us;
+                stats_avg += delta_us2;
                 stats_loop_index++;
 
                 if ( stats_loop_index > 200 )

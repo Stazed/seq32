@@ -246,7 +246,6 @@ bool FruityPerfInput::on_button_release_event(GdkEventButton* a_ev, perfroll& th
 
     ths.m_moving = false;
     ths.m_growing = false;
-    m_adding_pressed = false;
 
     if ( ths.m_mainperf->is_active( ths.m_drop_sequence  ))
     {
@@ -496,7 +495,6 @@ bool Seq32PerfInput::on_button_release_event(GdkEventButton* a_ev, perfroll& ths
 
     ths.m_moving = false;
     ths.m_growing = false;
-    m_adding_pressed = false;
 
     if ( ths.m_mainperf->is_active( ths.m_drop_sequence  ))
     {

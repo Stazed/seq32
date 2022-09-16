@@ -1137,7 +1137,7 @@ perfedit::tick_to_timestring (long a_tick)
     int hours = seconds / (60 * 60);
     minutes -= hours * 60;
     seconds -= (hours * 60 * 60) + (minutes * 60);
-    microseconds -= (hours * 60 * 60 + minutes * 60 + seconds) * 1000000UL;
+    //microseconds -= (hours * 60 * 60 + minutes * 60 + seconds) * 1000000UL;
 
     char tmp[32];
     snprintf(tmp, sizeof tmp, " %03d:%d:%02d ", hours, minutes, seconds);
@@ -1234,7 +1234,7 @@ perfedit::set_marker_line_selection(uint64_t a_tick)
 int
 FF_RW_timeout(void *arg)
 {
-    perform *p = (perform *) arg;
+    perform *p = static_cast<perform *>(arg);
 
     if(FF_RW_button_type != FF_RW_RELEASE)
     {
