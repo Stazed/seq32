@@ -59,7 +59,14 @@ mainwid::mainwid( perform *a_p, mainwnd *a_main ):
     m_have_realize(false),
     m_progress_tick(0),
     m_background_color(COLOR_WHITE),
-    m_foreground_color(COLOR_BLACK)
+    m_foreground_color(COLOR_BLACK),
+    m_drop_x(),
+    m_drop_y(),
+    m_current_x(),
+    m_current_y(),
+    m_old_seq(),
+    m_last_tick_x(),
+    m_last_playing()
 {
     Gtk::Allocation allocation = get_allocation();
     m_surface = Cairo::ImageSurface::create(

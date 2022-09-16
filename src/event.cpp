@@ -212,7 +212,7 @@ event::get_note_velocity()
 void
 event::print()
 {
-    printf( "[%06ld] [%04X] %02X ",
+    printf( "[%06lu] [%04X] %02X ",
             m_timestamp,
             (unsigned char)m_sysex.size(),
             m_status );

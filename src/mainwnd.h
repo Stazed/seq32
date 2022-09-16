@@ -43,7 +43,7 @@ using namespace Menu_Helpers;
 class mainwnd : public Gtk::Window, public performcallback
 {
     /* notification handler for learn mode toggle */
-    virtual void on_grouplearnchange(bool state);
+    virtual void on_grouplearnchange(bool state) override;
 
 private:
 
@@ -189,9 +189,9 @@ public:
 
     bool open_file(const Glib::ustring&);
     void export_seq_track_trigger(file_type_e type, int a_seq);
-    bool on_delete_event(GdkEventAny *a_e);
-    bool on_key_press_event(GdkEventKey* a_ev);
-    bool on_key_release_event(GdkEventKey* a_ev);
+    bool on_delete_event(GdkEventAny *a_e) override;
+    bool on_key_press_event(GdkEventKey* a_ev) override;
+    bool on_key_release_event(GdkEventKey* a_ev) override;
     bool playlist_jump(int jmp, bool a_verify = false);
     bool verify_playlist_dialog();
     void playlist_verify();

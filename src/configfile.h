@@ -43,7 +43,7 @@ protected:
     bool m_done;
 
     void next_data_line( ifstream *a_file);
-    void line_after( ifstream *a_file, string a_tag);
+    void line_after( ifstream *a_file, const string &a_tag);
 
 public:
 

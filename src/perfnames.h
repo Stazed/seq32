@@ -59,12 +59,12 @@ private:
     bool         m_moving;
     int          m_old_seq;
 
-    void on_realize();
-    bool on_button_press_event(GdkEventButton* a_ev);
-    bool on_button_release_event(GdkEventButton* a_ev);
-    bool on_motion_notify_event(GdkEventMotion* a_ev);
-    void on_size_allocate(Gtk::Allocation& );
-    bool on_scroll_event( GdkEventScroll* a_ev ) ;
+    void on_realize() override;
+    bool on_button_press_event(GdkEventButton* a_ev) override;
+    bool on_button_release_event(GdkEventButton* a_ev) override;
+    bool on_motion_notify_event(GdkEventMotion* a_ev) override;
+    void on_size_allocate(Gtk::Allocation& ) override;
+    bool on_scroll_event( GdkEventScroll* a_ev ) override;
 
     void convert_y( int a_y, int *a_note);
 
@@ -72,7 +72,7 @@ private:
 
     void change_vert();
 
-    void redraw( int a_sequence );
+    void redraw( int a_sequence ) override;
     
     void check_global_solo_tracks();
     

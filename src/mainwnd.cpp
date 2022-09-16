@@ -871,9 +871,9 @@ void mainwnd::file_save_as( file_type_e type, int a_seq )
                                        "Do you want to overwrite it?",
                                        false,
                                        Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
-            auto result = warning.run();
+            auto result_run = warning.run();
 
-            if (result == Gtk::RESPONSE_NO)
+            if (result_run == Gtk::RESPONSE_NO)
                 return;
         }
 
@@ -938,8 +938,6 @@ void mainwnd::new_open_error_dialog()
 
 bool mainwnd::open_file(const Glib::ustring& fn)
 {
-    bool result;
-
     /* reset everything to default */
     if(m_mainperf->clear_all())
     {
@@ -947,7 +945,7 @@ bool mainwnd::open_file(const Glib::ustring& fn)
         m_perf_edit->set_xpose(0);
 
         midifile f(fn);
-        result = f.parse(m_mainperf, this, 0);
+        bool result = f.parse(m_mainperf, this, 0);
 
         global_is_modified = !result; /* this means good file = NOT modified and bad = modified?? */
 
@@ -1236,7 +1234,7 @@ void
 mainwnd::toLower(basic_string<char>& s)
 {
     for (basic_string<char>::iterator p = s.begin();
-            p != s.end(); p++)
+            p != s.end(); ++p)
     {
         *p = tolower(*p);
     }

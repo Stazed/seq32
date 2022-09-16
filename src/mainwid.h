@@ -105,14 +105,14 @@ private:
     bool m_last_playing[c_max_sequence];
     static const char m_seq_to_char[c_seqs_in_set];
 
-    void on_realize();
+    void on_realize() override;
 
-    bool on_button_press_event(GdkEventButton* a_ev);
-    bool on_button_release_event(GdkEventButton* a_ev);
-    bool on_motion_notify_event(GdkEventMotion* a_p0);
-    bool on_focus_in_event(GdkEventFocus*);
-    bool on_focus_out_event(GdkEventFocus*);
-    void on_size_allocate(Gtk::Allocation& );
+    bool on_button_press_event(GdkEventButton* a_ev) override;
+    bool on_button_release_event(GdkEventButton* a_ev) override;
+    bool on_motion_notify_event(GdkEventMotion* a_p0) override;
+    bool on_focus_in_event(GdkEventFocus*) override;
+    bool on_focus_out_event(GdkEventFocus*) override;
+    void on_size_allocate(Gtk::Allocation& ) override;
 
     void draw_sequence_on_surface( int a_seq );
     void draw_sequences_on_surface();
@@ -122,11 +122,11 @@ private:
 
     int seq_from_xy( int a_x, int a_y );
 
-    void redraw( int a_seq );
+    void redraw( int a_seq ) override;
     void sequence_is_being_edited();
     
 protected:
-    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
 public:
 

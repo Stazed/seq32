@@ -38,9 +38,9 @@ public:
     FruityPerfInput() : m_adding_pressed( false ), m_current_x( 0 ),
         m_current_y( 0 )
     {}
-    bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths);
-    bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths);
-    bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths);
+    bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths) override;
+    bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths) override;
+    bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths) override;
 
 private:
     void updateMousePtr(perfroll& ths);
@@ -54,9 +54,9 @@ class Seq32PerfInput : public AbstractPerfInput
 {
 public:
     Seq32PerfInput() : m_adding( false ), m_adding_pressed( false ) {}
-    bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths);
-    bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths);
-    bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths);
+    bool on_button_press_event(GdkEventButton* a_ev, perfroll& ths) override;
+    bool on_button_release_event(GdkEventButton* a_ev, perfroll& ths) override;
+    bool on_motion_notify_event(GdkEventMotion* a_ev, perfroll& ths) override;
 
 private:
     void set_adding( bool a_adding, perfroll& ths );
