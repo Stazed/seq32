@@ -75,6 +75,7 @@ private:
     int m_keyarea_y;
     int m_rollarea_y;
     float m_vertical_zoom;
+    bool m_show_note_letters;
 
     void draw_key( int a_key, bool a_state );
     void on_size_allocate(Gtk::Allocation&);
