@@ -92,7 +92,7 @@ mark_as_advanced (CMAKE_INSTALL_PREFIX)
 mark_as_advanced (LIBRT)
 
 
-install(FILES README.md COPYING AUTHORS SEQ32 NEWS ChangeLog seq32usr.example
+install(FILES README.md COPYING AUTHORS SEQ32 ChangeLog seq32usr.example
     DESTINATION share/doc/seq32)
 
 
