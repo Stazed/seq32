@@ -212,11 +212,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
             unsigned long proprietary = 0;
 
             seq = new sequence ();
-            if (seq == NULL)
-            {
-                a_perf->error_message_gtk("Memory allocation failed");
-                return false;
-            }
+
             seq->set_master_midi_bus (&a_perf->m_master_bus);
 
             /* reset time */
@@ -503,8 +499,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                         Glib::ustring message = "Unexpected system event : ";
                         message += Ulong_To_String_Hex((unsigned long)status);
                         a_perf->error_message_gtk(message);
-                        if (seq)
-                            delete seq;
+                        delete seq;
                         return false;
                     }
 
@@ -514,8 +509,9 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                     Glib::ustring message = "Unsupported MIDI event:  ";
                     message += Ulong_To_String_Hex((unsigned long)status);
                     a_perf->error_message_gtk(message);
+                    delete seq;
                     return false;
-                    break;
+//                    break;
                 }
             }			/* while ( !done loading Trk chunk */
 
