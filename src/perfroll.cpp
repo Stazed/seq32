@@ -28,6 +28,9 @@ perfroll::perfroll( perform *a_perf,
                     Glib::RefPtr<Adjustment> a_vadjust  ) :
     m_mainperf(a_perf),
     m_perfedit(a_perf_edit),
+    m_snap(0),
+    m_measure_length(0),
+    m_beat_length(0),
 
     m_perf_scale_x(c_perf_scale_x),       // 32 ticks per pixel
     m_names_y(c_names_y),
@@ -35,12 +38,18 @@ perfroll::perfroll( perform *a_perf,
     m_resize_handle_w(c_perfroll_resize_box_default),
     m_resize_handle_h(c_perfroll_resize_box_default),
 
-    m_old_progress_ticks(0),
+    m_window_x(0),
+    m_window_y(0),
 
+    m_old_progress_ticks(0),
     m_4bar_offset(0),
     m_sequence_offset(0),
     m_roll_length_ticks(0),
+    m_drop_x(0),
     m_drop_y(0),
+    m_drop_tick(0),
+    m_drop_tick_trigger_offset(0),
+
     m_drop_sequence(-1),    // set to invalid so focus will work on first sequence
 
     m_vadjust(a_vadjust),
@@ -48,6 +57,7 @@ perfroll::perfroll( perform *a_perf,
 
     m_moving(false),
     m_growing(false),
+    m_grow_direction(false),
 
     have_button_press(false),
     transport_follow(true),
