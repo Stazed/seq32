@@ -503,6 +503,8 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
                         Glib::ustring message = "Unexpected system event : ";
                         message += Ulong_To_String_Hex((unsigned long)status);
                         a_perf->error_message_gtk(message);
+                        if (seq)
+                            delete seq;
                         return false;
                     }
 
@@ -980,7 +982,7 @@ bool midifile::write (perform * a_perf, int a_solo_seq)
     return true;
 }
 
-bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
+bool midifile::write_song (perform * a_perf, file_type_e type, int a_solo_track)
 {
     int numtracks = 0;
 
@@ -1078,8 +1080,7 @@ bool midifile::write_song (perform * a_perf,file_type_e type, int a_solo_track)
                 for (int i = 0; i < vect_size; i++)
                 {
                     a_trig = &trig_vect[i]; // get the trigger
-                    if(a_trig != NULL)
-                        prev_timestamp = seq->song_fill_list_seq_event(&l,a_trig,prev_timestamp, type); // put events on list
+                    prev_timestamp = seq->song_fill_list_seq_event(&l,a_trig,prev_timestamp, type); // put events on list
                 }
 
                 total_seq_length = trig_vect[vect_size-1].m_tick_end;
