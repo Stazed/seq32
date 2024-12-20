@@ -19,6 +19,7 @@
 //-----------------------------------------------------------------------------
 #include "event.h"
 #include "perfroll.h"
+#include "themes.h"
 #include "pixmaps/resize_black.xpm"
 #include "pixmaps/resize_white.xpm"
 

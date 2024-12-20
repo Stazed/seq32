@@ -22,6 +22,7 @@
 #include "font.h"
 #include "pixmaps/tempo_marker.xpm"
 #include "pixmaps/stop_marker.xpm"
+#include "themes.h"
 
 
 tempo::tempo( perform *a_perf, perfedit *a_perf_edit, Glib::RefPtr<Adjustment> a_hadjust ) :

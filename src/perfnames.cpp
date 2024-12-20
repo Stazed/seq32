@@ -20,6 +20,7 @@
 #include "perfnames.h"
 #include "font.h"
 #include "mainwnd.h"
+#include "themes.h"
 #include "pixmaps/track_play.xpm"
 #include "pixmaps/track_solo.xpm"
 #include "pixmaps/track_mute.xpm"

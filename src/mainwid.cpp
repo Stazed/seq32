@@ -21,6 +21,7 @@
 #include "mainwid.h"
 #include "font.h"
 #include "seqedit.h"
+#include "themes.h"
 
 const char mainwid::m_seq_to_char[c_seqs_in_set] =
 {

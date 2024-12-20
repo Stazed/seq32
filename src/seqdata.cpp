@@ -19,6 +19,7 @@
 //-----------------------------------------------------------------------------
 #include "event.h"
 #include "seqdata.h"
+#include "themes.h"
 
 
 seqdata::seqdata(sequence *a_seq, int a_zoom,  Glib::RefPtr<Adjustment> a_hadjust):
