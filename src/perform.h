@@ -114,6 +114,7 @@ struct position_info
     BBT bbt;
     
     position_info() :
+        frame(0),
         tempo(0.0),
         beats_per_bar(0),
         beat_type(0),
