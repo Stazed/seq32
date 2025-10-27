@@ -111,6 +111,7 @@ private:
     void change_vert();
 
     void split_trigger( int a_sequence, long a_tick );
+    void change_interaction_method();
 
     bool have_button_press;
     bool transport_follow;

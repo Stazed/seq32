@@ -23,6 +23,8 @@
 #include "pixmaps/resize_black.xpm"
 #include "pixmaps/resize_white.xpm"
 
+bool global_mouse_interaction_changed = false;
+
 perfroll::perfroll( perform *a_perf,
                     perfedit * a_perf_edit,
                     Glib::RefPtr<Adjustment> a_hadjust,
@@ -402,6 +404,12 @@ perfroll::draw_progress()
 bool 
 perfroll::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
+    if(global_mouse_interaction_changed)
+    {
+        global_mouse_interaction_changed = false;
+        change_interaction_method();
+    }
+
     m_surface_window = cr;
 
     m_have_realize = true;
@@ -1016,6 +1024,28 @@ perfroll::split_trigger( int a_sequence, long a_tick )
     m_mainperf->get_sequence( a_sequence )->split_trigger( a_tick );
 
     draw_track_on_window(a_sequence);
+}
+
+void
+perfroll::change_interaction_method()
+{
+    if(m_interaction)
+        delete m_interaction;
+
+    switch (global_interactionmethod)
+    {
+        case e_fruity_interaction:
+        {
+            m_interaction = new FruityPerfInput;
+            break;
+        }
+        default:
+        case e_seq32_interaction:
+        {
+            m_interaction = new Seq32PerfInput;
+            break;
+        }
+    }
 }
 
 void

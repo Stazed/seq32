@@ -536,14 +536,20 @@ void
 options::mouse_seq32_callback(Gtk::RadioButton *btn)
 {
     if (btn->get_active())
+    {
         global_interactionmethod = e_seq32_interaction;
+        global_mouse_interaction_changed = true;
+    }
 }
 
 void
 options::mouse_fruity_callback(Gtk::RadioButton *btn)
 {
     if (btn->get_active())
+    {
         global_interactionmethod = e_fruity_interaction;
+        global_mouse_interaction_changed = true;
+    }
 }
 
 /* Never used */

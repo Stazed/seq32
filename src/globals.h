@@ -478,6 +478,9 @@ enum mouse_action_e
     e_action_grow
 };
 
+// To update perfroll interaction method
+extern bool global_mouse_interaction_changed;
+
 enum interaction_method_e
 {
     e_seq32_interaction,
