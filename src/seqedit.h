@@ -245,6 +245,8 @@ private:
     void set_background_sequence( int a_seq );
 
     void measures_button_callback( int a_length_measures );
+    void measures_entry_callback( );
+    void measures_warning_message( Glib::ustring message );
     void transposable_change_callback(CheckButton *a_button);
     void midi_channel_button_callback( int a_midichannel );
     void midi_bus_button_callback( int a_midibus );
