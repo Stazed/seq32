@@ -1,8 +1,9 @@
 
-install (FILES 32/seq32_32.png
-    48/seq32_48.png
-    scalable/seq32.svg
+install (FILES hicolor/48x48/apps/seq32.png
+    hicolor/scalable/apps/seq32.svg
     DESTINATION share/pixmaps)
+
+install(DIRECTORY hicolor/ DESTINATION share/icons/hicolor)
 
 install (FILES seq32.desktop
     DESTINATION share/applications)
