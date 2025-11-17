@@ -2,7 +2,7 @@
 # To use:makepkg -si
 _pkgbasename=seq32
 pkgname=${_pkgbasename}-git
-pkgver=2.0.0.r8.ga1a570e
+pkgver=2.1.6
 pkgrel=1
 pkgdesc="A live-looping MIDI sequencer"
 arch=('i686' 'x86_64')
