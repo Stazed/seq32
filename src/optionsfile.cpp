@@ -211,10 +211,10 @@ optionsfile::parse( perform *a_perf )
 
     sscanf( m_line, "%u", &a_perf->m_key_follow_trans );
 
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
     next_data_line( &file );
     sscanf( m_line, "%u", &a_perf->m_key_jack );
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
     
     next_data_line( &file );
     sscanf( m_line, "%u", &a_perf->m_key_tap_bpm );
@@ -634,11 +634,11 @@ optionsfile::write( perform *a_perf  )
     file << a_perf->m_key_follow_trans << "        # "
          << gdk_keyval_name( a_perf->m_key_follow_trans )
          << " follow transport\n";
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
     file << a_perf->m_key_jack << "        # "
          << gdk_keyval_name( a_perf->m_key_jack )
          << " jack sync\n";
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
     
     file << a_perf->m_key_tap_bpm << "        # "
          << gdk_keyval_name( a_perf->m_key_tap_bpm )

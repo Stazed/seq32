@@ -34,10 +34,10 @@ class perform;
 #include <pthread.h>
 
 /* if we have jack, include the jack headers */
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
 #include <jack/jack.h>
 #include <jack/transport.h>
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
 
 #undef USE_JACK_BBT_POSITION                // old code could be used for debug
 
@@ -89,7 +89,7 @@ struct tempo_mark
         microseconds_start(0.0) {}
 };
 
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
 /*  Bar and beat start at 1. */
 struct BBT
 {
@@ -136,7 +136,7 @@ struct time_sig
         beat_type( note ) {}
 };
 
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
 
 #define STOP_MARKER         0.0
 #define STARTING_MARKER     0
@@ -294,7 +294,7 @@ private:
     std::map<long,unsigned int> key_events_rev; // reverse lookup, keep this in sync!!
     std::map<long,unsigned int> key_groups_rev; // reverse lookup, keep this in sync!!
 
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
 
     jack_client_t *m_jack_client;
     jack_nframes_t m_jack_frame_current,
@@ -304,7 +304,7 @@ private:
     jack_transport_state_t m_jack_transport_state;
     jack_transport_state_t m_jack_transport_state_last;
     double m_jack_tick;
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
 
     bool m_jack_running;
     bool m_toggle_jack;
@@ -642,7 +642,7 @@ public:
         return int(m_recent_files.size());
     }
 
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
 #ifdef USE_JACK_BBT_POSITION
     void jack_BBT_position(jack_position_t &pos, double jack_tick);
     friend int jack_sync_callback(jack_transport_state_t state,
@@ -658,7 +658,7 @@ public:
                                        jack_position_t *pos, int new_pos, void *arg);
     friend int jack_process_callback(jack_nframes_t nframes, void* arg);
     friend long get_current_jack_position(jack_nframes_t a_frame, void *arg);
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
 };
 
 /* located in perform.C */
@@ -668,7 +668,7 @@ extern void *input_thread_func(void *a_p);
 /* located in perfedit.h */
 extern ff_rw_type_e FF_RW_button_type;
 
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
 #ifdef USE_JACK_BBT_POSITION
 int jack_sync_callback(jack_transport_state_t state,
                        jack_position_t *pos, void *arg);
@@ -685,4 +685,4 @@ void jack_timebase_callback(jack_transport_state_t state, jack_nframes_t nframes
                             jack_position_t *pos, int new_pos, void *arg);
 int jack_process_callback(jack_nframes_t nframes, void* arg);
 long get_current_jack_position(jack_nframes_t a_frame, void *arg);
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT

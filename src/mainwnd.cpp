@@ -541,12 +541,12 @@ mainwnd::timer_callback(  )
         m_entry_notes->set_text(*m_mainperf->get_screen_set_notepad(
                                     m_mainperf->get_screenset()));
     }
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
     /* for seqroll keybinding, this is needed here instead of */
     /* perfedit timeout() since perfedit may not be open */
     if (m_perf_edit->get_toggle_jack() != m_mainperf->get_toggle_jack())
         m_perf_edit->toggle_jack();
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
 
 #ifdef NSM_SUPPORT
     if(m_nsm)
@@ -1729,13 +1729,13 @@ mainwnd::on_key_press_event(GdkEventKey* a_ev)
             return true;
         }
 
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
         if ( a_ev->keyval ==  m_mainperf->m_key_jack )
         {
             m_perf_edit->toggle_jack();
             return true;
         }
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
 
         // the start/end key may be the same key (i.e. SPACE)
         // allow toggling when the same key is mapped to both

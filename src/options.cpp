@@ -205,13 +205,13 @@ options::add_keyboard_page()
                                     &m_perf->m_key_song));
     controltable->attach(*label, 0, 1, 2, 3);
     controltable->attach(*entry, 1, 2, 2, 3);
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
     label = manage(new Label("Jack", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
                                     &m_perf->m_key_jack));
     controltable->attach(*label, 0, 1, 3, 4);
     controltable->attach(*entry, 1, 2, 3, 4);
-#endif // JACK_SUPPORT
+#endif // JACK_TRANSPORT_SUPPORT
 
     label = manage(new Label("Tap BPM", Gtk::ALIGN_END));
     entry = manage(new KeyBindEntry(KeyBindEntry::location,
@@ -442,7 +442,7 @@ options::add_mouse_page()
 void
 options::add_jack_sync_page()
 {
-#ifdef JACK_SUPPORT
+#ifdef JACK_TRANSPORT_SUPPORT
     VBox *vbox = manage(new VBox());
     vbox->set_border_width(4);
     m_notebook->append_page(*vbox, "_Jack Sync", true);
