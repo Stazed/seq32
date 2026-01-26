@@ -11,7 +11,6 @@ add_definitions (-D'VERSION="${PACKAGE_VERSION}"')
 add_definitions(-D'WEBSITE="https://github.com/Stazed/seq32"')
 add_definitions(-D'PACKAGE="seq32"')
 #add_definitions(-D'HELPDIR="${CMAKE_INSTALL_PREFIX}/share/doc/seq32"')
-add_definitions(-D'CMAKE_BUILD_SUPPORT=1')
 
 include (CheckCSourceCompiles)
 include(CheckCXXCompilerFlag)

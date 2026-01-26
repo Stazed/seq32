@@ -24,14 +24,6 @@
 class mastermidibus;
 class midibus;
 
-#ifndef CMAKE_BUILD_SUPPORT
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#else
-#include "configdefault.h"
-#endif
-#endif
-
 #ifndef HAVE_LIBASOUND
 #include "midibus_portmidi.h"
 #else
