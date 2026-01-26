@@ -20,6 +20,8 @@
 
 #pragma once
 
+#ifndef JACK_MIDI_SUPPORT
+
 /* forward declarations*/
 class mastermidibus;
 class midibus;
@@ -296,3 +298,4 @@ public:
 };
 
 #endif
+#endif  // #ifndef JACK_MIDI_SUPPORT
