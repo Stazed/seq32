@@ -18,17 +18,11 @@
 //
 //-----------------------------------------------------------------------------
 
+class mastermidibus_iface;
+
 #include "seqedit.h"
 #include "sequence.h"
-
-#ifdef JACK_MIDI_SUPPORT
-  #include "midibus_jack.h"
-using mastermidibus = mastermidibus_jack;
-#else
-  #include "midibus.h"
-#endif
-
-
+#include "mastermidibus_iface.h"
 #include "controllers.h"
 #include "event.h"
 #include "options.h"
@@ -1130,7 +1124,7 @@ seqedit::popup_midibus_menu()
     m_menu_midibus = manage( new Menu());
 
     /* midi buses */
-    mastermidibus *masterbus = m_mainperf->get_master_midi_bus();
+    mastermidibus_iface *masterbus = m_mainperf->get_master_midi_bus();
     for ( int i = 0; i < masterbus->get_num_out_buses(); i++ )
     {
         MenuItem * menu_item = new MenuItem(masterbus->get_midi_out_bus_name(i));
@@ -1448,7 +1442,7 @@ void
 seqedit::set_midi_bus( int a_midibus )
 {
     m_seq->set_midi_bus( a_midibus );
-    mastermidibus *mmb =  m_mainperf->get_master_midi_bus();
+    mastermidibus_iface *mmb =  m_mainperf->get_master_midi_bus();
     m_entry_bus->set_text( mmb->get_midi_out_bus_name( a_midibus ));
     // m_mainwid->update_sequence_on_window( m_pos );
 }

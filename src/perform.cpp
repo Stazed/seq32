@@ -18,15 +18,10 @@
 //
 //-----------------------------------------------------------------------------
 
+class mastermidibus_iface;
+
 #include "perform.h"
-
-#ifdef JACK_MIDI_SUPPORT
-  #include "midibus_jack.h"
-using mastermidibus = mastermidibus_jack;
-#else
-  #include "midibus.h"
-#endif
-
+#include "mastermidibus_iface.h"
 #include "event.h"
 #include "mainwnd.h"
 #include <stdio.h>
@@ -238,7 +233,7 @@ perform::perform()
 
 void perform::init()
 {
-    m_master_bus.init( );
+    m_master_bus->init( );
 }
 
 void perform::init_jack()
@@ -910,9 +905,9 @@ sequence* perform::get_sequence( int a_sequence )
     return m_seqs[a_sequence];
 }
 
-mastermidibus* perform::get_master_midi_bus( )
+mastermidibus_iface* perform::get_master_midi_bus( )
 {
-    return &m_master_bus;
+    return m_master_bus;
 }
 
 void perform::set_bpm(double a_bpm)
@@ -924,13 +919,13 @@ void perform::set_bpm(double a_bpm)
     /* do not allow start bpm change when sequencer is running, in song mode or when connected to jack transport */
     if ( ! ( global_is_running && (m_jack_running || m_playback_mode)))
     {
-        m_master_bus.set_bpm( a_bpm );
+        m_master_bus->set_bpm( a_bpm );
     }
 }
 
 double  perform::get_bpm()
 {
-    return  m_master_bus.get_bpm( );
+    return  m_master_bus->get_bpm( );
 }
 
 void perform::set_bp_measure(int a_bp_mes)
@@ -975,7 +970,7 @@ bool perform::is_sequence_in_edit( int a_num )
 void perform::new_sequence( int a_sequence )
 {
     m_seqs[ a_sequence ] = new sequence();
-    m_seqs[ a_sequence ]->set_master_midi_bus( &m_master_bus );
+    m_seqs[ a_sequence ]->set_master_midi_bus( m_master_bus );
     set_active(a_sequence, true);
     global_is_modified = true;
 }
@@ -1106,7 +1101,7 @@ void perform::play( long a_tick )
     }
 
     /* flush the bus */
-    m_master_bus.flush();
+    m_master_bus->flush();
 }
 
 void perform::set_orig_ticks( long a_tick  )
@@ -1140,7 +1135,7 @@ bool perform::tempo_change()
             }
             else
             {
-                m_master_bus.set_bpm((i)->bpm);
+                m_master_bus->set_bpm((i)->bpm);
                 m_list_play_marker.erase(i);
                 break;
             }
@@ -1753,7 +1748,7 @@ void perform::all_notes_off()
         }
     }
     /* flush the bus */
-    m_master_bus.flush();
+    m_master_bus->flush();
 }
 
 void perform::reset_sequences()
@@ -1775,7 +1770,7 @@ void perform::reset_sequences()
         }
     }
     /* flush the bus */
-    m_master_bus.flush();
+    m_master_bus->flush();
 }
 
 void perform::launch_output_thread()
@@ -2064,7 +2059,7 @@ void perform::output_func()
             set_orig_ticks( m_starting_tick );
         }
 
-        int ppqn = m_master_bus.get_ppqn();
+        int ppqn = m_master_bus->get_ppqn();
 #ifndef __WIN32__
         /* get start time position */
         clock_gettime(CLOCK_REALTIME, &last);
@@ -2117,7 +2112,7 @@ void perform::output_func()
 
             /* delta time to ticks */
             /* bpm */
-            double bpm  = m_master_bus.get_bpm() * ( 4.0 / m_bw);
+            double bpm  = m_master_bus->get_bpm() * ( 4.0 / m_bw);
 
             /* get delta ticks, delta_ticks_f is in 1000th of a tick */
             long long delta_tick_num = bpm * ppqn * delta_us + delta_tick_frac;
@@ -2182,7 +2177,7 @@ void perform::output_func()
                         m_jack_pos.beats_per_bar = m_bp_measure;
                         m_jack_pos.beat_type = m_bw;
                         m_jack_pos.ticks_per_beat = c_ppqn * 10;
-                        m_jack_pos.beats_per_minute =  m_master_bus.get_bpm();
+                        m_jack_pos.beats_per_minute =  m_master_bus->get_bpm();
                         
                         m_jack_tick =
                             m_jack_frame_current *
@@ -2320,7 +2315,7 @@ void perform::output_func()
 
             if (init_clock)
             {
-                m_master_bus.init_clock( clock_tick );
+                m_master_bus->init_clock( clock_tick );
                 init_clock = false;
             }
 
@@ -2375,7 +2370,7 @@ void perform::output_func()
                 //printf( "play[%d]\n", current_tick );
 
                 /* midi clock */
-                m_master_bus.clock( clock_tick );
+                m_master_bus->clock( clock_tick );
 
                 if ( global_stats )
                 {
@@ -2526,7 +2521,7 @@ void perform::output_func()
                 printf( "[%3d][%8ld]\n", i * 100, stats_all[i] );
             }
             printf("\n\n-- clock width --\n" );
-            double bpm  = m_master_bus.get_bpm();
+            double bpm  = m_master_bus->get_bpm();
 
             printf("optimal: [%f]us\n", ((c_ppqn / 24)* 60000000 / c_ppqn / bpm));
 
@@ -2569,8 +2564,8 @@ void perform::output_func()
 
         /* this means we leave m_tick at stopped location if in slave mode or m_usemidiclock = true */
 
-        m_master_bus.flush();
-        m_master_bus.stop();
+        m_master_bus->flush();
+        m_master_bus->stop();
 
 #ifdef JACK_TRANSPORT_SUPPORT
         if(m_jack_running)
@@ -2972,11 +2967,11 @@ void perform::input_func()
 
     while (m_inputing)
     {
-        if ( m_master_bus.poll_for_midi() > 0 )
+        if ( m_master_bus->poll_for_midi() > 0 )
         {
             do
             {
-                if (m_master_bus.get_midi_event(&ev) )
+                if (m_master_bus->get_midi_event(&ev) )
                 {
                     // only used when starting from the beginning of the song = 0
                     if (ev.get_status() == EVENT_MIDI_START)
@@ -3044,7 +3039,7 @@ void perform::input_func()
                             ev.print();
 
                         /* is there at least one sequence set ? */
-                        if (m_master_bus.is_dumping())
+                        if (m_master_bus->is_dumping())
                         {
                             /* The true flag will limit the controls to start, stop
                              * and  record only. The function returns a a bool flag
@@ -3058,7 +3053,7 @@ void perform::input_func()
                                 ev.set_timestamp(m_tick);
 
                                 /* dump to it - possibly multiple sequences set */
-                                m_master_bus.dump_midi_input(ev);
+                                m_master_bus->dump_midi_input(ev);
                             }
                         }
 
@@ -3075,11 +3070,11 @@ void perform::input_func()
                             ev.print();
 
                         if (global_pass_sysex)
-                            m_master_bus.sysex(&ev);
+                            m_master_bus->sysex(&ev);
                     }
                 }
             }
-            while (m_master_bus.is_more_input());
+            while (m_master_bus->is_more_input());
         }
     }
     pthread_exit(0);

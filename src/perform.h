@@ -21,18 +21,14 @@
 #pragma once
 
 class perform;
+class mastermidibus_iface;
 
 #include <vector>
 #include "globals.h"
 #include "event.h"
 
-#ifdef JACK_MIDI_SUPPORT
-  #include "midibus_jack.h"
-using mastermidibus = mastermidibus_jack;
-#else
-  #include "midibus.h"
-#endif
-
+#include "mastermidibus_iface.h"
+#include "mastermidibus_factory.h"
 #include "midifile.h"
 #include "sequence.h"
 #ifndef __WIN32__
@@ -243,7 +239,7 @@ private:
     vector<int> redo_vect;
 
     /* our midibus */
-    mastermidibus m_master_bus;
+    mastermidibus_iface *m_master_bus;
 
     /* pthread info */
     pthread_t m_out_thread;
@@ -582,7 +578,7 @@ public:
 
     void set_song_mute( mute_op op  );
 
-    mastermidibus* get_master_midi_bus( );
+    mastermidibus_iface* get_master_midi_bus( );
 
     void output_func();
     void input_func();

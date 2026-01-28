@@ -213,7 +213,7 @@ bool midifile::parse (perform * a_perf, mainwnd * a_main, int a_screen_set, bool
 
             seq = new sequence ();
 
-            seq->set_master_midi_bus (&a_perf->m_master_bus);
+            seq->set_master_midi_bus (a_perf->m_master_bus);
 
             /* reset time */
             RunningTime = 0;

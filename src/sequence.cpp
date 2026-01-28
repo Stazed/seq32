@@ -238,7 +238,7 @@ sequence::get_unit_measure()
 }
 
 void
-sequence::set_master_midi_bus( mastermidibus *a_mmb )
+sequence::set_master_midi_bus( mastermidibus_iface *a_mmb )
 {
     lock();
 

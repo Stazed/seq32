@@ -22,23 +22,14 @@
 #pragma once
 
 class sequence;
+class mastermidibus_iface;
 
 #include <string>
 #include <list>
 #include <stack>
 
 #include "event.h"
-
-#ifdef JACK_MIDI_SUPPORT
-  #include "midibus_jack.h"
-class mastermidibus_jack;
-class midibus_jack;
-using mastermidibus = mastermidibus_jack;
-using midibus = midibus_jack;
-#else
-  #include "midibus.h"
-#endif
-
+#include "mastermidibus_iface.h"
 #include "globals.h"
 #include "mutex.h"
 
@@ -137,7 +128,7 @@ private:
     int m_notes_on;
 
     /* outputs to sequence to this Bus on midichannel */
-    mastermidibus *m_masterbus;
+    mastermidibus_iface *m_masterbus;
 
     /* map for noteon, used when muting, to shut off current
        messages */
@@ -410,7 +401,7 @@ public:
     void set_midi_bus (char a_mb);
     char get_midi_bus ();
 
-    void set_master_midi_bus (mastermidibus * a_mmb);
+    void set_master_midi_bus (mastermidibus_iface * a_mmb);
 
     enum select_action_e
     {
