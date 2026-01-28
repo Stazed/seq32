@@ -156,6 +156,7 @@ private:
     midibus_jack * m_buses_out[c_maxBuses] {};
     bool           m_buses_out_active[c_maxBuses] {};
     bool           m_buses_out_init[c_maxBuses] {};
+    clock_e        m_init_clock[c_maxBuses];
 
     // Single JACK MIDI input port (typical for sequencers)
     jack_port_t * m_in_port {};
