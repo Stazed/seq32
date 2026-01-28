@@ -14,6 +14,7 @@ set (ProgSources
     midibus.cpp
     midibus_portmidi.cpp
     midibus_jack.cpp
+    mastermidibus_factory.cpp
     midifile.cpp
     mutex.cpp
     options.cpp
