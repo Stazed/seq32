@@ -46,27 +46,31 @@ using namespace sigc;
 
 ff_rw_type_e FF_RW_button_type = FF_RW_RELEASE;
 
-perfedit::perfedit( perform *a_perf, mainwnd *a_main )
+perfedit::perfedit( perform *a_perf, mainwnd *a_main ) :
+    m_mainperf(a_perf),
+    m_mainwnd(a_main),
+
+    m_snap(8),
+    m_bp_measure(4),
+    m_bw(4),
+
+    m_tick_time_as_bbt(false),
+    m_toggle_time_type(true),
+    m_default_horizontal_zoom(c_perf_scale_x),
+
+    m_vadjust(Adjustment::create(0, 0, 1, 1, 1, 1)),
+    m_hadjust(Adjustment::create(0, 0, 1, 1, 1, 1)),
+
+    m_snap_menu_items(25),
+    m_bw_menu_items(5)
 {
     using namespace Menu_Helpers;
 
     set_icon(Gdk::Pixbuf::create_from_xpm_data(perfedit_xpm));
 
-    /* set the performance */
-    m_snap = c_ppqn / 4;
-
-    m_mainperf = a_perf;
-    m_mainwnd = a_main;
-    m_tick_time_as_bbt = false;
-    m_toggle_time_type = true;      // set true to show clock on start
-    m_default_horizontal_zoom = c_perf_scale_x;
-
     /* main window */
     set_title( "seq32 - Song Editor");
     set_size_request(750, 400);
-
-    m_vadjust = Adjustment::create(0,0,1,1,1,1 );
-    m_hadjust = Adjustment::create(0,0,1,1,1,1 );
 
     m_vscroll   =  manage(new VScrollbar( m_vadjust ));
     m_hscroll   =  manage(new HScrollbar( m_hadjust ));
@@ -136,8 +140,6 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
     m_table->attach( *m_button_grow, 2, 3, 4, 5, Gtk::SHRINK, Gtk::SHRINK  );
 
     m_menu_snap =   manage( new Menu());
-
-    m_snap_menu_items.resize(25);
 
     m_snap_menu_items[0].set_label("1/1");
     m_snap_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this,&perfedit::set_snap), 1 ));
@@ -282,8 +284,6 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
 
     m_menu_bp_measure = manage( new Menu() );
     m_menu_bw = manage( new Menu() );
-
-    m_bw_menu_items.resize(5);
 
     m_bw_menu_items[0].set_label("1");
     m_bw_menu_items[0].signal_activate().connect(sigc::bind(mem_fun(*this, &perfedit::bw_button_callback), 1 ));
@@ -443,10 +443,6 @@ perfedit::perfedit( perform *a_perf, mainwnd *a_main )
 
     /* add table */
     this->add( *m_table );
-
-    m_snap = 8;
-    m_bp_measure = 4;
-    m_bw = 4;
 
     set_snap( 8 );
     set_bp_measure( 4 );
