@@ -78,6 +78,9 @@ perform::perform()
     m_midiclocktick = 0;
     m_midiclockpos = -1;
 
+    m_midibus_type = midi_backend::alsa;
+    m_backend_type = midi_backend::alsa;
+
     thread_trigger_width_ms = c_thread_trigger_width_ms;
 
     m_left_tick = 0;
@@ -229,6 +232,19 @@ perform::perform()
 
     m_have_undo = false;
     m_have_redo = false;
+}
+
+bool perform::set_midibus_type(unsigned int type)
+ {
+    m_midibus_type = m_backend_type = static_cast<midi_backend>(type);
+    m_master_bus = static_cast<mastermidibus_iface *>(create_mastermidibus(m_midibus_type).release());
+
+    if (m_master_bus == nullptr)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void perform::init()
@@ -559,6 +575,8 @@ perform::~perform()
             delete m_seqs[i];
         }
     }
+
+    delete m_master_bus;
 }
 
 void
