@@ -42,196 +42,256 @@ using namespace Gtk;
  * song editor (perfroll, perfnames) */
 bool global_solo_track_set = false;
 
-perform::perform()
+perform::perform() :
+    /* PUBLIC (decl order) */
+    m_key_playlist_next(GDK_KEY_Right),
+    m_key_playlist_prev(GDK_KEY_Left),
+    m_setjump(0),
+    m_playlist_midi_jump_value(0),
+    m_playlist_midi_control_set(false),
+    m_playlist_stop_mark(false),
+
+    /* PRIVATE (decl order) */
+    m_playlist_mode(false),
+    m_playlist_file(),                 // empty
+    m_playlist_nfiles(0),
+    m_playlist_current_idx(0),
+    m_playlist_fileset(),              // empty vector
+
+    // andy mute group
+    m_mode_group(true),
+    m_mode_group_learn(false),
+    m_mute_group_selected(0),
+    m_playing_screen(0),
+
+    // sequences / state arrays handled in body
+
+    undo_vect(),
+    redo_vect(),
+
+    m_midibus_type(midi_backend::alsa),
+    m_backend_type(midi_backend::alsa),
+
+    m_master_bus(nullptr),
+
+    // pthread info
+    m_out_thread(),
+    m_in_thread(),
+    m_out_thread_launched(false),
+    m_in_thread_launched(false),
+
+    m_inputing(true),
+    m_outputing(true),
+    m_looping(false),
+    m_reposition(false),
+
+    m_playback_mode(false),
+    m_follow_transport(true),
+    m_start_from_perfedit(false),
+
+    thread_trigger_width_ms(c_thread_trigger_width_ms),
+
+    m_left_tick(0),
+    m_right_tick(c_ppqn * 16),
+    m_starting_tick(0),
+
+    m_tick(0),
+    m_usemidiclock(false),
+    m_midiclockrunning(false),
+    m_midiclocktick(0),
+    m_midiclockpos(-1),
+
+    m_bp_measure(4),
+    m_bw(4),
+
+    m_show_ui_sequence_key(true),
+
+    // screen-set notepad array handled by default construction / left as-is
+
+    // midi control arrays handled in body
+    // note-used array handled in body
+
+    m_recording_set(false),
+    m_list_sequence_editing(0),
+    m_list_sequence_recording_set(0),
+
+    m_offset(0),
+    m_control_status(0),
+    m_screen_set(0),
+
+    m_condition_var(),                 // default
+
+    key_events(),
+    key_groups(),
+    key_events_rev(),
+    key_groups_rev()
+
+#ifdef JACK_TRANSPORT_SUPPORT
+    ,
+    m_jack_client(nullptr),
+    m_jack_frame_current(0),
+    m_jack_frame_last(0),
+    m_jack_frame_rate(0),
+    m_jack_pos(),
+    m_jack_transport_state(),
+    m_jack_transport_state_last(),
+    m_jack_tick(0.0)
+#endif
+    ,
+    m_jack_running(false),
+    m_toggle_jack(false),
+    m_jack_master(false),
+    m_jack_stop_tick(0),
+
+    m_continue(false),
+    m_update_perf_edit_tempo_markers(false),
+
+    m_recent_files(),
+
+    // lists/stacks default construct
+    m_notify(),
+    m_list_play_marker(),
+    m_list_total_marker(),
+    m_list_no_stop_markers(),
+    m_list_undo(),
+    m_list_redo(),
+
+    // key bindings (simple scalars)
+    m_key_bpm_up(GDK_KEY_apostrophe),
+    m_key_bpm_dn(GDK_KEY_semicolon),
+    m_key_tap_bpm(GDK_KEY_F9),
+
+    m_key_replace(GDK_KEY_Control_L),
+    m_key_queue(GDK_KEY_Control_R),
+    m_key_keep_queue(GDK_KEY_backslash),
+    m_key_snapshot_1(GDK_KEY_Alt_L),
+    m_key_snapshot_2(GDK_KEY_Alt_R),
+
+    m_key_screenset_up(GDK_KEY_bracketright),
+    m_key_screenset_dn(GDK_KEY_bracketleft),
+    m_key_set_playing_screenset(GDK_KEY_Home),
+
+    m_key_group_on(GDK_KEY_igrave),
+    m_key_group_off(GDK_KEY_apostrophe),
+    m_key_group_learn(GDK_KEY_Insert),
+
+    m_key_start(GDK_KEY_space),
+    m_key_stop(GDK_KEY_Escape),
+    m_key_forward(GDK_KEY_f),
+    m_key_rewind(GDK_KEY_r),
+    m_key_pointer(GDK_KEY_p),
+
+    m_key_song(GDK_KEY_F1),
+    m_key_jack(GDK_KEY_F2),
+    m_key_menu(GDK_KEY_F3),
+    m_key_follow_trans(GDK_KEY_F4),
+    m_key_export_trigger(GDK_KEY_F10),
+
+    m_have_undo(false),
+    m_have_redo(false),
+
+    m_excell_FF_RW(1.0f)
 {
-    for (int i=0; i< c_max_sequence; i++)
+    for (int i = 0; i < c_max_sequence; ++i)
     {
-        m_seqs[i] = NULL;
+        m_seqs[i] = nullptr;
         m_seqs_active[i] = false;
 
-        m_was_active_main[i] = false;
-        m_was_active_edit[i] = false;
-        m_was_active_perf[i] = false;
+        m_was_active_main[i]  = false;
+        m_was_active_edit[i]  = false;
+        m_was_active_perf[i]  = false;
         m_was_active_names[i] = false;
-        m_is_focus_track[i] = false;
+        m_is_focus_track[i]   = false;
+        m_sequence_state[i]   = false;
     }
 
-    m_playlist_midi_jump_value = 0;
-    m_playlist_midi_control_set = false;
-    m_setjump = 0;
-    m_playlist_stop_mark = false;
-    m_playlist_mode = false;
-    m_playlist_file = "";
-    m_playlist_nfiles = 0;
-    m_playlist_current_idx = 0;
-    
-    m_mute_group_selected = 0;
-    m_mode_group = true;
-    m_mode_group_learn = false;
-    m_looping = false;
-    m_reposition = false;
-    m_inputing = true;
-    m_outputing = true;
-    m_tick = 0;
-    m_midiclockrunning = false;
-    m_usemidiclock = false;
-    m_midiclocktick = 0;
-    m_midiclockpos = -1;
+    // andy mute group arrays
+    for (int i = 0; i < c_gmute_tracks; ++i)
+        m_mute_group[i] = false;
 
-    m_midibus_type = midi_backend::alsa;
-    m_backend_type = midi_backend::alsa;
+    for (int i = 0; i < c_seqs_in_set; ++i)
+        m_tracks_mute_state[i] = false;
 
-    thread_trigger_width_ms = c_thread_trigger_width_ms;
+    // MIDI CC control arrays
+    midi_control zero { false, false, 0, 0, 0, 0 };
 
-    m_left_tick = 0;
-    m_right_tick = c_ppqn * 16;
-    m_starting_tick = 0;
-
-    midi_control zero = {false, false, 0, 0, 0, 0};
-
-    for ( int i=0; i<c_midi_controls; i++ )
+    for (int i = 0; i < c_midi_controls; ++i)
     {
         m_midi_cc_toggle[i] = zero;
-        m_midi_cc_on[i] = zero;
-        m_midi_cc_off[i] = zero;
+        m_midi_cc_on[i]     = zero;
+        m_midi_cc_off[i]    = zero;
     }
-    
-    /* initialize to off */
-    for (int i=0; i< c_midi_notes; i++ )
+
+    // Note-used array
+    for (int i = 0; i < c_midi_notes; ++i)
         m_note_is_used[i] = 0;
 
-    m_show_ui_sequence_key = true;
+    // Key mappings (function calls)
+    set_key_event(GDK_KEY_1, 0);
+    set_key_event(GDK_KEY_q, 1);
+    set_key_event(GDK_KEY_a, 2);
+    set_key_event(GDK_KEY_z, 3);
+    set_key_event(GDK_KEY_2, 4);
+    set_key_event(GDK_KEY_w, 5);
+    set_key_event(GDK_KEY_s, 6);
+    set_key_event(GDK_KEY_x, 7);
+    set_key_event(GDK_KEY_3, 8);
+    set_key_event(GDK_KEY_e, 9);
+    set_key_event(GDK_KEY_d, 10);
+    set_key_event(GDK_KEY_c, 11);
+    set_key_event(GDK_KEY_4, 12);
+    set_key_event(GDK_KEY_r, 13);
+    set_key_event(GDK_KEY_f, 14);
+    set_key_event(GDK_KEY_v, 15);
+    set_key_event(GDK_KEY_5, 16);
+    set_key_event(GDK_KEY_t, 17);
+    set_key_event(GDK_KEY_g, 18);
+    set_key_event(GDK_KEY_b, 19);
+    set_key_event(GDK_KEY_6, 20);
+    set_key_event(GDK_KEY_y, 21);
+    set_key_event(GDK_KEY_h, 22);
+    set_key_event(GDK_KEY_n, 23);
+    set_key_event(GDK_KEY_7, 24);
+    set_key_event(GDK_KEY_u, 25);
+    set_key_event(GDK_KEY_j, 26);
+    set_key_event(GDK_KEY_m, 27);
+    set_key_event(GDK_KEY_8, 28);
+    set_key_event(GDK_KEY_i, 29);
+    set_key_event(GDK_KEY_k, 30);
+    set_key_event(GDK_KEY_comma, 31);
 
-    set_key_event( GDK_KEY_1, 0 );
-    set_key_event( GDK_KEY_q, 1 );
-    set_key_event( GDK_KEY_a, 2 );
-    set_key_event( GDK_KEY_z, 3 );
-    set_key_event( GDK_KEY_2, 4 );
-    set_key_event( GDK_KEY_w, 5 );
-    set_key_event( GDK_KEY_s, 6 );
-    set_key_event( GDK_KEY_x, 7 );
-    set_key_event( GDK_KEY_3, 8 );
-    set_key_event( GDK_KEY_e, 9 );
-    set_key_event( GDK_KEY_d, 10 );
-    set_key_event( GDK_KEY_c, 11 );
-    set_key_event( GDK_KEY_4, 12 );
-    set_key_event( GDK_KEY_r, 13 );
-    set_key_event( GDK_KEY_f, 14 );
-    set_key_event( GDK_KEY_v, 15 );
-    set_key_event( GDK_KEY_5, 16 );
-    set_key_event( GDK_KEY_t, 17 );
-    set_key_event( GDK_KEY_g, 18 );
-    set_key_event( GDK_KEY_b, 19 );
-    set_key_event( GDK_KEY_6, 20 );
-    set_key_event( GDK_KEY_y, 21 );
-    set_key_event( GDK_KEY_h, 22 );
-    set_key_event( GDK_KEY_n, 23 );
-    set_key_event( GDK_KEY_7, 24 );
-    set_key_event( GDK_KEY_u, 25 );
-    set_key_event( GDK_KEY_j, 26 );
-    set_key_event( GDK_KEY_m, 27 );
-    set_key_event( GDK_KEY_8, 28 );
-    set_key_event( GDK_KEY_i, 29 );
-    set_key_event( GDK_KEY_k, 30 );
-    set_key_event( GDK_KEY_comma, 31 );
-
-    set_key_group( GDK_KEY_exclam,  0 );
-    set_key_group( GDK_KEY_quotedbl,  1  );
-    set_key_group( GDK_KEY_numbersign,  2  );
-    set_key_group( GDK_KEY_dollar,  3  );
-    set_key_group( GDK_KEY_percent,  4  );
-    set_key_group( GDK_KEY_ampersand,  5  );
-    set_key_group( GDK_KEY_parenleft,  7  );
-    set_key_group( GDK_KEY_slash,  6  );
-    set_key_group( GDK_KEY_semicolon,  31 );
-    set_key_group( GDK_KEY_A,  16 );
-    set_key_group( GDK_KEY_B,  28 );
-    set_key_group( GDK_KEY_C,  26 );
-    set_key_group( GDK_KEY_D,  18 );
-    set_key_group( GDK_KEY_E,  10 );
-    set_key_group( GDK_KEY_F,  19 );
-    set_key_group( GDK_KEY_G,  20 );
-    set_key_group( GDK_KEY_H,  21 );
-    set_key_group( GDK_KEY_I,  15 );
-    set_key_group( GDK_KEY_J,  22 );
-    set_key_group( GDK_KEY_K,  23 );
-    set_key_group( GDK_KEY_M,  30 );
-    set_key_group( GDK_KEY_N,  29 );
-    set_key_group( GDK_KEY_Q,  8  );
-    set_key_group( GDK_KEY_R,  11 );
-    set_key_group( GDK_KEY_S,  17 );
-    set_key_group( GDK_KEY_T,  12 );
-    set_key_group( GDK_KEY_U,  14 );
-    set_key_group( GDK_KEY_V,  27 );
-    set_key_group( GDK_KEY_W,  9  );
-    set_key_group( GDK_KEY_X,  25 );
-    set_key_group( GDK_KEY_Y,  13 );
-    set_key_group( GDK_KEY_Z,  24 );
-
-    m_key_bpm_up = GDK_KEY_apostrophe;
-    m_key_bpm_dn = GDK_KEY_semicolon;
-    m_key_tap_bpm = GDK_KEY_F9;
-
-    m_key_replace = GDK_KEY_Control_L;
-    m_key_queue = GDK_KEY_Control_R;
-    m_key_snapshot_1 = GDK_KEY_Alt_L;
-    m_key_snapshot_2 = GDK_KEY_Alt_R;
-    m_key_keep_queue = GDK_KEY_backslash;
-
-    m_key_screenset_up = GDK_KEY_bracketright;
-    m_key_screenset_dn = GDK_KEY_bracketleft;
-    m_key_set_playing_screenset = GDK_KEY_Home;
-    m_key_group_on = GDK_KEY_igrave;
-    m_key_group_off = GDK_KEY_apostrophe;
-    m_key_group_learn = GDK_KEY_Insert;
-
-    m_key_start  = GDK_KEY_space;
-    m_key_stop   = GDK_KEY_Escape;
-    m_key_forward   = GDK_KEY_f;
-    m_key_rewind   = GDK_KEY_r;
-    m_key_pointer   = GDK_KEY_p;
-
-    m_key_song   = GDK_KEY_F1;
-    m_key_jack   = GDK_KEY_F2;
-    m_key_menu   = GDK_KEY_F3;
-    m_key_follow_trans  = GDK_KEY_F4;
-    m_key_export_trigger = GDK_KEY_F10;
-
-    //playlist next/prev keys:
-    m_key_playlist_next = GDK_KEY_Right;
-    m_key_playlist_prev = GDK_KEY_Left;
-
-    m_jack_stop_tick = 0;
-    m_continue = false;
-    m_update_perf_edit_tempo_markers = false;
-
-    m_offset = 0;
-    m_control_status = 0;
-    m_screen_set = 0;
-
-    m_jack_running = false;
-    m_toggle_jack = false;
-
-    m_jack_master = false;
-
-    m_out_thread_launched = false;
-    m_in_thread_launched = false;
-
-    m_playback_mode = false;
-    m_follow_transport = true;
-    m_start_from_perfedit = false;
-
-    m_bp_measure = 4;
-    m_bw = 4;
-    
-    m_recording_set = false;
-    m_list_sequence_editing = 0;
-    m_list_sequence_recording_set = 0;
-
-    m_excell_FF_RW = 1.0;
-
-    m_have_undo = false;
-    m_have_redo = false;
+    set_key_group(GDK_KEY_exclam,     0);
+    set_key_group(GDK_KEY_quotedbl,   1);
+    set_key_group(GDK_KEY_numbersign, 2);
+    set_key_group(GDK_KEY_dollar,     3);
+    set_key_group(GDK_KEY_percent,    4);
+    set_key_group(GDK_KEY_ampersand,  5);
+    set_key_group(GDK_KEY_slash,      6);
+    set_key_group(GDK_KEY_parenleft,  7);
+    set_key_group(GDK_KEY_Q,          8);
+    set_key_group(GDK_KEY_W,          9);
+    set_key_group(GDK_KEY_E,         10);
+    set_key_group(GDK_KEY_R,         11);
+    set_key_group(GDK_KEY_T,         12);
+    set_key_group(GDK_KEY_Y,         13);
+    set_key_group(GDK_KEY_U,         14);
+    set_key_group(GDK_KEY_I,         15);
+    set_key_group(GDK_KEY_A,         16);
+    set_key_group(GDK_KEY_S,         17);
+    set_key_group(GDK_KEY_D,         18);
+    set_key_group(GDK_KEY_F,         19);
+    set_key_group(GDK_KEY_G,         20);
+    set_key_group(GDK_KEY_H,         21);
+    set_key_group(GDK_KEY_J,         22);
+    set_key_group(GDK_KEY_K,         23);
+    set_key_group(GDK_KEY_Z,         24);
+    set_key_group(GDK_KEY_X,         25);
+    set_key_group(GDK_KEY_C,         26);
+    set_key_group(GDK_KEY_V,         27);
+    set_key_group(GDK_KEY_B,         28);
+    set_key_group(GDK_KEY_N,         29);
+    set_key_group(GDK_KEY_M,         30);
+    set_key_group(GDK_KEY_semicolon, 31);
 }
 
 bool perform::set_midibus_type(unsigned int type)
