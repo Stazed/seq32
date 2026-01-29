@@ -30,7 +30,7 @@ public:
 
     explicit optionsfile(const Glib::ustring& a_name);
 
-    bool parse( perform *a_perf ) override;
+    bool parse( perform *a_perf, bool command_line = false ) override;
     bool write( perform *a_perf ) override;
 
 };
