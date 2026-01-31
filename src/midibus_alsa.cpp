@@ -18,14 +18,14 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "midibus.h"
+#include "midibus_alsa.h"
 
 #ifdef HAVE_LIBASOUND
 #    include <sys/poll.h>
 #endif
 
 #ifdef HAVE_LIBASOUND
-midibus::midibus( int a_localclient,
+midibus_alsa::midibus_alsa( int a_localclient,
                   int a_destclient,
                   int a_destport,
                   snd_seq_t *a_seq,
@@ -72,7 +72,7 @@ midibus::midibus( int a_localclient,
     m_name = tmp;
 }
 
-midibus::midibus( int a_localclient,
+midibus_alsa::midibus_alsa( int a_localclient,
                   snd_seq_t *a_seq,
                   int a_id, int a_queue ) :
     m_id(a_id),
@@ -100,7 +100,7 @@ midibus::midibus( int a_localclient,
 #endif
 
 #ifdef __WIN32__
-midibus::midibus( char a_id, int a_queue )
+midibus_alsa::midibus( char a_id, int a_queue )
 {
     /* set members */
     m_queue          = a_queue;
@@ -119,21 +119,21 @@ midibus::midibus( char a_id, int a_queue )
 }
 #endif
 
-int midibus::m_clock_mod = 16 * 4;
+int midibus_alsa::m_clock_mod = 16 * 4;
 
 void
-midibus::lock( )
+midibus_alsa::lock( )
 {
     m_mutex.lock();
 }
 
 void
-midibus::unlock( )
+midibus_alsa::unlock( )
 {
     m_mutex.unlock();
 }
 
-bool midibus::init_out( )
+bool midibus_alsa::init_out( )
 {
 #ifdef HAVE_LIBASOUND
     /* temp return */
@@ -169,7 +169,7 @@ bool midibus::init_out( )
     return true;
 }
 
-bool midibus::init_out_sub( )
+bool midibus_alsa::init_out_sub( )
 {
 #ifdef HAVE_LIBASOUND
     /* temp return */
@@ -193,7 +193,7 @@ bool midibus::init_out_sub( )
     return true;
 }
 
-bool midibus::init_in( )
+bool midibus_alsa::init_in( )
 {
 #ifdef HAVE_LIBASOUND
     /* temp return */
@@ -248,7 +248,7 @@ bool midibus::init_in( )
     return true;
 }
 
-bool midibus::init_in_sub( )
+bool midibus_alsa::init_in_sub( )
 {
 #ifdef HAVE_LIBASOUND
     /* temp return */
@@ -274,7 +274,7 @@ bool midibus::init_in_sub( )
     return true;
 }
 
-bool midibus::deinit_in( )
+bool midibus_alsa::deinit_in( )
 {
 #ifdef HAVE_LIBASOUND
     /* temp return */
@@ -312,24 +312,24 @@ bool midibus::deinit_in( )
 }
 
 int
-midibus::get_id( )
+midibus_alsa::get_id( )
 {
     return m_id;
 }
 
 void
-midibus::print()
+midibus_alsa::print()
 {
     printf( "%s", m_name.c_str() );
 }
 
 string
-midibus::get_name()
+midibus_alsa::get_name()
 {
     return m_name;
 }
 
-midibus::~midibus()
+midibus_alsa::~midibus_alsa()
 {
 
 }
@@ -337,7 +337,7 @@ midibus::~midibus()
 /* takes an native event, encodes to alsa event,
    puts it in the queue */
 void
-midibus::play( event *a_e24, unsigned char a_channel )
+midibus_alsa::play( event *a_e24, unsigned char a_channel )
 {
     lock();
 
@@ -389,7 +389,7 @@ min ( long a, long b )
 /* takes an native event, encodes to alsa event,
    puts it in the queue */
 void
-midibus::sysex( event *a_e24 )
+midibus_alsa::sysex( event *a_e24 )
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -429,7 +429,7 @@ midibus::sysex( event *a_e24 )
 
 // flushes our local queue events out into ALSA
 void
-midibus::flush()
+midibus_alsa::flush()
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -439,7 +439,7 @@ midibus::flush()
 }
 
 void
-midibus::init_clock( long a_tick )
+midibus_alsa::init_clock( long a_tick )
 {
 #ifdef HAVE_LIBASOUND
     if ( m_clock_type == e_clock_pos && a_tick != 0)
@@ -467,7 +467,7 @@ midibus::init_clock( long a_tick )
 }
 
 void
-midibus::continue_from( long a_tick )
+midibus_alsa::continue_from( long a_tick )
 {
 #ifdef HAVE_LIBASOUND
     /* tell the device that we are going to start at a certain position */
@@ -525,7 +525,7 @@ midibus::continue_from( long a_tick )
 
 /* gets it a runnin */
 void
-midibus::start()
+midibus_alsa::start()
 {
 #ifdef HAVE_LIBASOUND
     m_lasttick = -1;
@@ -555,19 +555,19 @@ midibus::start()
 }
 
 void
-midibus::set_clock( clock_e a_clock_type )
+midibus_alsa::set_clock( clock_e a_clock_type )
 {
     m_clock_type = a_clock_type;
 }
 
 clock_e
-midibus::get_clock( )
+midibus_alsa::get_clock( )
 {
     return m_clock_type;
 }
 
 void
-midibus::set_input( bool a_inputing )
+midibus_alsa::set_input( bool a_inputing )
 {
     if ( m_inputing != a_inputing )
     {
@@ -585,13 +585,13 @@ midibus::set_input( bool a_inputing )
 }
 
 bool
-midibus::get_input( )
+midibus_alsa::get_input( )
 {
     return m_inputing;
 }
 
 void
-midibus::stop()
+midibus_alsa::stop()
 {
 #ifdef HAVE_LIBASOUND
     m_lasttick = -1;
@@ -622,7 +622,7 @@ midibus::stop()
 
 // generates midi clock
 void
-midibus::clock( long a_tick )
+midibus_alsa::clock( long a_tick )
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -678,7 +678,7 @@ midibus::clock( long a_tick )
 
 /* deletes events in queue */
 /*void
-midibus::remove_queued_on_events( int a_tag )
+midibus_alsa::remove_queued_on_events( int a_tag )
 {
     lock();
 
@@ -701,22 +701,22 @@ midibus::remove_queued_on_events( int a_tag )
 */
 
 void
-mastermidibus::lock( )
+mastermidibus_alsa::lock( )
 {
-    // printf( "mastermidibus::lock()\n" );
+    // printf( "mastermidibus_alsa::lock()\n" );
     m_mutex.lock();
 }
 
 void
-mastermidibus::unlock( )
+mastermidibus_alsa::unlock( )
 {
-    // printf( "mastermidibus::unlock()\n" );
+    // printf( "mastermidibus_alsa::unlock()\n" );
     m_mutex.unlock();
 }
 
 /* gets it running */
 void
-mastermidibus::start()
+mastermidibus_alsa::start()
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -731,7 +731,7 @@ mastermidibus::start()
 
 /* gets it a runnin */
 void
-mastermidibus::continue_from( long a_tick)
+mastermidibus_alsa::continue_from( long a_tick)
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -745,7 +745,7 @@ mastermidibus::continue_from( long a_tick)
 }
 
 void
-mastermidibus::init_clock( long a_tick )
+mastermidibus_alsa::init_clock( long a_tick )
 {
     lock();
 
@@ -756,7 +756,7 @@ mastermidibus::init_clock( long a_tick )
 }
 
 void
-mastermidibus::stop()
+mastermidibus_alsa::stop()
 {
     lock();
 
@@ -775,7 +775,7 @@ mastermidibus::stop()
 
 // generates midi clock
 void
-mastermidibus::clock( long a_tick )
+mastermidibus_alsa::clock( long a_tick )
 {
     lock();
 
@@ -786,7 +786,7 @@ mastermidibus::clock( long a_tick )
 }
 
 void
-mastermidibus::set_ppqn( int a_ppqn )
+mastermidibus_alsa::set_ppqn( int a_ppqn )
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -809,7 +809,7 @@ mastermidibus::set_ppqn( int a_ppqn )
 }
 
 void
-mastermidibus::set_bpm( double a_bpm )
+mastermidibus_alsa::set_bpm( double a_bpm )
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -832,7 +832,7 @@ mastermidibus::set_bpm( double a_bpm )
 
 // flushes our local queue events out into ALSA
 void
-mastermidibus::flush()
+mastermidibus_alsa::flush()
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -842,7 +842,7 @@ mastermidibus::flush()
 }
 
 /* fills the array with our buses */
-mastermidibus::mastermidibus() :
+mastermidibus_alsa::mastermidibus_alsa() :
 m_buses_out(),
 m_buses_in(),
 m_bus_announce(),
@@ -889,7 +889,7 @@ m_transpose(0)
 }
 
 void
-mastermidibus::init( )
+mastermidibus_alsa::init( )
 {
 #ifdef HAVE_LIBASOUND
     /* client info */
@@ -911,7 +911,7 @@ mastermidibus::init( )
         for( int i=0; i<num_buses; ++i )
         {
             m_buses_out[i] =
-                new midibus( snd_seq_client_id( m_alsa_seq ), m_alsa_seq, i+1, m_queue );
+                new midibus_alsa( snd_seq_client_id( m_alsa_seq ), m_alsa_seq, i+1, m_queue );
 
             m_buses_out[i]->init_out_sub();
             m_buses_out_active[i] = true;
@@ -922,7 +922,7 @@ mastermidibus::init( )
 
         /* only one in */
         m_buses_in[0] =
-            new midibus( snd_seq_client_id( m_alsa_seq ),
+            new midibus_alsa( snd_seq_client_id( m_alsa_seq ),
                          m_alsa_seq,
                          m_num_in_buses, m_queue);
 
@@ -958,7 +958,7 @@ mastermidibus::init( )
                             snd_seq_client_id( m_alsa_seq ) != snd_seq_port_info_get_client(pinfo))
                     {
                         m_buses_out[m_num_out_buses] =
-                            new midibus( snd_seq_client_id( m_alsa_seq ),
+                            new midibus_alsa( snd_seq_client_id( m_alsa_seq ),
                                          snd_seq_port_info_get_client(pinfo),
                                          snd_seq_port_info_get_port(pinfo),
                                          m_alsa_seq,
@@ -984,7 +984,7 @@ mastermidibus::init( )
                             snd_seq_client_id( m_alsa_seq ) != snd_seq_port_info_get_client(pinfo))
                     {
                         m_buses_in[m_num_in_buses] =
-                            new midibus( snd_seq_client_id( m_alsa_seq ),
+                            new midibus_alsa( snd_seq_client_id( m_alsa_seq ),
                                          snd_seq_port_info_get_client(pinfo),
                                          snd_seq_port_info_get_port(pinfo),
                                          m_alsa_seq,
@@ -1030,7 +1030,7 @@ mastermidibus::init( )
     snd_seq_set_input_buffer_size(m_alsa_seq, c_midibus_input_size );
 
     m_bus_announce =
-        new midibus( snd_seq_client_id( m_alsa_seq ),
+        new midibus_alsa( snd_seq_client_id( m_alsa_seq ),
                      SND_SEQ_CLIENT_SYSTEM,
                      SND_SEQ_PORT_SYSTEM_ANNOUNCE,
                      m_alsa_seq,
@@ -1053,7 +1053,7 @@ mastermidibus::init( )
     for( int i=0; i<num_buses; ++i )
     {
         m_buses_out[i] =
-            new midibus( i+1, m_queue );
+            new midibus_alsa( i+1, m_queue );
 
         m_buses_out[i]->init_out_sub();
         m_buses_out_active[i] = true;
@@ -1064,7 +1064,7 @@ mastermidibus::init( )
 
     /* only one in */
     m_buses_in[0] =
-        new midibus( m_num_in_buses, m_queue);
+        new midibus_alsa( m_num_in_buses, m_queue);
 
     m_buses_in[0]->init_in_sub();
     m_buses_in_active[0] = true;
@@ -1087,7 +1087,7 @@ mastermidibus::init( )
 #endif
 }
 
-mastermidibus::~mastermidibus()
+mastermidibus_alsa::~mastermidibus_alsa()
 {
     for ( int i=0; i<m_num_out_buses; i++ )
         delete m_buses_out[i];
@@ -1113,7 +1113,7 @@ mastermidibus::~mastermidibus()
 }
 
 void
-mastermidibus::sysex( event *a_ev )
+mastermidibus_alsa::sysex( event *a_ev )
 {
     lock();
 
@@ -1126,7 +1126,7 @@ mastermidibus::sysex( event *a_ev )
 }
 
 void
-mastermidibus::play( unsigned char a_bus, event *a_e24, unsigned char a_channel )
+mastermidibus_alsa::play( unsigned char a_bus, event *a_e24, unsigned char a_channel )
 {
     lock();
     if ( a_bus < m_num_out_buses && m_buses_out_active[a_bus] )
@@ -1138,7 +1138,7 @@ mastermidibus::play( unsigned char a_bus, event *a_e24, unsigned char a_channel 
 
 
 void
-mastermidibus::set_clock( unsigned char a_bus, clock_e a_clock_type )
+mastermidibus_alsa::set_clock( unsigned char a_bus, clock_e a_clock_type )
 {
     lock();
     if ( a_bus < c_maxBuses )
@@ -1154,7 +1154,7 @@ mastermidibus::set_clock( unsigned char a_bus, clock_e a_clock_type )
 }
 
 clock_e
-mastermidibus::get_clock( unsigned char a_bus )
+mastermidibus_alsa::get_clock( unsigned char a_bus )
 {
     if ( a_bus < m_num_out_buses && m_buses_out_active[a_bus] )
     {
@@ -1164,20 +1164,20 @@ mastermidibus::get_clock( unsigned char a_bus )
 }
 
 void
-midibus::set_clock_mod( int a_clock_mod )
+midibus_alsa::set_clock_mod( int a_clock_mod )
 {
     if (a_clock_mod != 0 )
         m_clock_mod = a_clock_mod;
 }
 
 int
-midibus::get_clock_mod()
+midibus_alsa::get_clock_mod()
 {
     return m_clock_mod;
 }
 
 void
-mastermidibus::set_input( unsigned char a_bus, bool a_inputing )
+mastermidibus_alsa::set_input( unsigned char a_bus, bool a_inputing )
 {
     lock();
     if ( a_bus < c_maxBuses )
@@ -1193,7 +1193,7 @@ mastermidibus::set_input( unsigned char a_bus, bool a_inputing )
 }
 
 bool
-mastermidibus::get_input( unsigned char a_bus )
+mastermidibus_alsa::get_input( unsigned char a_bus )
 {
     if ( a_bus < m_num_in_buses && m_buses_in_active[a_bus] )
     {
@@ -1203,7 +1203,7 @@ mastermidibus::get_input( unsigned char a_bus )
 }
 
 string
-mastermidibus::get_midi_out_bus_name( int a_bus )
+mastermidibus_alsa::get_midi_out_bus_name( int a_bus )
 {
     if ( a_bus < m_num_out_buses && m_buses_out_active[a_bus] )
     {
@@ -1232,7 +1232,7 @@ mastermidibus::get_midi_out_bus_name( int a_bus )
 
 
 string
-mastermidibus::get_midi_in_bus_name( int a_bus )
+mastermidibus_alsa::get_midi_in_bus_name( int a_bus )
 {
     if ( a_bus < m_num_in_buses && m_buses_in_active[a_bus] )
     {
@@ -1260,7 +1260,7 @@ mastermidibus::get_midi_in_bus_name( int a_bus )
 }
 
 void
-mastermidibus::print()
+mastermidibus_alsa::print()
 {
     printf( "Available Buses\n");
     for ( int i=0; i<m_num_out_buses; i++ )
@@ -1270,19 +1270,19 @@ mastermidibus::print()
 }
 
 int
-mastermidibus::get_num_out_buses()
+mastermidibus_alsa::get_num_out_buses()
 {
     return m_num_out_buses;
 }
 
 int
-mastermidibus::get_num_in_buses()
+mastermidibus_alsa::get_num_in_buses()
 {
     return m_num_in_buses;
 }
 
 int
-mastermidibus::poll_for_midi( )
+mastermidibus_alsa::poll_for_midi( )
 {
     int ret = 0;
 #ifdef HAVE_LIBASOUND
@@ -1294,7 +1294,7 @@ mastermidibus::poll_for_midi( )
 }
 
 bool
-mastermidibus::is_more_input( )
+mastermidibus_alsa::is_more_input( )
 {
     lock();
 
@@ -1309,7 +1309,7 @@ mastermidibus::is_more_input( )
 }
 
 void
-mastermidibus::port_start( int a_client, int a_port )
+mastermidibus_alsa::port_start( int a_client, int a_port )
 {
     lock();
 
@@ -1353,7 +1353,7 @@ mastermidibus::port_start( int a_client, int a_port )
             }
 
             m_buses_out[bus_slot] =
-                new midibus( snd_seq_client_id( m_alsa_seq ),
+                new midibus_alsa( snd_seq_client_id( m_alsa_seq ),
                              snd_seq_port_info_get_client(pinfo),
                              snd_seq_port_info_get_port(pinfo),
                              m_alsa_seq,
@@ -1393,7 +1393,7 @@ mastermidibus::port_start( int a_client, int a_port )
             //printf( "in [%d] [%d]\n", replacement, bus_slot );
 
             m_buses_in[bus_slot] =
-                new midibus( snd_seq_client_id( m_alsa_seq ),
+                new midibus_alsa( snd_seq_client_id( m_alsa_seq ),
                              snd_seq_port_info_get_client(pinfo),
                              snd_seq_port_info_get_port(pinfo),
                              m_alsa_seq,
@@ -1434,7 +1434,7 @@ mastermidibus::port_start( int a_client, int a_port )
 }
 
 void
-mastermidibus::port_exit( int a_client, int a_port )
+mastermidibus_alsa::port_exit( int a_client, int a_port )
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -1460,7 +1460,7 @@ mastermidibus::port_exit( int a_client, int a_port )
 }
 
 bool
-mastermidibus::get_midi_event( event *a_in )
+mastermidibus_alsa::get_midi_event( event *a_in )
 {
     lock();
 #ifdef HAVE_LIBASOUND
@@ -1580,7 +1580,7 @@ mastermidibus::get_midi_event( event *a_in )
 }
 
 void
-mastermidibus::set_sequence_input( bool a_state, sequence *a_seq )
+mastermidibus_alsa::set_sequence_input( bool a_state, sequence *a_seq )
 {
     lock();
 
@@ -1618,7 +1618,7 @@ mastermidibus::set_sequence_input( bool a_state, sequence *a_seq )
 }
 
 void
-mastermidibus::dump_midi_input(event a_in)
+mastermidibus_alsa::dump_midi_input(event a_in)
 {
     for(unsigned i = 0; i < m_vector_sequence.size(); i++)
     {

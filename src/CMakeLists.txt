@@ -11,7 +11,7 @@ set (ProgSources
     maintime.cpp
     mainwid.cpp
     mainwnd.cpp
-    midibus.cpp
+    midibus_alsa.cpp
     midibus_portmidi.cpp
     midibus_jack.cpp
     mastermidibus_factory.cpp
