@@ -314,8 +314,10 @@ void perform::init()
 
 void perform::init_jack()
 {
-
 #ifdef JACK_TRANSPORT_SUPPORT
+
+    Glib::ustring jack_transport_name = global_client_name;
+    jack_transport_name += "-transport";
 
     if ( global_with_jack_transport  && !m_jack_running)
     {
@@ -327,7 +329,7 @@ void perform::init_jack()
         do
         {
             /* become a new client of the JACK server */
-            m_jack_client = jack_client_open(PACKAGE, JackNullOption, NULL );
+            m_jack_client = jack_client_open(jack_transport_name.c_str(), JackNullOption, NULL );
 
             if (m_jack_client == 0)
             {

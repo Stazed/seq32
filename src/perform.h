@@ -306,7 +306,6 @@ private:
     std::map<long,unsigned int> key_groups_rev; // reverse lookup, keep this in sync!!
 
 #ifdef JACK_TRANSPORT_SUPPORT
-
     jack_client_t *m_jack_client;
     jack_nframes_t m_jack_frame_current,
                    m_jack_frame_last,
@@ -448,8 +447,8 @@ public:
 
     void launch_input_thread();
     void launch_output_thread();
-    void init_jack();
-    void deinit_jack();
+    void init_jack();   // transport control
+    void deinit_jack(); // transport control
 
     void add_sequence( sequence *a_seq, int a_perf );
     void delete_sequence( int a_num );
