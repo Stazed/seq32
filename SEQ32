@@ -483,7 +483,7 @@ simple interface.
             # beginning of song 
             5 [0 0   0   0   0   0] [1 0 144 106   0 127] [0 0   0   0   0   0]
 
-        Midi control for playlist will only be active when seq42 transport is stopped. You
+        Midi control for playlist will only be active when seq32 transport is stopped. You
         can set the playlist value while running but the selected file will not be loaded
         until the sequencer stops. If the sequencer is stopped by a stop marker, then
         the playlist will set the file at the next file past the selected value. The program
