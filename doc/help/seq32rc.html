@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8">
+  <title>SEQ32 Help - User Configuration File (.seq32rc)</title>
+  <meta name="AUTHOR" content="Seq32 Contributors">
+  <meta name="CHANGED" content="20260203;00000000">
+</head>
+
+<body dir="ltr" style="color: rgb(0,0,0); background-color: rgb(255,255,255);" lang="en-US">
+<a name="top"></a>
+
+<table cellpadding="8" cellspacing="0" width="100%">
+  <tbody>
+    <tr bgcolor="#888A85">
+      <td>
+        <h1 style="margin:0;"><b>[7] User Configuration File (.seq32rc)</b></h1>
+      </td>
+      <td align="right" style="white-space:nowrap;">
+        <a href="help.html" style="color: rgb(0,0,0);"><b>Contents</b></a>
+        &nbsp;|&nbsp;
+        <a href="#top" style="color: rgb(0,0,0);"><b>Top</b></a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  After you run Seq32 for the first time, it will generate a <code>.seq32rc</code> file in your
+  home directory. It contains data for remote MIDI control, keyboard control, and MIDI clock.
+</p>
+
+<h2><code>[midi-control]</code></h2>
+
+<p>
+  For each sequence, you can set up MIDI events to turn a sequence on, off, or toggle it.
+  In the <code>[midi-control]</code> section you will see lines like:
+</p>
+
+<pre>
+0  [0 0 0 0 0 0]   [0 0 0 0 0 0]   [0 0 0 0 0 0]
+1  [0 0 0 0 0 0]   [0 0 0 0 0 0]   [0 0 0 0 0 0]
+2  [0 0 0 0 0 0]   [0 0 0 0 0 0]   [0 0 0 0 0 0]
+...
+</pre>
+
+<p>
+  The first number is the sequence number in the main window. Each set of brackets is a MIDI
+  filter. If the incoming MIDI event matches the filter, it will perform <b>toggle</b>, <b>on</b>,
+  or <b>off</b> for the sequence respectively.
+</p>
+
+<h3>Filter format</h3>
+<p>The layout of each filter inside a bracket is:</p>
+
+<pre>
+[(on/off) (inverse) (midi status byte (channel ignored)) (data1) (data2 min) (data2 max)]
+</pre>
+
+<ul>
+  <li>If <code>(on/off)</code> is <code>1</code>, the filter is active and will match incoming MIDI.</li>
+  <li>If it matches, the action (toggle/on/off) is performed if the data falls in the specified range.</li>
+  <li>All values are in decimal.</li>
+  <li>The last three values define the matching data range.</li>
+</ul>
+
+<h3>Example: Note on/off to turn a sequence on/off</h3>
+
+<pre>
+Toggle                 On                         Off
+1 [0 0 0 0 0 0]         [1 0  144 0 0 127]          [1 0 128 0 0 127]
+</pre>
+
+<p>
+  The <code>inverse</code> field makes the sequence perform the opposite action if the incoming
+  data falls outside the specified range. This lets you map several sequences to one knob/fader.
+</p>
+
+<h3>Example: Map a row of sequences to one knob (CC)</h3>
+
+<pre>
+Toggle            On                    Off
+0  [0 0 0 0 0 0]  [1 1 176 1   0   15]  [0 0 0 0 0 0]
+1  [0 0 0 0 0 0]  [1 1 176 1  16   31]  [0 0 0 0 0 0]
+2  [0 0 0 0 0 0]  [1 1 176 1  32   47]  [0 0 0 0 0 0]
+3  [0 0 0 0 0 0]  [1 1 176 1  48   63]  [0 0 0 0 0 0]
+4  [0 0 0 0 0 0]  [1 1 176 1  64   79]  [0 0 0 0 0 0]
+5  [0 0 0 0 0 0]  [1 1 176 1  80   95]  [0 0 0 0 0 0]
+6  [0 0 0 0 0 0]  [1 1 176 1  96  111]  [0 0 0 0 0 0]
+7  [0 0 0 0 0 0]  [1 1 176 1 112  127]  [0 0 0 0 0 0]
+</pre>
+
+<h2>MIDI Transport Control</h2>
+
+<p>
+  MIDI control has been extended for transport control, recording, screen set adjustment,
+  and playlist adjustment. Transport supports start, stop, fast forward, rewind, and
+  beginning-of-song.
+</p>
+
+<p>
+  To enable MIDI transport control for existing users, start Seq32 then quit to generate the
+  MIDI control grid for existing <code>.seq32rc</code> files. For new users, the file is created
+  after quitting the program for the first time.
+</p>
+
+<p>
+  All transport controls are channel-specific. MIDI channels are numbered 0–15 in the status
+  byte math, while Seq32 displays channels as 1–16 (subtract 1 when setting).
+</p>
+
+<pre>
+Note On              = 144 + channel (0 to 15)
+Note Off             = 128 + channel (0 to 15)
+Control Code (CC)    = 176 + channel (0 to 15)
+</pre>
+
+<h3>Example: screen set adjustment by CC value and “up” key</h3>
+
+<pre>
+# screen set up (value, up, up)
+66 [1 0 176   4   0 127] [1 0 145  21   0 127] [0 0   0   0   0   0]
+</pre>
+
+<h3>Example: start playing (toggle/start/stop)</h3>
+
+<pre>
+# start playing (toggle, start, stop)
+0 [1 0 144 108   0 127] [1 0 144 106   0 127] [1 0 144 105   0 127]
+</pre>
+
+<h3>Recording</h3>
+<p>
+  The record group toggles recording on/off for all sequences with an open sequence editor.
+  When recording, only start/stop and record MIDI controls are active; those events are not
+  passed through.
+</p>
+
+<pre>
+# record
+2 [0 0   0   0   0   0] [1 0 144  21   0 127] [0 0   0   0   0   0]
+</pre>
+
+<h3>Fast forward example (press to forward, release to stop)</h3>
+
+<pre>
+# fast forward (forward, forward, stop)
+3 [0 0   0   0   0   0] [1 0 144 107   0 127] [1 0 128 107   0 127]
+</pre>
+
+<p>Rewind works similarly to fast forward.</p>
+
+<h3>Beginning of song example</h3>
+
+<pre>
+# beginning of song
+5 [0 0   0   0   0   0] [1 0 144 106   0 127] [0 0   0   0   0   0]
+</pre>
+
+<h3>Playlist MIDI control (transport stopped)</h3>
+<p>
+  Playlist MIDI control is only active when Seq32 transport is stopped. You can change the
+  value while running, but the selected file loads only after stopping. The file list starts
+  at 1 and the program range-checks validity.
+</p>
+
+<pre>
+6 [1 0 176   7   1 127] [1 0 144  21   0 127] [1 0 144  22   0 127]
+</pre>
+
+<h2><code>[mute-group]</code></h2>
+
+<p>
+  This section controls 32 groups of mutes in the same way as defined for <code>[midi-control]</code>.
+  A group is a set of sequences that toggle their playing state together. Every group contains
+  all 32 sequences in the active screen set.
+</p>
+
+<p>
+  Here are the definitions of the state of the 32 sequences when a group is selected:
+</p>
+
+<pre>
+group [state of the first 8 sequences] [second 8] [third 8] [fourth 8]
+</pre>
+
+<h2>Other sections</h2>
+<ul>
+  <li><code>[midi-clock]</code> — clocking state from the last run (0 = off, 1 = on).</li>
+  <li><code>[manual-alsa-ports]</code> — 1 exposes ALSA ports to JACK; 0 uses manual ALSA connections.</li>
+  <li><code>[vertical-zoom-sequence]</code> — default vertical zoom for the sequence editor.</li>
+  <li><code>[vertical-zoom-song]</code> — default vertical zoom for song editor tracks.</li>
+  <li><code>[horizontal-zoom-song]</code> — default horizontal zoom for song editor tracks.</li>
+  <li><code>[keyboard-control]</code> — dump of keys Seq32 recognizes for sequences in the active screen set.</li>
+  <li><code>[keyboard-group]</code> — similar to <code>[keyboard-control]</code>, but for groups.</li>
+</ul>
+
+<h2>Notes</h2>
+<div class="note">
+  <ul>
+    <li>To see key codes when pressed, run Seq32 with <code>--show_keys</code>.</li>
+    <li>Seq32 overwrites <code>.seq32rc</code> on quit. Quit Seq32 before editing the file.</li>
+    <li>
+      Some keys should not be assigned to control sequences because they are already used
+      by menu shortcuts (Ctrl-based).
+    </li>
+  </ul>
+</div>
+
+<hr>
+
+<table cellpadding="4" cellspacing="0" width="100%">
+  <tbody>
+    <tr>
+      <td align="left">
+        Prev: <a href="song_editor.html">[6] Song Editor Window</a>
+      </td>
+      <td align="center">
+        <a href="help.html">Contents</a>
+      </td>
+      <td align="right">
+        Next: <a href="playlist_mode.html">[8] Playlist Mode</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8">
+  <title>SEQ32 Help - Main Window</title>
+  <meta name="AUTHOR" content="Seq42 Contributors">
+  <meta name="CHANGED" content="20260203;00000000">
+</head>
+
+<body dir="ltr" style="color: rgb(0,0,0); background-color: rgb(255,255,255);" lang="en-US">
+<a name="top"></a>
+
+<table cellpadding="8" cellspacing="0" width="100%">
+  <tbody>
+    <tr bgcolor="#888A85">
+      <td>
+        <h1 style="margin:0;"><b>[3] Main Window</b></h1>
+      </td>
+      <td align="right" style="white-space:nowrap;">
+        <a href="help.html" style="color: rgb(0,0,0);"><b>Contents</b></a>
+        &nbsp;|&nbsp;
+        <a href="#top" style="color: rgb(0,0,0);"><b>Top</b></a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><img src="images/main_window.png" alt="Main Window" align="middle" border="1" height="360" width="700"></p>
+
+<p><img src="images/main_menu.png" alt="Main Menu" align="middle" border="1" height="28" width="134"></p>
+<h2>File menu</h2>
+<ul>
+  <li><b>New</b>: Create a new seq32 project file. Seq32 supports standard (<b>.MIDI/.midi/.MID/.mid</b>) type 1 files.</li>
+  <li><b>Open</b>: Open an existing seq32 (<b>.MIDI/.midi/.MID/.mid</b>) file.</li>
+  <li><b>Recent Files</b>: Display/select recent (<b>.MIDI/.midi/.MID/.mid</b>) files that were loaded or created.</li>
+  <li><b>Open Playlist</b>: Select a playlist file (see <a href="playlist_mode.html">[8] Playlist Mode</a>).</li>
+  <li><b>Save</b>: Save the current seq32 file loaded. If no current file is loaded then the same as <b>Save as...</b></li>
+  <li><b>Save as...</b>: Save the current project to a given new seq32 file.</li>
+  <li><b>Options</b>: Open the options window (see <a href="options_window.html">[4] Options Window</a>).</li>
+  <li><b>Exit</b>: Quit the program. If there are changes, you will be prompted to save/cancel.</li>
+</ul>
+
+<h2>Edit menu</h2>
+<ul>
+  <li><b>SongEditor</b>: Opens the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+  <li><b>Apply song transpose</b>: This will make any transposed sequences on a sequence that indicated Transposable be shifted in
+      the <a href="sequence_editor.html">[5] Sequence Editor Window</a> by the transpose amount as indicated on the main window transpose.</li>
+  <li><b>Mute all tracks</b>: Will mute all used tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+  <li><b>Unmute all tracks</b>: Will unmute all tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+  <li><b>Toggle mute all tracks</b>: Will toggle mute all tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+  <li>
+    <b>Import MIDI</b>: Import any SMF type 1 MIDI file into the current project. This will append the imported file to existing projects. It will not overwrite tracks.
+  </li>
+  <li>
+    <b>Midi export song</b>: Export the <a href="song_editor.html">[6] Song Editor Window</a> as a type 1 MIDI file. This will combine all triggers and sequences on a track for standard MIDI type 1 format.
+  </li>
+</ul>
+
+<h2>Help</h2>
+<ul>
+  <li><b>About</b>: Shows the About box.</li>
+  <li><b>User Manual</b>: Show this help manual window.</li>
+</ul>
+
+<h2>Boxes</h2>
+<p><img src="images/main_window_boxes.png" alt="Main Window Boxes" align="middle" border="1" height="241" width="700"></p>
+
+<ul>
+  <li>
+    The main Seq32 window is where you manage loop “sequences” (boxes),
+  screen sets, tempo, and live performance controls.
+  </li>
+  <li>Each sequence (box) represents a loop.</li>
+  <li>
+    Right-click an empty box to open a menu to create a new loop or edit an existing one.
+  </li>
+  <li>
+    Left-click a box toggles its state from muted (dark blue) to playing (light blue)
+    when the sequencer is running.
+  </li>
+  <li>Click and hold the left button on a sequence to drag it to a new grid location.</li>
+  <li>Dragging onto an existing sequence swaps locations.</li>
+  <li>Dragging with <b>Alt</b> held to an inactive location copies to the landing location.</li>
+  <li>
+    Right-clicking a sequence opens its options menu:
+    <ul>
+      <li>Select MIDI bus/channel.</li>
+      <li>Clear all performance data (on/off).</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Screen Sets</h2>
+<ul>
+  <li>You only see 32 loops in the main window. This is a screen set.</li>
+  <li>
+    Switch between sets using the <code>[</code> and <code>]</code> keys
+    or the spin widget labeled <b>set</b>.
+  </li>
+  <li>There are 32 sets, for a total of 1024 loops.</li>
+</ul>
+
+<h2>BPM</h2>
+<ul>
+  <li>The <code>;</code> and <code>'</code> keys increase/decrease tempo, as does the BPM spinner.</li>
+</ul>
+
+<h2>Muting and Unmuting sequences</h2>
+<ul>
+  <li>Left-clicking a sequence toggles its playing status.</li>
+  <li>Pressing its assigned keyboard key also toggles its status.</li>
+  <li>Keyboard mapping for the active screen set:</li>
+</ul>
+
+<pre>
+[1    ][2    ][3    ][4    ][5    ][6    ][7    ][8    ]
+[q    ][w    ][e    ][r    ][t    ][y    ][u    ][i    ]
+[a    ][s    ][d    ][f    ][g    ][h    ][j    ][k    ]
+[z    ][x    ][c    ][v    ][b    ][n    ][m    ][,    ]
+</pre>
+
+<h2>Mute/Unmute patterns (Groups)</h2>
+<ul>
+  <li>
+    Toggle the playing status of up to 32 previously defined mute/unmute patterns (groups)
+    in the active screen set, similar to hardware sequencers.
+  </li>
+  <li>
+    This can be done using a “group toggle” key or via a MIDI controller, both assigned
+    in the <code>.seq32rc</code> file.
+  </li>
+  <li>
+    A group is stored by holding a “group learn” key while pressing the corresponding
+    “group toggle” key.
+  </li>
+  <li>Keys also exist to enable/disable group functionality.</li>
+</ul>
+
+<h2>Replace</h2>
+<ul>
+  <li>
+    Holding <b>Left Ctrl</b> while selecting a sequence mutes all other sequences and turns on
+    the selected sequence.
+  </li>
+</ul>
+
+<h2>Restore</h2>
+<ul>
+  <li>
+    Holding <b>Alt</b> saves the current state of playing sequences and restores them when
+    <b>Alt</b> is released.
+  </li>
+  <li>
+    Holding <b>Left Ctrl</b> + <b>Alt</b> allows briefly switching to new sequences, then flipping
+    back upon releasing <b>Alt</b>.
+  </li>
+</ul>
+
+<h2>Queue</h2>
+<ul>
+  <li>
+    Holding <b>Right Ctrl</b> queues an on/off toggle for a sequence when the loop ends.
+  </li>
+  <li>
+    Queue also works for groups; in that case each sequence toggles after its individual loop end.
+  </li>
+</ul>
+
+<h2>Keep queue</h2>
+<ul>
+  <li>
+    Pressing the “keep queue” key assigned in <code>.seq32rc</code> activates permanent queue mode
+    until you use temporary queue again (Right Ctrl).
+  </li>
+</ul>
+
+<p class="nav">
+  (see <a href="playlist_mode.html">[8] Playlist Mode</a>)
+</p>
+
+<hr>
+
+<table cellpadding="4" cellspacing="0" width="100%">
+  <tbody>
+    <tr>
+      <td align="left">
+        Prev: <a href="who.html">[2] Who</a>
+      </td>
+      <td align="center">
+        <a href="help.html">Contents</a>
+      </td>
+      <td align="right">
+        Next: <a href="options_window.html">[4] Options Window</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
