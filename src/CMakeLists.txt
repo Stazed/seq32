@@ -6,6 +6,7 @@ set (ProgSources
     configfile.cpp
     event.cpp
     font.cpp
+    HelpWindow.cpp
     keybindentry.cpp
     lfownd.cpp
     maintime.cpp
@@ -44,6 +45,7 @@ set(ExternLibraries
     ${ALSA_LIBRARIES}
     ${JACK_LINK_LIBRARIES}
     ${LIBLO_LINK_LIBRARIES}
+    ${WEBKIT2GTK_LIBRARIES}
     rt
 )
 
@@ -55,11 +57,13 @@ target_include_directories (
     ${ALSA_INCLUDE_DIRS}
     ${JACK_INCLUDE_DIRS}
     ${LIBLO_INCLUDE_DIRS}
+    ${WEBKIT2GTK_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}/pixmaps"
     "${CMAKE_CURRENT_BINARY_DIR}/pixmaps"
 )
 
-target_link_libraries (seq32 ${ExternLibraries})
+target_compile_options(seq32 PRIVATE ${WEBKIT2GTK_CFLAGS_OTHER})
 
+target_link_libraries (seq32 ${ExternLibraries})
 
 install (TARGETS seq32 RUNTIME DESTINATION bin)

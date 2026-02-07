@@ -28,6 +28,7 @@
 #include "maintime.h"
 #include "perfedit.h"
 #include "options.h"
+#include "HelpWindow.h"
 
 #ifdef NSM_SUPPORT
 #include "nsm.h"
@@ -65,6 +66,8 @@ private:
     std::vector<MenuItem> m_edit_menu_items;
     MenuItem m_help_menu_item;
     MenuItem m_help_submenu_item;
+    MenuItem m_help_manual_item;
+    HelpWindow m_help_window;
     Glib::RefPtr<Gtk::AccelGroup> m_accelgroup;
     SeparatorMenuItem   m_menu_separator1;
     SeparatorMenuItem   m_menu_separator2;
@@ -122,6 +125,7 @@ private:
     void file_import_dialog();
     void options_dialog();
     void about_dialog();
+    void user_manual();
 
     void adj_callback_ss( );
     void adj_callback_bpm( );
