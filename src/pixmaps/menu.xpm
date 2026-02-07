@@ -4,7 +4,7 @@ static const char *menu_xpm[] = {
 "21 20 3 1 ",
 "  c #D20D1AA32133",
 ". c #FFAFDCDADCDA",
-"n c #None",
+"n c None",
 /* pixels */
 "nnnnn           nnnnn",
 "nnnn             nnnn",
