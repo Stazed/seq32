@@ -26,6 +26,20 @@
 </table>
 <p><img src="images/main_window.png" alt="Main Window" align="middle" border="1" height="360" width="700"></p>
 
+<p><img src="images/main_window_top_bar.png" alt="Top Bar" align="middle" border="1" height="37" width="500"></p>
+<h2>Top Bar</h2>
+<ul>
+  <li><b>Live</b> button will toggle between live and song mode. When in <b>Live</b> mode the main window boxes determine what will be played.
+        When in <b>Song mode</b>, the <a href="song_editor.html">[6] Song Editor Window</a> will determine what is played.</li>
+  <li><b>Stop Menu</b> button will toggle the main menu access on/off when the sequencer is NOT running. This is beneficial 
+        when queuing sequences for start during live performance as some of the default keybinding may conflict with the menu keybinding
+        (for example <b>CTRL + Q)</b>.</li>
+  <Li>Timer will show the sequencer timing while playing.</Li>
+  <li><b>L</b> Mute Group Learn button. Click <b>L</b> button then press a mute group key to store the mute state of
+                 the sequences in that key. (see File/Options/Keyboard for available mute group keys and the corresponding
+                 hotkey for the <b>L</b> button).</li>
+</ul>
+
 <p><img src="images/main_menu.png" alt="Main Menu" align="middle" border="1" height="28" width="134"></p>
 <h2>File menu</h2>
 <ul>
@@ -43,7 +57,7 @@
 <ul>
   <li><b>SongEditor</b>: Opens the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
   <li><b>Apply song transpose</b>: This will make any transposed sequences on a sequence that indicated Transposable be shifted in
-      the <a href="sequence_editor.html">[5] Sequence Editor Window</a> by the transpose amount as indicated on the main window transpose.</li>
+      the <a href="sequence_editor.html">[5] Sequence Editor Window</a> by the transpose amount as indicated on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
   <li><b>Mute all tracks</b>: Will mute all used tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
   <li><b>Unmute all tracks</b>: Will unmute all tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
   <li><b>Toggle mute all tracks</b>: Will toggle mute all tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
@@ -72,6 +86,18 @@
   <li>Each sequence (box) represents a loop.</li>
   <li>
     Right-click an empty box to open a menu to create a new loop or edit an existing one.
+    <ul>
+        <li><b>New</b> will create a new sequence and launch the <a href="sequence_editor.html">[5] Sequence Editor Window</a>
+            for the new sequence.</li>
+        <li><b>Paste</b> will paste any previously copied sequence to the current box.</li>
+        <li><b>Song</b> will show a sub menu for editing the <a href="song_editor.html">[6] Song Editor Window</a>.
+            <ul>
+                <li><b>Mute all tracks</b>: Will mute all used tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+                <li><b>Unmute all tracks</b>: Will unmute all tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+                <li><b>Toggle mute all tracks</b>: Will toggle mute all tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+            </ul>
+        </li>
+    </ul>
   </li>
   <li>
     Left-click a box toggles its state from muted (dark blue) to playing (light blue)
@@ -81,27 +107,22 @@
   <li>Dragging onto an existing sequence swaps locations.</li>
   <li>Dragging with <b>Alt</b> held to an inactive location copies to the landing location.</li>
   <li>
-    Right-clicking a sequence opens its options menu:
+    Right-clicking an active sequence opens its options menu with additional menu items:
     <ul>
-      <li>Select MIDI bus/channel.</li>
-      <li>Clear all performance data (on/off).</li>
+      <li><b>Edit</b> will open the <a href="sequence_editor.html">[5] Sequence Editor Window</a> for the current sequence.</li>
+      <li><b>Cut</b> will delete the current sequence and copy it to the clipboard for later paste.</li>
+      <li><b>Copy</b> will copy the current sequence to the clipboard for later paste.</li>
+      <li><b>Export Sequence</b> will launch the file browser to allow exporting the current sequence to a MIDI file.</li>
+      <li><b>Export Track</b> will launch the file browser to allow exporting the entire <a href="song_editor.html">[6] Song Editor Window</a>
+            triggers as a MIDI file for the current selected box.</li>
+      <li><b>Song</b> will open show a sub menu for editing the <a href="song_editor.html">[6] Song Editor Window</a> with one additional item.
+          <ul>
+              <li><b>Clear Song Data</b> will remove all song triggers on the related track from the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+          </ul>
+      </li>
+      <li><b>Midi Bus</b> will show sub menus for selecting the MIDI bus and channel for sequence output or recording.</li>
     </ul>
   </li>
-</ul>
-
-<h2>Screen Sets</h2>
-<ul>
-  <li>You only see 32 loops in the main window. This is a screen set.</li>
-  <li>
-    Switch between sets using the <code>[</code> and <code>]</code> keys
-    or the spin widget labeled <b>set</b>.
-  </li>
-  <li>There are 32 sets, for a total of 1024 loops.</li>
-</ul>
-
-<h2>BPM</h2>
-<ul>
-  <li>The <code>;</code> and <code>'</code> keys increase/decrease tempo, as does the BPM spinner.</li>
 </ul>
 
 <h2>Muting and Unmuting sequences</h2>
@@ -161,7 +182,7 @@
     Holding <b>Right Ctrl</b> queues an on/off toggle for a sequence when the loop ends.
   </li>
   <li>
-    Queue also works for groups; in that case each sequence toggles after its individual loop end.
+    Queue also works for groups; in that case each sequence toggles after the individual loop ends.
   </li>
 </ul>
 
@@ -169,13 +190,35 @@
 <ul>
   <li>
     Pressing the “keep queue” key assigned in <code>.seq32rc</code> activates permanent queue mode
-    until you use temporary queue again (Right Ctrl).
+    until you use temporary queue again (<b>Right Ctrl</b>).
   </li>
 </ul>
 
-<p class="nav">
-  (see <a href="playlist_mode.html">[8] Playlist Mode</a>)
-</p>
+<p><img src="images/main_window_bottom_bar.png" alt="Bottom Bar" align="middle" border="1" height="36" width="700"></p>
+<h2>Bottom Bar</h2>
+<ul>
+  <li>Stop and Start the sequencer.</li>
+  <li><b>BPM</b>:
+      <ul>
+          <li>Set the current tempo by typing or using the spinner.</li>
+          <li>Use the <b>F9</b> key for tap tempo or using the <b>0</b> tap button.</li>
+          <li>The <code>;</code> and <code>'</code> keys can also be used to increase/decrease tempo.</li>
+    </ul>
+  <li><b>Name</b>: The current screen set name can be entered and displayed.</li>
+  <li><b>Set</b>: Shows the current active screen set number.
+      <ul>
+          <li><b>Screen Sets</b>
+              <ul>
+                  <li>You only see 32 loops in the main window. This is a screen set.</li>
+                  <li>Switch between sets using the <code>[</code> and <code>]</code> keys
+                      or the spin widget labeled <b>set</b>.</li>
+                  <li>There are 32 sets, for a total of 1024 loops.</li>
+              </ul>
+          </li>
+      </ul>
+  </li>
+  <li>Song Editor button will launch the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+</ul>
 
 <hr>
 
