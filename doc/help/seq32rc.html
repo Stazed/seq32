@@ -188,9 +188,16 @@ group [state of the first 8 sequences] [second 8] [third 8] [fourth 8]
 <ul>
   <li><code>[midi-clock]</code> — clocking state from the last run (0 = off, 1 = on).</li>
   <li><code>[manual-alsa-ports]</code> — 1 exposes ALSA ports to JACK; 0 uses manual ALSA connections.</li>
-  <li><code>[vertical-zoom-sequence]</code> — default vertical zoom for the sequence editor.</li>
-  <li><code>[vertical-zoom-song]</code> — default vertical zoom for song editor tracks.</li>
-  <li><code>[horizontal-zoom-song]</code> — default horizontal zoom for song editor tracks.</li>
+  
+  <li><code>[vertical-zoom-sequence]</code> — Sets default vertical zoom for the
+      <a href="sequence_editor.html">[5] Sequence Editor Window</a> (value 1 to 17 - default 1).</li>
+
+  <li><code>[vertical-zoom-song]</code> — Sets default vertical zoom for the song editor
+      tracks on the <a href="song_editor.html">[6] Song Editor Window</a> (value 1 to 50 - default 9).</li>
+
+  <li><code>[horizontal-zoom-song]</code> — Sets default horizontal zoom for the song editor
+      tracks on the <a href="song_editor.html">[6] Song Editor Window</a> (value 0 to 60 - default 12).</li>
+
   <li><code>[keyboard-control]</code> — dump of keys Seq32 recognizes for sequences in the active screen set.</li>
   <li><code>[keyboard-group]</code> — similar to <code>[keyboard-control]</code>, but for groups.</li>
 </ul>

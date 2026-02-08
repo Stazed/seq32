@@ -31,18 +31,19 @@
 <p><img src="images/top_bar_song_editor.png" alt="Top_Bar" align="middle" border="1" height="39" width="799"></p>
 <ul>
   <li><b>S</b> controls whether the sequencer pauses or resets to the starting position when stopped (see tooltip).</li>
-  <li>Transport buttons Stop, Rewind, Play, Fast Forward the sequencer.</li>
+  <li>Transport buttons Stop, Play the sequencer.</li>
+  <li>Additional keybinding for <b>f (Fast Forward)</b> and <b> r (Rewind)</b> are available.</li>
   <li><b>L &#61; R</b> loops the range between the L and R markers when in song mode.</li>
   <li>Down-arrow buttons set main window time signature Beats/Length.</li>
   <li><b>Grid snap</b> sets the precision of trigger snapping on the main grid.</li>
   <li>
-    <b>Transpose</b> sets global transpose of tracks with “Transposable” enabled in the track name window.
+    <b>Transpose</b> sets global transpose of tracks with transpose enabled on the top bar of the <a href="sequence_editor.html">[5] Sequence Editor Window</a>.
     You can make transpose permanent via <b>Edit &gt; Apply song transpose</b>.
   </li>
   <li><b>JACK</b> controls whether the sequencer connects to JACK transport. You can toggle transport control on/off to temporarily disable while editing.</li>
   <li><b>Transport Follow</b> toggles whether the grid follows the play progress line. This disables progress follow globally, including in the <a href="sequence_editor.html">[5] Sequence Editor Window</a>.</li>
-  <li><b>Undo</b> reverts main window edits (grid, name, tempo) for the current session. It does not revert transpose or swing.</li>
-  <li><b>Redo</b> re-applies edits up to the last manual edit change for the same items as Undo.</li>
+  <li><b>Undo</b> reverts song triggers only for the current session.</li>
+  <li><b>Redo</b> re-applies triggers to the last manual edit change for the same items as Undo.</li>
   <li><b>Collapse</b> removes triggers between L and R markers and shifts triggers on the right of the R marker, left to fill the gap.</li>
   <li><b>Expand</b> inserts empty grid space between L and R (may split triggers).</li>
   <li><b>Expand and Copy</b> inserts new triggers to the right of R, copying triggers between L and R.</li>
@@ -95,7 +96,13 @@
     <ul>
       <li><b>New</b>: open <a href="sequence_editor.html">[5] Sequence Editor Window</a> and add a new sequence to the track.</li>
       <li><b>Paste</b>: duplicate tracks copied to clipboard to the current track.</li>
-      <li><b>Song</b>: TODO</li>
+      <li><b>Song</b> will show a sub menu for editing the <a href="song_editor.html">[6] Song Editor Window</a>.
+            <ul>
+                <li><b>Mute all tracks</b>: Will mute all used tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+                <li><b>Unmute all tracks</b>: Will unmute all tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+                <li><b>Toggle mute all tracks</b>: Will toggle mute all tracks on the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+            </ul>
+        </li>
     </ul>
   </li>
   <li>Right click on a used track: additional popup items:
@@ -103,10 +110,14 @@
       <li><b>Edit</b>: edit track settings.</li>
       <li><b>Cut</b>: remove track and copy to clipboard.</li>
       <li><b>Copy</b>: copy track to clipboard (paste to unused track).</li>
-      <li><b>Export Sequence</b>: TODO</li>
-      <li><b>Export Track</b>: TODO</li>
-      <li><b>Song</b>: TODO</li>
-        <li><b>Clear triggers</b>: remove all triggers from the track grid.</li>
+      <li><b>Export Sequence</b> will launch the file browser to allow exporting the sequence of the current track to a MIDI file.</li>
+      <li><b>Export Track</b> will launch the file browser to allow exporting the entire <a href="song_editor.html">[6] Song Editor Window</a>
+            triggers as a MIDI file for the current selected track.</li>
+      <li><b>Song</b> will open show a sub menu for editing the <a href="song_editor.html">[6] Song Editor Window</a> with one additional item.
+          <ul>
+              <li><b>Clear Song Data</b> will remove all song triggers on the related track from the <a href="song_editor.html">[6] Song Editor Window</a>.</li>
+          </ul>
+      </li>
       
       <li><b>Midi bus</b>: set track bus and MIDI channel.</li>
     </ul>
@@ -130,9 +141,11 @@
   <li><b>z</b> key: horizontal zoom-out.</li>
   <li><b>Shift+z</b>: horizontal zoom-in.</li>
   <li><b>0</b>: reset horizontal zoom.</li>
+  <li>The default starting horizontal zoom can be set in the <a href="seq32rc.html">[7] User Configuration File (.seq32rc)</a>.</li>
   <li><b>v</b> key: vertical zoom-out.</li>
   <li><b>Shift+v</b>: vertical zoom-in.</li>
   <li><b>9</b>: reset vertical zoom.</li>
+  <li>The default starting vertical zoom can be set in the <a href="seq32rc.html">[7] User Configuration File (.seq32rc)</a>.</li>
 
   <li><b>Ctrl+C</b>: copy selected trigger to clipboard.</li>
   <li><b>Ctrl+V</b>: paste clipboard trigger after selected trigger.</li>
