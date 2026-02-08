@@ -25,9 +25,8 @@
   </tbody>
 </table>
 
-<p><img src="images/options.png" alt="Options Window" align="middle" border="1" height="420" width="500"></p>
-
 <h2>MIDI Clock</h2>
+<p><img src="images/options.png" alt="Options Window" align="middle" border="1" height="420" width="500"></p>
 <ul>
   <li>Use the MIDI bus table to set which bus(es) can send MIDI start, stop and song position and the method to use. See tooltips for additional information.</li>
 </ul>
@@ -38,8 +37,8 @@
   <li>Check <b>Enable JACK MIDI backend</b> to use JACK MIDI instead of ALSA.</li>
 </ul>
 
-<p><img src="images/options_keyboard.png" alt="Keyboard Tab" align="middle" border="1" height="600" width="650"></p>
 <h2>Keyboard</h2>
+<p><img src="images/options_keyboard.png" alt="Keyboard Tab" align="middle" border="1" height="600" width="650"></p>
 <ul>
   <li>Change default keybindings for supported actions.</li>
   <li><b>Show key labels on sequences</b>: will display the key mapped to the boxes on the <a href="main_window.html">[3] Main Window</a>
@@ -57,6 +56,26 @@
   <li><b>Jack Transport</b>: sets sync to JACK transport. Check if you want sync.</li>
   <li><b>Transport Master</b>: make seq32 become transport master.</li>
   <li><b>Master Conditional</b>: make seq32 become transport master only if no other master is already set.</li>
+</ul>
+
+<h1>[manual-alsa-ports]</h1>
+<ul>
+    <li>If the <a href="seq32rc.html">[7] User Configuration File (.seq42rc)</a> entry for <b>[manual-alsa-ports]</b> is
+        set to <b>0</b> then the MIDI Clock and MIDI Input will show any available ALSA ports for connection.</li>
+    <li>This setting will not create any visible ports that can be seen by JACK graph for connection.</li>
+    <li>The setting does not apply if <b>[midi-backend]</b> is set to <b>1</b> for JACK backend.</li>
+</ul>
+<h2>MIDI Clock</h2>
+<p><img src="images/options_alsa_midi_clock.png" alt="ALSA Midi Clock" align="middle" border="1" height="420" width="500"></p>
+<ul>
+  <li>Use the listed bus table to set which bus(es) can send MIDI start, stop and song position and the method to use. See tooltips for additional information.</li>
+</ul>
+
+<h2>MIDI Input / Backend</h2>
+<p><img src="images/options_alsa_midi_input.png" alt="ALSA Midi Input" align="middle" border="1" height="420" width="500"></p>
+<ul>
+  <li>Check the listed ALSA ports to allow incoming MIDI to be recorded.</li>
+  <li>Check <b>Enable JACK MIDI backend</b> to use JACK MIDI instead of ALSA.</li>
 </ul>
 
 <hr>
