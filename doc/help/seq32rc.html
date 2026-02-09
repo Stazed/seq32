@@ -64,11 +64,11 @@
   <li>The last three values define the matching data range.</li>
 </ul>
 
-<h3>Example: Note on/off to turn a sequence on/off</h3>
+<h3>Example: MIDI note 21 on/off to turn a sequence on/off</h3>
 
 <pre>
 Toggle                 On                         Off
-1 [0 0 0 0 0 0]         [1 0  144 0 0 127]          [1 0 128 0 0 127]
+1 [0 0 0 0 0 0]         [1 0  144 21 0 127]          [1 0 128 21 0 127]
 </pre>
 
 <p>
@@ -76,7 +76,7 @@ Toggle                 On                         Off
   data falls outside the specified range. This lets you map several sequences to one knob/fader.
 </p>
 
-<h3>Example: Map a row of sequences to one knob (CC)</h3>
+<h3>Example: Map a row of sequences to one knob (Control Code 1)</h3>
 
 <pre>
 Toggle            On                    Off
@@ -116,6 +116,12 @@ Control Code (CC)    = 176 + channel (0 to 15)
 </pre>
 
 <h3>Example: screen set adjustment by CC value and “up” key</h3>
+<p>
+    For screen set adjustment, ability to adjust by CC value has been added to
+    the screen set up group section. Use the toggle section to adjust by value.
+    The following will allow value adjustment using CC (176); number 4; and also
+    allow single up adjustment using A0 (note 21), channel 2.
+</p>
 
 <pre>
 # screen set up (value, up, up)
@@ -123,6 +129,10 @@ Control Code (CC)    = 176 + channel (0 to 15)
 </pre>
 
 <h3>Example: start playing (toggle/start/stop)</h3>
+<p>
+    The following would set play to toggle start/stop with note press C8 (midi note 108)
+    on channel 1; to start only with A#7 (note 106); to stop only with A7 (note 105):
+</p>
 
 <pre>
 # start playing (toggle, start, stop)
@@ -135,6 +145,10 @@ Control Code (CC)    = 176 + channel (0 to 15)
   When recording, only start/stop and record MIDI controls are active; those events are not
   passed through.
 </p>
+<p>
+    Example to set record to toggle with A0 (note 21). The toggle group and off
+    group work for record and can also be used and will always toggle:
+</p>
 
 <pre>
 # record
@@ -142,6 +156,10 @@ Control Code (CC)    = 176 + channel (0 to 15)
 </pre>
 
 <h3>Fast forward example (press to forward, release to stop)</h3>
+<p>
+    Fast forward with note-on (144) B7 (note 107) when pressed, and to stop when
+    the key is released note-off (128):
+</p>
 
 <pre>
 # fast forward (forward, forward, stop)
@@ -152,16 +170,32 @@ Control Code (CC)    = 176 + channel (0 to 15)
 
 <h3>Beginning of song example</h3>
 
+<p>
+    Beginning of song will move the transport to the beginning of the song or the 
+    left (L) grid marker. Each section can be used and will only set to the marker.
+    Following will use A#7 (note 106) to set:
+</p>
+
 <pre>
 # beginning of song
 5 [0 0   0   0   0   0] [1 0 144 106   0 127] [0 0   0   0   0   0]
 </pre>
 
-<h3>Playlist MIDI control (transport stopped)</h3>
 <p>
-  Playlist MIDI control is only active when Seq32 transport is stopped. You can change the
-  value while running, but the selected file loads only after stopping. The file list starts
-  at 1 and the program range-checks validity.
+    
+</p>
+
+<h3><a href="playlist_mode.html">[9] Playlist Mode</a> MIDI control (transport stopped)</h3>
+<p>
+    Midi control for playlist will only be active when seq32 transport is stopped. You
+    can set the playlist value while running but the selected file will not be loaded
+    until the sequencer stops. If the sequencer is stopped by a stop marker, then
+    the playlist will set the file at the next file past the selected value. The program
+    will range check for validity, and the file list starts at 1.
+    For playlist, the toggle group can be used to send by CC value, the on group for next, 
+    and off group for previous.
+    Example to set playlist to adjust by value, CC (178), CC number 7. Playlist Next is set
+    to note A0 (21) and previous is set to A#0 (22):
 </p>
 
 <pre>
