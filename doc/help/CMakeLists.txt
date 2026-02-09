@@ -6,6 +6,7 @@ install (FILES help.html
     options_window.html
     playlist_mode.html 
     seq32rc.html
+    seq32usr.html
     sequence_editor.html
     song_editor.html
     what_why.html
