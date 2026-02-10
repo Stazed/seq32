@@ -64,7 +64,7 @@
   <li>The last three values define the matching data range.</li>
 </ul>
 
-<h3>Example: MIDI note 21 on/off to turn a sequence on/off</h3>
+<h3>Example: MIDI note 21 on/off to turn sequence 1 on/off</h3>
 
 <pre>
 Toggle                 On                         Off
@@ -99,12 +99,6 @@ Toggle            On                    Off
 </p>
 
 <p>
-  To enable MIDI transport control for existing users, start Seq32 then quit to generate the
-  MIDI control grid for existing <code>.seq32rc</code> files. For new users, the file is created
-  after quitting the program for the first time.
-</p>
-
-<p>
   All transport controls are channel-specific. MIDI channels are numbered 0–15 in the status
   byte math, while Seq32 displays channels as 1–16 (subtract 1 when setting).
 </p>
@@ -119,7 +113,7 @@ Control Code (CC)    = 176 + channel (0 to 15)
 <p>
     For screen set adjustment, ability to adjust by CC value has been added to
     the screen set up group section. Use the toggle section to adjust by value.
-    The following will allow value adjustment using CC (176); number 4; and also
+    The following will allow value adjustment using CC (176), number 4, and also
     allow single up adjustment using A0 (note 21), channel 2.
 </p>
 
@@ -131,12 +125,12 @@ Control Code (CC)    = 176 + channel (0 to 15)
 <h3>Example: start playing (toggle/start/stop)</h3>
 <p>
     The following would set play to toggle start/stop with note press C8 (midi note 108)
-    on channel 1; to start only with A#7 (note 106); to stop only with A7 (note 105):
+    on channel 1, to start only with A#7 (note 106), to stop only with A7 (note 105):
 </p>
 
 <pre>
 # start playing (toggle, start, stop)
-0 [1 0 144 108   0 127] [1 0 144 106   0 127] [1 0 144 105   0 127]
+74 [1 0 144 108   0 127] [1 0 144 106   0 127] [1 0 144 105   0 127]
 </pre>
 
 <h3>Recording</h3>
@@ -152,7 +146,7 @@ Control Code (CC)    = 176 + channel (0 to 15)
 
 <pre>
 # record
-2 [0 0   0   0   0   0] [1 0 144  21   0 127] [0 0   0   0   0   0]
+75 [0 0   0   0   0   0] [1 0 144  21   0 127] [0 0   0   0   0   0]
 </pre>
 
 <h3>Fast forward example (press to forward, release to stop)</h3>
@@ -163,7 +157,7 @@ Control Code (CC)    = 176 + channel (0 to 15)
 
 <pre>
 # fast forward (forward, forward, stop)
-3 [0 0   0   0   0   0] [1 0 144 107   0 127] [1 0 128 107   0 127]
+76 [0 0   0   0   0   0] [1 0 144 107   0 127] [1 0 128 107   0 127]
 </pre>
 
 <p>Rewind works similarly to fast forward.</p>
@@ -178,7 +172,7 @@ Control Code (CC)    = 176 + channel (0 to 15)
 
 <pre>
 # beginning of song
-5 [0 0   0   0   0   0] [1 0 144 106   0 127] [0 0   0   0   0   0]
+78 [0 0   0   0   0   0] [1 0 144 106   0 127] [0 0   0   0   0   0]
 </pre>
 
 <p>
@@ -199,7 +193,7 @@ Control Code (CC)    = 176 + channel (0 to 15)
 </p>
 
 <pre>
-6 [1 0 176   7   1 127] [1 0 144  21   0 127] [1 0 144  22   0 127]
+79 [1 0 176   7   1 127] [1 0 144  21   0 127] [1 0 144  22   0 127]
 </pre>
 
 <h2><code>[mute-group]</code></h2>
