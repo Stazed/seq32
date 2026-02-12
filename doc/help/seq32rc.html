@@ -111,13 +111,13 @@ Control Code (CC)    = 176 + channel (0 to 15)
 <p>
     For screen set adjustment, ability to adjust by CC value has been added to
     the screen set up group section. Use the toggle section to adjust by value.
-    The following will allow value adjustment using CC (176), number 4, and also
-    allow single up adjustment using A0 (note 21), channel 2.
+    The following will allow value adjustment using CC (177), number 4, and also
+    allow single up adjustment using A0 (note 21), on channel 2.
 </p>
 
 <pre>
 # screen set up (value, up, up)
-66 [1 0 176   4   0 127] [1 0 145  21   0 127] [0 0   0   0   0   0]
+66 [1 0 177   4   0 127] [1 0 145  21   0 127] [0 0   0   0   0   0]
 </pre>
 
 <h3>Example: start playing (toggle/start/stop)</h3>
