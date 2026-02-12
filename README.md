@@ -12,7 +12,22 @@ It's a fork of [seq24](https://launchpad.net/seq24) (which is a fork of the [ori
 
 This a GTKMM-3 version with many enhancements.
 
-Version 2.0.0 changes:
+Seq32 version 2.2.0:
+--------------------
+Beginning with version 2.2.0 JACK MIDI has been added and can be selected from:
+
+    File/Options.../MIDI Input/Backend tab.
+
+Or from command line with:
+```bash
+    seq42 -b 1
+```
+
+Also a Help/Manual dialog has been added for additional information.
+
+
+Seq32 version 2.0.0:
+--------------------
 
 Beginning with version 2.0.0 seq32 has been ported to Gtkmm-3. 
 
@@ -24,7 +39,6 @@ Additional editing features.
 
 NSM support now has optional gui, and dirty flag.
 
-See the SEQ32 document for additional information.
 
 Install
 -------
@@ -61,17 +75,6 @@ Using CMAKE:
 To remove:
 ```bash
     make uninstall (as root)
-```
-
-Seq32 version 2.2.0
--------------------
-Begining with version 2.2.0 JACK MIDI has been added and can be selected from:
-
-    File/Options.../MIDI Input/Backend tab.
-
-Or from command line with:
-```bash
-    seq42 -b 1
 ```
 
 ## SAST Tools
