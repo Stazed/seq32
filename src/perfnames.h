@@ -79,7 +79,7 @@ private:
     void sequence_is_being_edited();
 
 protected:
-    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
 public:
 
