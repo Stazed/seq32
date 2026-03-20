@@ -209,7 +209,9 @@ main (int argc, char *argv[])
             printf( "                                              (1 = song mode) (default)\n" );
             printf( "   -n, --client_name <name>: Set alsa client name: Default = seq32\n");
 #ifdef JACK_MIDI_SUPPORT
+#ifdef HAVE_LIBASOUND
             printf( "   -b, --backend_midi <type>: Set to '0' for ALSA, '1' for JACK\n");
+#endif
 #endif
             printf( "   -S, --stats: show statistics\n" );
             printf( "   -U, --jack_session_uuid <uuid>: set uuid for jack session\n" );
@@ -294,11 +296,13 @@ main (int argc, char *argv[])
 
         case 'b':
 #ifdef JACK_MIDI_SUPPORT
+#ifdef HAVE_LIBASOUND
             backend = atoi( optarg );
 
             // sanity check
             if (backend < 0 || backend > 1)
                 backend = -1;
+#endif
 #endif
             break;            
 
@@ -338,7 +342,13 @@ main (int argc, char *argv[])
                 // Set to default bus alsa if reading error
                 if ( !using_command_line_backend )
                 {
+#ifdef HAVE_LIBASOUND
                     p.set_midibus_type(0);  // alsa
+#elif JACK_MIDI_SUPPORT
+                    p.set_midibus_type(1);  // jack
+#else
+                    printf( "No backend type was enabled\n");
+#endif
                 }
             }
         }
@@ -351,7 +361,13 @@ main (int argc, char *argv[])
             // already above.
             if ( !using_command_line_backend )
             {
+#ifdef HAVE_LIBASOUND
                 p.set_midibus_type(0);  // alsa
+#elif JACK_MIDI_SUPPORT
+                p.set_midibus_type(1);  // jack
+#else
+                printf( "No backend type was enabled\n");
+#endif
             }
         }
 
@@ -375,7 +391,13 @@ main (int argc, char *argv[])
         // Set to default
         if ( !using_command_line_backend )
         {
+#ifdef HAVE_LIBASOUND
             p.set_midibus_type(0);  // alsa
+#elif JACK_MIDI_SUPPORT
+            p.set_midibus_type(1);  // jack
+#else
+            printf( "No backend type was enabled\n");
+#endif
         }
     }
 

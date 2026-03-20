@@ -132,8 +132,10 @@ options::add_midi_clock_page()
     }
     else
     {
+#ifdef HAVE_LIBASOUND
         clock_mod_adj = Gtk::Adjustment::create(midibus_alsa::get_clock_mod(),
             1, 16 << 10, 1 );
+#endif
     }
 
     SpinButton *clock_mod_spin = new SpinButton( clock_mod_adj );
@@ -178,10 +180,12 @@ options::add_midi_input_page()
     }
 
 #ifdef JACK_MIDI_SUPPORT
+#ifdef HAVE_LIBASOUND
     CheckButton *j_check = manage(new CheckButton( "Enable JACK MIDI backend (Requires restart)", 0));
     j_check->signal_toggled().connect(sigc::bind(mem_fun(*this, &options::backend_callback), j_check));
     j_check->set_active( static_cast<bool>( m_perf->get_backend_type() ) );
     vbox->pack_start(*j_check, false, false);
+#endif
 #endif
 }
 
@@ -543,7 +547,9 @@ options::clock_mod_callback( Glib::RefPtr<Gtk::Adjustment> adj )
     }
     else
     {
+#ifdef HAVE_LIBASOUND
         midibus_alsa::set_clock_mod((int)adj->get_value());
+#endif
     }
 }
 
@@ -569,6 +575,7 @@ options::input_callback (int a_bus, Button * i_button)
 }
 
 #ifdef JACK_MIDI_SUPPORT
+#ifdef HAVE_LIBASOUND
 void
 options::backend_callback (Button * i_button)
 {
@@ -576,6 +583,7 @@ options::backend_callback (Button * i_button)
     bool input = a_button->get_active ();
     m_perf->set_backend_type(static_cast<midi_backend>(input));
 }
+#endif
 #endif
 
 void
