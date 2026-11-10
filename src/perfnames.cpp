@@ -168,11 +168,14 @@ perfnames::draw_sequence( int sequence )
                 font_color = font::BLACK;
             }
 
+            const gchar *value = g_getenv("GDK_DPI_SCALE");
+            gdouble dpi_scale = value ? g_ascii_strtod(value, NULL) : 1.0;
+
             /* Print the sequence name */
             p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width,
                                                        (m_names_y * i) + 2,
                                                        cr, name, font_color,
-                                                       c_default_horizontal_zoom,
+                                                       dpi_scale,
                                                        m_vertical_zoom);
 
             /* Buses */
@@ -188,7 +191,7 @@ perfnames::draw_sequence( int sequence )
             p_font_renderer->render_string_on_drawable(5 + c_perf_ss_width,
                                                        m_names_y * i + (12 * m_vertical_zoom),
                                                        cr, str, font_color,
-                                                       c_default_horizontal_zoom,
+                                                       dpi_scale,
                                                        m_vertical_zoom);
 
             bool solo = m_mainperf->get_sequence(sequence)->get_song_solo();
